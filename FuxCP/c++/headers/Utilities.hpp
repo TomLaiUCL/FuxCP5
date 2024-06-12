@@ -245,7 +245,7 @@ const vector<int> NATURAL_MINOR_SCALE = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECON
 const vector<int> HARMONIC_MINOR_SCALE = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, AUGMENTED_SECOND, MINOR_SECOND};
 const vector<int> MELODIC_MINOR_SCALE = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND};
 
-/** Counterpoint related */
+/** Part related */
 enum species{
     FIRST_SPECIES,  //0
     SECOND_SPECIES, //1
@@ -254,6 +254,10 @@ enum species{
     FIFTH_SPECIES,  //4
 };
 
+const map<int,int> notesPerMeasure = {{FIRST_SPECIES, 1}, {SECOND_SPECIES, 2},
+                                      {THIRD_SPECIES, 4}, {FOURTH_SPECIES, 2},
+                                      {FIFTH_SPECIES, 4}};
+
 enum nVoices{
     TWO_VOICES,     //0
     THREE_VOICES,   //1
@@ -261,9 +265,9 @@ enum nVoices{
 };
 
 enum motions{
-    PARALLEL,       //0
-    CONTRARY,       //1
-    OBLIQUE         //2
+    CONTRARY_MOTION,       //0
+    OBLIQUE_MOTION,        //1
+    PARALLEL_MOTION,       //2
 };
 
 const vector<int> PERFECT_CONSONANCES = {UNISSON, PERFECT_FIFTH, PERFECT_OCTAVE};
@@ -361,6 +365,13 @@ string intVar_to_string(const IntVar &var, bool absolute = false);
  * @return a string representing the values of the variables
  */
 string intVarArray_to_string(IntVarArray vars);
+
+/**
+ * Returns the values of an array of variables as a string
+ * @param vars an array of integer variables
+ * @return a string representing the values of the variables, ignoring unassigned variables
+ */
+string cleanIntVarArray_to_string(IntVarArray vars);
 
 /**
  * Returns the values of an IntVarArgs as a string

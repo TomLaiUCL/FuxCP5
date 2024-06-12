@@ -17,10 +17,12 @@ using namespace Gecode;
 using namespace Gecode::Search;
 using namespace std;
 
-/// abstract class
-class Counterpoint : public Space{
+/// abstract class!!! Should not be instanciated
+/// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
+class Part : public Space{
     protected:
         int nMeasures;
+        int size;
         int species;
         int key;
 
@@ -38,17 +40,17 @@ class Counterpoint : public Space{
         /// Auxiliary variables, not representing Cp but useful for constraints
 
     public:
-        Counterpoint(int sp, vector<int> cf, int lb, int ub, int k);
+        Part(int nMes, int sp, vector<int> cf, int lb, int ub, int k);
 
-        Counterpoint(Counterpoint& s);
+        Part(Part& s);
 
-        //@todo rule G6 from Thibault
-        /// This rule is general so it is defined here, but must be called in the child classes because the cp array is not initialised in this class
-        void noChromaticMelodies();
+        //@todo general melodic rules should go here
+        /// G6 from Thibault This rule is general so it is defined here, but must be called in the child classes because the cp array is not initialised in this class
+        void noChromaticMelodies(IntVarArray mIntervals);
 
         virtual Space *copy();
 
-        string to_string();
+        virtual string to_string();
 };
 
 

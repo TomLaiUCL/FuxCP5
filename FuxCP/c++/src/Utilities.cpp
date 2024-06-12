@@ -153,6 +153,25 @@ string intVarArray_to_string(IntVarArray vars){
 }
 
 /**
+ * Returns the values of an array of variables as a string
+ * @param vars an array of integer variables
+ * @return a string representing the values of the variables, ignoring unassigned variables
+ */
+string cleanIntVarArray_to_string(IntVarArray vars){
+    int s = vars.size();
+    string res = "{";
+    for(int i = 0; i < s; i++){
+        if (vars[i].assigned()){
+            res += intVar_to_string(vars[i]);
+            if(i != s - 1)
+                res += ", ";
+        }
+    }
+    res += "}";
+    return res;
+}
+
+/**
  * Returns the values of an IntVarArgs as a string
  * @param args an IntVarArgs
  * @return a string representing the values
