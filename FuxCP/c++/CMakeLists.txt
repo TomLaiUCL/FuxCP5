@@ -25,6 +25,8 @@ set(MY_HEADERS headers/problem_wrapper.hpp headers/gecode_problem.hpp src/gecode
         headers/Parts/SecondSpeciesCounterpoint.hpp
         src/Parts/CantusFirmus.cpp
         headers/Parts/CantusFirmus.hpp
+        src/CounterpointProblems/TwoVoiceCounterpoint.cpp
+        headers/CounterpointProblems/TwoVoiceCounterpoint.hpp
 )
 add_library(damien ${MY_HEADERS} src/problem_wrapper.cpp main.cpp
         headers/Utilities.hpp
@@ -35,5 +37,7 @@ add_library(damien ${MY_HEADERS} src/problem_wrapper.cpp main.cpp
         headers/Parts/SecondSpeciesCounterpoint.hpp
         src/Parts/CantusFirmus.cpp
         headers/Parts/CantusFirmus.hpp
+        src/CounterpointProblems/TwoVoiceCounterpoint.cpp
+        headers/CounterpointProblems/TwoVoiceCounterpoint.hpp
 )
 target_link_libraries(damien ${GECODE_LIBRARY})
