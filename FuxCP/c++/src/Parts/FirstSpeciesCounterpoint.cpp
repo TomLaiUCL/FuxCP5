@@ -7,6 +7,7 @@
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k, int mSpecies):
         Part(size, FIRST_SPECIES, cf, lb, ub, k) { /// super constructor
     motherSpecies = mSpecies;
+    lengthCp1stSpecies = nMeasures;
     /// First species notes in the counterpoint
     firstSpeciesNotesCp = IntVarArray(*this, nMeasures, lowerBound, upperBound);
     rel(*this, firstSpeciesNotesCp, IRT_EQ, cp.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),cp.size()));

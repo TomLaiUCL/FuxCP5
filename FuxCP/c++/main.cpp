@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
 
     // create a new search engine
     BAB<Part> e(p);
+
     delete p;
 
     int nb_sol = 0;

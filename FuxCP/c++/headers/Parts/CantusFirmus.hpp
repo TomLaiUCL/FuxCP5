@@ -19,6 +19,8 @@ class CantusFirmus : public Part {
 
         IntVarArray getNotes() { return notes; }
 
+        IntVarArray getBranchingNotes() override;
+
         Space *copy() override;
 };
 

@@ -23,8 +23,6 @@ set(MY_HEADERS headers/problem_wrapper.hpp headers/gecode_problem.hpp src/gecode
         src/Utilities.cpp
         src/Parts/SecondSpeciesCounterpoint.cpp
         headers/Parts/SecondSpeciesCounterpoint.hpp
-        src/TwoVoiceCounterpoint.cpp
-        headers/TwoVoiceCounterpoint.hpp
         src/Parts/CantusFirmus.cpp
         headers/Parts/CantusFirmus.hpp
 )
@@ -35,8 +33,6 @@ add_library(damien ${MY_HEADERS} src/problem_wrapper.cpp main.cpp
         src/Utilities.cpp
         src/Parts/SecondSpeciesCounterpoint.cpp
         headers/Parts/SecondSpeciesCounterpoint.hpp
-        src/TwoVoiceCounterpoint.cpp
-        headers/TwoVoiceCounterpoint.hpp
         src/Parts/CantusFirmus.cpp
         headers/Parts/CantusFirmus.hpp
 )

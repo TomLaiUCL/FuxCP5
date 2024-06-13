@@ -14,7 +14,11 @@ CantusFirmus::CantusFirmus(int size, vector<int> cf, int k) : Part(size, CANTUS_
     for(int i = 0; i < size; i++)
         rel(*this, notes[i], IRT_EQ, cfVector[i]);
 
-    branch(*this, notes, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    //branch(*this, notes, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+}
+
+IntVarArray CantusFirmus::getBranchingNotes(){
+    return notes;
 }
 
 CantusFirmus::CantusFirmus(CantusFirmus &s) : Part(s){

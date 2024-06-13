@@ -51,6 +51,10 @@ string Part::to_string(){
     return part;
 }
 
+IntVarArray Part::getBranchingNotes(){
+    return cp;
+}
+
 Part::Part(Part& s) : Space(s){
     nMeasures = s.nMeasures;
     species = s.species;

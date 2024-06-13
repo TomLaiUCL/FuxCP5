@@ -9,22 +9,27 @@
 #include "../Utilities.hpp"
 
 class FirstSpeciesCounterpoint : public Part{
-    protected:
-        int motherSpecies;
-        IntVarArray firstSpeciesNotesCp;
-        IntVarArray firstSpeciesHarmonicIntervals;
-        IntVarArray firstSpeciesMelodicIntervals;
-    public:
-        /// This constructor is for when the first species is called by another species
-        FirstSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k, int mSpecies);
-        ///This is the constructor for the first species on its own
-        FirstSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k);
+protected:
+    int motherSpecies;
+    int lengthCp1stSpecies;
+    IntVarArray firstSpeciesNotesCp;
+    IntVarArray firstSpeciesHarmonicIntervals;
+    IntVarArray firstSpeciesMelodicIntervals;
+public:
+    /// This constructor is for when the first species is called by another species
+    FirstSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k, int mSpecies);
+    ///This is the constructor for the first species on its own
+    FirstSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k);
 
-        string to_string() override;
+    int getLengthCp1stSpecies() {return lengthCp1stSpecies;};
 
-        FirstSpeciesCounterpoint(FirstSpeciesCounterpoint &s);
+    IntVarArray getBranchingNotes() override {return firstSpeciesNotesCp;};
 
-        virtual Space *copy() override;
+    string to_string() override;
+
+    FirstSpeciesCounterpoint(FirstSpeciesCounterpoint &s);
+
+    virtual Space *copy() override;
 };
 
 

@@ -44,9 +44,23 @@ class Part : public Space{
 
         Part(Part& s);
 
+        int getNMeasures() { return nMeasures; }
+        int getSize() { return size; }
+        int getSpecies() { return species; }
+        int getKey() { return key; }
+
+        int getLowerBound() { return lowerBound; }
+        int getUpperBound() { return upperBound; }
+
+        vector<int> getCantusFirmus() { return cantusFirmus; }
+        vector<int> getMelodicIntervalsCf() { return melodicIntervalsCf; }
+
         //@todo general melodic rules should go here
         /// G6 from Thibault This rule is general so it is defined here, but must be called in the child classes because the cp array is not initialised in this class
         void noChromaticMelodies(IntVarArray mIntervals);
+
+        /// must be implemented in the child classes, returns the variables to branch on
+        virtual IntVarArray getBranchingNotes();
 
         virtual Space *copy();
 
