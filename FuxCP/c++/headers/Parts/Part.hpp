@@ -5,7 +5,7 @@
 #ifndef FUXCP_BASE_COUNTERPOINT_HPP
 #define FUXCP_BASE_COUNTERPOINT_HPP
 
-#include "Utilities.hpp"
+#include "../Utilities.hpp"
 
 #include "gecode/kernel.hh"
 #include "gecode/int.hh"
@@ -31,8 +31,8 @@ class Part : public Space{
 
         IntVarArray cp;
         IntVarArray hIntervalsCpCf;
-        IntVarArray mIntervalsCp;
-        IntVarArray motionsCfCp;
+//        IntVarArray mIntervalsCp;
+//        IntVarArray motionsCfCp;
 
         vector<int> cantusFirmus;
         vector<int> melodicIntervalsCf;

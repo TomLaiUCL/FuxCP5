@@ -6,7 +6,7 @@
 #define FUXCP_BASE_FIRSTSPECIESCOUNTERPOINT_HPP
 
 #include "Part.hpp"
-#include "Utilities.hpp"
+#include "../Utilities.hpp"
 
 class FirstSpeciesCounterpoint : public Part{
     protected:

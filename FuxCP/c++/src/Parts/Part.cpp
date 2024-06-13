@@ -2,7 +2,7 @@
 // Created by Damien Sprockeels on 11/06/2024.
 //
 
-#include "../headers/Part.hpp"
+#include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
 Part::Part(int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
@@ -46,8 +46,8 @@ Part::Part(int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
 
 string Part::to_string(){
     string part = "Part characteristics :\n";
-    part += "Cp array: " + cleanIntVarArray_to_string(cp) + "\n";
-    part += "Harmonic intervals array: " + cleanIntVarArray_to_string(hIntervalsCpCf) + "\n";
+    part += "Cp array: " + intVarArray_to_string(cp) + "\n";
+    part += "Harmonic intervals array: " + intVarArray_to_string(hIntervalsCpCf) + "\n";
     return part;
 }
 
@@ -64,8 +64,8 @@ Part::Part(Part& s) : Space(s){
 
     cp.update(*this, s.cp);
     hIntervalsCpCf.update(*this, s.hIntervalsCpCf);
-    mIntervalsCp.update(*this, s.mIntervalsCp);
-    motionsCfCp.update(*this, s.motionsCfCp);
+//    mIntervalsCp.update(*this, s.mIntervalsCp);
+//    motionsCfCp.update(*this, s.motionsCfCp);
 }
 
 Space* Part::copy() {

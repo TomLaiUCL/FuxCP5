@@ -18,8 +18,26 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
 # Create the dynamic library and link to the Gecode library
 set(MY_HEADERS headers/problem_wrapper.hpp headers/gecode_problem.hpp src/gecode_problem.cpp main.cpp
         headers/Utilities.hpp
+        src/Parts/FirstSpeciesCounterpoint.cpp
+        src/Parts/Part.cpp
+        src/Utilities.cpp
+        src/Parts/SecondSpeciesCounterpoint.cpp
+        headers/Parts/SecondSpeciesCounterpoint.hpp
+        src/TwoVoiceCounterpoint.cpp
+        headers/TwoVoiceCounterpoint.hpp
+        src/Parts/CantusFirmus.cpp
+        headers/Parts/CantusFirmus.hpp
 )
 add_library(damien ${MY_HEADERS} src/problem_wrapper.cpp main.cpp
         headers/Utilities.hpp
+        src/Parts/FirstSpeciesCounterpoint.cpp
+        src/Parts/Part.cpp
+        src/Utilities.cpp
+        src/Parts/SecondSpeciesCounterpoint.cpp
+        headers/Parts/SecondSpeciesCounterpoint.hpp
+        src/TwoVoiceCounterpoint.cpp
+        headers/TwoVoiceCounterpoint.hpp
+        src/Parts/CantusFirmus.cpp
+        headers/Parts/CantusFirmus.hpp
 )
 target_link_libraries(damien ${GECODE_LIBRARY})

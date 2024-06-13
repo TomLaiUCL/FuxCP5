@@ -7,7 +7,7 @@
 
 
 #include "FirstSpeciesCounterpoint.hpp"
-#include "Utilities.hpp"
+#include "../Utilities.hpp"
 
 ///This class extends the first species class because most rules of the first species are also valid for the second species
 class SecondSpeciesCounterpoint : public FirstSpeciesCounterpoint {

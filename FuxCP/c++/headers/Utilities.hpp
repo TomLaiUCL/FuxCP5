@@ -1,8 +1,11 @@
 #ifndef UTILITIES
 #define UTILITIES
 
-#include <gecode/int.hh>
-#include <gecode/minimodel.hh>
+#include "gecode/kernel.hh"
+#include "gecode/int.hh"
+#include "gecode/search.hh"
+#include "gecode/minimodel.hh"
+#include "gecode/set.hh"
 
 #include <iostream>
 #include <vector>
@@ -252,11 +255,12 @@ enum species{
     THIRD_SPECIES,  //2
     FOURTH_SPECIES, //3
     FIFTH_SPECIES,  //4
+    CANTUS_FIRMUS   //5
 };
 
 const map<int,int> notesPerMeasure = {{FIRST_SPECIES, 1}, {SECOND_SPECIES, 2},
                                       {THIRD_SPECIES, 4}, {FOURTH_SPECIES, 2},
-                                      {FIFTH_SPECIES, 4}};
+                                      {FIFTH_SPECIES, 4}, {CANTUS_FIRMUS, 1}};
 
 enum nVoices{
     TWO_VOICES,     //0

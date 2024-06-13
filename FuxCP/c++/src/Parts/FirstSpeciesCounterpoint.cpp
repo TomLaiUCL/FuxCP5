@@ -2,17 +2,17 @@
 // Created by Damien Sprockeels on 11/06/2024.
 //
 
-#include "../headers/FirstSpeciesCounterpoint.hpp"
+#include "../../headers/Parts/FirstSpeciesCounterpoint.hpp"
 
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k, int mSpecies):
         Part(size, FIRST_SPECIES, cf, lb, ub, k) { /// super constructor
     motherSpecies = mSpecies;
     /// First species notes in the counterpoint
     firstSpeciesNotesCp = IntVarArray(*this, nMeasures, lowerBound, upperBound);
-    rel(*this, firstSpeciesNotesCp, IRT_EQ, cp.slice(0,4/notesPerMeasure.at(species),cp.size()));
+    rel(*this, firstSpeciesNotesCp, IRT_EQ, cp.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),cp.size()));
     /// Harmonic intervals for the first species notes
     firstSpeciesHarmonicIntervals = IntVarArray(*this, nMeasures, UNISSON, PERFECT_OCTAVE);
-    rel(*this, firstSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4,hIntervalsCpCf.size()));
+    rel(*this, firstSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),hIntervalsCpCf.size()));
     /// Melodic intervals for the first species notes
     firstSpeciesMelodicIntervals = IntVarArray(*this, nMeasures-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     ///link melodic intervals
@@ -39,7 +39,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(int size, vector<int> cf,int 
     /// Melodic rules
 
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth
-    //rel(*this, mIntervalsCp, IRT_LQ, MINOR_SIXTH);
+    rel(*this, firstSpeciesMelodicIntervals, IRT_LQ, MINOR_SIXTH);
+    rel(*this, firstSpeciesMelodicIntervals, IRT_GQ, -MINOR_SIXTH);
     //todo add other melodic rules here
 
     /// Motion rules
@@ -57,10 +58,10 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(int size, vector<int> cf,int 
 }
 
 string FirstSpeciesCounterpoint::to_string(){
-    string text = Part::to_string();
-    text += "First species notes: " + cleanIntVarArray_to_string(firstSpeciesNotesCp) + "\n";
-    text += "First species harmonic intervals: " + cleanIntVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
-    text += "First species melodic intervals: " + cleanIntVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
+    string text = Part::to_string() + "\n First species : \n";
+    text += "First species notes: " + intVarArray_to_string(firstSpeciesNotesCp) + "\n";
+    text += "First species harmonic intervals: " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
+    text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
     return text;
 }
 

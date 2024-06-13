@@ -2,7 +2,7 @@
 // Created by Damien Sprockeels on 12/06/2024.
 //
 
-#include "../headers/SecondSpeciesCounterpoint.hpp"
+#include "../../headers/Parts/SecondSpeciesCounterpoint.hpp"
 
 SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k):
     FirstSpeciesCounterpoint(size, cf, lb, ub, k, SECOND_SPECIES) /// super constructor

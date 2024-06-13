@@ -1,20 +1,22 @@
 #include "headers/gecode_problem.hpp"
 #include "headers/Utilities.hpp"
-#include "headers/Part.hpp"
-#include "headers/FirstSpeciesCounterpoint.hpp"
-#include "headers/SecondSpeciesCounterpoint.hpp"
+#include "headers/Parts/Part.hpp"
+#include "headers/Parts/FirstSpeciesCounterpoint.hpp"
+#include "headers/Parts/SecondSpeciesCounterpoint.hpp"
+#include "headers/Parts/CantusFirmus.hpp"
 
 using namespace Gecode;
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    int size = 3;
     int upper_bound_domain = 72;
     int lower_bound_domain = 60;
     int species = 0;
     vector<int> cantusFirmus = {60, 67, 65, 64, 62, 60};
+    int size = cantusFirmus.size();
 
     // create a new problem
+    //Part *p = new CantusFirmus(size, cantusFirmus, C);
     Part *p = new FirstSpeciesCounterpoint(cantusFirmus.size(), cantusFirmus, lower_bound_domain, upper_bound_domain, C);
 
     // create a new search engine
