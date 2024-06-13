@@ -9,13 +9,13 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(int size, vector<int> cf,int 
     motherSpecies = mSpecies;
     lengthCp1stSpecies = nMeasures;
     /// First species notes in the counterpoint
-    firstSpeciesNotesCp = IntVarArray(*this, nMeasures, lowerBound, upperBound);
+    firstSpeciesNotesCp = IntVarArray(*this, nMeasures * notesPerMeasure.at(FIRST_SPECIES), lowerBound, upperBound);
     rel(*this, firstSpeciesNotesCp, IRT_EQ, cp.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),cp.size()));
     /// Harmonic intervals for the first species notes
-    firstSpeciesHarmonicIntervals = IntVarArray(*this, nMeasures, UNISSON, PERFECT_OCTAVE);
+    firstSpeciesHarmonicIntervals = IntVarArray(*this, nMeasures* notesPerMeasure.at(FIRST_SPECIES), UNISSON, PERFECT_OCTAVE);
     rel(*this, firstSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),hIntervalsCpCf.size()));
     /// Melodic intervals for the first species notes
-    firstSpeciesMelodicIntervals = IntVarArray(*this, nMeasures-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    firstSpeciesMelodicIntervals = IntVarArray(*this, nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     ///link melodic intervals
     for(int i = 0; i < firstSpeciesMelodicIntervals.size(); i++)
         rel(*this, firstSpeciesMelodicIntervals[i], IRT_EQ, expr(*this, firstSpeciesNotesCp[i+1] - firstSpeciesNotesCp[i]));

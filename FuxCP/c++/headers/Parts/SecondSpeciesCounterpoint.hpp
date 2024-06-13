@@ -11,13 +11,18 @@
 
 ///This class extends the first species class because most rules of the first species are also valid for the second species
 class SecondSpeciesCounterpoint : public FirstSpeciesCounterpoint {
-    protected:
-    public:
-        SecondSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k);
+protected:
+    IntVarArray secondSpeciesNotesCp;
+    IntVarArray secondSpeciesHarmonicIntervals;
+    IntVarArray secondSpeciesMelodicIntervals;
+public:
+    SecondSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k);
 
-        SecondSpeciesCounterpoint(FirstSpeciesCounterpoint &s);
+    string to_string() override;
 
-        virtual Space *copy();
+    SecondSpeciesCounterpoint(SecondSpeciesCounterpoint &s);
+
+    virtual Space *copy() override;
 };
 
 

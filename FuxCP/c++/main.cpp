@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
     // create a new problem
     //Part *p = new CantusFirmus(size, cantusFirmus, C);
-    Part *p = new FirstSpeciesCounterpoint(cantusFirmus.size(), cantusFirmus, lower_bound_domain, upper_bound_domain, C);
+    Part *p = new SecondSpeciesCounterpoint(cantusFirmus.size(), cantusFirmus, lower_bound_domain, upper_bound_domain, C);
 
     // create a new search engine
     BAB<Part> e(p);
