@@ -21,3 +21,7 @@ run_mac_os:
 clean:
 	rm -f *.o *.so *.dylib ../sources/*.so ../sources/*.dylib Main
 
+run_linux:
+	g++ -std=c++11 main.cpp -o Main src/Utilities.cpp src/gecode_problem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
+		src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp -lgecodekernel -lgecodesearch -lgecodeint -lgecodedriver -lgecodeminimodel -lgecodesupport
+	./Main
