@@ -29,13 +29,17 @@ public:
      * @param ub
      * @param k
      */
-    SecondSpeciesCounterpoint(int size, vector<int> cf,int lb, int ub, int k);
+    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k);
 
-    string to_string() override;
+    string to_string() const override;
 
-    SecondSpeciesCounterpoint(SecondSpeciesCounterpoint &s);
+    // SecondSpeciesCounterpoint(SecondSpeciesCounterpoint &s);    No longer a copy, now a clone (since it is not a space, and copy constructor are for spaces, while cloning functions are just used to create a deep copy of an object)
 
-    virtual Space *copy() override;
+    // virtual Space *copy() override;
+
+    SecondSpeciesCounterpoint(Home home, SecondSpeciesCounterpoint &s); // clone constructor
+    SecondSpeciesCounterpoint* clone(Home home) override; 
+
 };
 
 

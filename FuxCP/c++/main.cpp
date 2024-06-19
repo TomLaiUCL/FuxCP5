@@ -20,11 +20,11 @@ int main(int argc, char* argv[]) {
     auto* ctp = new TwoVoiceCounterpoint(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain);
 
     // create a new search engine
-    BAB<Part> e(ctp->getCounterpoint());
+    BAB<TwoVoiceCounterpoint> e(ctp);
 
     int nb_sol = 0;
 
-    while(Part* pb = e.next()){
+    while(TwoVoiceCounterpoint* pb = e.next()){
         nb_sol++;
         cout << "Solution " << nb_sol << ": " << endl;
         cout << pb->to_string() << endl;

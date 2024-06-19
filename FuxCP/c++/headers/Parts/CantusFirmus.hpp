@@ -13,15 +13,15 @@ class CantusFirmus : public Part {
         IntVarArray notes;
         //IntVarArray melodicIntervals; not used for now
     public:
-        CantusFirmus(int size, vector<int> cf, int k);
+        CantusFirmus(Home home, int size, vector<int> cf, int k);
 
-        CantusFirmus(CantusFirmus &s);
+        // CantusFirmus(CantusFirmus &s);
 
         IntVarArray getNotes() { return notes; }
 
         IntVarArray getBranchingNotes() override;
 
-        Space *copy() override;
+        // Space *copy() override;
 };
 
 

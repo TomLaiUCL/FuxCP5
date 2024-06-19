@@ -33,7 +33,7 @@ public:
      * @param k the key of the composition
      * @param mSpecies the species from which this is called.
      */
-    FirstSpeciesCounterpoint(int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies);
+    FirstSpeciesCounterpoint(Home  home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies);
 
     /**
      * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
@@ -44,7 +44,7 @@ public:
      * @param ub the upper bound for the counterpoint
      * @param k the key of the composition
      */
-    FirstSpeciesCounterpoint(int nMes, vector<int> cf, int lb, int ub, int k);
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k);
 
     /// Getters
     int getLengthCp1stSpecies() {return lengthCp1stSpecies;};
@@ -54,12 +54,16 @@ public:
      * the Part class and adds 1st species specific characteristics.
      * @return a string representation of the current instance of the FirstSpeciesCounterpoint class.
      */
-    string to_string() override;
+    string to_string() const override;
 
-    /// Copy constructor. This needs to copy all useful attributes and update variables. Must call the super copy constructor
-    FirstSpeciesCounterpoint(FirstSpeciesCounterpoint &s);
+    /// Copy constructor. This needs to copy all useful attributes and update variables. Must call the super copy constructor       NO LONGER NEEDED
+    // FirstSpeciesCounterpoint(FirstSpeciesCounterpoint &s);
     /// Copy function
-    virtual Space *copy() override;
+    // virtual Space *copy() override;
+
+    FirstSpeciesCounterpoint(Home home, FirstSpeciesCounterpoint& s); // clone constructor
+    FirstSpeciesCounterpoint* clone(Home home) override;
+
 };
 
 

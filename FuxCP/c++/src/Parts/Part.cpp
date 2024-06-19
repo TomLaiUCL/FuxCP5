@@ -5,7 +5,7 @@
 #include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
-Part::Part(int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
+Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
     nMeasures       = nMes;
     size            = nMes * 4;
     species         = sp;
@@ -19,19 +19,19 @@ Part::Part(int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
     for (int i = 0; i < nMeasures-1; i++)
         melodicIntervalsCf.push_back(cantusFirmus[i+1] - cantusFirmus[i]);
 
-    cp                  = IntVarArray(*this, size, lowerBound, upperBound); /// rule G2 from Thibault (rule G3 is implicit)
-    hIntervalsCpCf      = IntVarArray(*this, size, UNISSON, PERFECT_OCTAVE);
-//    mIntervalsCp        = IntVarArray(*this, nMeasures-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-//    motionsCfCp         = IntVarArray(*this, nMeasures-1, IntSet(IntArgs({CONTRARY_MOTION, PARALLEL_MOTION, OBLIQUE_MOTION})));
+    cp                  = IntVarArray(home, size, lowerBound, upperBound); /// rule G2 from Thibault (rule G3 is implicit)
+    hIntervalsCpCf      = IntVarArray(home, size, UNISSON, PERFECT_OCTAVE);
+//    mIntervalsCp        = IntVarArray(home, nMeasures-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+//    motionsCfCp         = IntVarArray(home, nMeasures-1, IntSet(IntArgs({CONTRARY_MOTION, PARALLEL_MOTION, OBLIQUE_MOTION})));
 
     /// link harmonic intervals
     for (int i = 0; i < hIntervalsCpCf.size(); i++){
         /// i // 4 because the ctp has 4 notes per measure and the Cf 1
-        rel(*this, expr(*this, abs(cp[i] - cantusFirmus[floor(i / 4)])), IRT_EQ, hIntervalsCpCf[i]); /// absolute value is rule G1 from Thibault
+        rel(home, expr(home, abs(cp[i] - cantusFirmus[floor(i / 4)])), IRT_EQ, hIntervalsCpCf[i]); /// absolute value is rule G1 from Thibault
     }
     /// link melodic intervals
 //    for(int i = 0; i < nMeasures-1; i++){
-//        rel(*this, mIntervalsCp[i], IRT_EQ, expr(*this, cp[i+1] - cp[i]));
+//        rel(home, mIntervalsCp[i], IRT_EQ, expr(home, cp[i+1] - cp[i]));
 //    }
     //todo link motions using the enum in headers/Utilities.hpp
 
@@ -40,11 +40,12 @@ Part::Part(int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /// rule G4 from Thibault: The counterpoint has to be in the key of the Cantus Firmus todo move this to the parent class in a function
-    dom(*this, cp, IntSet(IntArgs(get_all_notes_from_scale(key, MAJOR_SCALE)))); //@todo do it correctly, this is just an example
+    dom(home, cp, IntSet(IntArgs(get_all_notes_from_scale(key, MAJOR_SCALE)))); //@todo do it correctly, this is just an example
 
 }
 
-string Part::to_string(){
+string Part::to_string() const{
+    cout << "part tostring" << endl;
     string part = "Part characteristics :\n";
     part += "Cp array: " + intVarArray_to_string(cp) + "\n";
     part += "Harmonic intervals array: " + intVarArray_to_string(hIntervalsCpCf) + "\n";
@@ -55,7 +56,33 @@ IntVarArray Part::getBranchingNotes(){
     return cp;
 }
 
-Part::Part(Part& s) : Space(s){
+
+
+// PART no longer needs a copy constructor since it is not a space anymore
+
+// Part::Part(Part& s) : Space(s){
+//     nMeasures = s.nMeasures;
+//     species = s.species;
+//     key = s.key;
+
+//     lowerBound = s.lowerBound;
+//     upperBound = s.upperBound;
+
+//     cantusFirmus = s.cantusFirmus;
+//     melodicIntervalsCf = s.melodicIntervalsCf;
+
+//     cp.update(*this, s.cp);
+//     hIntervalsCpCf.update(*this, s.hIntervalsCpCf);
+// //    mIntervalsCp.update(*this, s.mIntervalsCp);
+// //    motionsCfCp.update(*this, s.motionsCfCp);
+// }
+
+// Space* Part::copy() {
+//     return new Part(*this);
+// }
+
+
+Part::Part(Home home, Part& s){
     nMeasures = s.nMeasures;
     species = s.species;
     key = s.key;
@@ -66,12 +93,13 @@ Part::Part(Part& s) : Space(s){
     cantusFirmus = s.cantusFirmus;
     melodicIntervalsCf = s.melodicIntervalsCf;
 
-    cp.update(*this, s.cp);
-    hIntervalsCpCf.update(*this, s.hIntervalsCpCf);
-//    mIntervalsCp.update(*this, s.mIntervalsCp);
-//    motionsCfCp.update(*this, s.motionsCfCp);
+    cp.update(home, s.cp);
+    hIntervalsCpCf.update(home, s.hIntervalsCpCf);
+//    mIntervalsCp.update(home, s.mIntervalsCp);
+//    motionsCfCp.update(home, s.motionsCfCp);
 }
 
-Space* Part::copy() {
-    return new Part(*this);
+// Virtual clone function
+Part* Part::clone(Home home) {
+    return new Part(home, *this);
 }

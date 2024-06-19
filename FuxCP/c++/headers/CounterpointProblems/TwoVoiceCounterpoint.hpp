@@ -12,7 +12,7 @@
 /**
  * This class models a counterpoint problem with 2 voices.
  */
-class TwoVoiceCounterpoint {
+class TwoVoiceCounterpoint : public Space{
 protected:
     vector<int> cantusFirmus;
     Part* counterpoint;
@@ -34,13 +34,18 @@ public:
      */
     TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub);
 
+    TwoVoiceCounterpoint(TwoVoiceCounterpoint& s);
+    virtual Space* copy(); // pq virtual?
+
+    string to_string() const;  // pq c'etait virtual?
+
     /// Getters
     Part* getCounterpoint(){ return counterpoint; }
     //todo add here other getters if necessary
 
     ///destructor
     //todo release the allocated memory (each object created must be deleted)
-    ~TwoVoiceCounterpoint(){ delete counterpoint; }
+    ~TwoVoiceCounterpoint(){ delete counterpoint; }  
 };
 
 #endif //MYPROJECT_TWOVOICECOUNTERPOINT_HPP
