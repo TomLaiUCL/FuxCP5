@@ -1,4 +1,3 @@
-#include "headers/gecode_problem.hpp"
 #include "headers/Utilities.hpp"
 #include "headers/Parts/Part.hpp"
 #include "headers/Parts/FirstSpeciesCounterpoint.hpp"

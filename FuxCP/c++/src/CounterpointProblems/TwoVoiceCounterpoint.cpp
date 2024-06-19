@@ -3,6 +3,7 @@
 //
 
 #include "../../headers/CounterpointProblems/TwoVoiceCounterpoint.hpp"
+#include "../../headers/CounterpointUtils.hpp"
 
 /**
  * Constructor of the class.
@@ -20,23 +21,13 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     upperBound = ub;
     species = sp;
 
-    switch (species) { /// call the appropriate constructor
-        case FIRST_SPECIES:
-            counterpoint = new FirstSpeciesCounterpoint(*this, nMeasures, cantusFirmus, lowerBound, upperBound, key);
-            break;
-        case SECOND_SPECIES:
-            counterpoint = new SecondSpeciesCounterpoint(*this, nMeasures, cantusFirmus, lowerBound, upperBound, key);
-            break;
-        default:
-            throw std::invalid_argument("Species not implemented");
-    }
+    counterpoint = create_counterpoint(*this, species, nMeasures, cantusFirmus, lowerBound, upperBound, key);
 
 }
 
 // COPY CONSTRUCTOR
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : Space(s){
     cantusFirmus = s.cantusFirmus; 
-    // counterpoint = s.counterpoint;  // just do it like this? counterpoint is a part, should we copy it?
     if (s.counterpoint) {
         counterpoint = s.counterpoint->clone(*this);
     } else {
