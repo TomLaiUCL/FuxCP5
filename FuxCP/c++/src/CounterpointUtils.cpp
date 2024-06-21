@@ -1,6 +1,11 @@
 #include "../headers/CounterpointUtils.hpp"
 
 
+///////////////////////////////////////////////////////////////////
+//////////////      GENERAL UTILS           ///////////////////////
+///////////////////////////////////////////////////////////////////
+
+
 Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> cantusFirmus, int lowerBound, int upperBound, int key){
     switch (species) { /// call the appropriate constructor for the counterpoint
     case FIRST_SPECIES:
@@ -22,12 +27,18 @@ CounterpointProblem* create_problem(vector<int> cf, vector<int> spList, int k, i
         return new TwoVoiceCounterpoint(cf, spList[0], k, lb, ub);
         break;
     
-    // case 2: 
-        // return new ThreeVoiceCounterpoint(cf, spList, k, lb, ub); 
-        // break;
+    case 2: 
+        return new ThreeVoiceCounterpoint(cf, spList, k, lb, ub); 
+        break;
 
     default:
         throw std::invalid_argument("The number of voices you asked for is not implemented (yet).");
         break;
     }
 }
+
+
+
+///////////////////////////////////////////////////////////////////
+//////////////     CONTSTRAINTS             ///////////////////////
+///////////////////////////////////////////////////////////////////
