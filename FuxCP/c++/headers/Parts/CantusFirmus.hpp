@@ -9,7 +9,6 @@
 #include "Part.hpp"
 class CantusFirmus : public Part {
     protected:
-        vector<int> cfVector;
         IntVarArray notes;
         //IntVarArray melodicIntervals; not used for now
     public:
@@ -22,6 +21,12 @@ class CantusFirmus : public Part {
         IntVarArray getBranchingNotes() override;
 
         // Space *copy() override;
+
+
+        string to_string() const override;
+
+        CantusFirmus(Home home, CantusFirmus& s); // clone constructor
+        CantusFirmus* clone(Home home) override;
 };
 
 

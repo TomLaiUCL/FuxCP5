@@ -2,22 +2,19 @@
 #define MYPROJECT_THREEVOICECOUNTERPOINT_HPP
 
 #include "../Utilities.hpp"
+#include "CounterpointProblem.hpp"
 #include "../Parts/FirstSpeciesCounterpoint.hpp"
 #include "../Parts/SecondSpeciesCounterpoint.hpp"
+#include "../Parts/CantusFirmus.hpp"
 
 /**
  * This class models a counterpoint problem with 3 voices.
  */
-class ThreeVoiceCounterpoint : public Space{
+class ThreeVoiceCounterpoint : public CounterpointProblem{
 protected:
-    vector<int> cantusFirmus;
     Part* counterpoint_1;
     Part* counterpoint_2;
 
-    int nMeasures;      /// the number of measures in the score to generate
-    int key;            /// the key of the score
-    int lowerBound;     /// the lowest note possible for the counterpoints
-    int upperBound;     /// the highest note possible for the counterpoints
     vector<int> species;        /// the species of the counterpoints to generate
 
 public:
@@ -32,9 +29,9 @@ public:
     ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub);
 
     ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s);
-    virtual Space* copy(); // pq virtual?
+    Space* copy() override; 
 
-    string to_string() const;  // pq c'etait virtual?
+    string to_string() const override;
 
     /// Getters
     // Part* getCounterpoint(){ return counterpoint; }

@@ -34,7 +34,7 @@ class Part{
 //        IntVarArray mIntervalsCp;
 //        IntVarArray motionsCfCp;
 
-        vector<int> cantusFirmus;
+        vector<int> cf_vector;   // the vector containing the cantus firmus notes. Not called cantusFirmus because cantusFirmus is already a Part* in CounterpointProblem, so avoiding confusion.
         vector<int> melodicIntervalsCf;
 
         /// Auxiliary variables, not representing Cp but useful for constraints
@@ -53,7 +53,7 @@ class Part{
         int getLowerBound() { return lowerBound; }
         int getUpperBound() { return upperBound; }
 
-        vector<int> getCantusFirmus() { return cantusFirmus; }
+        vector<int> getCantusFirmus() { return cf_vector; }
         vector<int> getMelodicIntervalsCf() { return melodicIntervalsCf; }
 
         //@todo general melodic rules should go here

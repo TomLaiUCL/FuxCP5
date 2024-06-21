@@ -9,23 +9,16 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub){
-    cantusFirmus = cf;
-    nMeasures = cf.size();
-    key = k;
-    lowerBound = lb;
-    upperBound = ub;
+ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub) : CounterpointProblem(cf, k, lb, ub){
     species = sp;
 
-    counterpoint_1 = create_counterpoint(*this, species, nMeasures, cantusFirmus, lowerBound, upperBound, key);
-    counterpoint_2 = create_counterpoint(*this, species, nMeasures, cantusFirmus, lowerBound, upperBound, key);
-
+    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, lowerBound, upperBound, key);
+    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, lowerBound, upperBound, key);
 
 }
 
 // COPY CONSTRUCTOR
-ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : Space(s){
-    cantusFirmus = s.cantusFirmus; 
+ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : CounterpointProblem(s){
     if (s.counterpoint_1) {
         counterpoint_1 = s.counterpoint_1->clone(*this);
     } else {
@@ -37,11 +30,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : Spac
     } else {
         counterpoint_2 = nullptr;
     }
-
-    nMeasures = s.nMeasures; 
-    key = s.key;
-    lowerBound = s.lowerBound;
-    upperBound = s.upperBound;
     species = s.species;
 }
 

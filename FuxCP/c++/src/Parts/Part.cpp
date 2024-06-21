@@ -14,10 +14,10 @@ Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
     lowerBound      = lb;/// rule G5 from Thibault
     upperBound      = ub;
 
-    cantusFirmus    = cf;
+    cf_vector    = cf;
     /// compute melodic intervals for the Cf
     for (int i = 0; i < nMeasures-1; i++)
-        melodicIntervalsCf.push_back(cantusFirmus[i+1] - cantusFirmus[i]);
+        melodicIntervalsCf.push_back(cf_vector[i+1] - cf_vector[i]);
 
     cp                  = IntVarArray(home, size, lowerBound, upperBound); /// rule G2 from Thibault (rule G3 is implicit)
     hIntervalsCpCf      = IntVarArray(home, size, UNISSON, PERFECT_OCTAVE);
@@ -27,7 +27,7 @@ Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
     /// link harmonic intervals
     for (int i = 0; i < hIntervalsCpCf.size(); i++){
         /// i // 4 because the ctp has 4 notes per measure and the Cf 1
-        rel(home, expr(home, abs(cp[i] - cantusFirmus[floor(i / 4)])), IRT_EQ, hIntervalsCpCf[i]); /// absolute value is rule G1 from Thibault
+        rel(home, expr(home, abs(cp[i] - cf_vector[floor(i / 4)])), IRT_EQ, hIntervalsCpCf[i]); /// absolute value is rule G1 from Thibault
     }
     /// link melodic intervals
 //    for(int i = 0; i < nMeasures-1; i++){
@@ -45,7 +45,6 @@ Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k) {
 }
 
 string Part::to_string() const{
-    cout << "part tostring" << endl;
     string part = "Part characteristics :\n";
     part += "Cp array: " + intVarArray_to_string(cp) + "\n";
     part += "Harmonic intervals array: " + intVarArray_to_string(hIntervalsCpCf) + "\n";
@@ -58,30 +57,6 @@ IntVarArray Part::getBranchingNotes(){
 
 
 
-// PART no longer needs a copy constructor since it is not a space anymore
-
-// Part::Part(Part& s) : Space(s){
-//     nMeasures = s.nMeasures;
-//     species = s.species;
-//     key = s.key;
-
-//     lowerBound = s.lowerBound;
-//     upperBound = s.upperBound;
-
-//     cantusFirmus = s.cantusFirmus;
-//     melodicIntervalsCf = s.melodicIntervalsCf;
-
-//     cp.update(*this, s.cp);
-//     hIntervalsCpCf.update(*this, s.hIntervalsCpCf);
-// //    mIntervalsCp.update(*this, s.mIntervalsCp);
-// //    motionsCfCp.update(*this, s.motionsCfCp);
-// }
-
-// Space* Part::copy() {
-//     return new Part(*this);
-// }
-
-
 Part::Part(Home home, Part& s){
     nMeasures = s.nMeasures;
     species = s.species;
@@ -90,7 +65,7 @@ Part::Part(Home home, Part& s){
     lowerBound = s.lowerBound;
     upperBound = s.upperBound;
 
-    cantusFirmus = s.cantusFirmus;
+    cf_vector = s.cf_vector;
     melodicIntervalsCf = s.melodicIntervalsCf;
 
     cp.update(home, s.cp);
