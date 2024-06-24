@@ -9,7 +9,8 @@
 #include "Part.hpp"
 class CantusFirmus : public Part {
     protected:
-        IntVarArray notes;
+        IntVarArray active_notes;
+        vector<int> cf_vector;
         //IntVarArray melodicIntervals; not used for now
     public:
         CantusFirmus(Home home, int size, vector<int> cf, int k);
@@ -18,7 +19,7 @@ class CantusFirmus : public Part {
 
         IntVarArray getNotes() { return notes; }
 
-        IntVarArray getBranchingNotes() override;
+        // IntVarArray getBranchingNotes() override;
 
         // Space *copy() override;
 

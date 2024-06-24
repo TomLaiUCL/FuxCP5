@@ -8,7 +8,7 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k) : Part(ho
     cf_vector = cf;
     notes = IntVarArray(home, size, lowerBound, upperBound);
     /// link aux variables de la part
-    rel(home, notes, IRT_EQ, cp.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),cp.size()));
+    rel(home, active_notes, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
 
     /// The cantus firmus is deterministic, so the values are assigned. It is useful to have it as an IntVarArray for > 3 voices.
     for(int i = 0; i < size; i++)
@@ -17,9 +17,9 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k) : Part(ho
     //branch(home, notes, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 }
 
-IntVarArray CantusFirmus::getBranchingNotes(){
-    return notes;
-}
+// IntVarArray CantusFirmus::getBranchingNotes(){
+//     return notes;
+// }
 
 
 string CantusFirmus::to_string() const {

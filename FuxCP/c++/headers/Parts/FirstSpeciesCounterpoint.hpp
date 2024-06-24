@@ -18,7 +18,7 @@ protected:
     int motherSpecies;                          /// The species from which this is called.
     int lengthCp1stSpecies;                     /// The number of notes in the counterpoint
     IntVarArray firstSpeciesNotesCp;            /// The notes of the counterpoint that have to follow the rules for the first species
-    IntVarArray firstSpeciesHarmonicIntervals;  /// The harmonic intervals between the notes that have to follow the 1st species rules and the cantus firmus
+    IntVarArray firstSpeciesHarmonicIntervals;  /// The harmonic intervals between the notes that have to follow the 1st species rules and the lowest stratum
     IntVarArray firstSpeciesMelodicIntervals;   /// The melodic intervals between the notes that have to follow the 1st species rules
 public:
     /**

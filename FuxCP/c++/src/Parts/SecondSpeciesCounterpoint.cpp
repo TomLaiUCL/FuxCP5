@@ -9,11 +9,11 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 {
     /// Second species notes in the counterpoint
     secondSpeciesNotesCp = IntVarArray(home, nMeasures*notesPerMeasure.at(SECOND_SPECIES), lowerBound, upperBound);
-    rel(home, secondSpeciesNotesCp, IRT_EQ, cp.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),cp.size()));
+    rel(home, secondSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),notes.size()));
 
     /// Harmonic intervals for the second species notes
     secondSpeciesHarmonicIntervals = IntVarArray(home, nMeasures*notesPerMeasure.at(SECOND_SPECIES), UNISSON, PERFECT_OCTAVE);
-    rel(home, secondSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),hIntervalsCpCf.size()));
+    // rel(home, secondSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),hIntervalsCpCf.size()));
 
     /// Melodic intervals for the second species notes
     secondSpeciesMelodicIntervals = IntVarArray(home, nMeasures*notesPerMeasure.at(SECOND_SPECIES) -1, -PERFECT_OCTAVE, PERFECT_OCTAVE);

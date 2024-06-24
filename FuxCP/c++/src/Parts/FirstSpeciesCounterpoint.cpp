@@ -22,10 +22,10 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// First species notes in the counterpoint
     firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), lowerBound, upperBound);
 
-    rel(home, firstSpeciesNotesCp, IRT_EQ, cp.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),cp.size()));
+    rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
     /// Harmonic intervals for the first species notes
-    firstSpeciesHarmonicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES), UNISSON, PERFECT_OCTAVE);
-    rel(home, firstSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),hIntervalsCpCf.size()));
+    // firstSpeciesHarmonicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES), UNISSON, PERFECT_OCTAVE);
+    // rel(home, firstSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),hIntervalsCpCf.size()));
     /// Melodic intervals for the first species notes
     firstSpeciesMelodicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     ///link melodic intervals
@@ -41,10 +41,10 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     dom(home, firstSpeciesHarmonicIntervals, IntSet(IntArgs(CONSONANCES)));
 
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
-    dom(home, hIntervalsCpCf[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    // dom(home, hIntervalsCpCf[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
 
     /// H3 from Thibault: The last harmonic interval must be a perfect consonance
-    dom(home, hIntervalsCpCf[hIntervalsCpCf.size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    // dom(home, hIntervalsCpCf[hIntervalsCpCf.size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
 
     //todo add other harmonic rules here
 
