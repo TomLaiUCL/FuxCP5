@@ -91,6 +91,64 @@ vector<int> int_pointer_to_vector(int* ptr, int size){
 }
 
 /**
+ * Union algorithm found and adapted from GeeksForGeeks.com
+ */
+vector<int> vector_union(vector<int> v1, vector<int> v2){
+    vector<int> v(v1.size() 
+                  + v2.size()); 
+    vector<int>::iterator it, st; 
+
+    it = set_union(v1.begin(), v1.end(), 
+                   v2.begin(), 
+                   v2.end(), v.begin()); 
+
+    vector<int> res = {};
+    for(st = v.begin(); st != it; ++st){
+        res.push_back(*st);
+    }
+    return res;
+}
+
+/**
+ * Intersection algorithm found and adapted from GeeksForGeeks.com
+ */
+vector<int> vector_intersection(vector<int> v1, vector<int> v2){
+    vector<int> v(v1.size() 
+                  + v2.size()); 
+    vector<int>::iterator it, st; 
+
+    it = set_intersection(v1.begin(), v1.end(), 
+                   v2.begin(), 
+                   v2.end(), v.begin()); 
+
+    vector<int> res = {};
+    for(st = v.begin(); st != it; ++st){
+        res.push_back(*st);
+    }
+    return res;
+}
+
+/**
+ * Difference algorithm found and adapted from GeeksForGeeks.com
+ */
+vector<int> vector_difference(vector<int> v1, int lb, int ub){
+    vector<int> v = {};
+    for(int i = lb; i <= ub; i++){
+        int t = 0;
+        for(int j = 0; j < v1.size(); j++){
+            if(i==v1[j]){
+                t=1;
+                break;
+            }
+        }
+        if(t==0){
+            v.push_back(i);
+        }
+    }
+    return v;
+}
+
+/**
  * Prints the Search::Statistics object into a readable format
  * @param stats a Search::Statistics object representing the statistics of a search
  * @return The string representation of the statistics object

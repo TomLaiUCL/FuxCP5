@@ -15,12 +15,18 @@ using namespace Gecode;
  * This function creates the appropriate Part given the species of the counterpoint requested. 
  * @return a pointer to a Part object
 */
-Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> cantusFirmus, int lowerBound, int upperBound, int key);
+Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> cantusFirmus, int lowerBound, int upperBound, int key, Stratum* low,
+    CantusFirmus* c, int v_type);
 
 /**
  * This function creates the appropriate counterpoint problem given the number of counterpoints (size of the species list) requested. 
  * @return a pointer to a counterpoint problem object
 */
-CounterpointProblem* create_problem(vector<int> cf, vector<int> sp, int k, int lb, int ub);
+CounterpointProblem* create_problem(vector<int> cf, vector<int> sp, int k, int lb, int ub, int v_type);
+
+/**
+ * Creates the lowest strata deciding which notes currently are the lowest
+ */
+void create_lowest(Home home, Stratum* lowest, CantusFirmus* cf, Part* cp1, Part* cp2=nullptr);
 
 #endif

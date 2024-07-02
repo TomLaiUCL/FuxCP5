@@ -17,11 +17,10 @@ using namespace std;
 /// This class represents a Stratum
 class Stratum : public Voice{
     protected:
-
         // intvararray with species of each measure?
 
     public:
-        Stratum(Home home, int nMes, int lb, int ub);
+        Stratum(Home home, int nMes, int lb, int ub, int v_type);
 
         // /**
         //  * These functions are the real constructors of Stratum. The base constructor should not be used. 
@@ -41,7 +40,7 @@ class Stratum : public Voice{
 
 
 
-        void setNote(int index);
+        void setNote(Home home, int index, IntVar note);
         void setMInterval(int index);   // these two functions will be called from the create strata part of the Problem files. The create strata code is done index by index. 
 };
 

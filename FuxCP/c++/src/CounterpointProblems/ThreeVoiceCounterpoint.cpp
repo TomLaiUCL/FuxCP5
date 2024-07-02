@@ -9,11 +9,13 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub) : CounterpointProblem(cf, k, lb, ub){
+ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, int v_type) : CounterpointProblem(cf, k, lb, ub, v_type){
     species = sp;
 
-    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, lowerBound, upperBound, key);
-    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, lowerBound, upperBound, key);
+    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type);
+    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type);
+
+    create_lowest(*this, lowest, cantusFirmus, counterpoint_1, counterpoint_2);
 
 }
 

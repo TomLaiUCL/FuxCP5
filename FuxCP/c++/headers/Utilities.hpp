@@ -247,6 +247,9 @@ const vector<int> MAJOR_SCALE = {MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR
 const vector<int> NATURAL_MINOR_SCALE = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND};
 const vector<int> HARMONIC_MINOR_SCALE = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, AUGMENTED_SECOND, MINOR_SECOND};
 const vector<int> MELODIC_MINOR_SCALE = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND};
+const vector<int> BORROWED_SCALE = {PERFECT_FOURTH, MAJOR_THIRD, MAJOR_SECOND, MINOR_SECOND};
+const vector<int> CHROMATIC_SCALE = {MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,
+    MINOR_SECOND,MINOR_SECOND,MINOR_SECOND};
 
 /** Part related */
 enum species{
@@ -333,6 +336,21 @@ vector<int> get_all_given_note(int note);
  * @return a vector<int> containing the same values as the array
  */
 vector<int> int_pointer_to_vector(int* ptr, int size);
+
+/**
+ * Union algorithm found and adapted from GeeksForGeeks.com
+ */
+vector<int> vector_union(vector<int> v1, vector<int> v2);
+
+/**
+ * Intersection algorithm found and adapted from GeeksForGeeks.com
+ */
+vector<int> vector_intersection(vector<int> v1, vector<int> v2);
+
+/**
+ * Difference algorithm found and adapted from GeeksForGeeks.com
+ */
+vector<int> vector_difference(vector<int> v1, int lb, int ub);
 
 /**
  * Transforms a vector of integers into a string

@@ -1,17 +1,21 @@
 #include "../headers/Voice.hpp"
 
-Voice::Voice(Home home, int nMes, int lb, int ub){
+Voice::Voice(Home home, int nMes, int lb, int ub, int v_type){
     nMeasures = nMes; 
     size = nMes*4;
 
+    voice_type = v_type;
+
     lowerBound = lb;
     upperBound = ub;
+
+    
 
     notes = IntVarArray(home, size, lowerBound, upperBound);
     h_intervals = IntVarArray(home, size, UNISSON, PERFECT_OCTAVE);
     // m_intervals_brut = IntVarArray(); TODO initialize correctly
 
-    isLowest = BoolVarArray(home, nMeasures);
+    
 }
 
 
@@ -29,13 +33,16 @@ Voice::Voice(Home home, Voice &s){
     size = s.size;
     lowerBound = s.lowerBound;
     upperBound = s.upperBound;
+    voice_type = s.voice_type;
     notes.update(home, s.notes);
     h_intervals.update(home, s.h_intervals);
     // m_intervals_brut.update(home, s.m_intervals_brut);
-
-    isLowest.update(home, s.isLowest);
 }
 
 Voice* Voice::clone(Home home){
     return new Voice(home, *this);
+}
+
+IntVarArgs Voice::getFirstNotes(){
+    return notes.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES),notes.size());
 }

@@ -4,7 +4,7 @@
 
 #include "../../headers/Parts/CantusFirmus.hpp"
 
-CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k) : Part(home, size, CANTUS_FIRMUS, cf, 0, 127, k){
+CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* low, int v_type) : Part(home, size, CANTUS_FIRMUS, cf, 0, 127, k, low, v_type){
     cf_vector = cf;
     notes = IntVarArray(home, size, lowerBound, upperBound);
     /// link aux variables de la part
@@ -38,3 +38,7 @@ CantusFirmus::CantusFirmus(Home home, CantusFirmus &s) : Part(home, s){
 CantusFirmus* CantusFirmus::clone(Home home){
     return new CantusFirmus(home, *this);
 }
+
+//IntVarArray CantusFirmus::getBranchingNotes(){
+//    return notes;
+//}

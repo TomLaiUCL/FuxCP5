@@ -7,6 +7,7 @@
 
 #include "../Utilities.hpp"
 #include "../Voice.hpp"
+#include "../Stratum.hpp"
 
 #include "gecode/kernel.hh"
 #include "gecode/int.hh"
@@ -24,16 +25,27 @@ class Part : public Voice {
     protected:
         int species;
         int key;
+        Stratum* lowest;
 
+        BoolVarArray isLowest;
 
+        vector<int> borrowed_scale;
+        vector<int> scale;
+        vector<int> chromatic_scale;
+
+        vector<int> cp_range;
+
+        vector<int> extended_domain;
+        vector<int> off_domain;
     public:
-        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k);
+        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, Stratum* low, int v_type);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
         Part(Home home, Part& s);  // clone constructor
 
         int getSpecies() { return species; }
         int getKey() { return key; }
+        BoolVar getIsLowestIdx(int idx);
 
         /// must be implemented in the child classes, returns the variables to branch on
         // virtual IntVarArray getBranchingNotes();
@@ -41,6 +53,8 @@ class Part : public Voice {
         virtual Part* clone(Home home);
 
         virtual string to_string() const;
+
+        virtual IntVarArray getBranchingNotes();
 };
 
 

@@ -16,10 +16,11 @@ int main(int argc, char* argv[]) {
     vector<int> species = {FIRST_SPECIES};
     vector<int> cantusFirmus = {60, 67, 65, 64, 62, 60};
     int size = cantusFirmus.size();
+    int v_type = 1;
 
     // create a new problem
     // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-    auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain);
+    auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type);
 
     // create a new search engine
     BAB<CounterpointProblem> e(problem);

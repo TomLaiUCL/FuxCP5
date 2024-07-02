@@ -29,7 +29,7 @@ public:
      * @param ub
      * @param k
      */
-    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k);
+    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type);
 
     string to_string() const override;
 

@@ -7,6 +7,7 @@
 
 #include "Part.hpp"
 #include "../Utilities.hpp"
+#include "CantusFirmus.hpp"
 
 /**
  * This class represents a counterpoint of the first species. It inherits from the Part class.
@@ -17,6 +18,7 @@ class FirstSpeciesCounterpoint : public Part{
 protected:
     int motherSpecies;                          /// The species from which this is called.
     int lengthCp1stSpecies;                     /// The number of notes in the counterpoint
+    CantusFirmus* cantus;
     IntVarArray firstSpeciesNotesCp;            /// The notes of the counterpoint that have to follow the rules for the first species
     IntVarArray firstSpeciesHarmonicIntervals;  /// The harmonic intervals between the notes that have to follow the 1st species rules and the lowest stratum
     IntVarArray firstSpeciesMelodicIntervals;   /// The melodic intervals between the notes that have to follow the 1st species rules
@@ -33,7 +35,7 @@ public:
      * @param k the key of the composition
      * @param mSpecies the species from which this is called.
      */
-    FirstSpeciesCounterpoint(Home  home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies);
+    FirstSpeciesCounterpoint(Home  home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type);
 
     /**
      * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
@@ -44,7 +46,7 @@ public:
      * @param ub the upper bound for the counterpoint
      * @param k the key of the composition
      */
-    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k);
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type);
 
     /// Getters
     int getLengthCp1stSpecies() {return lengthCp1stSpecies;};
@@ -63,6 +65,8 @@ public:
 
     FirstSpeciesCounterpoint(Home home, FirstSpeciesCounterpoint& s); // clone constructor
     FirstSpeciesCounterpoint* clone(Home home) override;
+
+    virtual IntVarArray getBranchingNotes() override;
 
 };
 

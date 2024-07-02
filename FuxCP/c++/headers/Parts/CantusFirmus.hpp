@@ -13,7 +13,7 @@ class CantusFirmus : public Part {
         vector<int> cf_vector;
         //IntVarArray melodicIntervals; not used for now
     public:
-        CantusFirmus(Home home, int size, vector<int> cf, int k);
+        CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* low, int v_type);
 
         // CantusFirmus(CantusFirmus &s);
 

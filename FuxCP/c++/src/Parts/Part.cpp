@@ -5,9 +5,16 @@
 #include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
-Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k) : Voice(home, nMes, lb, ub){
+Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, Stratum* low, int v_type) : Voice(home, nMes, lb, ub, v_type){
     species         = sp;
     key             = k;
+    lowest          = low;
+    isLowest        = BoolVarArray(home, nMeasures);
+
+    borrowed_scale = get_all_notes_from_scale(key, BORROWED_SCALE);
+    scale = get_all_notes_from_scale(key, MAJOR_SCALE);
+    chromatic_scale = get_all_notes_from_scale(key, CHROMATIC_SCALE);
+    cp_range = {};
 
 //    mIntervalsCp        = IntVarArray(home, nMeasures-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
 
@@ -43,9 +50,18 @@ string Part::to_string() const{
 Part::Part(Home home, Part& s) : Voice(home, s) {
     species = s.species;
     key = s.key;
+    lowest = s.lowest;
 
-    lowerBound = s.lowerBound;
-    upperBound = s.upperBound;
+    borrowed_scale = s.borrowed_scale;
+    scale = s.scale;
+    chromatic_scale = s.chromatic_scale;
+
+    cp_range = s.cp_range;
+
+    extended_domain = s.extended_domain;
+    off_domain = s.off_domain;
+
+    isLowest.update(home, s.isLowest);
 
 //    mIntervalsCp.update(home, s.mIntervalsCp);
 //    motionsCfCp.update(home, s.motionsCfCp);
@@ -54,4 +70,12 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
 // Virtual clone function
 Part* Part::clone(Home home) {
     return new Part(home, *this);
+}
+
+BoolVar Part::getIsLowestIdx(int idx){
+    return isLowest[idx];
+}
+
+IntVarArray Part::getBranchingNotes(){
+    return notes;
 }

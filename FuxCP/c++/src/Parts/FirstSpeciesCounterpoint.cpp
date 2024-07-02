@@ -15,14 +15,26 @@
  * @param k the key of the composition
  * @param mSpecies the species from which this is called.
  */
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies):
-        Part(home, nMes, FIRST_SPECIES, cf, lb, ub, k) { /// super constructor
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
+     int v_type):
+        Part(home, nMes, FIRST_SPECIES, cf, lb, ub, k, low, v_type) { /// super constructor
     motherSpecies = mSpecies;
     lengthCp1stSpecies = nMeasures;
+    cantus = c;
+
+    for(int i = lowerBound; i <= upperBound; i++){
+        cp_range.push_back(i);
+    }
+
+    extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+    off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
+
     /// First species notes in the counterpoint
-    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), lowerBound, upperBound);
+    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(extended_domain)));
 
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
+
+    
     /// Harmonic intervals for the first species notes
     // firstSpeciesHarmonicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES), UNISSON, PERFECT_OCTAVE);
     // rel(home, firstSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),hIntervalsCpCf.size()));
@@ -68,14 +80,14 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
  * @param ub the upper bound for the counterpoint
  * @param k the key of the composition
  */
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k) :
-        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES) ///call the general constructor
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type) :
+        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type) ///call the general constructor
 {
     //todo add here rules that are specific to the first species, rules that are used by other species are in the general constructor
 
     ///branching strategy
     ///only branch on the relevant variables for this species, others from the Part are ignored
-    branch(home, firstSpeciesNotesCp, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    //branch(home, firstSpeciesNotesCp, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 }
 
 /**
@@ -107,6 +119,7 @@ string FirstSpeciesCounterpoint::to_string() const {
 // clone constructor
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, FirstSpeciesCounterpoint &s) : Part(home, s){
     motherSpecies = s.motherSpecies;
+    cantus = s.cantus;
     firstSpeciesNotesCp.update(home, s.firstSpeciesNotesCp);
     firstSpeciesHarmonicIntervals.update(home, s.firstSpeciesHarmonicIntervals);
     firstSpeciesMelodicIntervals.update(home, s.firstSpeciesMelodicIntervals);
@@ -114,4 +127,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, FirstSpeciesCounte
 
 FirstSpeciesCounterpoint* FirstSpeciesCounterpoint::clone(Home home){
     return new FirstSpeciesCounterpoint(home, *this);
+}
+
+IntVarArray FirstSpeciesCounterpoint::getBranchingNotes(){
+    return firstSpeciesNotesCp;
 }

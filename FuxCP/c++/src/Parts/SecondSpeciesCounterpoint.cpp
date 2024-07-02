@@ -4,8 +4,8 @@
 
 #include "../../headers/Parts/SecondSpeciesCounterpoint.hpp"
 
-SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k):
-    FirstSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES) /// super constructor. Applies all rules for the first species to the 1st note of each measure
+SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type):
+    FirstSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type) /// super constructor. Applies all rules for the first species to the 1st note of each measure
 {
     /// Second species notes in the counterpoint
     secondSpeciesNotesCp = IntVarArray(home, nMeasures*notesPerMeasure.at(SECOND_SPECIES), lowerBound, upperBound);
@@ -60,3 +60,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, SecondSpeciesCou
 SecondSpeciesCounterpoint* SecondSpeciesCounterpoint::clone(Home home){
     return new SecondSpeciesCounterpoint(home, *this);
 }
+
+//IntVarArray SecondSpeciesCounterpoint::getBranchingNotes(){
+//    return firstSpeciesNotesCp;
+//}

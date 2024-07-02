@@ -23,18 +23,20 @@ class Voice{
         int lowerBound;
         int upperBound;
 
+        int voice_type;
+
         IntVarArray notes;
         IntVarArray h_intervals;  // with respect to lowest stratum. TODO set to 0 if isLowest
         IntVarArray m_intervals_brut;
         // motions ? (w/r to lowest)
 
-        BoolVarArray isLowest;
+        
 
         // Stratum lowestStratum;
 
 
     public:
-        Voice(Home home, int nMes, int lb, int ub);
+        Voice(Home home, int nMes, int lb, int ub, int v_type);
 
         Voice(Home home, Voice& s);  // clone constructor
 
@@ -51,6 +53,8 @@ class Voice{
         virtual Voice* clone(Home home);
 
         virtual string to_string() const;
+
+        IntVarArgs getFirstNotes();
 };
 
 
