@@ -30,11 +30,11 @@ class Stratum : public Voice{
         // Stratum* CreateThreeVoiceStratum(Home home, int nMes , int lb, int ub, int index);
         // Stratum* CreateFourVoiceStratum(Home home, int nMes , int lb, int ub, int index);
 
-        Stratum(Home home, Stratum& s);  // clone constructor
+        Stratum(Stratum& s);  // clone constructor
 
         // IntVarArray getBranchingNotes() override;
 
-        Stratum* clone(Home home) override;
+        Stratum* copy() override;
 
         string to_string() const override;
 

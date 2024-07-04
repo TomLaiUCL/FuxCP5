@@ -63,8 +63,8 @@ public:
     /// Copy function
     // virtual Space *copy() override;
 
-    FirstSpeciesCounterpoint(Home home, FirstSpeciesCounterpoint& s); // clone constructor
-    FirstSpeciesCounterpoint* clone(Home home) override;
+    FirstSpeciesCounterpoint(FirstSpeciesCounterpoint& s); // clone constructor
+    FirstSpeciesCounterpoint* copy() override;
 
     virtual IntVarArray getBranchingNotes() override;
 

@@ -21,18 +21,9 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
 
 // COPY CONSTRUCTOR
 ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : CounterpointProblem(s){
-    if (s.counterpoint_1) {
-        counterpoint_1 = s.counterpoint_1->clone(*this);
-    } else {
-        counterpoint_1 = nullptr;
-    }
-
-    if (s.counterpoint_2) {
-        counterpoint_2 = s.counterpoint_2->clone(*this);
-    } else {
-        counterpoint_2 = nullptr;
-    }
     species = s.species;
+    counterpoint_1 = s.counterpoint_1;
+    counterpoint_2 = s.counterpoint_2;
 }
 
 Space* ThreeVoiceCounterpoint::copy(){  

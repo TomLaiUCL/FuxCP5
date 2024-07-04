@@ -26,8 +26,8 @@ class CantusFirmus : public Part {
 
         string to_string() const override;
 
-        CantusFirmus(Home home, CantusFirmus& s); // clone constructor
-        CantusFirmus* clone(Home home) override;
+        CantusFirmus(CantusFirmus& s); // clone constructor
+        CantusFirmus* copy() override;
 };
 
 

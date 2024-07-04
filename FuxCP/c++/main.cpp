@@ -21,12 +21,10 @@ int main(int argc, char* argv[]) {
     // create a new problem
     // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
     auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type);
-
     // create a new search engine
     BAB<CounterpointProblem> e(problem);
 
     int nb_sol = 0;
-
     while(CounterpointProblem* pb = e.next()){
         nb_sol++;
         cout << "Solution " << nb_sol << ": " << endl;

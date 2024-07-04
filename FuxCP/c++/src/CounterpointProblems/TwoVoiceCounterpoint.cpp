@@ -16,19 +16,14 @@
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type) : CounterpointProblem(cf, k, lb, ub, v_type){
     species = sp; 
     counterpoint = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type);
-    create_lowest(*this, lowest, cantusFirmus, counterpoint);
+    //create_lowest(*this, lowest, cantusFirmus, counterpoint);
     cout << counterpoint->getBranchingNotes() << endl;
     cout << counterpoint->getFirstNotes() << endl;
     branch(*this, counterpoint->getBranchingNotes(), INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 }
-
 // COPY CONSTRUCTOR
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : CounterpointProblem(s){
-    if (s.counterpoint) {
-        counterpoint = s.counterpoint->clone(*this);
-    } else {
-        counterpoint = nullptr;
-    }
+    counterpoint = s.counterpoint;
     species = s.species;
 }
 
@@ -40,7 +35,7 @@ Space* TwoVoiceCounterpoint::copy(){   // todo use 'bool share' in copy construc
 string TwoVoiceCounterpoint::to_string() const {
     string text = "";
     text += CounterpointProblem::to_string();
-    text += "TwoVoiceCounterpoint problem object : ";
+    text += "TwoVoiceCounterpoint problem object : \n";
     text += counterpoint->to_string();  // segmentation fault here was because counterpoint was deleted (but why did it still work when tostring was not virtual?)
     return text;
 }

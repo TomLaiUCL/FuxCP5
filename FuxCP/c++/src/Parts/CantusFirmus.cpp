@@ -4,11 +4,11 @@
 
 #include "../../headers/Parts/CantusFirmus.hpp"
 
-CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* low, int v_type) : Part(home, size, CANTUS_FIRMUS, cf, 0, 127, k, low, v_type){
+CantusFirmus::CantusFirmus(Home hme, int size, vector<int> cf, int k, Stratum* low, int v_type) : Part(hme, size, CANTUS_FIRMUS, cf, 0, 127, k, low, v_type){
     cf_vector = cf;
     notes = IntVarArray(home, size, lowerBound, upperBound);
     /// link aux variables de la part
-    rel(home, active_notes, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
+    //rel(home, active_notes, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
 
     /// The cantus firmus is deterministic, so the values are assigned. It is useful to have it as an IntVarArray for > 3 voices.
     for(int i = 0; i < size; i++)
@@ -24,19 +24,19 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* 
 
 string CantusFirmus::to_string() const {
     string text = "Cantus Firmus : ";
-    text += int_vector_to_string(cf_vector);
+    text += intVarArray_to_string(notes);
     text += "\n";
     return text;
 }
 
 
 // clone constructor
-CantusFirmus::CantusFirmus(Home home, CantusFirmus &s) : Part(home, s){
+CantusFirmus::CantusFirmus(CantusFirmus &s) : Part(s){
     notes.update(home, s.notes);
 }
 
-CantusFirmus* CantusFirmus::clone(Home home){
-    return new CantusFirmus(home, *this);
+CantusFirmus* CantusFirmus::copy(){
+    return new CantusFirmus(*this);
 }
 
 //IntVarArray CantusFirmus::getBranchingNotes(){

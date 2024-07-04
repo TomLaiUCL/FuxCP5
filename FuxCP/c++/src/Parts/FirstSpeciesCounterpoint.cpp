@@ -15,9 +15,9 @@
  * @param k the key of the composition
  * @param mSpecies the species from which this is called.
  */
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home hme, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
      int v_type):
-        Part(home, nMes, FIRST_SPECIES, cf, lb, ub, k, low, v_type) { /// super constructor
+        Part(hme, nMes, FIRST_SPECIES, cf, lb, ub, k, low, v_type) { /// super constructor
     motherSpecies = mSpecies;
     lengthCp1stSpecies = nMeasures;
     cantus = c;
@@ -28,9 +28,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 
     extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
     off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
-
     /// First species notes in the counterpoint
     firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(extended_domain)));
+    //firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, 0, 127); //TODO : to be changed to correct domain
 
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
 
@@ -39,10 +39,10 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     // firstSpeciesHarmonicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES), UNISSON, PERFECT_OCTAVE);
     // rel(home, firstSpeciesHarmonicIntervals, IRT_EQ, hIntervalsCpCf.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),hIntervalsCpCf.size()));
     /// Melodic intervals for the first species notes
-    firstSpeciesMelodicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    //firstSpeciesMelodicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     ///link melodic intervals
-    for(int i = 0; i < firstSpeciesMelodicIntervals.size(); i++)
-        rel(home, firstSpeciesMelodicIntervals[i], IRT_EQ, expr(home, firstSpeciesNotesCp[i+1] - firstSpeciesNotesCp[i]));
+    //for(int i = 0; i < firstSpeciesMelodicIntervals.size(); i++)
+    //    rel(home, firstSpeciesMelodicIntervals[i], IRT_EQ, expr(home, firstSpeciesNotesCp[i+1] - firstSpeciesNotesCp[i]));
 
     /// General rules
     //todo the rules hera are examples, they should be verified and changed if not accurate.
@@ -50,7 +50,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// Harmonic rules
     //todo put each rule in a function so it is easy to call them in different constructors depending on the species calling the first species
     /// H1 from Thibault: All harmonic intervals must be consonances
-    dom(home, firstSpeciesHarmonicIntervals, IntSet(IntArgs(CONSONANCES)));
+    //dom(home, firstSpeciesHarmonicIntervals, IntSet(IntArgs(CONSONANCES)));
 
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
     // dom(home, hIntervalsCpCf[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
@@ -63,8 +63,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// Melodic rules
 
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth
-    rel(home, firstSpeciesMelodicIntervals, IRT_LQ, MINOR_SIXTH);
-    rel(home, firstSpeciesMelodicIntervals, IRT_GQ, -MINOR_SIXTH);
+    //rel(home, firstSpeciesMelodicIntervals, IRT_LQ, MINOR_SIXTH);
+    //rel(home, firstSpeciesMelodicIntervals, IRT_GQ, -MINOR_SIXTH);
     //todo add other melodic rules here
 
     /// Motion rules
@@ -80,8 +80,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
  * @param ub the upper bound for the counterpoint
  * @param k the key of the composition
  */
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type) :
-        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type) ///call the general constructor
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home hme, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type) :
+        FirstSpeciesCounterpoint(hme, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type) ///call the general constructor
 {
     //todo add here rules that are specific to the first species, rules that are used by other species are in the general constructor
 
@@ -98,8 +98,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 string FirstSpeciesCounterpoint::to_string() const {
     string text = Part::to_string() + "\nFirst species :\n";
     text += "First species notes: " + intVarArray_to_string(firstSpeciesNotesCp) + "\n";
-    text += "First species harmonic intervals: " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
-    text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
+    //text += "First species harmonic intervals: " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
+    //text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
     return text;
 }
 
@@ -117,7 +117,7 @@ string FirstSpeciesCounterpoint::to_string() const {
 // }
 
 // clone constructor
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, FirstSpeciesCounterpoint &s) : Part(home, s){
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(FirstSpeciesCounterpoint &s) : Part(s){
     motherSpecies = s.motherSpecies;
     cantus = s.cantus;
     firstSpeciesNotesCp.update(home, s.firstSpeciesNotesCp);
@@ -125,8 +125,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, FirstSpeciesCounte
     firstSpeciesMelodicIntervals.update(home, s.firstSpeciesMelodicIntervals);
 }
 
-FirstSpeciesCounterpoint* FirstSpeciesCounterpoint::clone(Home home){
-    return new FirstSpeciesCounterpoint(home, *this);
+FirstSpeciesCounterpoint* FirstSpeciesCounterpoint::copy(){
+    return new FirstSpeciesCounterpoint(*this);
 }
 
 IntVarArray FirstSpeciesCounterpoint::getBranchingNotes(){
