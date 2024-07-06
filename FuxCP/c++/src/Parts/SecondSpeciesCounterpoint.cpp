@@ -50,15 +50,15 @@ string SecondSpeciesCounterpoint::to_string() const {
 //     return new SecondSpeciesCounterpoint(*this);
 // }
 
-SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(SecondSpeciesCounterpoint &s): FirstSpeciesCounterpoint(s){  
+SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, SecondSpeciesCounterpoint &s): FirstSpeciesCounterpoint(s){  
     secondSpeciesNotesCp.update(home, s.secondSpeciesNotesCp);
     secondSpeciesHarmonicIntervals.update(home, s.secondSpeciesHarmonicIntervals);
     secondSpeciesMelodicIntervals.update(home, s.secondSpeciesMelodicIntervals);
 
 }
 
-SecondSpeciesCounterpoint* SecondSpeciesCounterpoint::copy(){
-    return new SecondSpeciesCounterpoint(*this);
+SecondSpeciesCounterpoint* SecondSpeciesCounterpoint::clone(Home home){
+    return new SecondSpeciesCounterpoint(home, *this);
 }
 
 //IntVarArray SecondSpeciesCounterpoint::getBranchingNotes(){

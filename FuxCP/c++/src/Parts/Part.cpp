@@ -5,7 +5,7 @@
 #include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
-Part::Part(Home hme, int nMes, int sp, vector<int> cf, int lb, int ub, int k, Stratum* low, int v_type) : Voice(hme, nMes, lb, ub, v_type){
+Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, Stratum* low, int v_type) : Voice(home, nMes, lb, ub, v_type){
     species         = sp;
     key             = k;
     lowest          = low;
@@ -49,7 +49,7 @@ string Part::to_string() const{
 
 
 
-Part::Part(Part& s) : Voice(s) {
+Part::Part(Home home, Part& s) : Voice(home, s) {
     species = s.species;
     key = s.key;
     lowest = s.lowest;
@@ -70,8 +70,8 @@ Part::Part(Part& s) : Voice(s) {
 }
 
 // Virtual clone function
-Part* Part::copy() {
-    return new Part(*this);
+Part* Part::clone(Home home) {
+    return new Part(home, *this);
 }
 
 BoolVar Part::getIsLowestIdx(int idx){

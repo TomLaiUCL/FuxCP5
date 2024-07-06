@@ -37,8 +37,8 @@ public:
 
     // virtual Space *copy() override;
 
-    SecondSpeciesCounterpoint(SecondSpeciesCounterpoint &s); // clone constructor
-    SecondSpeciesCounterpoint* copy() override; 
+    SecondSpeciesCounterpoint(Home home, SecondSpeciesCounterpoint &s); // clone constructor
+    SecondSpeciesCounterpoint* clone(Home home) override; 
 
 };
 

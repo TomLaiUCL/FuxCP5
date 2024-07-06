@@ -15,12 +15,12 @@
  * @param k the key of the composition
  * @param mSpecies the species from which this is called.
  */
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home hme, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
      int v_type):
-        Part(hme, nMes, FIRST_SPECIES, cf, lb, ub, k, low, v_type) { /// super constructor
+        Part(home, nMes, FIRST_SPECIES, cf, lb, ub, k, low, v_type) { /// super constructor
     motherSpecies = mSpecies;
     lengthCp1stSpecies = nMeasures;
-    cantus = c;
+    //cantus = c;
 
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
@@ -80,8 +80,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home hme, int nMes, vector<in
  * @param ub the upper bound for the counterpoint
  * @param k the key of the composition
  */
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home hme, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type) :
-        FirstSpeciesCounterpoint(hme, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type) ///call the general constructor
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type) :
+        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type) ///call the general constructor
 {
     //todo add here rules that are specific to the first species, rules that are used by other species are in the general constructor
 
@@ -117,7 +117,7 @@ string FirstSpeciesCounterpoint::to_string() const {
 // }
 
 // clone constructor
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(FirstSpeciesCounterpoint &s) : Part(s){
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, FirstSpeciesCounterpoint &s) : Part(s){
     motherSpecies = s.motherSpecies;
     cantus = s.cantus;
     firstSpeciesNotesCp.update(home, s.firstSpeciesNotesCp);
@@ -125,8 +125,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(FirstSpeciesCounterpoint &s) 
     firstSpeciesMelodicIntervals.update(home, s.firstSpeciesMelodicIntervals);
 }
 
-FirstSpeciesCounterpoint* FirstSpeciesCounterpoint::copy(){
-    return new FirstSpeciesCounterpoint(*this);
+FirstSpeciesCounterpoint* FirstSpeciesCounterpoint::clone(Home home){
+    return new FirstSpeciesCounterpoint(home, *this);
 }
 
 IntVarArray FirstSpeciesCounterpoint::getBranchingNotes(){

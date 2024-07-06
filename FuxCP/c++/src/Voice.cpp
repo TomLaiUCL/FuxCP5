@@ -1,7 +1,6 @@
 #include "../headers/Voice.hpp"
 
-Voice::Voice(Home hme, int nMes, int lb, int ub, int v_type) : home(hme){
-    home = hme;
+Voice::Voice(Home home, int nMes, int lb, int ub, int v_type){
     nMeasures = nMes; 
     size = nMes*4;
 
@@ -29,8 +28,7 @@ string Voice::to_string() const {
 
 
 // clone constructor
-Voice::Voice(Voice &s):home(s.home){
-    home = s.home;
+Voice::Voice(Home home, Voice &s){
     nMeasures = s.nMeasures;
     size = s.size;
     lowerBound = s.lowerBound;
@@ -41,8 +39,8 @@ Voice::Voice(Voice &s):home(s.home){
     // m_intervals_brut.update(home, s.m_intervals_brut);
 }
 
-Voice* Voice::copy(){
-    return new Voice(*this);
+Voice* Voice::clone(Home home){
+    return new Voice(home, *this);
 }
 
 IntVarArgs Voice::getFirstNotes(){

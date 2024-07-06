@@ -41,7 +41,7 @@ class Part : public Voice {
         Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, Stratum* low, int v_type);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
-        Part(Part& s);  // clone constructor
+        Part(Home home, Part& s);  // clone constructor
 
         int getSpecies() { return species; }
         int getKey() { return key; }
@@ -50,7 +50,7 @@ class Part : public Voice {
         /// must be implemented in the child classes, returns the variables to branch on
         // virtual IntVarArray getBranchingNotes();
 
-        virtual Part* copy() override;
+        virtual Part* clone(Home home) override;
 
         virtual string to_string() const;
 

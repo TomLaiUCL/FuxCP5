@@ -21,12 +21,16 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int k, int lb, int ub, 
 
 // COPY CONSTRUCTOR
 CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : Space(s){
-    /*if (s.cantusFirmus) {
+    if (s.cantusFirmus) {
         cantusFirmus = s.cantusFirmus->clone(*this);
     } else {
         cantusFirmus = nullptr;
-    }*/
-    cantusFirmus = s.cantusFirmus;
+    }
+    if (s.lowest) {
+        lowest = s.lowest->clone(*this);
+    } else {
+        lowest = nullptr;
+    }
     nMeasures = s.nMeasures; 
     key = s.key;
     lowerBound = s.lowerBound;

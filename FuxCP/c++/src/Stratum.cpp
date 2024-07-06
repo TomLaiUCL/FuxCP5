@@ -18,12 +18,12 @@ string Stratum::to_string() const {
 
 
 // clone constructor
-Stratum::Stratum(Stratum &s) : Voice(s){
+Stratum::Stratum(Home home, Stratum &s) : Voice(s){
     // update/clone here all variables that are not in voice
 }
 
-Stratum* Stratum::copy(){
-    return new Stratum(*this);
+Stratum* Stratum::clone(Home home){
+    return new Stratum(home, *this);
 }
 
 void Stratum::setNote(Home home, int index, IntVar note){

@@ -17,13 +17,16 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     species = sp; 
     counterpoint = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type);
     //create_lowest(*this, lowest, cantusFirmus, counterpoint);
-    cout << counterpoint->getBranchingNotes() << endl;
-    cout << counterpoint->getFirstNotes() << endl;
     branch(*this, counterpoint->getBranchingNotes(), INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 }
 // COPY CONSTRUCTOR
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : CounterpointProblem(s){
-    counterpoint = s.counterpoint;
+    //counterpoint = s.counterpoint;
+    if (s.counterpoint) {
+        counterpoint = s.counterpoint->clone(*this);
+    } else {
+        counterpoint = nullptr;
+    }
     species = s.species;
 }
 

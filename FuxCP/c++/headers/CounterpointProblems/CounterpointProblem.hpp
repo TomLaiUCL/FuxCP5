@@ -41,7 +41,7 @@ public:
 
     ///destructor
     //todo release the allocated memory (each object created must be deleted)
-    virtual ~CounterpointProblem(){ delete cantusFirmus; }  
+    virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; }  
 };
 
 #endif //MYPROJECT_COUNTERPOINTPROBLEM_HPP

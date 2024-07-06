@@ -30,15 +30,13 @@ class Voice{
         IntVarArray m_intervals_brut;
         // motions ? (w/r to lowest)
 
-        Home home;
-
         // Stratum lowestStratum;
 
 
     public:
         Voice(Home home, int nMes, int lb, int ub, int v_type);
 
-        Voice(Voice& s);  // clone constructor
+        Voice(Home home, Voice& s);  // clone constructor
 
         int getNMeasures() { return nMeasures; }
         int getSize() { return size; }
@@ -50,7 +48,7 @@ class Voice{
         /// must be implemented in the child classes, returns the variables to branch on
         // virtual IntVarArray getBranchingNotes();
 
-        virtual Voice* copy();
+        virtual Voice* clone(Home home);
 
         virtual string to_string() const;
 
