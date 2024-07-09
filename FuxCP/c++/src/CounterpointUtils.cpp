@@ -7,29 +7,48 @@
 
 
 Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> cantusFirmus, int lowerBound, int upperBound, int key, Stratum* low,
-    CantusFirmus* c, int v_type){
-    switch (species) { /// call the appropriate constructor for the counterpoint
-    case FIRST_SPECIES:
-        return new FirstSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type);
-        break;
-    case SECOND_SPECIES:
-        return new SecondSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type);
-        break;
-    default:
-        throw std::invalid_argument("Species not implemented");
+    CantusFirmus* c, int v_type, vector<int> m_costs, vector<int> g_costs, int nV){
+    switch(nV) {
+        case TWO_VOICES :
+            switch (species) { /// call the appropriate constructor for the counterpoint
+            case FIRST_SPECIES:
+                return new FirstSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, TWO_VOICES);
+                break;
+            case SECOND_SPECIES:
+                return new SecondSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, TWO_VOICES);
+                break;
+            default:
+                throw std::invalid_argument("Species not implemented");
+            }
+            break;
+        case THREE_VOICES :
+            switch (species) { /// call the appropriate constructor for the counterpoint
+            case FIRST_SPECIES:
+                return new FirstSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, 
+                    TWO_VOICES, THREE_VOICES);
+                break;
+            case SECOND_SPECIES:
+                return new SecondSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, THREE_VOICES);
+                break;
+            default:
+                throw std::invalid_argument("Species not implemented");
+            }
+            break;
+        default :
+            throw std::invalid_argument("Number of voices not implemented");
     }
 };
 
 
-CounterpointProblem* create_problem(vector<int> cf, vector<int> spList, int k, int lb, int ub, int v_type){
+CounterpointProblem* create_problem(vector<int> cf, vector<int> spList, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs){
     switch (spList.size())
     {
     case 1:
-        return new TwoVoiceCounterpoint(cf, spList[0], k, lb, ub, v_type);
+        return new TwoVoiceCounterpoint(cf, spList[0], k, lb, ub, v_type[0], m_costs, g_costs);
         break;
     
     case 2: 
-        return new ThreeVoiceCounterpoint(cf, spList, k, lb, ub, v_type); 
+        return new ThreeVoiceCounterpoint(cf, spList, k, lb, ub, v_type, m_costs, g_costs); 
         break;
 
     default:
@@ -53,7 +72,6 @@ void create_lowest(Home home, Stratum* lowest, CantusFirmus* cf, Part* cp1, Part
         if(nVoices==3){
             rel(home, voices[2], IRT_EQ, cp2->getFirstNotes()[i]);
         }
-            
         IntVarArray order = IntVarArray(home, nVoices, 0, 1);
         sorted_voices.push_back(IntVarArray(home, nVoices, 0, 127));
 
@@ -71,8 +89,6 @@ void create_lowest(Home home, Stratum* lowest, CantusFirmus* cf, Part* cp1, Part
         }
     }
 }
-
-
 
 ///////////////////////////////////////////////////////////////////
 //////////////     CONTSTRAINTS             ///////////////////////

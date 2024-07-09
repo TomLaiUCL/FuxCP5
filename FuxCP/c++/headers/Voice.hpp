@@ -22,19 +22,23 @@ class Voice{
 
         int lowerBound;
         int upperBound;
+        int species;
 
         int voice_type;
 
         IntVarArray notes;
         IntVarArray h_intervals;  // with respect to lowest stratum. TODO set to 0 if isLowest
         IntVarArray m_intervals_brut;
+        IntVarArray motions;
+
+        BoolVarArray isLowest;
         // motions ? (w/r to lowest)
 
         // Stratum lowestStratum;
 
 
     public:
-        Voice(Home home, int nMes, int lb, int ub, int v_type);
+        Voice(Home home, int nMes, int lb, int ub, int v_type, int sp);
 
         Voice(Home home, Voice& s);  // clone constructor
 
@@ -44,6 +48,8 @@ class Voice{
         int getLowerBound() { return lowerBound; }
         int getUpperBound() { return upperBound; }
 
+        IntVarArray getNotes() { return notes; }
+        IntVarArray getMelodicIntervals();
 
         /// must be implemented in the child classes, returns the variables to branch on
         // virtual IntVarArray getBranchingNotes();
@@ -53,6 +59,12 @@ class Voice{
         virtual string to_string() const;
 
         IntVarArgs getFirstNotes();
+
+        BoolVar getIsLowestIdx(int idx);
+
+        IntVarArray getHInterval();
+
+        int getSpecies();
 };
 
 

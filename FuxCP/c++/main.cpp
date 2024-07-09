@@ -13,14 +13,21 @@ using namespace std;
 int main(int argc, char* argv[]) {
     int upper_bound_domain = 72;
     int lower_bound_domain = 60;
-    vector<int> species = {FIRST_SPECIES};
+    vector<int> species = {FIRST_SPECIES, FIRST_SPECIES};
     vector<int> cantusFirmus = {60, 67, 65, 64, 62, 60};
     int size = cantusFirmus.size();
-    int v_type = 1;
+    vector<int> v_type = {2, 1};
+
+    vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
+    //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
+    vector<int> general_params = {4, 1, 1, 2, 2, 2, 8, 1};
+
+    //penult sixth, non-ciambata, con m after skip, h triad 3rd species, m2 eq zero, no syncopation, pref species slider
+    vector<int> specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
 
     // create a new problem
     // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-    auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type);
+    auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params);
     //cout << problem->to_string() << endl;
     // create a new search engine
     BAB<CounterpointProblem> e(problem);
@@ -33,7 +40,7 @@ int main(int argc, char* argv[]) {
         // cout << int_vector_to_string(cantusFirmus) << endl;
 
         delete pb;
-        if (nb_sol >= 10)
+        if (nb_sol >= 15)
             break;
     }
     cout << "No (more) solutions." << endl;

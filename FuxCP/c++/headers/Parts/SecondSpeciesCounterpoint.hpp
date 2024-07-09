@@ -29,7 +29,8 @@ public:
      * @param ub
      * @param k
      */
-    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type);
+    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
+    , vector<int> g_costs, int nV);
 
     string to_string() const override;
 
@@ -39,6 +40,8 @@ public:
 
     SecondSpeciesCounterpoint(Home home, SecondSpeciesCounterpoint &s); // clone constructor
     SecondSpeciesCounterpoint* clone(Home home) override; 
+
+    IntVarArray getFirstHInterval() override;
 
 };
 

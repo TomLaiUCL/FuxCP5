@@ -13,11 +13,9 @@ class CantusFirmus : public Part {
         vector<int> cf_vector;
         //IntVarArray melodicIntervals; not used for now
     public:
-        CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* low, int v_type);
+        CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* low, int v_type, vector<int> m_costs, vector<int> g_costs, int nV);
 
         // CantusFirmus(CantusFirmus &s);
-
-        IntVarArray getNotes() { return notes; }
 
         // IntVarArray getBranchingNotes() override;
 
@@ -28,6 +26,9 @@ class CantusFirmus : public Part {
 
         CantusFirmus(Home home, CantusFirmus& s); // clone constructor
         CantusFirmus* clone(Home home) override;
+
+        IntVarArray getFirstHInterval() override;
+
 };
 
 

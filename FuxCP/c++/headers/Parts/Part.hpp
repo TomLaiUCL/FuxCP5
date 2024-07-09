@@ -25,9 +25,16 @@ class Part : public Voice {
     protected:
         int species;
         int key;
-        Stratum* lowest;
-
-        BoolVarArray isLowest;
+        int nVoices;
+        //Stratum* lowest;
+        IntVarArray melodicDegreeCost;
+        IntVarArray fifthCostArray;
+        IntVarArray octaveCostArray;
+        BoolVarArray is_off;
+        IntVarArray offCostArray;
+        IntVarArray costs;
+        IntVarArray varietyCostArray;
+        IntVarArray directCostArray;
 
         vector<int> borrowed_scale;
         vector<int> scale;
@@ -37,15 +44,36 @@ class Part : public Voice {
 
         vector<int> extended_domain;
         vector<int> off_domain;
+
+        int secondCost;
+        int thirdCost;
+        int fourthCost;
+        int tritoneCost;
+        int fifthCost;
+        int sixthCost;
+        int seventhCost;
+        int octaveCost;
+
+        int borrowCost;
+        int h_fifthCost;
+        int h_octaveCost;
+        int succCost;
+        int varietyCost;
+        int triadCost;
+        int directMoveCost;
+        int penultCost;
+
+        int directCost;
+        int obliqueCost;
+        int contraryCost;
     public:
-        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, Stratum* low, int v_type);
+        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, int nV);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
         Part(Home home, Part& s);  // clone constructor
 
         int getSpecies() { return species; }
         int getKey() { return key; }
-        BoolVar getIsLowestIdx(int idx);
 
         /// must be implemented in the child classes, returns the variables to branch on
         // virtual IntVarArray getBranchingNotes();
@@ -55,6 +83,14 @@ class Part : public Voice {
         virtual string to_string() const;
 
         virtual IntVarArray getBranchingNotes();
+
+        virtual IntVarArray getFirstHInterval();
+
+        IntVarArray getPartNotes();
+
+        IntVarArray getCosts();
+
+        int getSuccCost();
 };
 
 

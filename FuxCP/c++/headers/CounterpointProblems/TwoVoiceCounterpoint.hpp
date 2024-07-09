@@ -17,6 +17,7 @@
 class TwoVoiceCounterpoint : public CounterpointProblem{
 protected:
     Part* counterpoint;
+    Stratum* upper;
 
     int species;        /// the species of the counterpoint to generate
 
@@ -29,7 +30,7 @@ public:
      * @param lb the lowest note possible for the counterpoint in MIDI
      * @param ub the highest note possible for the counterpoint in MIDI
      */
-    TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type);
+    TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs);
 
     TwoVoiceCounterpoint(TwoVoiceCounterpoint& s);
     Space* copy() override; 
@@ -42,7 +43,7 @@ public:
 
     ///destructor
     //todo release the allocated memory (each object created must be deleted) WILL THE COUNTERPOINTPROBLEM DESTRUCTOR BE AUTOMATICALLY CALLED?
-    ~TwoVoiceCounterpoint() { delete counterpoint; }  
+    ~TwoVoiceCounterpoint() { delete counterpoint; delete upper; }  
 };
 
 #endif //MYPROJECT_TWOVOICECOUNTERPOINT_HPP

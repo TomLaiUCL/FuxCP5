@@ -280,6 +280,7 @@ enum motions{
 const vector<int> PERFECT_CONSONANCES = {UNISSON, PERFECT_FIFTH, PERFECT_OCTAVE};
 const vector<int> IMPERFECT_CONSONANCES = {MAJOR_THIRD, MINOR_THIRD, MAJOR_SIXTH, MINOR_SIXTH};
 const vector<int> CONSONANCES = {UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE};
+const vector<int> TRIAD = {UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH};
 
 enum costValues{
     NO_COST,        //0
@@ -387,6 +388,21 @@ string intVar_to_string(const IntVar &var, bool absolute = false);
  * @return a string representing the values of the variables
  */
 string intVarArray_to_string(IntVarArray vars);
+
+/**
+ * Returns the value of a variable as a string
+ * @param var an integer variable
+ * @param absolute a boolean indicating if the value should be returned as an absolute value (default is false)
+ * @return a string representing the value of the variable
+ */
+string boolVar_to_string(const BoolVar &var, bool absolute = false);
+
+/**
+ * Returns the values of an array of variables as a string
+ * @param vars an array of integer variables
+ * @return a string representing the values of the variables
+ */
+string boolVarArray_to_string(BoolVarArray vars);
 
 /**
  * Returns the values of an array of variables as a string

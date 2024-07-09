@@ -19,6 +19,7 @@ protected:
     int lowerBound;     /// the lowest note possible for the counterpoints
     int upperBound;     /// the highest note possible for the counterpoints
     Stratum* lowest;
+    IntVarArray successiveCostArray;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:
@@ -29,7 +30,7 @@ public:
      * @param lb the lowest note possible for the counterpoints in MIDI
      * @param ub the highest note possible for the counterpoints in MIDI
      */
-    CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type);
+    CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, int nV);
 
     CounterpointProblem(CounterpointProblem& s);
     virtual Space* copy(); 

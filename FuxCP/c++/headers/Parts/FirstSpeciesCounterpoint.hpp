@@ -6,8 +6,8 @@
 #define FUXCP_BASE_FIRSTSPECIESCOUNTERPOINT_HPP
 
 #include "Part.hpp"
-#include "../Utilities.hpp"
 #include "CantusFirmus.hpp"
+#include "../constraints.hpp"
 
 /**
  * This class represents a counterpoint of the first species. It inherits from the Part class.
@@ -22,6 +22,8 @@ protected:
     IntVarArray firstSpeciesNotesCp;            /// The notes of the counterpoint that have to follow the rules for the first species
     IntVarArray firstSpeciesHarmonicIntervals;  /// The harmonic intervals between the notes that have to follow the 1st species rules and the lowest stratum
     IntVarArray firstSpeciesMelodicIntervals;   /// The melodic intervals between the notes that have to follow the 1st species rules
+    IntVarArray firstSpeciesMotions;
+    IntVarArray firstSpeciesMotionCosts;
 public:
     /**
      * General constructor. It takes the mother species as an argument and calls the super constructor from the part class.
@@ -35,7 +37,8 @@ public:
      * @param k the key of the composition
      * @param mSpecies the species from which this is called.
      */
-    FirstSpeciesCounterpoint(Home  home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type);
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
+    , vector<int> m_costs, vector<int> g_costs, int nV);
 
     /**
      * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
@@ -46,7 +49,20 @@ public:
      * @param ub the upper bound for the counterpoint
      * @param k the key of the composition
      */
-    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type);
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    , vector<int> g_costs, int nV);
+
+    /**
+     * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
+     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints as well as the branching.
+     * @param nMes the number of measures in the composition
+     * @param cf the cantus firmus todo maybe it should be a CantusFirmusObject
+     * @param lb the lower bound for the counterpoint
+     * @param ub the upper bound for the counterpoint
+     * @param k the key of the composition
+     */
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    , vector<int> g_costs, int nV1, int nV2);
 
     /// Getters
     int getLengthCp1stSpecies() {return lengthCp1stSpecies;};
@@ -68,7 +84,11 @@ public:
 
     virtual IntVarArray getBranchingNotes() override;
 
+    IntVarArray getFirstHInterval() override;
+
 };
+
+void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 
 
 #endif //FUXCP_BASE_FIRSTSPECIESCOUNTERPOINT_HPP
