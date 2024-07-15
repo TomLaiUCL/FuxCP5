@@ -8,7 +8,7 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type) : Voice(home, 
 //if the stratum is in the upper strata, this constructor will create the h_intervals to the lowest stratum
 Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes) : Stratum(home, nMes, lb, ub, v_type){
     for(int i = 0; i < h_intervals.size(); i++){
-        rel(home, h_intervals[i]==(notes[i]-lowestNotes[i]));
+        rel(home, h_intervals[i]==((notes[i]-lowestNotes[i])%12));
     }
 }
 

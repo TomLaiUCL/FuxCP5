@@ -9,7 +9,8 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs) :
+ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
+    int bm) :
     CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, THREE_VOICES){
     species = sp;
 
@@ -20,9 +21,18 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
 
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], key, lowest, 
-        cantusFirmus, v_type[0], m_costs, g_costs, THREE_VOICES);
+        cantusFirmus, v_type[0], m_costs, g_costs, bm, THREE_VOICES);
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], key, lowest, 
-        cantusFirmus, v_type[1], m_costs, g_costs, THREE_VOICES);
+        cantusFirmus, v_type[1], m_costs, g_costs, bm, THREE_VOICES);
+
+    cout << (6 * v_type[0] - 6) + cf[0] << endl;
+    cout << (6 * v_type[0] + 12) + cf[0] << endl;
+
+    cout << (6 * v_type[1] - 6) + cf[0] << endl;
+    cout << (6 * v_type[1] + 12) + cf[0] << endl;
+
+    cout << counterpoint_1->getFirstHInterval() << endl;
+    cout << counterpoint_2->getFirstHInterval() << endl;
 
     //P4 avoid successive perfect consonances
     int scc_cz = 0;
@@ -76,6 +86,24 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
         }
     }
 
+    //P6 : no move in same direction
+    for(int i = 0; i < parts[0]->getMotions().size(); i++){
+        rel(*this, expr(*this, parts[0]->getMotions()[i]==2 && parts[1]->getMotions()[i]==2), BOT_AND, expr(*this, parts[2]->getMotions()[i]==2), 0);
+    }
+
+    //P7 : no suxxessive ascending sixths
+    for(int p1 = 0; p1 < parts.size(); p1++){
+        for(int p2 = p1+1; p2 < parts.size(); p2++){
+            for(int j = 1; j < parts[p1]->getFirstHInterval().size()-1; j++){
+                rel(*this, ((parts[p1]->getFirstHInterval()[j-1]!=MINOR_SIXTH && parts[p1]->getFirstHInterval()[j-1]!=MAJOR_SIXTH) && 
+                    (parts[p2]->getFirstHInterval()[j-1]!=MINOR_SIXTH && parts[p2]->getFirstHInterval()[j-1]!=MAJOR_SIXTH)) || (
+                        (parts[p1]->getFirstHInterval()[j]!=MINOR_SIXTH && parts[p1]->getFirstHInterval()[j]!=MAJOR_SIXTH) && 
+                    (parts[p2]->getFirstHInterval()[j]!=MINOR_SIXTH && parts[p2]->getFirstHInterval()[j]!=MAJOR_SIXTH)) || (
+                        parts[p1]->getFirstMInterval()[j]>0 || parts[p2]->getFirstMInterval()[j] > 0));
+            }
+        }
+    }
+
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size()*2, 0, 127);
 
     int c_sz = 0;
@@ -90,6 +118,20 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     lowest->setCantusPointer(cantusFirmus);
     lowest->setCpPointer(*this, counterpoint_1, counterpoint_2);
     lowest->setLowest(*this, upper1, upper2);
+
+    cout << counterpoint_1->getBranchingNotes() << endl;
+    
+    //TEST
+    //cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 3v cf
+    vector<int> cp1 = {60,60,60,62,58,59,57,69,65,62,64,65};
+    vector<int> cp2 = {53,52,53,50,55,55,53,45,50,50,48,41};
+    for(int i = 0; i < 12; i++){
+        //la mi so fa mi do la si si la so# la
+        //69 64 67 65 64 72 69 71 71 69 68  69
+        
+        rel(*this, counterpoint_1->getFirstNotes()[i], IRT_EQ, cp1[i]);
+        rel(*this, counterpoint_2->getFirstNotes()[i], IRT_EQ, cp2[i]);
+    }
 
     uniteCounterpoints();
     uniteCosts();

@@ -31,7 +31,7 @@ public:
      * @param lb the lowest note possible for the counterpoint in MIDI
      * @param ub the highest note possible for the counterpoint in MIDI
      */
-    ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs);
+    ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, int bm);
 
     ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s);
     Space* copy() override; 

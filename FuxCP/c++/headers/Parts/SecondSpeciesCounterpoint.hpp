@@ -30,7 +30,7 @@ public:
      * @param k
      */
     SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
-    , vector<int> g_costs, int nV);
+    , vector<int> g_costs, int bm, int nV);
 
     string to_string() const override;
 
@@ -42,6 +42,10 @@ public:
     SecondSpeciesCounterpoint* clone(Home home) override; 
 
     IntVarArray getFirstHInterval() override;
+
+    IntVarArray getMotions() override;
+
+    IntVarArray getFirstMInterval() override;
 
 };
 

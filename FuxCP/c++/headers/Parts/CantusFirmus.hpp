@@ -29,6 +29,10 @@ class CantusFirmus : public Part {
 
         IntVarArray getFirstHInterval() override;
 
+        IntVarArray getFirstMInterval() override;
+
+        IntVarArray getMotions() override;
+
 };
 
 

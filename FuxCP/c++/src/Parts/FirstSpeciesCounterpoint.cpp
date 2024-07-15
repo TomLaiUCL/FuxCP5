@@ -16,19 +16,25 @@
  * @param mSpecies the species from which this is called.
  */
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
-     int v_type, vector<int> m_costs, vector<int> g_costs, int nV):
-        Part(home, nMes, FIRST_SPECIES, cf, lb, ub, k, v_type, m_costs, g_costs, nV) { /// super constructor
+     int v_type, vector<int> m_costs, vector<int> g_costs, int bm, int nV):
+        Part(home, nMes, FIRST_SPECIES, cf, lb, ub, k, v_type, m_costs, g_costs, nV, bm) { /// super constructor
     motherSpecies = mSpecies;
     lengthCp1stSpecies = nMeasures;
     //cantus = c;
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
-    
-    extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+    if(borrowMode==1){
+        extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
+    } else {
+        extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+    }
     off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
     /// First species notes in the counterpoint
     firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(extended_domain)));
+    if(borrowMode==1){
+        firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
+    }
 
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
     
@@ -38,7 +44,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     firstSpeciesHarmonicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES), UNISSON, PERFECT_OCTAVE);
     rel(home, firstSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),h_intervals.size()));
     for(int i = 0; i < firstSpeciesHarmonicIntervals.size(); i++){
-        rel(home, (firstSpeciesHarmonicIntervals[i])==(firstSpeciesNotesCp[i]-low->getNotes()[i*4]));
+        rel(home, (firstSpeciesHarmonicIntervals[i])==((firstSpeciesNotesCp[i]-low->getNotes()[i*4])%12));
     }
     
     /// Melodic intervals for the first species notes
@@ -184,10 +190,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
  * @param k the key of the composition
  */
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type
-    , vector<int> m_costs, vector<int> g_costs, int nV) :
-        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, nV) ///call the general constructor
+    , vector<int> m_costs, vector<int> g_costs, int bm, int nV) :
+        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, bm, nV) ///call the general constructor
 {
-    
     //todo add here rules that are specific to the first species, rules that are used by other species are in the general constructor
     //H7,H8 from Thibault : penultimate note major sixth or minor third
     int p = firstSpeciesNotesCp.size()-2;
@@ -234,14 +239,16 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 
 //First species 3 voices constructor
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, 
-    vector<int> m_costs, vector<int> g_costs, int nV1, int nV2) : 
-    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, nV2) ///call the general constructor
+    vector<int> m_costs, vector<int> g_costs, int bm, int nV1, int nV2) : 
+    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, bm, nV2) ///call the general constructor
 {
+    
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
     //H7, H8 three voices version
     int p = firstSpeciesNotesCp.size()-2;
-    dom(home, firstSpeciesHarmonicIntervals[p], IntSet(IntArgs({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH})));
+    //this rule actively excludes fux examples? see figure 109 page 82
+    //dom(home, firstSpeciesHarmonicIntervals[p], IntSet(IntArgs({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH})));
 
     //M4 notes should be as diverse as possible
     int temp = 0;
@@ -267,7 +274,11 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
             (directCostArray[j]==0));
     }
 
-    //P4 avoid successive perfect consonances
+    //P3 from Thibault : no battuta
+    for(int j = 0; j < firstSpeciesMotions.size(); j++){
+        rel(home, expr(home, firstSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
+            BOT_AND, isLowest[j], 0);
+    }
 
 
     costs = IntVarArray(home, 7, 0, 1000);
@@ -347,4 +358,12 @@ void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs){
 
 IntVarArray FirstSpeciesCounterpoint::getFirstHInterval(){
     return firstSpeciesHarmonicIntervals;
+}
+
+IntVarArray FirstSpeciesCounterpoint::getMotions(){
+    return firstSpeciesMotions;
+}
+
+IntVarArray FirstSpeciesCounterpoint::getFirstMInterval(){
+    return firstSpeciesMelodicIntervals;
 }

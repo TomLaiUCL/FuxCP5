@@ -26,6 +26,7 @@ class Part : public Voice {
         int species;
         int key;
         int nVoices;
+        int borrowMode;
         //Stratum* lowest;
         IntVarArray melodicDegreeCost;
         IntVarArray fifthCostArray;
@@ -67,7 +68,7 @@ class Part : public Voice {
         int obliqueCost;
         int contraryCost;
     public:
-        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, int nV);
+        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, int nV, int bm);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
         Part(Home home, Part& s);  // clone constructor
@@ -85,6 +86,10 @@ class Part : public Voice {
         virtual IntVarArray getBranchingNotes();
 
         virtual IntVarArray getFirstHInterval();
+
+        virtual IntVarArray getFirstMInterval();
+
+        virtual IntVarArray getMotions();
 
         IntVarArray getPartNotes();
 

@@ -5,14 +5,18 @@
 #include "../../headers/Parts/CantusFirmus.hpp"
 
 CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* low, int v_type, vector<int> m_costs, vector<int> g_costs, int nV) :
-    Part(home, size, CANTUS_FIRMUS, cf, 0, 127, k, v_type, m_costs, g_costs, nV){
+    Part(home, size, CANTUS_FIRMUS, cf, 0, 127, k, v_type, m_costs, g_costs, nV, -1){
     cf_vector = cf;
     notes = IntVarArray(home, size, lowerBound, upperBound);
     /// Melodic intervals for the first species notes
     m_intervals_brut = IntVarArray(home, notes.size()-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    h_intervals = IntVarArray(home, size, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     ///link melodic intervals
     for(int i = 0; i < m_intervals_brut.size(); i++)
         rel(home, m_intervals_brut[i], IRT_EQ, expr(home, notes[i+1] - notes[i]));
+    for(int i = 0; i < size; i++){
+        rel(home, h_intervals[i], IRT_EQ, expr(home, (notes[i]-low->getFirstNotes()[i])%12));
+    }
     /// link aux variables de la part
     //rel(home, active_notes, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
 
@@ -83,4 +87,12 @@ CantusFirmus* CantusFirmus::clone(Home home){
 
 IntVarArray CantusFirmus::getFirstHInterval(){
     return h_intervals;
+}
+
+IntVarArray CantusFirmus::getMotions(){
+    return motions;
+}
+
+IntVarArray CantusFirmus::getFirstMInterval(){
+    return m_intervals_brut;
 }

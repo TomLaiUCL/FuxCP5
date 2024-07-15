@@ -13,11 +13,11 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs) : 
+TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, int bm) : 
     CounterpointProblem(cf, k, lb, ub, v_type, m_costs, g_costs, TWO_VOICES){
     species = sp;
     upper = new Stratum(*this, nMeasures, 0, 127, v_type, lowest->getNotes()); 
-    counterpoint = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type, m_costs, g_costs, TWO_VOICES);
+    counterpoint = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type, m_costs, g_costs, bm, TWO_VOICES);
 
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
     dom(*this, counterpoint->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
@@ -30,6 +30,16 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     lowest->setCantusPointer(cantusFirmus);
     lowest->setCpPointer(*this, counterpoint);
     lowest->setLowest(*this, upper);
+
+    vector<int> cp ={69,64,67,65,64,72,69,71,71,69,68,69};
+    //cp ={57,57,55,53,52,52,50,48,55,57,56,57};
+    for(int i = 0; i < counterpoint->getNMeasures(); i++){
+        //la mi so fa mi do la si si la so# la
+        //69 64 67 65 64 72 69 71 71 69 68  69
+        
+        rel(*this, counterpoint->getFirstNotes()[i], IRT_EQ, cp[i]);
+    }
+
     //upper->setNote(*this, 5, counterpoint->getFirstNotes()[5]);
     branch(*this, counterpoint->getBranchingNotes(), INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 }

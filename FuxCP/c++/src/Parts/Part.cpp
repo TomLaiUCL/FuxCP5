@@ -5,10 +5,11 @@
 #include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
-Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, int nV) : 
+Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, int nV, int bm) : 
     Voice(home, nMes, lb, ub, v_type, sp){
     key             = k;
     nVoices         = nV;
+    borrowMode      = bm;
     //lowest          = low;
     isLowest        = BoolVarArray(home, nMeasures, 0, 1);
     
@@ -75,6 +76,7 @@ string Part::to_string() const{
 Part::Part(Home home, Part& s) : Voice(home, s) {
     key = s.key;
     nVoices = s.nVoices;
+    borrowMode = s.borrowMode;
     //lowest = s.lowest;
     
 
@@ -141,6 +143,14 @@ int Part::getSuccCost(){
 
 IntVarArray Part::getFirstHInterval(){
     return h_intervals;
+}
+
+IntVarArray Part::getMotions(){
+    return motions;
+}
+
+IntVarArray Part::getFirstMInterval(){
+    return m_intervals_brut;
 }
 
 IntVarArray Part::getCosts(){
