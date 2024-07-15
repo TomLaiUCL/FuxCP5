@@ -16,14 +16,14 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lo
 Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes, int nV) : Stratum(home, nMes, lb, ub, v_type, lowestNotes){
 
     //G8 Last chord can only consist of notes of the harmonic triad
-    dom(home, h_intervals[h_intervals.size()-4], IntSet(IntArgs(TRIAD)));
+    dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(TRIAD)));
 
     //H10 No tenths in last chord
-    rel(home, ((notes[notes.size()-4]-lowestNotes[lowestNotes.size()-4])>12) >> (h_intervals[h_intervals.size()-4]!=MINOR_THIRD && 
+    rel(home, ((notes[notes.size()-4]-lowestNotes[lowestNotes.size()-1])>12) >> (h_intervals[h_intervals.size()-1]!=MINOR_THIRD && 
         h_intervals[h_intervals.size()-4]!=MAJOR_THIRD));
 
     //H12 Last chord cannot include a minor third
-    rel(home, h_intervals[h_intervals.size()-4], IRT_NQ, 3);
+    rel(home, h_intervals[h_intervals.size()-1], IRT_NQ, 3);
 
 }
 

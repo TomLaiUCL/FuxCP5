@@ -20,6 +20,10 @@ protected:
     IntVarArray secondSpeciesNotesCp;               /// The notes of the counterpoint that have to follow the rules for the 2nd species
     IntVarArray secondSpeciesHarmonicIntervals;     /// The harmonic intervals between the notes that have to follow the 2nd species rules and the cantus firmus
     IntVarArray secondSpeciesMelodicIntervals;      /// The melodic intervals between the notes that have to follow the 2nd species rules
+    IntVarArray secondSpeciesMotions;               /// This array is the array of REAL motions
+    IntVarArray secondSpeciesMotionCosts;
+    IntVarArray secondSpeciesRealMotions;
+    IntVarArray secondSpeciesRealMotionCosts;
 public:
     /**
      * 
@@ -46,6 +50,8 @@ public:
     IntVarArray getMotions() override;
 
     IntVarArray getFirstMInterval() override;
+
+    IntVarArray getBranchingNotes() override;
 
 };
 

@@ -15,6 +15,7 @@ Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> can
                 return new FirstSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, bm, TWO_VOICES);
                 break;
             case SECOND_SPECIES:
+                
                 return new SecondSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, bm, TWO_VOICES);
                 break;
             default:

@@ -15,7 +15,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     species = sp;
 
     //G9 last chord must have the same fundamental as the cf (used throughout the composition)
-    rel(*this, expr(*this, lowest->getNotes()[lowest->getNotes().size()-4]%12), IRT_EQ, expr(*this, cantusFirmus->getNotes()[cantusFirmus->getNotes().size()-1]%12));
+    rel(*this, expr(*this, lowest->getNotes()[lowest->getNotes().size()-1]%12), IRT_EQ, expr(*this, cantusFirmus->getNotes()[cantusFirmus->getNotes().size()-1]%12));
 
     upper1 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
     upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
@@ -122,16 +122,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     cout << counterpoint_1->getBranchingNotes() << endl;
     
     //TEST
-    //cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 3v cf
-    vector<int> cp1 = {60,60,60,62,58,59,57,69,65,62,64,65};
-    vector<int> cp2 = {53,52,53,50,55,55,53,45,50,50,48,41};
-    for(int i = 0; i < 12; i++){
-        //la mi so fa mi do la si si la so# la
-        //69 64 67 65 64 72 69 71 71 69 68  69
-        
-        rel(*this, counterpoint_1->getFirstNotes()[i], IRT_EQ, cp1[i]);
-        rel(*this, counterpoint_2->getFirstNotes()[i], IRT_EQ, cp2[i]);
-    }
 
     uniteCounterpoints();
     uniteCosts();

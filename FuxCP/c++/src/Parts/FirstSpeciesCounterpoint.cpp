@@ -54,13 +54,13 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     for(int i = 0; i < firstSpeciesMelodicIntervals.size(); i++)
       rel(home, firstSpeciesMelodicIntervals[i], IRT_EQ, expr(home, firstSpeciesNotesCp[i+1] - firstSpeciesNotesCp[i]));
     
-    is_off = BoolVarArray(home, firstSpeciesNotesCp.size(), 0, 1);
+    is_off = BoolVarArray(home, notes.size(), 0, 1);
     for(int i = 0; i < is_off.size(); i++){
         IntVarArray res = IntVarArray(home, off_domain.size(), 0, 1);
         IntVar sm = IntVar(home, 0, off_domain.size());
         for(int l = 0; l < off_domain.size(); l++){      // TODO il y a d'office une meilleure manière de faire que double boucle for
             BoolVar b1 = BoolVar(home, 0, 1);
-            rel(home, firstSpeciesNotesCp[i], IRT_EQ, off_domain[l], Reify(b1));   // REIFY RM_PMI?
+            rel(home, notes[i], IRT_EQ, off_domain[l], Reify(b1));   // REIFY RM_PMI?
             ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);
         }
         IntVarArgs x(res.size());
@@ -78,7 +78,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, (is_off[i]==1) >> (offCostArray[i]==borrowCost));
     }
     
-    melodicDegreeCost = IntVarArray(home, firstSpeciesMelodicIntervals.size(), IntSet({secondCost, thirdCost, fourthCost, tritoneCost, fifthCost, 
+    melodicDegreeCost = IntVarArray(home, m_intervals_brut.size(), IntSet({secondCost, thirdCost, fourthCost, tritoneCost, fifthCost, 
         sixthCost, seventhCost, octaveCost}));
 
     //create motions arrays
@@ -128,7 +128,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, expr(home, m_intervals_brut[i]==1), BOT_AND, expr(home, m_intervals_brut[i+1]==1), 0);
         rel(home, expr(home, m_intervals_brut[i]==-1), BOT_AND, expr(home, m_intervals_brut[i+1]==-1), 0);
     }
-
+    cout << "HEREEEEEEEEEEE" << endl;
     // G7 : melodic intervals should be small (works for 1st, 2nd and 3rd species)
     int idx = 0;
     for(int i = 0; i < m_intervals_brut.size(); i+=4/notesPerMeasure.at(motherSpecies)){
@@ -142,7 +142,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, (abs(m_intervals_brut[i])==PERFECT_OCTAVE) >> (melodicDegreeCost[idx]==octaveCost));
         idx++;
     }
-
+    cout << "HEREEEEEEEEEEE" << endl;
     /// Harmonic rules
     //todo put each rule in a function so it is easy to call them in different constructors depending on the species calling the first species
     /// H1 from Thibault: All harmonic intervals must be consonances

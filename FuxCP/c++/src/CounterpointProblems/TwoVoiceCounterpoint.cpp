@@ -23,22 +23,13 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     dom(*this, counterpoint->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
 
     /// H3 from Thibault: The last harmonic interval must be a perfect consonance
-    dom(*this, counterpoint->getHInterval()[counterpoint->getHInterval().size()-4], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    dom(*this, counterpoint->getHInterval()[counterpoint->getHInterval().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
 
     //rel(*this, counterpoint->getFirstNotes()[2], IRT_EQ, 76);
     //create_lowest(*this, lowest, cantusFirmus, counterpoint);
     lowest->setCantusPointer(cantusFirmus);
     lowest->setCpPointer(*this, counterpoint);
     lowest->setLowest(*this, upper);
-
-    vector<int> cp ={69,64,67,65,64,72,69,71,71,69,68,69};
-    //cp ={57,57,55,53,52,52,50,48,55,57,56,57};
-    for(int i = 0; i < counterpoint->getNMeasures(); i++){
-        //la mi so fa mi do la si si la so# la
-        //69 64 67 65 64 72 69 71 71 69 68  69
-        
-        rel(*this, counterpoint->getFirstNotes()[i], IRT_EQ, cp[i]);
-    }
 
     //upper->setNote(*this, 5, counterpoint->getFirstNotes()[5]);
     branch(*this, counterpoint->getBranchingNotes(), INT_VAR_SIZE_MIN(), INT_VAL_MIN());

@@ -13,14 +13,14 @@ using namespace std;
 int main(int argc, char* argv[]) {
     int upper_bound_domain = 72;
     int lower_bound_domain = 60;
-    vector<int> species = {FIRST_SPECIES,FIRST_SPECIES};
+    vector<int> species = {SECOND_SPECIES};
     //la do si re do mi fa mi re do si la
     //57 60 59 62 60 64 65 64 62 60 59 57
     vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65};
     
     int size = cantusFirmus.size();
-    vector<int> v_type = {-1,-3};
+    vector<int> v_type = {1};
 
     vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
     //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check

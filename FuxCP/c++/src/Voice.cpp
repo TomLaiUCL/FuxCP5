@@ -11,9 +11,9 @@ Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
 
     species = sp;
 
-    notes = IntVarArray(home, size, lowerBound, upperBound);
-    h_intervals = IntVarArray(home, size, UNISSON, PERFECT_OCTAVE);
-    m_intervals_brut = IntVarArray(home, size-4, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    notes = IntVarArray(home, size-3, lowerBound, upperBound);
+    h_intervals = IntVarArray(home, size-3, UNISSON, PERFECT_OCTAVE);
+    m_intervals_brut = IntVarArray(home, size-7, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     
 }
 
