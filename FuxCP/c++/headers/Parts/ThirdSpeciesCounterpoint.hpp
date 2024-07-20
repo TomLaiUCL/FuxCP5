@@ -16,6 +16,7 @@ protected :
     BoolVarArray isDiminution;
     IntVarArray cambiataCostArray;
     IntVarArray m2ZeroArray;
+    IntVarArray thirdHTriadArray;
 
 public:
 
