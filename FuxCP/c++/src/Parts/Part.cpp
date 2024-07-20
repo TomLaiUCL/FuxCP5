@@ -119,6 +119,7 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     costs.update(home, s.costs);
     varietyCostArray.update(home, s.varietyCostArray);
     directCostArray.update(home, s.directCostArray);
+    isConsonance.update(home, s.isConsonance);
 
 //    mIntervalsCp.update(home, s.mIntervalsCp);
 //    motionsCfCp.update(home, s.motionsCfCp);
@@ -155,4 +156,16 @@ IntVarArray Part::getFirstMInterval(){
 
 IntVarArray Part::getCosts(){
     return costs;
+}
+
+int Part::getVarietyCost(){
+    return varietyCost;
+}
+
+IntVar Part::getVarietyArray(int idx){
+    return varietyCostArray[idx];
+}
+
+int Part::getHIntervalSize(){
+    return h_intervals.size();
 }

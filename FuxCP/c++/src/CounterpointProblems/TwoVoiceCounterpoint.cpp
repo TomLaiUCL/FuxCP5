@@ -59,6 +59,7 @@ string TwoVoiceCounterpoint::to_string() const {
     string text = "";
     text += CounterpointProblem::to_string();
     text += "TwoVoiceCounterpoint problem object : \n";
+    text += "Cantus Firmus : \n" + cantusFirmus->to_string() + "\n";
     text += "Counterpoint : \n" +counterpoint->to_string() + "\n";  // segmentation fault here was because counterpoint was deleted (but why did it still work when tostring was not virtual?)
     text += "Lowest : \n" +lowest->to_string() + "\n";
     text += "Upper : \n" +upper->to_string() + "\n";

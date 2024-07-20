@@ -96,3 +96,11 @@ IntVarArray CantusFirmus::getMotions(){
 IntVarArray CantusFirmus::getFirstMInterval(){
     return m_intervals_brut;
 }
+
+IntVarArgs CantusFirmus::getFirstNotes(){
+    return notes.slice(0, 4/4, notes.size());
+}
+
+int CantusFirmus::getHIntervalSize(){
+    return h_intervals.size();
+}

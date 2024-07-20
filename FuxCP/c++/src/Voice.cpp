@@ -13,7 +13,7 @@ Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
 
     notes = IntVarArray(home, size-3, lowerBound, upperBound);
     h_intervals = IntVarArray(home, size-3, UNISSON, PERFECT_OCTAVE);
-    m_intervals_brut = IntVarArray(home, size-7, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    m_intervals_brut = IntVarArray(home, notes.size()-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     
 }
 
@@ -46,11 +46,7 @@ Voice* Voice::clone(Home home){
 }
 
 IntVarArgs Voice::getFirstNotes(){
-    if(species==CANTUS_FIRMUS){
-        return notes.slice(0, 4/4, notes.size());
-    } else {
-        return notes.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES),notes.size());
-    }
+    return notes.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES),notes.size());
 }
 
 BoolVar Voice::getIsLowestIdx(int idx){
@@ -67,4 +63,8 @@ IntVarArray Voice::getHInterval(){
 
 int Voice::getSpecies(){
     return species;
+}
+
+IntVarArgs Voice::getSecondHInterval(){
+    return h_intervals.slice(2,4,h_intervals.size());
 }

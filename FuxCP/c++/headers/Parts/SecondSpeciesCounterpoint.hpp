@@ -24,6 +24,10 @@ protected:
     IntVarArray secondSpeciesMotionCosts;
     IntVarArray secondSpeciesRealMotions;
     IntVarArray secondSpeciesRealMotionCosts;
+    BoolVarArray isDiminution;
+    IntVarArray penultCostArray;
+    IntVarArray secondSpeciesArsisArray;
+
 public:
     /**
      * 
@@ -33,8 +37,15 @@ public:
      * @param ub
      * @param k
      */
+
     SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
     , vector<int> g_costs, int bm, int nV);
+
+    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, int mSpec, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
+    , vector<int> g_costs, int bm, int nV);
+
+    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
+    , vector<int> g_costs, int bm, int nV1, int nv2);
 
     string to_string() const override;
 
@@ -52,6 +63,8 @@ public:
     IntVarArray getFirstMInterval() override;
 
     IntVarArray getBranchingNotes() override;
+
+    int getHIntervalSize() override;
 
 };
 

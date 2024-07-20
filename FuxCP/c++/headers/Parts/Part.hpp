@@ -36,6 +36,7 @@ class Part : public Voice {
         IntVarArray costs;
         IntVarArray varietyCostArray;
         IntVarArray directCostArray;
+        BoolVarArray isConsonance;
 
         vector<int> borrowed_scale;
         vector<int> scale;
@@ -96,6 +97,12 @@ class Part : public Voice {
         IntVarArray getCosts();
 
         int getSuccCost();
+
+        int getVarietyCost();
+
+        IntVar getVarietyArray(int idx);
+
+        virtual int getHIntervalSize();
 };
 
 

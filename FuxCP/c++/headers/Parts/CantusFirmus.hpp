@@ -33,6 +33,10 @@ class CantusFirmus : public Part {
 
         IntVarArray getMotions() override;
 
+        IntVarArgs getFirstNotes() override;
+
+        int getHIntervalSize() override;
+
 };
 
 

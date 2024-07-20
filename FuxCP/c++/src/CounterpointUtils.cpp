@@ -23,13 +23,15 @@ Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> can
             }
             break;
         case THREE_VOICES :
+            cout << "going into 3 voices" << endl;
             switch (species) { /// call the appropriate constructor for the counterpoint
             case FIRST_SPECIES:
                 return new FirstSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, bm,
                     TWO_VOICES, THREE_VOICES);
                 break;
             case SECOND_SPECIES:
-                return new SecondSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, bm, THREE_VOICES);
+                return new SecondSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, bm, 
+                    TWO_VOICES, THREE_VOICES);
                 break;
             default:
                 throw std::invalid_argument("Species not implemented");

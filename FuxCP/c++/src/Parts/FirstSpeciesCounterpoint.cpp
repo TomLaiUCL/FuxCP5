@@ -17,7 +17,7 @@
  */
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
      int v_type, vector<int> m_costs, vector<int> g_costs, int bm, int nV):
-        Part(home, nMes, FIRST_SPECIES, cf, lb, ub, k, v_type, m_costs, g_costs, nV, bm) { /// super constructor
+        Part(home, nMes, mSpecies, cf, lb, ub, k, v_type, m_costs, g_costs, nV, bm) { /// super constructor
     motherSpecies = mSpecies;
     lengthCp1stSpecies = nMeasures;
     //cantus = c;
@@ -49,7 +49,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     
     /// Melodic intervals for the first species notes
     firstSpeciesMelodicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-    rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
+    
     ///link melodic intervals
     for(int i = 0; i < firstSpeciesMelodicIntervals.size(); i++)
       rel(home, firstSpeciesMelodicIntervals[i], IRT_EQ, expr(home, firstSpeciesNotesCp[i+1] - firstSpeciesNotesCp[i]));
@@ -118,8 +118,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     }
     
     // create pefectConsArray
-    fifthCostArray = IntVarArray(home, firstSpeciesNotesCp.size(), IntSet({0, h_fifthCost}));
-    octaveCostArray = IntVarArray(home, firstSpeciesNotesCp.size(), IntSet({0, h_octaveCost}));
+    fifthCostArray = IntVarArray(home, h_intervals.size(), IntSet({0, h_fifthCost}));
+    octaveCostArray = IntVarArray(home, h_intervals.size(), IntSet({0, h_octaveCost}));
     /// General rules
 
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
@@ -132,21 +132,21 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     // G7 : melodic intervals should be small (works for 1st, 2nd and 3rd species)
     int idx = 0;
     for(int i = 0; i < m_intervals_brut.size(); i+=4/notesPerMeasure.at(motherSpecies)){
-        rel(home, (abs(m_intervals_brut[i])<MINOR_THIRD) >> (melodicDegreeCost[idx]==secondCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_THIRD || abs(m_intervals_brut[i])==MAJOR_THIRD) >> (melodicDegreeCost[idx]==thirdCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_FOURTH) >> (melodicDegreeCost[idx]==fourthCost));
-        rel(home, (abs(m_intervals_brut[i])==TRITONE) >> (melodicDegreeCost[idx]==tritoneCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_FIFTH) >> (melodicDegreeCost[idx]==fifthCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_SIXTH || abs(m_intervals_brut[i])==MAJOR_SIXTH) >> (melodicDegreeCost[idx]==sixthCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_SEVENTH || abs(m_intervals_brut[i])==MAJOR_SEVENTH) >> (melodicDegreeCost[idx]==seventhCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_OCTAVE) >> (melodicDegreeCost[idx]==octaveCost));
+        rel(home, (abs(m_intervals_brut[i])<MINOR_THIRD) >> (melodicDegreeCost[i]==secondCost));
+        rel(home, (abs(m_intervals_brut[i])==MINOR_THIRD || abs(m_intervals_brut[i])==MAJOR_THIRD) >> (melodicDegreeCost[i]==thirdCost));
+        rel(home, (abs(m_intervals_brut[i])==PERFECT_FOURTH) >> (melodicDegreeCost[i]==fourthCost));
+        rel(home, (abs(m_intervals_brut[i])==TRITONE) >> (melodicDegreeCost[i]==tritoneCost));
+        rel(home, (abs(m_intervals_brut[i])==PERFECT_FIFTH) >> (melodicDegreeCost[i]==fifthCost));
+        rel(home, (abs(m_intervals_brut[i])==MINOR_SIXTH || abs(m_intervals_brut[i])==MAJOR_SIXTH) >> (melodicDegreeCost[i]==sixthCost));
+        rel(home, (abs(m_intervals_brut[i])==MINOR_SEVENTH || abs(m_intervals_brut[i])==MAJOR_SEVENTH) >> (melodicDegreeCost[i]==seventhCost));
+        rel(home, (abs(m_intervals_brut[i])==PERFECT_OCTAVE) >> (melodicDegreeCost[i]==octaveCost));
         idx++;
     }
     cout << "HEREEEEEEEEEEE" << endl;
     /// Harmonic rules
     //todo put each rule in a function so it is easy to call them in different constructors depending on the species calling the first species
     /// H1 from Thibault: All harmonic intervals must be consonances
-    dom(home, firstSpeciesHarmonicIntervals, IntSet(IntArgs(CONSONANCES)));
+    dom(home, h_intervals.slice(0, notesPerMeasure.at(FIRST_SPECIES), h_intervals.size()), IntSet(IntArgs(CONSONANCES)));
 
     // H4 from Thibault : The key tone is tuned to the first note of the lowest strata
     rel(home, (isLowest[0]==0) >> (firstSpeciesHarmonicIntervals[0]==0));
@@ -158,12 +158,12 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     }
 
     // H6 from Thibault : Imperfect consonances are preferred
-    for(int i = 0; i < firstSpeciesNotesCp.size(); i++){
-        rel(home, octaveCostArray[i], IRT_EQ, h_octaveCost, Reify(expr(home, firstSpeciesHarmonicIntervals[i]==UNISSON), RM_PMI));
-        rel(home, octaveCostArray[i], IRT_EQ, 0, Reify(expr(home, firstSpeciesHarmonicIntervals[i]!=UNISSON), RM_PMI));
+    for(int i = 0; i < h_intervals.size(); i++){
+        rel(home, octaveCostArray[i], IRT_EQ, h_octaveCost, Reify(expr(home, h_intervals[i]==UNISSON), RM_PMI));
+        rel(home, octaveCostArray[i], IRT_EQ, 0, Reify(expr(home, h_intervals[i]!=UNISSON), RM_PMI));
 
-        rel(home, fifthCostArray[i], IRT_EQ, h_fifthCost, Reify(expr(home, firstSpeciesHarmonicIntervals[i]==PERFECT_FIFTH), RM_PMI));
-        rel(home, fifthCostArray[i], IRT_EQ, 0, Reify(expr(home, firstSpeciesHarmonicIntervals[i]!=PERFECT_FIFTH), RM_PMI));
+        rel(home, fifthCostArray[i], IRT_EQ, h_fifthCost, Reify(expr(home, h_intervals[i]==PERFECT_FIFTH), RM_PMI));
+        rel(home, fifthCostArray[i], IRT_EQ, 0, Reify(expr(home, h_intervals[i]!=PERFECT_FIFTH), RM_PMI));
     }
 
     //todo add other harmonic rules here
@@ -193,6 +193,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     , vector<int> m_costs, vector<int> g_costs, int bm, int nV) :
         FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, bm, nV) ///call the general constructor
 {
+    rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
     //todo add here rules that are specific to the first species, rules that are used by other species are in the general constructor
     //H7,H8 from Thibault : penultimate note major sixth or minor third
     int p = firstSpeciesNotesCp.size()-2;
@@ -221,15 +222,16 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     costs = IntVarArray(home, 5, 0, 1000);
 
     //set cost[0] to be fifth cost
-    add_cost(home, 0, fifthCostArray, costs);
+    //add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
     //set cost[1] to be octave cost
-    add_cost(home, 1, octaveCostArray, costs);
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), octaveCostArray.size())), costs);
     //set cost[2] to be motion cost
     add_cost(home, 2, firstSpeciesMotionCosts, costs);
     //set cost[3] to be melodic cost
-    add_cost(home, 3, melodicDegreeCost, costs);
+    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
     //need to set cost[4] to be off cost
-    add_cost(home, 4, offCostArray, costs);
+    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
 
     ///branching strategy
     ///only branch on the relevant variables for this species, others from the Part are ignored
@@ -242,7 +244,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     vector<int> m_costs, vector<int> g_costs, int bm, int nV1, int nV2) : 
     FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, bm, nV2) ///call the general constructor
 {
-    
+    rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
     //H7, H8 three voices version
@@ -251,7 +253,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     //dom(home, firstSpeciesHarmonicIntervals[p], IntSet(IntArgs({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH})));
 
     //M4 notes should be as diverse as possible
-    int temp = 0;
+    /*int temp = 0;
     for(int j = 0; j < firstSpeciesHarmonicIntervals.size()-1; j++){
         int upbnd = 0;
         if(j+3<firstSpeciesHarmonicIntervals.size()){
@@ -263,7 +265,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
             rel(home, (firstSpeciesNotesCp[j]!=firstSpeciesNotesCp[k])>>(varietyCostArray[temp]==0));
             temp++;
         }
-    }
+    }*/
 
     //P1 3 voices version
     for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
@@ -281,18 +283,19 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     }
 
 
-    costs = IntVarArray(home, 7, 0, 1000);
+    costs = IntVarArray(home, 7, 0, 10000);
 
     //set cost[0] to be fifth cost
-    add_cost(home, 0, fifthCostArray, costs);
+    //add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
     //set cost[1] to be octave cost
-    add_cost(home, 1, octaveCostArray, costs);
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), octaveCostArray.size())), costs);
     //set cost[2] to be motion cost
     add_cost(home, 2, firstSpeciesMotionCosts, costs);
     //set cost[3] to be melodic cost
-    add_cost(home, 3, melodicDegreeCost, costs);
+    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
     //need to set cost[4] to be off cost
-    add_cost(home, 4, offCostArray, costs);
+    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
     //need to set cost[5] to be variety cost
     add_cost(home, 5, varietyCostArray, costs);
     //need to set cost[6] to be direct move cost
@@ -310,6 +313,7 @@ string FirstSpeciesCounterpoint::to_string() const {
     text += "First species harmonic intervals: " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
     text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
     text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMotions) + "\n";
+    text += "Fifth cost : " + intVarArray_to_string(melodicDegreeCost) + "\n";
     text += "isLowest : " + boolVarArray_to_string(isLowest) + "\n";
     text += "Costs: " + intVarArray_to_string(costs) + "\n";
     return text;
@@ -366,4 +370,8 @@ IntVarArray FirstSpeciesCounterpoint::getMotions(){
 
 IntVarArray FirstSpeciesCounterpoint::getFirstMInterval(){
     return firstSpeciesMelodicIntervals;
+}
+
+int FirstSpeciesCounterpoint::getHIntervalSize(){
+    return firstSpeciesHarmonicIntervals.size();
 }

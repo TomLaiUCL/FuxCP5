@@ -90,9 +90,10 @@ public:
 
     IntVarArray getFirstMInterval() override;
 
+    int getHIntervalSize() override;
+
 };
 
 void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
-
 
 #endif //FUXCP_BASE_FIRSTSPECIESCOUNTERPOINT_HPP

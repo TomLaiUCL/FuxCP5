@@ -25,15 +25,29 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], key, lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, bm, THREE_VOICES);
 
-    cout << (6 * v_type[0] - 6) + cf[0] << endl;
-    cout << (6 * v_type[0] + 12) + cf[0] << endl;
-
-    cout << (6 * v_type[1] - 6) + cf[0] << endl;
-    cout << (6 * v_type[1] + 12) + cf[0] << endl;
-
-    cout << counterpoint_1->getFirstHInterval() << endl;
-    cout << counterpoint_2->getFirstHInterval() << endl;
-
+    vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2};
+    
+    //M4 variety cost (notes should be as diverse as possible)
+    for(int i = 1; i < parts.size(); i++){
+        Part* p = parts[i];
+        int mSpec = p->getSpecies();
+        int temp = 0;
+        IntVarArray notes = p->getBranchingNotes();
+        for(int j = 0; j < p->getHIntervalSize()-1; j++){
+            int upbnd = 0;
+            if(j+3<p->getHIntervalSize()){
+                upbnd = j+4;
+            } else {upbnd = p->getHIntervalSize();}
+            for(int k = j+1; k < upbnd;k++){
+                //setting a cost if notes inside a window are the same in a part
+                rel(*this, (notes[j]==notes[k])>>(p->getVarietyArray(temp)==p->getVarietyCost()));
+                rel(*this, (notes[j]!=notes[k])>>(p->getVarietyArray(temp)==0));
+                temp++;
+            }
+            
+        }
+    }
+    
     //P4 avoid successive perfect consonances
     int scc_cz = 0;
     if(sp.size()==2){
@@ -42,50 +56,61 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
         scc_cz += 2*((cantusFirmus->getSize()/4)-1);
     }
     successiveCostArray = IntVarArray(*this, scc_cz, IntSet({0, counterpoint_1->getSuccCost()}));
-    vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2};
+    
     int idx = 0;
+   
     // cout << "SUCC SIZE :" + to_string(succ_cost.size()) << endl;
     for(int p1 = 1; p1 < parts.size(); p1++){
         for(int p2 = p1+1; p2 < parts.size(); p2++){
+            cout << "Mother species 3 voices : " << endl;
             // cout << "Part 1 : " << to_string(parts[p1].species) << endl;
             // cout << "Part 2 : " << to_string(parts[p2].species) << endl;
+            //cout << parts[p1]->getSpecies() << endl;
+            cout << parts[p2]->getSpecies() << endl;
             if(parts[p1]->getSpecies()!=SECOND_SPECIES && parts[p2]->getSpecies()!=SECOND_SPECIES){
-                for(int i = 0; i < parts[p1]->getFirstNotes().size()-1; i++){
+                
+                for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     // cout << "IDX : " + to_string(idx) << endl;
                     rel(*this, successiveCostArray[idx], IRT_EQ, counterpoint_1->getSuccCost(), 
                         Reify(expr(*this, (parts[p1]->getFirstHInterval()[i]==0 || parts[p1]->getFirstHInterval()[i]==7) &&
                             (parts[p2]->getFirstHInterval()[i]==0 || parts[p2]->getFirstHInterval()[i]==7))));
                     idx++;
                 }        
-            }/*
-            else if(parts[p1].species==2){
-                for(int i = 0; i < parts[p1].is_P_cons.size()-1; i++){
-                    BoolVar case1 = expr(home, (parts[p1].is_P_cons[i]==1 && parts[p2].is_P_cons[i]==1) && 
-                        (parts[p1].hIntervalsCpCf[0][i]!=PERFECT_FIFTH || parts[p2].hIntervalsCpCf[0][i]!=PERFECT_FIFTH));
-                    BoolVar case2 = expr(home, (parts[p1].m_succ_intervals[0][i]!=MINOR_THIRD && parts[p1].m_succ_intervals[0][i]!=MAJOR_THIRD) && 
-                        (parts[p1].hIntervalsCpCf[0][i]==PERFECT_FIFTH && parts[p2].hIntervalsCpCf[0][i]==PERFECT_FIFTH));
+            }
+            else if(parts[p1]->getSpecies()==SECOND_SPECIES){
+                
+                for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
+                    BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
+                    (parts[p2]->getFirstHInterval()[i]==UNISSON || parts[p2]->getFirstHInterval()[i]==PERFECT_FIFTH)) && 
+                        ((parts[p1]->getFirstHInterval()[i+1]==UNISSON || parts[p1]->getFirstHInterval()[i+1]==PERFECT_FIFTH) && 
+                    (parts[p2]->getFirstHInterval()[i+1]==UNISSON || parts[p2]->getFirstHInterval()[i+1]==PERFECT_FIFTH)));
+                    BoolVar case2 = expr(*this, (parts[p1]->getFirstHInterval()[i]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i]!=PERFECT_FIFTH) || 
+                        (parts[p1]->getFirstHInterval()[i+1]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i+1]!=PERFECT_FIFTH) || 
+                        ((parts[p1]->getSecondHInterval()[i]==3 || parts[p2]->getSecondHInterval()[i]==3) && 
+                        (parts[p1]->getSecondHInterval()[i]==4 || parts[p2]->getSecondHInterval()[i]==4)));
                     //first expression states that the melodic succ interval is not a third, second that we have successive fifths
-                    rel(home, succ_cost[idx], IRT_EQ, parts[p2].succ, Reify(expr(home, (case1==1 || case2==1))));
+                    rel(*this, successiveCostArray[idx], IRT_EQ, counterpoint_1->getSuccCost(), Reify(expr(*this, (case1==1 || case2==1)), RM_IMP));
                     idx++;
                 }
             }
-            else if(parts[p2].species==2){
-                cout << "P cons size : " + to_string(parts[p1].is_P_cons.size()) << endl;
-                cout << "M succ size : " + to_string(parts[p2].m_succ_intervals[0].size()) << endl;
-                for(int i = 0; i < parts[p1].is_P_cons.size()-1; i++){
-                    BoolVar case1 = expr(home, (parts[p1].is_P_cons[i]==1 && parts[p2].is_P_cons[i]==1) && 
-                        (parts[p1].hIntervalsCpCf[0][i]!=PERFECT_FIFTH || parts[p2].hIntervalsCpCf[0][i]!=PERFECT_FIFTH));
-                    cout << "i : " + to_string(i) << endl;
-                    BoolVar case2 = expr(home, (parts[p2].m_succ_intervals[0][i]!=MINOR_THIRD && parts[p2].m_succ_intervals[0][i]!=MAJOR_THIRD) && 
-                        (parts[p1].hIntervalsCpCf[0][i]==PERFECT_FIFTH && parts[p2].hIntervalsCpCf[0][i]==PERFECT_FIFTH));
+            else if(parts[p2]->getSpecies()==SECOND_SPECIES){
+                for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
+                    BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
+                    (parts[p2]->getFirstHInterval()[i]==UNISSON || parts[p2]->getFirstHInterval()[i]==PERFECT_FIFTH)) && 
+                        ((parts[p1]->getFirstHInterval()[i+1]==UNISSON || parts[p1]->getFirstHInterval()[i+1]==PERFECT_FIFTH) && 
+                    (parts[p2]->getFirstHInterval()[i+1]==UNISSON || parts[p2]->getFirstHInterval()[i+1]==PERFECT_FIFTH)));
+                    BoolVar case2 = expr(*this, (parts[p1]->getFirstHInterval()[i]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i]!=PERFECT_FIFTH) || 
+                        (parts[p1]->getFirstHInterval()[i+1]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i+1]!=PERFECT_FIFTH) || 
+                        ((parts[p1]->getSecondHInterval()[i]==3 || parts[p2]->getSecondHInterval()[i]==3) && 
+                        (parts[p1]->getSecondHInterval()[i]==4 || parts[p2]->getSecondHInterval()[i]==4)));
                     //first expression states that the melodic succ interval is not a third, second that we have successive fifths
-                    rel(home, succ_cost[idx], IRT_EQ, parts[p2].succ, Reify(expr(home, (case1==1 || case2==1))));
+                    rel(*this, successiveCostArray[idx], IRT_EQ, counterpoint_1->getSuccCost(), Reify(expr(*this, (case1==1 || case2==1)), RM_IMP));
                     idx++;
                 }
-            }*/
+            }
         }
     }
-
+    
     //P6 : no move in same direction
     for(int i = 0; i < parts[0]->getMotions().size(); i++){
         rel(*this, expr(*this, parts[0]->getMotions()[i]==2 && parts[1]->getMotions()[i]==2), BOT_AND, expr(*this, parts[2]->getMotions()[i]==2), 0);

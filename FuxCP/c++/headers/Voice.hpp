@@ -58,13 +58,15 @@ class Voice{
 
         virtual string to_string() const;
 
-        IntVarArgs getFirstNotes();
+        virtual IntVarArgs getFirstNotes();
 
         BoolVar getIsLowestIdx(int idx);
 
         IntVarArray getHInterval();
 
         int getSpecies();
+
+        IntVarArgs getSecondHInterval();
 };
 
 
