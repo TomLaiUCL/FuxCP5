@@ -8,13 +8,13 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-CounterpointProblem::CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, int nV){
+CounterpointProblem::CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int nV){
     nMeasures = cf.size();
     key = k;
     lowerBound = (6 * v_type - 6) + cf[0];
     upperBound = (6 * v_type + 12) + cf[0];
     lowest = new Stratum(*this, nMeasures, 0, 127, v_type);
-    cantusFirmus = new CantusFirmus(*this, nMeasures, cf, key, lowest, v_type, m_costs, g_costs, nV);
+    cantusFirmus = new CantusFirmus(*this, nMeasures, cf, key, lowest, v_type, m_costs, g_costs, s_costs, nV);
 
 }
 

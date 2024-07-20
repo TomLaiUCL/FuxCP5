@@ -16,8 +16,8 @@
  * @param mSpecies the species from which this is called.
  */
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
-     int v_type, vector<int> m_costs, vector<int> g_costs, int bm, int nV):
-        Part(home, nMes, mSpecies, cf, lb, ub, k, v_type, m_costs, g_costs, nV, bm) { /// super constructor
+     int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
+        Part(home, nMes, mSpecies, cf, lb, ub, k, v_type, m_costs, g_costs, s_costs, nV, bm) { /// super constructor
     motherSpecies = mSpecies;
     lengthCp1stSpecies = nMeasures;
     //cantus = c;
@@ -31,7 +31,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     }
     off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
     /// First species notes in the counterpoint
-    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(extended_domain)));
+    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
     if(borrowMode==1){
         firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     }
@@ -128,7 +128,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, expr(home, m_intervals_brut[i]==1), BOT_AND, expr(home, m_intervals_brut[i+1]==1), 0);
         rel(home, expr(home, m_intervals_brut[i]==-1), BOT_AND, expr(home, m_intervals_brut[i+1]==-1), 0);
     }
-    cout << "HEREEEEEEEEEEE" << endl;
+
     // G7 : melodic intervals should be small (works for 1st, 2nd and 3rd species)
     int idx = 0;
     for(int i = 0; i < m_intervals_brut.size(); i+=4/notesPerMeasure.at(motherSpecies)){
@@ -142,7 +142,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, (abs(m_intervals_brut[i])==PERFECT_OCTAVE) >> (melodicDegreeCost[i]==octaveCost));
         idx++;
     }
-    cout << "HEREEEEEEEEEEE" << endl;
+
     /// Harmonic rules
     //todo put each rule in a function so it is easy to call them in different constructors depending on the species calling the first species
     /// H1 from Thibault: All harmonic intervals must be consonances
@@ -190,8 +190,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
  * @param k the key of the composition
  */
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type
-    , vector<int> m_costs, vector<int> g_costs, int bm, int nV) :
-        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, bm, nV) ///call the general constructor
+    , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV) :
+        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV) ///call the general constructor
 {
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
     //todo add here rules that are specific to the first species, rules that are used by other species are in the general constructor
@@ -241,8 +241,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 
 //First species 3 voices constructor
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, 
-    vector<int> m_costs, vector<int> g_costs, int bm, int nV1, int nV2) : 
-    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, bm, nV2) ///call the general constructor
+    vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2) : 
+    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2) ///call the general constructor
 {
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));

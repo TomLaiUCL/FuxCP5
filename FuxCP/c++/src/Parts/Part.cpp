@@ -5,7 +5,8 @@
 #include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
-Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, int nV, int bm) : 
+Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
+    int nV, int bm) : 
     Voice(home, nMes, lb, ub, v_type, sp){
     key             = k;
     nVoices         = nV;
@@ -36,6 +37,14 @@ Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, i
     triadCost = g_costs[5];
     directMoveCost = g_costs[6];
     penultCost = g_costs[7];
+
+    penultSixthCost = s_costs[0];
+    cambiataCost = s_costs[1];
+    mSkipCost = s_costs[2];
+    triad3rdCost = s_costs[3];
+    m2ZeroCost = s_costs[4];
+    syncopationCost = s_costs[5];
+    prefSlider = s_costs[6];
 
     directCost = 0;
     obliqueCost = 1;
@@ -106,6 +115,14 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     triadCost = s.triadCost;
     directMoveCost = s.directMoveCost;
     penultCost = s.penultCost;
+
+    penultSixthCost = s.penultSixthCost;
+    cambiataCost = s.cambiataCost;
+    mSkipCost = s.mSkipCost;
+    triad3rdCost = s.triad3rdCost;
+    m2ZeroCost = s.m2ZeroCost;
+    syncopationCost = s.syncopationCost;
+    prefSlider = s.prefSlider;
 
     directCost = s.directCost;
     obliqueCost = s.obliqueCost;

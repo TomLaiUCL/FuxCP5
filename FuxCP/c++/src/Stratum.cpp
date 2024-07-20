@@ -79,7 +79,6 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2){
     if(upper2!=nullptr){
         nVoices ++;
     }
-    cout << nVoices << endl;
     int size = cp1->getNMeasures();
     vector<IntVarArray> sorted_voices = {};
     for(int i = 0; i < size; i++){

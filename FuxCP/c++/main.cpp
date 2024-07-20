@@ -13,7 +13,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
     int upper_bound_domain = 72;
     int lower_bound_domain = 60;
-    vector<int> species = {FIRST_SPECIES, FIRST_SPECIES};
+    vector<int> species = {THIRD_SPECIES, THIRD_SPECIES};
     //la do si re do mi fa mi re do si la
     //57 60 59 62 60 64 65 64 62 60 59 57
     vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
@@ -33,7 +33,8 @@ int main(int argc, char* argv[]) {
 
     // create a new problem
     // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-    auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, borrowMode);
+    auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
+        borrowMode);
     //cout << problem->to_string() << endl;
     // create a new search engine
     BAB<CounterpointProblem> e(problem);

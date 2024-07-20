@@ -38,14 +38,14 @@ public:
      * @param k
      */
 
-    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
-    , vector<int> g_costs, int bm, int nV);
-
     SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, int mSpec, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
-    , vector<int> g_costs, int bm, int nV);
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
-    , vector<int> g_costs, int bm, int nV1, int nv2);
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
+
+    SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nv2);
 
     string to_string() const override;
 

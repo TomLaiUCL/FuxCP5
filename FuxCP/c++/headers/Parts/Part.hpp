@@ -65,11 +65,20 @@ class Part : public Voice {
         int directMoveCost;
         int penultCost;
 
+        int penultSixthCost;
+        int cambiataCost;
+        int mSkipCost;
+        int triad3rdCost;
+        int m2ZeroCost;
+        int syncopationCost;
+        int prefSlider;
+
         int directCost;
         int obliqueCost;
         int contraryCost;
     public:
-        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, int nV, int bm);
+        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs,
+            vector<int> s_costs, int nV, int bm);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
         Part(Home home, Part& s);  // clone constructor

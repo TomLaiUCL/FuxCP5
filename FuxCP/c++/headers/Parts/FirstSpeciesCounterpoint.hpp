@@ -38,7 +38,7 @@ public:
      * @param mSpecies the species from which this is called.
      */
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
-    , vector<int> m_costs, vector<int> g_costs, int bm, int nV);
+    , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**
      * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
@@ -50,7 +50,7 @@ public:
      * @param k the key of the composition
      */
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
-    , vector<int> g_costs, int bm, int nV);
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**
      * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
@@ -62,7 +62,7 @@ public:
      * @param k the key of the composition
      */
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
-    , vector<int> g_costs, int bm, int nV1, int nV2);
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2);
 
     /// Getters
     int getLengthCp1stSpecies() {return lengthCp1stSpecies;};
