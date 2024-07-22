@@ -27,6 +27,14 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lo
 
 }
 
+Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes, int nV1, int nV2) : Stratum(home, nMes, lb, ub, v_type, lowestNotes){
+    //G8 Last chord can only consist of notes of the harmonic triad
+    dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(TRIAD)));
+
+    //H12 Last chord cannot include a minor third
+    rel(home, h_intervals[h_intervals.size()-1], IRT_NQ, 3);
+}
+
 // IntVarArray Stratum::getBranchingNotes(){
 //     return notes;
 // }
@@ -50,8 +58,10 @@ Stratum::Stratum(Home home,  Stratum &s) : Voice(home, s){
     cantus = s.cantus;
     cp1 = s.cp1;
     cp2 = s.cp2;
+    cp3 = s.cp3;
     upper1 = s.upper1;
     upper2 = s.upper2;
+    upper3 = s.upper3;
 }
 
 Stratum* Stratum::clone(Home home){
@@ -67,26 +77,35 @@ void Stratum::setCantusPointer(Voice* cf){
 }
 
 
-void Stratum::setCpPointer(Home home, Voice* counter1, Voice* counter2){
+void Stratum::setCpPointer(Home home, Voice* counter1, Voice* counter2, Voice* counter3){
     cp1 = counter1;
     cp2 = counter2;
+    cp3 = counter3;
 }
 
-void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2){
+void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
     upper1 = up1;
     upper2 = up2;
+    upper3 = up3;
     int nVoices = 2;
     if(upper2!=nullptr){
         nVoices ++;
     }
+    if(upper3!=nullptr){
+        nVoices++;
+    }
+    cout << nVoices << endl;
     int size = cp1->getNMeasures();
     vector<IntVarArray> sorted_voices = {};
     for(int i = 0; i < size; i++){
         IntVarArray voices = IntVarArray(home, nVoices, 0, 127);
         rel(home, voices[0], IRT_EQ, cantus->getNotes()[i]);
         rel(home, voices[1], IRT_EQ, cp1->getFirstNotes()[i]);
-        if(nVoices==3){
+        if(nVoices>=3){
             rel(home, voices[2], IRT_EQ, cp2->getFirstNotes()[i]);
+        }
+        if(nVoices>=4){
+            rel(home, voices[3], IRT_EQ, cp3->getFirstNotes()[i]);
         }
         IntVarArray order = IntVarArray(home, nVoices, 0, nVoices-1);
         sorted_voices.push_back(IntVarArray(home, nVoices, 0, 127));
@@ -99,15 +118,23 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2){
         if(nVoices>=3){
             upper2->setNote(home, i, sorted_voices[i][2]);
         }
+        if(nVoices>=4){
+            upper3->setNote(home, i, sorted_voices[i][3]);
+        }
 
         rel(home, this->getFirstNotes()[i], IRT_NQ, cantus->getNotes()[i], Reify(cantus->getIsLowestIdx(i)));
 
         if(nVoices==2){
             rel(home, cantus->getIsLowestIdx(i), IRT_EQ, 0, Reify(cp1->getIsLowestIdx(i)));
-        } else {
+        } else if(nVoices==3){
             //rel(home, cantus->getIsLowestIdx(i), IRT_EQ, 0, Reify(cp1->getIsLowestIdx(i)));
             rel(home, expr(home, (cantus->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp1->getFirstNotes()[i])), IRT_NQ, 1, Reify(cp1->getIsLowestIdx(i)));
             rel(home, expr(home, cp1->getIsLowestIdx(i)!=cantus->getIsLowestIdx(i)), IRT_EQ, cp2->getIsLowestIdx(i));
+        } else {
+            rel(home, expr(home, (cantus->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp1->getFirstNotes()[1])), IRT_NQ, 1, Reify(cp1->getIsLowestIdx(i)));
+            rel(home, expr(home, (cantus->getIsLowestIdx(i)==1)&&(cp1->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp2->getFirstNotes()[i])), IRT_NQ, 1, Reify(cp2->getIsLowestIdx(i)));
+            rel(home, expr(home, (cantus->getIsLowestIdx(i)) && (cp1->getIsLowestIdx(i)) && (cp2->getIsLowestIdx(i))), IRT_NQ, cp3->getIsLowestIdx(i));
+
         }
 
         if(i > 0){
@@ -120,12 +147,11 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2){
 
             rel(home, cf_is_lowest, BOT_XOR, cantus->getIsLowestIdx(i), 1);
             rel(home, cp1_is_lowest, BOT_XOR, cp1->getIsLowestIdx(i), 1);
-            if(nVoices==3){
+            if(nVoices>=3){
                 rel(home, cp2_is_lowest, BOT_XOR, cp2->getIsLowestIdx(i), 1);
             }
-            if(nVoices==4){
-                rel(home, cp2_is_lowest, BOT_XOR, cp2->getIsLowestIdx(i), 1);
-                //rel(*this, cp3_is_lowest, BOT_XOR, parts[3].is_not_lowest[i], 1);
+            if(nVoices>=4){
+                rel(home, cp3_is_lowest, BOT_XOR, cp3->getIsLowestIdx(i), 1);
             }
 
             corresponding_m_intervals.push_back(cantus->getMelodicIntervals());
@@ -148,16 +174,12 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2){
                 }
             }
 
-            // cout << corresponding_m_intervals[0] << endl;
-            // rel(*this, cf_is_lowest+cp1_is_lowest+cp2_is_lowest+cp3_is_lowest == 1);
-
             rel(home, corresponding_m_intervals[0][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cf_is_lowest,RM_IMP));
             rel(home, corresponding_m_intervals[1][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp1_is_lowest,RM_IMP));
-            if(nVoices==3){
+            if(nVoices>=3){
                 rel(home, corresponding_m_intervals[2][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp2_is_lowest,RM_IMP));
             }
-            if(nVoices==4){
-                rel(home, corresponding_m_intervals[2][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp2_is_lowest,RM_IMP));
+            if(nVoices>=4){
                 rel(home, corresponding_m_intervals[3][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp3_is_lowest,RM_IMP));
             }
 

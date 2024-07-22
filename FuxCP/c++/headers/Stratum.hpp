@@ -21,14 +21,18 @@ class Stratum : public Voice{
         Voice* cantus;
         Voice* cp1;
         Voice* cp2;
+        Voice* cp3;
         Stratum* upper1;
         Stratum* upper2;
+        Stratum* upper3;
     public:
         Stratum(Home home, int nMes, int lb, int ub, int v_type);
 
         Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes);
 
         Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes, int nV);
+
+        Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes, int nV1, int nV2);
 
         // /**
         //  * These functions are the real constructors of Stratum. The base constructor should not be used. 
@@ -49,9 +53,9 @@ class Stratum : public Voice{
         void setNote(Home home, int index, IntVar note);
         void setMInterval(int index);   // these two functions will be called from the create strata part of the Problem files. The create strata code is done index by index.
         void setCantusPointer(Voice* cf);
-        void setCpPointer(Home home, Voice* counter1, Voice* counter2=nullptr);
+        void setCpPointer(Home home, Voice* counter1, Voice* counter2=nullptr, Voice* counter3=nullptr);
 
-        void setLowest(Home home, Stratum* up1, Stratum* up2=nullptr);
+        void setLowest(Home home, Stratum* up1, Stratum* up2=nullptr, Stratum* up3=nullptr);
 
         void setHIntervals(Home home);
 };

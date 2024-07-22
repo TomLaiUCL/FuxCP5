@@ -35,6 +35,7 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : Space(s){
     lowerBound = s.lowerBound;
     upperBound = s.upperBound;
     successiveCostArray.update(*this, s.successiveCostArray);
+    triadCostArray.update(*this, s.triadCostArray);
 }
 
 Space* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?

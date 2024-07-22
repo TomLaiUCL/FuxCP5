@@ -4,6 +4,7 @@
 #include "Utilities.hpp"
 #include "CounterpointProblems/TwoVoiceCounterpoint.hpp"
 #include "CounterpointProblems/ThreeVoiceCounterpoint.hpp"
+#include "CounterpointProblems/FourVoiceCounterpoint.hpp"
 #include "Parts/FirstSpeciesCounterpoint.hpp"
 #include "Parts/SecondSpeciesCounterpoint.hpp"
 #include "Parts/ThirdSpeciesCounterpoint.hpp"

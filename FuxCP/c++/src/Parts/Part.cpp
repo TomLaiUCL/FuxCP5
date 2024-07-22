@@ -186,3 +186,7 @@ IntVar Part::getVarietyArray(int idx){
 int Part::getHIntervalSize(){
     return h_intervals.size();
 }
+
+int Part::getTriadCost(){
+    return triadCost;
+}

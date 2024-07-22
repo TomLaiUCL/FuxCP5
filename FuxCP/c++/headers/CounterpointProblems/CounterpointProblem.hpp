@@ -20,6 +20,7 @@ protected:
     int upperBound;     /// the highest note possible for the counterpoints
     Stratum* lowest;
     IntVarArray successiveCostArray;
+    IntVarArray triadCostArray;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:

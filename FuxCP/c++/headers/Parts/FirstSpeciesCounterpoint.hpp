@@ -64,6 +64,18 @@ public:
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2);
 
+    /**
+     * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
+     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints as well as the branching.
+     * @param nMes the number of measures in the composition
+     * @param cf the cantus firmus todo maybe it should be a CantusFirmusObject
+     * @param lb the lower bound for the counterpoint
+     * @param ub the upper bound for the counterpoint
+     * @param k the key of the composition
+     */
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3);
+
     /// Getters
     int getLengthCp1stSpecies() {return lengthCp1stSpecies;};
 

@@ -248,24 +248,13 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
     //H7, H8 three voices version
-    int p = firstSpeciesNotesCp.size()-2;
+    //int p = firstSpeciesNotesCp.size()-2;
     //this rule actively excludes fux examples? see figure 109 page 82
     //dom(home, firstSpeciesHarmonicIntervals[p], IntSet(IntArgs({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH})));
 
-    //M4 notes should be as diverse as possible
-    /*int temp = 0;
-    for(int j = 0; j < firstSpeciesHarmonicIntervals.size()-1; j++){
-        int upbnd = 0;
-        if(j+3<firstSpeciesHarmonicIntervals.size()){
-            upbnd = j+4;
-        } else {upbnd = firstSpeciesHarmonicIntervals.size();}
-        for(int k = j+1; k < upbnd;k++){
-            //setting a cost if notes inside a window are the same in a part
-            rel(home, (firstSpeciesNotesCp[j]==firstSpeciesNotesCp[k])>>(varietyCostArray[temp]==varietyCost));
-            rel(home, (firstSpeciesNotesCp[j]!=firstSpeciesNotesCp[k])>>(varietyCostArray[temp]==0));
-            temp++;
-        }
-    }*/
+    /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth
+    rel(home, firstSpeciesMelodicIntervals, IRT_LQ, MINOR_SIXTH);
+    rel(home, firstSpeciesMelodicIntervals, IRT_GQ, -MINOR_SIXTH);
 
     //P1 3 voices version
     for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
@@ -302,6 +291,53 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     add_cost(home, 6, directCostArray, costs);
 }
 
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, 
+    vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
+    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
+{
+    rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
+    varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+    directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
+
+    //M2 : melodic intervals cannot exceed a minor sixth BUT also include an octave (adapted four voices version)
+    dom(home, firstSpeciesMelodicIntervals, IntSet({-UNISSON, -MINOR_SECOND, -MAJOR_SECOND, -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FOURTH, -TRITONE,
+            -PERFECT_FIFTH, -MINOR_SIXTH, -PERFECT_OCTAVE, UNISSON, MINOR_SECOND, MAJOR_SECOND, MINOR_THIRD, MAJOR_THIRD, PERFECT_FOURTH, TRITONE,
+            PERFECT_FIFTH, MINOR_SIXTH, PERFECT_OCTAVE}));
+
+    //P1 3 voices version
+    for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
+        //set a cost when it is reached through direct motion, it is 0 when not
+        rel(home, (firstSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
+            (directCostArray[j]==directMoveCost));
+        rel(home, (firstSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
+            (directCostArray[j]==0));
+    }
+
+    //P3 from Thibault : no battuta
+    for(int j = 0; j < firstSpeciesMotions.size(); j++){
+        rel(home, expr(home, firstSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
+            BOT_AND, isLowest[j], 0);
+    }
+
+    costs = IntVarArray(home, 7, 0, 10000);
+
+    //set cost[0] to be fifth cost
+    //add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
+    //set cost[1] to be octave cost
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), octaveCostArray.size())), costs);
+    //set cost[2] to be motion cost
+    add_cost(home, 2, firstSpeciesMotionCosts, costs);
+    //set cost[3] to be melodic cost
+    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
+    //need to set cost[4] to be off cost
+    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
+    //need to set cost[5] to be variety cost
+    add_cost(home, 5, varietyCostArray, costs);
+    //need to set cost[6] to be direct move cost
+    add_cost(home, 6, directCostArray, costs);
+}
+
 /**
  * This function returns a string with the characteristics of the counterpoint. It calls the to_string() method from
  * the Part class and adds 1st species specific characteristics.
@@ -312,7 +348,7 @@ string FirstSpeciesCounterpoint::to_string() const {
     text += "First species first notes: " + intVarArray_to_string(firstSpeciesNotesCp) + "\n";
     text += "First species harmonic intervals: " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
     text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
-    text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMotions) + "\n";
+    text += "First species motion intervals: " + intVarArray_to_string(firstSpeciesMotions) + "\n";
     text += "Fifth cost : " + intVarArray_to_string(melodicDegreeCost) + "\n";
     text += "isLowest : " + boolVarArray_to_string(isLowest) + "\n";
     text += "Costs: " + intVarArray_to_string(costs) + "\n";

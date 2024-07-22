@@ -107,6 +107,8 @@ class Part : public Voice {
 
         int getSuccCost();
 
+        int getTriadCost();
+
         int getVarietyCost();
 
         IntVar getVarietyArray(int idx);
