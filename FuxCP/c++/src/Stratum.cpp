@@ -122,19 +122,29 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
             upper3->setNote(home, i, sorted_voices[i][3]);
         }
 
-        rel(home, this->getFirstNotes()[i], IRT_NQ, cantus->getNotes()[i], Reify(cantus->getIsLowestIdx(i)));
+        //rel(home, this->getFirstNotes()[i], IRT_NQ, cantus->getNotes()[i], Reify(cantus->getIsLowestIdx(i), RM_IMP));
+        rel(home, (this->getFirstNotes()[i]==cantus->getNotes()[i]) >> (cantus->getIsLowestIdx(i)==0));
+        rel(home, (this->getFirstNotes()[i]!=cantus->getNotes()[i]) >> (cantus->getIsLowestIdx(i)==1));
 
         if(nVoices==2){
             rel(home, cantus->getIsLowestIdx(i), IRT_EQ, 0, Reify(cp1->getIsLowestIdx(i)));
         } else if(nVoices==3){
             //rel(home, cantus->getIsLowestIdx(i), IRT_EQ, 0, Reify(cp1->getIsLowestIdx(i)));
-            rel(home, expr(home, (cantus->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp1->getFirstNotes()[i])), IRT_NQ, 1, Reify(cp1->getIsLowestIdx(i)));
-            rel(home, expr(home, cp1->getIsLowestIdx(i)!=cantus->getIsLowestIdx(i)), IRT_EQ, cp2->getIsLowestIdx(i));
-        } else {
-            rel(home, expr(home, (cantus->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp1->getFirstNotes()[1])), IRT_NQ, 1, Reify(cp1->getIsLowestIdx(i)));
-            rel(home, expr(home, (cantus->getIsLowestIdx(i)==1)&&(cp1->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp2->getFirstNotes()[i])), IRT_NQ, 1, Reify(cp2->getIsLowestIdx(i)));
-            rel(home, expr(home, (cantus->getIsLowestIdx(i)) && (cp1->getIsLowestIdx(i)) && (cp2->getIsLowestIdx(i))), IRT_NQ, cp3->getIsLowestIdx(i));
+            rel(home, ((cantus->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp1->getFirstNotes()[i])) >> (cp1->getIsLowestIdx(i)==0));
+            rel(home, ((cantus->getIsLowestIdx(i)==0)||(this->getFirstNotes()[i]!=cp1->getFirstNotes()[i])) >> (cp1->getIsLowestIdx(i)==1));
 
+            rel(home, ((cantus->getIsLowestIdx(i)==1)&&(cp1->getIsLowestIdx(i)==1)) >> (cp2->getIsLowestIdx(i)==0));
+            rel(home, ((cantus->getIsLowestIdx(i)==0)||(cp1->getIsLowestIdx(i)==0)) >> (cp2->getIsLowestIdx(i)==1));
+        } else {
+
+            rel(home, ((cantus->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp1->getFirstNotes()[i])) >> (cp1->getIsLowestIdx(i)==0));
+            rel(home, ((cantus->getIsLowestIdx(i)==0)||(this->getFirstNotes()[i]!=cp1->getFirstNotes()[i])) >> (cp1->getIsLowestIdx(i)==1));
+
+            rel(home, ((cantus->getIsLowestIdx(i)==1)&&(cp1->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp2->getFirstNotes()[i])) >> (cp2->getIsLowestIdx(i)==0));
+            rel(home, ((cantus->getIsLowestIdx(i)==0)||(cp1->getIsLowestIdx(i)==0)||(this->getFirstNotes()[i]!=cp2->getFirstNotes()[i])) >> (cp2->getIsLowestIdx(i)==1));
+
+            rel(home, ((cantus->getIsLowestIdx(i)==1)&&(cp1->getIsLowestIdx(i)==1)&&(cp2->getIsLowestIdx(i)==1)) >> (cp3->getIsLowestIdx(i)==0));
+            rel(home, ((cantus->getIsLowestIdx(i)==0)||(cp1->getIsLowestIdx(i)==0)||(cp2->getIsLowestIdx(i)==0)) >> (cp3->getIsLowestIdx(i)==1));
         }
 
         if(i > 0){
