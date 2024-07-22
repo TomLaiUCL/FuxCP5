@@ -30,6 +30,21 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : Space(s){
     } else {
         lowest = nullptr;
     }
+    if (s.counterpoint_1) {
+        counterpoint_1 = s.counterpoint_1->clone(*this);
+    } else {
+        counterpoint_1 = nullptr;
+    }
+    if (s.counterpoint_2) {
+        counterpoint_2 = s.counterpoint_2->clone(*this);
+    } else {
+        counterpoint_2 = nullptr;
+    }
+    if (s.counterpoint_3) {
+        counterpoint_3 = s.counterpoint_3->clone(*this);
+    } else {
+        counterpoint_3 = nullptr;
+    }
     nMeasures = s.nMeasures; 
     key = s.key;
     lowerBound = s.lowerBound;
@@ -48,4 +63,8 @@ string CounterpointProblem::to_string() const {
     text += cantusFirmus->to_string(); 
     text += "\n";
     return text;
+}
+
+Home CounterpointProblem::getHome(){
+    return *this;
 }

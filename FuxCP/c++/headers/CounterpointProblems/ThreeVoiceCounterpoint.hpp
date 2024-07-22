@@ -13,8 +13,6 @@
  */
 class ThreeVoiceCounterpoint : public CounterpointProblem{
 protected:
-    Part* counterpoint_1;
-    Part* counterpoint_2;
 
     Stratum* upper1;
     Stratum* upper2;
@@ -45,9 +43,7 @@ public:
 
     ///destructor
     //todo release the allocated memory (each object created must be deleted)
-    ~ThreeVoiceCounterpoint(){ 
-        delete counterpoint_1;
-        delete counterpoint_2; 
+    ~ThreeVoiceCounterpoint(){
         delete upper1;
         delete upper2;
     }  

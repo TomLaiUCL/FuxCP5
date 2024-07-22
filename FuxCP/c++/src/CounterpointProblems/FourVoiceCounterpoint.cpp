@@ -200,22 +200,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(FourVoiceCounterpoint& s) : Counter
     solutionArray.update(*this, s.solutionArray);
     unitedCosts.update(*this, s.unitedCosts);
     successiveCostArray.update(*this, s.successiveCostArray);
-    triadCostArray.update(*this, s.triadCostArray);
-    if (s.counterpoint_1) {
-        counterpoint_1 = s.counterpoint_1->clone(*this);
-    } else {
-        counterpoint_1 = nullptr;
-    }
-    if (s.counterpoint_2) {
-        counterpoint_2 = s.counterpoint_2->clone(*this);
-    } else {
-        counterpoint_2 = nullptr;
-    }
-    if (s.counterpoint_3) {
-        counterpoint_3 = s.counterpoint_3->clone(*this);
-    } else {
-        counterpoint_3 = nullptr;
-    }
     if (s.upper1) {
         upper1 = s.upper1->clone(*this);
     } else {

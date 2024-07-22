@@ -21,6 +21,9 @@ protected:
     Stratum* lowest;
     IntVarArray successiveCostArray;
     IntVarArray triadCostArray;
+    Part* counterpoint_1;
+    Part* counterpoint_2;
+    Part* counterpoint_3;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:
@@ -40,10 +43,12 @@ public:
 
     /// Getters
     //todo add here getters if necessary
-
+    Part* getCounterpoint(){ return counterpoint_1; }
     ///destructor
     //todo release the allocated memory (each object created must be deleted)
-    virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; }  
+    virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; delete counterpoint_1; delete counterpoint_2; delete counterpoint_3; }
+
+    Home getHome();  
 };
 
 #endif //MYPROJECT_COUNTERPOINTPROBLEM_HPP

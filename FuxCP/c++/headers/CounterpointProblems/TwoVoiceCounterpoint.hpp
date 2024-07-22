@@ -16,7 +16,6 @@
  */
 class TwoVoiceCounterpoint : public CounterpointProblem{
 protected:
-    Part* counterpoint;
     Stratum* upper;
 
     int species;        /// the species of the counterpoint to generate
@@ -38,12 +37,12 @@ public:
     string to_string() const override; 
 
     /// Getters
-    Part* getCounterpoint(){ return counterpoint; }
+    
     //todo add here other getters if necessary
 
     ///destructor
     //todo release the allocated memory (each object created must be deleted) WILL THE COUNTERPOINTPROBLEM DESTRUCTOR BE AUTOMATICALLY CALLED?
-    ~TwoVoiceCounterpoint() { delete counterpoint; delete upper; }  
+    ~TwoVoiceCounterpoint() { delete upper; }  
 };
 
 #endif //MYPROJECT_TWOVOICECOUNTERPOINT_HPP
