@@ -139,15 +139,16 @@ int main(int argc, char* argv[]) {
         int nb_sol = 0;
         while(CounterpointProblem* pb = e.next()){
             nb_sol++;
-            cout << "Solution " << nb_sol << ": " << endl;
-            cout << pb->to_string() << endl;
+            cout << "This test passed successfully!" << endl;
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
             if (nb_sol >= 1)
                 break;
         }
-        cout << "No (more) solutions." << endl;
+        if(nb_sol!=1){
+            cout << "This test did not pass. An error was found!" << endl;
+        }
     } else {
         cout << "Wrong amount of arguments!" << endl;
     }
