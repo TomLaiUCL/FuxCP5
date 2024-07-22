@@ -10,7 +10,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
     upper1 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
     upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
     upper3 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
-    cout << species[0] << endl;
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], key, lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], key, lowest, 
@@ -20,6 +19,59 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2, counterpoint_3};
 
+    triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, counterpoint_1->getTriadCost()}));
+
+    //H8 : harmonic triads are preferred, adapted for 4 voices
+
+    for(int i = 0; i < triadCostArray.size(); i++){
+
+        IntVar H_b = upper1->getHInterval()[i*4];
+        IntVar H_c = upper2->getHInterval()[i*4];
+        IntVar H_d = upper3->getHInterval()[i*4];
+
+
+        BoolVar H_b_is_third    = expr(*this, H_b==MINOR_THIRD || H_b==MAJOR_THIRD);
+        BoolVar H_b_is_fifth    = expr(*this, H_b==PERFECT_FIFTH);
+        BoolVar H_b_is_octave   = expr(*this, H_b==UNISSON);
+
+        BoolVar H_c_is_third    = expr(*this, H_c==MINOR_THIRD || H_c==MAJOR_THIRD);
+        BoolVar H_c_is_fifth    = expr(*this, H_c==PERFECT_FIFTH);
+        BoolVar H_c_is_octave   = expr(*this, H_c==UNISSON);
+
+        BoolVar H_d_is_third    = expr(*this, H_d==MINOR_THIRD || H_d==MAJOR_THIRD);
+        BoolVar H_d_is_fifth    = expr(*this, H_d==PERFECT_FIFTH);
+        BoolVar H_d_is_octave   = expr(*this, H_d==UNISSON);
+
+
+        // worst case : not a harmonic triad with at least a third and a fifth
+        BoolVar no_fifth_or_no_third = expr(*this, H_b_is_third + H_c_is_third + H_d_is_third == 0 || H_b_is_fifth + H_c_is_fifth + H_d_is_fifth == 0);
+        BoolVar note_outside_harmonic_triad = expr(*this, H_b_is_third + H_b_is_fifth + H_b_is_octave == 0 || H_c_is_third + H_c_is_fifth + H_c_is_octave == 0 || H_d_is_third + H_d_is_fifth + H_d_is_octave == 0);
+
+        rel(*this, (note_outside_harmonic_triad || no_fifth_or_no_third) >> (triadCostArray[i] == not_harmonic_triad_cost));
+
+        // now we are left with only combinations with at a third, a fifth, and another note of the harmonic triad. 
+        // Doubling the fifth
+        rel(*this, expr(*this, H_b_is_fifth + H_c_is_fifth + H_d_is_fifth == 2) >> (triadCostArray[i] == double_fifths_cost));
+
+        // Doubling the third, and ensure it is the same type of third (not a major and a minor)
+        rel(*this, expr(*this, H_b_is_third + H_c_is_third + H_d_is_third == 2) >> (triadCostArray[i] == double_thirds_cost));
+        rel(*this, (H_b_is_third && H_c_is_third) >> (H_b == H_c));
+        rel(*this, (H_b_is_third && H_d_is_third) >> (H_b == H_d));
+        rel(*this, (H_c_is_third && H_d_is_third) >> (H_c == H_d));
+
+        // triad with octave
+        rel(*this, (H_b_is_fifth && H_c_is_third && H_d_is_octave) >> (triadCostArray[i] == triad_with_octave_cost)); // 5 3 8
+        rel(*this, (H_b_is_third && H_c_is_octave && H_d_is_fifth) >> (triadCostArray[i] == triad_with_octave_cost)); // 3 8 5
+        rel(*this, (H_b_is_third && H_c_is_fifth && H_d_is_octave) >> (triadCostArray[i] == triad_with_octave_cost)); // 3 5 8
+        rel(*this, (H_b_is_octave && H_c_is_third && H_d_is_fifth) >> (triadCostArray[i] == triad_with_octave_cost)); // 8 3 5
+        rel(*this, (H_b_is_octave && H_c_is_fifth && H_d_is_third) >> (triadCostArray[i] == triad_with_octave_cost)); // 8 5 3
+
+        // Best case : 5 8 3
+        rel(*this, (H_b_is_fifth && H_c_is_octave && H_d_is_third) >> (triadCostArray[i] == 0)); 
+    
+    }
+
+    
     //M4 variety cost (notes should be as diverse as possible)
     for(int i = 1; i < parts.size(); i++){
         Part* p = parts[i];
@@ -125,9 +177,9 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
     } else {
         c_sz = counterpoint_3->getCosts().size();
     }
-    c_sz++;
+    c_sz+=2;
     unitedCosts = IntVarArray(*this, c_sz, 0, 10000);
-
+    
     lowest->setCantusPointer(cantusFirmus);
     lowest->setCpPointer(*this, counterpoint_1, counterpoint_2, counterpoint_3);
     lowest->setLowest(*this, upper1, upper2, upper3);
@@ -135,8 +187,11 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
     //TEST
 
     uniteCounterpoints();
+    
     uniteCosts();
+    
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    
 }
 
 // COPY CONSTRUCTOR
@@ -145,6 +200,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(FourVoiceCounterpoint& s) : Counter
     solutionArray.update(*this, s.solutionArray);
     unitedCosts.update(*this, s.unitedCosts);
     successiveCostArray.update(*this, s.successiveCostArray);
+    triadCostArray.update(*this, s.triadCostArray);
     if (s.counterpoint_1) {
         counterpoint_1 = s.counterpoint_1->clone(*this);
     } else {
@@ -223,7 +279,8 @@ void FourVoiceCounterpoint::uniteCounterpoints(){
 
 void FourVoiceCounterpoint::uniteCosts(){
     //TODO : THIS WILL CREATE BUGS FROM 3RD SPECIES ONWARDS; TOO BAD
-    for(int i = 0; i < unitedCosts.size()-1; i++){
+    
+    for(int i = 0; i < unitedCosts.size()-2; i++){
         int sz = 0;
         if(i<counterpoint_1->getCosts().size()){
             sz++;
@@ -250,9 +307,20 @@ void FourVoiceCounterpoint::uniteCosts(){
         }
         rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
     }
+    
+    //add successive cost
     IntVarArgs y(successiveCostArray.size());
     for(int i = 0; i < successiveCostArray.size(); i++){
         y[i] = successiveCostArray[i];
     }
-    rel(*this, unitedCosts[unitedCosts.size()-1], IRT_EQ, expr(*this, sum(y)));
+    rel(*this, unitedCosts[unitedCosts.size()-2], IRT_EQ, expr(*this, sum(y)));
+    
+    //add triad cost
+    IntVarArgs z(triadCostArray.size());
+    for(int i = 0; i < triadCostArray.size(); i++){
+        z[i] = triadCostArray[i];
+    }
+    
+    rel(*this, unitedCosts[unitedCosts.size()-1], IRT_EQ, expr(*this, sum(z)));
+    cout << "HEREEEE" << endl;
 }

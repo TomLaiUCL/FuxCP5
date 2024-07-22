@@ -283,6 +283,11 @@ const vector<int> CONSONANCES = {UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFT
 const vector<int> TRIAD = {UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH};
 const vector<int> DISONANCE = {MINOR_SECOND, MAJOR_SECOND, PERFECT_FOURTH, TRITONE, MINOR_SEVENTH, MAJOR_SEVENTH};
 
+const int not_harmonic_triad_cost  = 16;
+const int double_fifths_cost       = 8;
+const int double_thirds_cost       = 6;
+const int triad_with_octave_cost   = 2;
+
 enum costValues{
     NO_COST,        //0
     LOW_COST,       //1

@@ -27,7 +27,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2};
     
-    triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size()-1, IntSet({0, counterpoint_1->getTriadCost()}));
+    triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, counterpoint_1->getTriadCost()}));
 
     //H8 : the triad should be used as much as possible
     for(int i = 0; i < triadCostArray.size(); i++){
