@@ -240,6 +240,61 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     
 }
 
+ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type,
+    vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
+    ThirdSpeciesCounterpoint(home, size, cf, lb, ub, k, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV3)
+{
+    varietyCostArray = IntVarArray(home, 3*(thirdSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+    directCostArray = IntVarArray(home, thirdSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
+
+    //1.H7,H8 adapted
+    rel(home, h_intervals[h_intervals.size()-1]==UNISSON||h_intervals[h_intervals.size()-1]==MINOR_THIRD||h_intervals[h_intervals.size()-1]==PERFECT_FIFTH||
+        h_intervals[h_intervals.size()-1]==MAJOR_SIXTH);
+
+    //3.H6 : harmonic triad should be used on the second or third beat
+    thirdHTriadArray = IntVarArray(home, nMeasures-1, IntSet({0, triad3rdCost}));
+    for(int i = 0; i < thirdHTriadArray.size(); i++){
+        rel(home, ((h_intervals[(i*4)+1]!=UNISSON&&h_intervals[(i*4)+1]!=MINOR_THIRD&&h_intervals[(i*4)+1]!=MAJOR_THIRD&&h_intervals[(i*4)+1]!=PERFECT_FIFTH)&&
+            (h_intervals[(i*4)+2]!=UNISSON&&h_intervals[(i*4)+2]!=MINOR_THIRD&&h_intervals[(i*4)+2]!=MAJOR_THIRD&&h_intervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
+            (thirdHTriadArray[i]==triad3rdCost));
+        rel(home, ((h_intervals[(i*4)+1]==UNISSON||h_intervals[(i*4)+1]==MINOR_THIRD||h_intervals[(i*4)+1]==MAJOR_THIRD||h_intervals[(i*4)+1]==PERFECT_FIFTH)||
+            (h_intervals[(i*4)+2]==UNISSON||h_intervals[(i*4)+2]==MINOR_THIRD||h_intervals[(i*4)+2]==MAJOR_THIRD||h_intervals[(i*4)+2]==PERFECT_FIFTH)) >> 
+            (thirdHTriadArray[i]==0));
+    }
+
+    //1.P1 3 voices version
+    for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
+        //set a cost when it is reached through direct motion, it is 0 when not
+        rel(home, (thirdSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
+            (directCostArray[j]==directMoveCost));
+        rel(home, (thirdSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
+            (directCostArray[j]==0));
+    }
+
+    costs = IntVarArray(home, 10, 0, 10000);
+
+    //set cost[0] to be fifth cost
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), fifthCostArray.size())), costs);
+    //set cost[1] to be octave cost
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), octaveCostArray.size())), costs);
+    //set cost[2] to be motion cost
+    add_cost(home, 2, thirdSpeciesMotionCosts, costs);
+    //set cost[3] to be melodic cost
+    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), melodicDegreeCost.size())), costs);
+    //need to set cost[4] to be off cost
+    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), offCostArray.size())), costs);
+    //need to set cost[5] to be cambiata cost
+    add_cost(home, 5, cambiataCostArray, costs);
+    //need to set cost[6] to be m2Zero cost
+    add_cost(home, 6, m2ZeroArray, costs);
+    //need to set cost[7] to be third h triad cost
+    add_cost(home, 7, thirdHTriadArray, costs);
+    //need to set cost[8] to be variety cost
+    add_cost(home, 8, varietyCostArray, costs);
+    //need to set cost[9] to be direct cost
+    add_cost(home, 9, directCostArray, costs);
+}
+
 string ThirdSpeciesCounterpoint::to_string() const {
     string text = Part::to_string() + "\nThird species : \n";
     text += "Third species notes : " + intVarArray_to_string(thirdSpeciesNotesCp) + "\n";

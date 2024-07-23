@@ -202,6 +202,42 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
 }
 
+SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, 
+    vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3) :
+    SecondSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
+{
+    costs = IntVarArray(home, 8, 0, 10000);
+
+    varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+    directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
+
+    //P1 3 voices version
+    for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
+        //set a cost when it is reached through direct motion, it is 0 when not
+        rel(home, (secondSpeciesRealMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
+            (directCostArray[j]==directMoveCost));
+        rel(home, (secondSpeciesRealMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
+            (directCostArray[j]==0));
+    }
+
+    //set cost[0] to be fifth cost
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
+    //set cost[1] to be octave cost
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), octaveCostArray.size())), costs);
+    //set cost[2] to be motion cost
+    add_cost(home, 2, secondSpeciesRealMotionCosts, costs);
+    //set cost[3] to be melodic cost
+    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
+    //need to set cost[4] to be off cost
+    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
+    //set cost[5] to be penult sixth cost
+    add_cost(home, 5, penultCostArray, costs);
+    //need to set cost[5] to be variety cost
+    add_cost(home, 6, varietyCostArray, costs);
+    //need to set cost[7] to be direct cost
+    add_cost(home, 7, directCostArray, costs);
+}
+
 string SecondSpeciesCounterpoint::to_string() const {
     string text = FirstSpeciesCounterpoint::to_string() + "\n Second species : \n";
     text += "Second species notes: " + intVarArray_to_string(secondSpeciesNotesCp) + "\n";

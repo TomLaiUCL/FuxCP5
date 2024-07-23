@@ -17,11 +17,11 @@ int main(int argc, char* argv[]) {
         cout << "-------------" << endl;
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
-        vector<int> species = {FIRST_SPECIES};
+        vector<int> species = {THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
-        cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65};
+        cantusFirmus = {65,67,69,65,62};
         
         int size = cantusFirmus.size();
         vector<int> v_type = {1, 2, 1};
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
             cout << "This test did not pass. An error was found!" << endl;
         }
     } else {
-        cout << "Wrong amount of arguments!" << endl;
+        throw std::invalid_argument("Wrong amount of arguments!");
     }
 
     return 0;

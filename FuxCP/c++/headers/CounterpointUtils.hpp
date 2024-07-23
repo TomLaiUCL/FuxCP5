@@ -27,9 +27,6 @@ Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> can
 CounterpointProblem* create_problem(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
     vector<int> s_costs, int bm);
 
-CounterpointProblem* create_problem(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
-    vector<int> s_costs, int bm, int i, vector<int> cp);
-
 /**
  * Creates the lowest strata deciding which notes currently are the lowest
  */

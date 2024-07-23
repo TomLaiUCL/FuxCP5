@@ -19,7 +19,8 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2, counterpoint_3};
 
-    triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, counterpoint_1->getTriadCost()}));
+    triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, not_harmonic_triad_cost, double_fifths_cost, double_thirds_cost,
+        triad_with_octave_cost}));
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
 
@@ -70,7 +71,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
         rel(*this, (H_b_is_fifth && H_c_is_octave && H_d_is_third) >> (triadCostArray[i] == 0)); 
     
     }
-
     
     //M4 variety cost (notes should be as diverse as possible)
     for(int i = 1; i < parts.size(); i++){
@@ -178,6 +178,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
         c_sz = counterpoint_3->getCosts().size();
     }
     c_sz+=2;
+    
     unitedCosts = IntVarArray(*this, c_sz, 0, 10000);
     
     lowest->setCantusPointer(cantusFirmus);

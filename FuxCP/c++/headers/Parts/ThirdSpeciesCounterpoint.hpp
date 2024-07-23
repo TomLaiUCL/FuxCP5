@@ -29,6 +29,9 @@ public:
     ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2);
 
+    ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, vector<int> m_costs
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3);
+
     string to_string() const override;
 
     ThirdSpeciesCounterpoint(Home home, ThirdSpeciesCounterpoint &s); // clone constructor
