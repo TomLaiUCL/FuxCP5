@@ -190,3 +190,41 @@ int Part::getHIntervalSize(){
 int Part::getTriadCost(){
     return triadCost;
 }
+
+int Part::getSecondCost(){
+    return secondCost;
+}
+int Part::getThirdCost(){
+    return thirdCost;
+}
+int Part::getFourthCost(){
+    return fourthCost;
+}
+int Part::getTritoneCost(){
+    return tritoneCost;
+}
+int Part::getFifthCost(){
+    return fifthCost;
+}
+int Part::getSixthCost(){
+    return sixthCost;
+}
+int Part::getSeventhCost(){
+    return seventhCost;
+}
+int Part::getOctaveCost(){
+    return octaveCost;
+}
+
+IntVarArray Part::getMelodicDegreeCost(){
+    return melodicDegreeCost;
+}
+
+void Part::add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs){
+    int sz = to_be_added.size();
+    IntVarArgs args(sz);
+    for(int i = 0; i < sz; i++){
+        args[i] = to_be_added[i];
+    }
+    rel(home, costs[idx], IRT_EQ, expr(home, sum(args)));
+}

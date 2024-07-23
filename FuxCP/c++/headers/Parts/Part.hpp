@@ -114,6 +114,19 @@ class Part : public Voice {
         IntVar getVarietyArray(int idx);
 
         virtual int getHIntervalSize();
+
+        int getSecondCost();
+        int getThirdCost();
+        int getFourthCost();
+        int getTritoneCost();
+        int getFifthCost();
+        int getSixthCost();
+        int getSeventhCost();
+        int getOctaveCost();
+
+        IntVarArray getMelodicDegreeCost();
+
+        void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 };
 
 

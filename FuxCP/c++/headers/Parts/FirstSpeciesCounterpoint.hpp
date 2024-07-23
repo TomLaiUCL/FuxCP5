@@ -17,7 +17,6 @@
 class FirstSpeciesCounterpoint : public Part{
 protected:
     int motherSpecies;                          /// The species from which this is called.
-    int lengthCp1stSpecies;                     /// The number of notes in the counterpoint
     CantusFirmus* cantus;
     IntVarArray firstSpeciesNotesCp;            /// The notes of the counterpoint that have to follow the rules for the first species
     IntVarArray firstSpeciesHarmonicIntervals;  /// The harmonic intervals between the notes that have to follow the 1st species rules and the lowest stratum
@@ -36,48 +35,83 @@ public:
      * @param ub the upper bound for the counterpoint
      * @param k the key of the composition
      * @param mSpecies the species from which this is called.
+     * @param low the lowest stratum
+     * @param c the cantus firmus
+     * @param v_type the voice type of the counterpoint
+     * @param m_costs the user-defined melodic costs 
+     * @param g_costs the user-defined general costs 
+     * @param s_costs the user-defined specific costs 
+     * @param bm parameter specifying if borrow Mode is enabled or not
+     * @param nV the number of voices - as it is a 2 voice constructor, this parameter contains the number of voices
      */
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**
-     * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
-     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints as well as the branching.
+     * 2 VOICES CONSTRUCTOR. This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
+     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints.
      * @param nMes the number of measures in the composition
      * @param cf the cantus firmus todo maybe it should be a CantusFirmusObject
      * @param lb the lower bound for the counterpoint
      * @param ub the upper bound for the counterpoint
      * @param k the key of the composition
+     * @param mSpecies the species from which this is called.
+     * @param low the lowest stratum
+     * @param c the cantus firmus
+     * @param v_type the voice type of the counterpoint
+     * @param m_costs the user-defined melodic costs 
+     * @param g_costs the user-defined general costs 
+     * @param s_costs the user-defined specific costs 
+     * @param bm parameter specifying if borrow Mode is enabled or not
+     * @param nV the number of voices - as it is a 2 voice constructor, this parameter is passed to the general constructor
      */
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**
-     * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
-     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints as well as the branching.
+     * 3 VOICES CONSTRUCTOR. This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
+     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints.
      * @param nMes the number of measures in the composition
      * @param cf the cantus firmus todo maybe it should be a CantusFirmusObject
      * @param lb the lower bound for the counterpoint
      * @param ub the upper bound for the counterpoint
      * @param k the key of the composition
+     * @param mSpecies the species from which this is called.
+     * @param low the lowest stratum
+     * @param c the cantus firmus
+     * @param v_type the voice type of the counterpoint
+     * @param m_costs the user-defined melodic costs 
+     * @param g_costs the user-defined general costs 
+     * @param s_costs the user-defined specific costs 
+     * @param bm parameter specifying if borrow Mode is enabled or not
+     * @param nV1 the number of voices - this parameter is there to differenciate it from other number of voices
+     * @param nV2 the number of voices - as it is a 3 voice constructor, this parameter is passed to the general constructor
      */
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2);
 
     /**
-     * This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
-     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints as well as the branching.
+     * 4 VOICES CONSTRUCTOR. This constructor is only used when creating a counterpoint of the first species. It calls the other constructor with
+     * FIRST_SPECIES as the mother species. Additionally, it posts 1st species specific constraints.
      * @param nMes the number of measures in the composition
      * @param cf the cantus firmus todo maybe it should be a CantusFirmusObject
      * @param lb the lower bound for the counterpoint
      * @param ub the upper bound for the counterpoint
      * @param k the key of the composition
+     * @param mSpecies the species from which this is called.
+     * @param low the lowest stratum
+     * @param c the cantus firmus
+     * @param v_type the voice type of the counterpoint
+     * @param m_costs the user-defined melodic costs 
+     * @param g_costs the user-defined general costs 
+     * @param s_costs the user-defined specific costs 
+     * @param bm parameter specifying if borrow Mode is enabled or not
+     * @param nV1 the number of voices - this parameter is there to differenciate it from other number of voices
+     * @param nV2 the number of voices - this parameter is there to differenciate it from other number of voices
+     * @param nV3 the number of voices - as it is a 4 voice constructor, this parameter is passed to the general constructor
      */
     FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3);
-
-    /// Getters
-    int getLengthCp1stSpecies() {return lengthCp1stSpecies;};
 
     /**
      * This function returns a string with the characteristics of the counterpoint. It calls the to_string() method from
@@ -105,7 +139,5 @@ public:
     int getHIntervalSize() override;
 
 };
-
-void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 
 #endif //FUXCP_BASE_FIRSTSPECIESCOUNTERPOINT_HPP

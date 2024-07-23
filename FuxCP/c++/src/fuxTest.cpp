@@ -42,8 +42,8 @@ void FuxTest::test_2v_1sp_fig22_setter(int i){
     cout << "Fig. 22" << endl;
     species = {FIRST_SPECIES};
     cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
+    cp =           {69,64,67,65,64,72,69,71,71,69,68,69};
     v_type = {2};
-    cp ={69,64,67,65,64,72,69,71,71,69,68,69};
     idx = i;
     borrowMode = 1;
 }
