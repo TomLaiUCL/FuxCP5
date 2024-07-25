@@ -6,6 +6,13 @@
 #include "../Parts/SecondSpeciesCounterpoint.hpp"
 #include "../Parts/CantusFirmus.hpp"
 
+/** Types of search engines */
+enum {
+    dfs_solver, //0
+    bab_solver, //1
+};
+
+
 /**
  * This (abstract) class gives a general model for a counterpoint problem. 
  */
@@ -74,6 +81,29 @@ public:
 
     void orderCosts();
 
+    int getSize();
+
+    int* return_solution();
 };
+
+
+/**
+ * Creates a search engine for the given problem
+ * Should only be used when using OM, otherwise you can create the solver etc in the main file
+ * @todo Modify this function to add search options etc
+ * @param pb an instance of the Problem class representing a given problem
+ * @param type the type of search engine to create (see enumeration in headers/gecode_problem.hpp)
+ * @return a search engine for the given problem
+ */
+Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type);
+
+
+/**
+ * Returns the next solution space for the problem
+ * Should only be used when using OM
+ * @param solver a solver for the problem
+ * @return an instance of the Problem class representing the next solution to the problem
+ */
+CounterpointProblem* get_next_solution_space(Search::Base<CounterpointProblem>* solver);
 
 #endif //MYPROJECT_COUNTERPOINTPROBLEM_HPP

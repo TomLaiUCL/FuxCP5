@@ -3,6 +3,7 @@
    (:use common-lisp :cl-user :cl :cffi))
 
 (in-package :gilf)
+(in-package :fuxcp)
 
 (print "Loading gecode-wrapper...")
 
@@ -20,27 +21,71 @@
 ;; Problem methods ;;
 ;;;;;;;;;;;;;;;;;;;;;
 
-(defun new-ctp-problem (lb ub sp cf)
+
+;; This function is used to convert lisp lists into int pointers so they can be passed to c++
+(defun new-ctp-problem (cf splist voicetypes borrowmode minskips generalcst motioncst melodiccst specificcst costimp toffset scale chromscale borscale)
     (let (
-        (x (cffi::foreign-alloc :int :initial-contents cf))
+        (cfi (cffi::foreign-alloc :int :initial-contents cf))
+        (spl (cffi::foreign-alloc :int :initial-contents splist))
+        (vt (cffi::foreign-alloc :int :initial-contents voicetypes))
+        (gen (cffi::foreign-alloc :int :initial-contents generalcst))
+        (mot (cffi::foreign-alloc :int :initial-contents motioncst))
+        (mel (cffi::foreign-alloc :int :initial-contents melodiccst))
+        (spe (cffi::foreign-alloc :int :initial-contents specificcst))
+        (cst (cffi::foreign-alloc :int :initial-contents costimp))
+        (sca (cffi::foreign-alloc :int :initial-contents scale))
+        (chr (cffi::foreign-alloc :int :initial-contents chromscale))
+        (bor (cffi::foreign-alloc :int :initial-contents borscale))
     )
-    (new-problem (length cf) lb ub sp x)
+    (test-cffi 4)
+    (new-problem cfi (length cf) (length splist) spl vt borrowmode minskips gen mot mel spe cst toffset sca (length scale) chr (length chromscale) bor (length borscale))
     )
 )
 
 (cffi::defcfun ("create_new_problem" new-problem) :pointer
     "Creates a new instance of the problem. Returns a void* cast of a Problem*."
-    (size               :int) ; an integer representing the size
-    (lower-bound-domain :int) ; an integer representing the lower bound of the domain
-    (upper-bound-domain :int) ; an integer representing the upper bound of the domain
-    (species            :int)
-    (cantus-firmus      :pointer :int)
+
+    (cantus-firmus          :pointer :int)  ; the cantus firmus, in MIDI values
+    (cf-size                :int)           ; the size of the cantus firmus
+    (n-counterpoints        :int)           ; number of counterpoints
+    (species-list           :pointer :int)  ; list of the species of the counterpoints (size=n-counterpoints)
+    (voice-types            :pointer :int)  ; list of the voice types of the counterpoints (size=n-counterpoints)
+    (borrow-mode            :int)           ; borrowing mode : 0 if "None", 1 if "Major", 2 if "Minor"
+    (min-skips-percent      :int)           ; min skips slider
+    (general-cost-values    :pointer :int)  ; size = 8
+    (motion-cost-values     :pointer :int)  ; size = 3
+    (melodic-cost-values    :pointer :int)  ; size = 8
+    (specific-cost-values   :pointer :int)  ; size = 7
+    (cost-importances       :pointer :int)  ; size = 14
+    (tonalite-offset        :int)
+    (scale                  :pointer :int)  
+    (scale-size             :int)
+    (chromatic-scale        :pointer :int)
+    (chromatic-scale-size   :int)
+    (borrowed-scale         :pointer :int)
+    (borrowed-scale-size    :int)
     ; TODO add here any additional arguments that your Problem constructor takes
 )
 
 (cffi::defcfun ("get_size" get-size) :int
     "Returns the size of the space."
     (sp :pointer) ; a void* cast of a Problem*
+)
+
+(cffi::defcfun ("test_cffi" test-cffi) :int
+    "Returns n+1."
+    (n :int) ; an integer
+)
+
+
+(cffi::defcfun ("delete_pointer" delete-pointer) :void
+    "Deletes the pointer passed as argument. "
+    (p :pointer) 
+)
+
+(cffi::defcfun ("delete_solver_pointer" delete-solver-pointer) :void
+    "Deletes the pointer to a solver (search engine) passed as argument. "
+    (p :pointer) 
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -57,6 +102,13 @@
     "Returns a pointer to the next solution of the problem. Returns a void* cast of a Problem*."
     (solver :pointer) ; a void* cast of a Base<Problem>* pointer
 )
+
+
+(cffi::defcfun ("search_stopped" search-stopped) :int
+    "Returns 1 if the seach was stopped by the TimeStop object, and 1 otherwise."
+    (solver :pointer) ; a void* cast of a Base<Problem>* pointer
+)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; Solution handling ;;
@@ -83,3 +135,6 @@
         )
     )
 )
+
+
+(print "finished loading gecode-wrapper")

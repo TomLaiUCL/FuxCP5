@@ -15,7 +15,9 @@ extern "C" {
  * @param upper_bound_domain an integer representing the upper bound of the domain of the variables
  * @return A pointer to a Problem object casted as a void*
  */
-void* create_new_problem(int size, int lower_bound_domain, int upper_bound_domain, int species, int* cantusFirmus);
+void* create_new_problem(int* cantusFirmus, int size, int n_cp, int* splist, int* v_types, int b_mode, int min_skips, int* general_params, 
+        int* motion_params, int* melodic, int* specific, int* importance, int t_off, int* scle, int scale_size, 
+        int* chromatic, int chrom_size, int* borrow, int borrow_size);
 
 /**
  * returns the size of the problem
@@ -23,6 +25,13 @@ void* create_new_problem(int size, int lower_bound_domain, int upper_bound_domai
  * @return an integer representing the size of the problem
  */
 int get_size(void* sp);
+
+int test_cffi(int n);
+
+void delete_pointer(void* p);
+
+void delete_solver_pointer(void* p);
+
 
 /**
  * returns the values of the variables for a solution
@@ -44,6 +53,10 @@ void* create_solver(void* sp, int type);
  * @return a void* cast of a Problem* pointer
  */
 void* return_next_solution_space(void* solver);
+
+
+int search_stopped(void* solver);
+
 
 #ifdef __cplusplus
 };

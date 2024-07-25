@@ -449,4 +449,7 @@ string time();
  */
 void write_to_log_file(const char *message, const string& filename);
 
+void writeToLogFile(const char* message);
+
+
 #endif

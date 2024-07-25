@@ -36,6 +36,8 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int k, int lb, int ub, 
 
 
 
+    writeToLogFile("counterpointproblem constructor"); 
+
 }
 
 // COPY CONSTRUCTOR
@@ -151,3 +153,84 @@ void CounterpointProblem::orderCosts(){
     }
     cout << finalCosts << endl;
 }
+
+
+/**
+ * Returns the size of the problem
+ * @return an integer representing the size of the vars array           RETURNS THE SIZE OF THE SOLUTION_ARRAY
+ */
+int CounterpointProblem::getSize(){
+    string message = "getSize function called. size = " + std::to_string(solutionArray.size()) + "\n";
+    writeToLogFile(message.c_str());
+    return this->solutionArray.size();  /// have to use this-> ?
+}
+
+/**
+ * Returns the values taken by the variables vars in a solution
+ * @todo Modify this to return the solution for your problem. This function uses @param size to generate an array of integers
+ * @return an array of integers representing the values of the variables in a solution
+ */
+int* CounterpointProblem::return_solution(){
+    string message = "return_solution method. Solution : [";
+    int* solution = new int[solutionArray.size()];
+    for(int i = 0; i < solutionArray.size(); i++){
+        solution[i] = solutionArray[i].val();       // TODO : modify!!
+        message += std::to_string(solution[i]) + " ";
+    }
+    message += "]\n";
+    writeToLogFile(message.c_str());
+    return solution;
+}
+
+
+
+/*************************
+ * Search engine methods *
+ *************************/
+
+Gecode::Search::TimeStop global_timeout(500000);
+
+/**
+ * Creates a search engine for the given problem
+ * Should only be used when using OM, otherwise you can create the solver etc in the main file
+ * @todo Modify this function to add search options etc
+ * @param pb an instance of the Problem class representing a given problem
+ * @param type the type of search engine to create (see enumeration in headers/gecode_problem.hpp)
+ * @return a search engine for the given problem
+ */
+Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type){
+    string message = "make_solver function called. type of solver :\n" + to_string(type) + "\n";
+    writeToLogFile(message.c_str());
+
+    Gecode::Search::Options opts;   
+    /**@todo add here any options you want*/
+    // opts.stop = &global_timeout;
+    opts.threads = 32;
+
+    if (type == bab_solver)
+        return new BAB<CounterpointProblem>(pb, opts);
+    else // default case
+        return new DFS<CounterpointProblem>(pb, opts);
+}
+
+/**
+ * Returns the next solution space for the problem
+ * Should only be used when using OM
+ * @param solver a solver for the problem
+ * @return an instance of the Problem class representing the next solution to the problem
+ */
+CounterpointProblem* get_next_solution_space(Search::Base<CounterpointProblem>* solver){
+    string message = "get_next_solution_space function called.\n";
+    // RESET TIMEOUT OBJECT HERE
+    global_timeout.reset();
+    CounterpointProblem* sol_space = solver->next();
+    if (sol_space == nullptr){
+        message += "solution_space was null. \n";
+        writeToLogFile(message.c_str());
+        return NULL;
+    }
+    message += sol_space->to_string();
+    writeToLogFile(message.c_str());
+    return sol_space;
+}
+
