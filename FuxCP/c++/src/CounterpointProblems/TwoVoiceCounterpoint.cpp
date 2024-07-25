@@ -32,7 +32,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     lowest->setCpPointer(*this, counterpoint_1);
     lowest->setLowest(*this, upper);
 
-    unitedCosts = IntVarArray(*this, counterpoint_1->getCosts().size(), 0, 10000);
+    unitedCosts = IntVarArray(*this, counterpoint_1->getCosts().size(), 0, 1000000);
 
     for(int i = 0; i < unitedCosts.size(); i++){
         rel(*this, unitedCosts[i], IRT_EQ, counterpoint_1->getCosts()[i]);
@@ -69,3 +69,33 @@ string TwoVoiceCounterpoint::to_string() const {
     text += CounterpointProblem::to_string();
     return text;
 }
+/*
+void TwoVoiceCounterpoint::uniteCosts(){
+    int cp1_idx = 0;
+    for(int i = 0; i < 14; i++){
+        string name = importanceNames[i];
+        //decides if the cost is present for any counterpoint
+        bool cp1_contains = 0;
+        int sz = 0;
+        for(int t = 0; t < counterpoint_1->getCostNames().size(); t++){
+            if(name==counterpoint_1->getCostNames()[t]){
+                cp1_contains=1;
+                sz++;
+            }
+        }
+        if(!cp1_contains){
+            unitedCostNames.push_back("NOT ADDED");
+        } else {
+            unitedCostNames.push_back(name);
+            //adds the cost to the IntVarArgs
+            IntVarArgs x(sz);
+            int idx=0;
+            if(cp1_contains){
+                x[idx] = counterpoint_1->getCosts()[cp1_idx];
+                idx++;
+                cp1_idx++;
+            }
+            rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
+        }
+    }
+}*/

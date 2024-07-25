@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
         cout << "-------------" << endl;
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
-        vector<int> species = {FIRST_SPECIES, SECOND_SPECIES};
+        vector<int> species = {FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf

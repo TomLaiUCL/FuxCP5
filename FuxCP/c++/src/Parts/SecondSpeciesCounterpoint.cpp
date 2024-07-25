@@ -134,8 +134,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV) :
     SecondSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
-    costs = IntVarArray(home, 7, 0, 1000000);
-    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult", "direct"};
+    costs = IntVarArray(home, 6, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult"};
 
     /// 2.M2: Two consecutive notes cannot be the same
     //can do better than this?
@@ -161,8 +161,6 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
     //set cost[5] to be penult sixth cost
     add_cost(home, 5, penultCostArray, costs);
-    //need to set cost[6] to be direct move cost
-    add_cost(home, 6, directCostArray, costs);
 
 }
 
