@@ -32,7 +32,7 @@ protected:
     Part* counterpoint_2;
     Part* counterpoint_3;
 
-    IntVarArray solution_array;
+    IntVarArray solutionArray;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:

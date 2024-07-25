@@ -31,8 +31,10 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     lowest->setCpPointer(*this, counterpoint_1);
     lowest->setLowest(*this, upper);
 
+    solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size(), 0, 127);
+    rel(*this, solutionArray, IRT_EQ, counterpoint_1->getBranchingNotes());
     //upper->setNote(*this, 5, counterpoint->getFirstNotes()[5]);
-    branch(*this, counterpoint_1->getBranchingNotes(), INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 }
 // COPY CONSTRUCTOR
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : CounterpointProblem(s){

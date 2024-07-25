@@ -163,7 +163,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
 // COPY CONSTRUCTOR
 ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : CounterpointProblem(s){
     species = s.species;
-    solutionArray.update(*this, s.solutionArray);
     unitedCosts.update(*this, s.unitedCosts);
     if (s.upper1) {
         upper1 = s.upper1->clone(*this);

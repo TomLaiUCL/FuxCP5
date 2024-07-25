@@ -18,9 +18,6 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int k, int lb, int ub, 
 
     writeToLogFile("counterpointproblem constructor"); 
 
-    solution_array = IntVarArray(*this, nMeasures*2, IntSet({1})); // todo modify to put the right intvararray
-    writeToLogFile(std::to_string(solution_array.size()).c_str());
-
 }
 
 // COPY CONSTRUCTOR
@@ -57,7 +54,7 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : Space(s){
     successiveCostArray.update(*this, s.successiveCostArray);
     triadCostArray.update(*this, s.triadCostArray);
 
-    solution_array.update(*this, s.solution_array);
+    solutionArray.update(*this, s.solutionArray);
 }
 
 Space* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?
@@ -83,9 +80,9 @@ Home CounterpointProblem::getHome(){
  * @return an integer representing the size of the vars array           RETURNS THE SIZE OF THE SOLUTION_ARRAY
  */
 int CounterpointProblem::getSize(){
-    string message = "getSize function called. size = " + std::to_string(solution_array.size()) + "\n";
+    string message = "getSize function called. size = " + std::to_string(solutionArray.size()) + "\n";
     writeToLogFile(message.c_str());
-    return this->solution_array.size();  /// have to use this-> ?
+    return this->solutionArray.size();  /// have to use this-> ?
 }
 
 /**
@@ -95,9 +92,9 @@ int CounterpointProblem::getSize(){
  */
 int* CounterpointProblem::return_solution(){
     string message = "return_solution method. Solution : [";
-    int* solution = new int[solution_array.size()];
-    for(int i = 0; i < solution_array.size(); i++){
-        solution[i] = solution_array[i].val();       // TODO : modify!!
+    int* solution = new int[solutionArray.size()];
+    for(int i = 0; i < solutionArray.size(); i++){
+        solution[i] = solutionArray[i].val();       // TODO : modify!!
         message += std::to_string(solution[i]) + " ";
     }
     message += "]\n";
