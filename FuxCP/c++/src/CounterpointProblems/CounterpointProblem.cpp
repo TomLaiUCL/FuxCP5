@@ -52,6 +52,7 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
     successiveCostArray.update(*this, s.successiveCostArray);
     triadCostArray.update(*this, s.triadCostArray);
     unitedCosts.update(*this, s.unitedCosts);
+    solutionArray.update(*this, s.solutionArray);
 }
 
 IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?

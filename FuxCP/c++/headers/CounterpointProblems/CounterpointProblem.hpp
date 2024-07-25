@@ -25,6 +25,7 @@ protected:
     Part* counterpoint_2;
     Part* counterpoint_3;
     IntVarArray unitedCosts;
+    IntVarArray solutionArray;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:

@@ -19,7 +19,6 @@ protected:
     Stratum* upper3;
 
     vector<int> species;        /// the species of the counterpoints to generate
-    IntVarArray solutionArray;
 
 public:
     /**

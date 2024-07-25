@@ -198,8 +198,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
 // COPY CONSTRUCTOR
 FourVoiceCounterpoint::FourVoiceCounterpoint(FourVoiceCounterpoint& s) : CounterpointProblem(s){
     species = s.species;
-    solutionArray.update(*this, s.solutionArray);
-    successiveCostArray.update(*this, s.successiveCostArray);
     if (s.upper1) {
         upper1 = s.upper1->clone(*this);
     } else {
