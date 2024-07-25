@@ -128,6 +128,8 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     obliqueCost = s.obliqueCost;
     contraryCost = s.contraryCost;
 
+    cost_names = s.cost_names;
+
     melodicDegreeCost.update(home, s.melodicDegreeCost);
     fifthCostArray.update(home, s.fifthCostArray);
     octaveCostArray.update(home, s.octaveCostArray);
@@ -218,6 +220,10 @@ int Part::getOctaveCost(){
 
 IntVarArray Part::getMelodicDegreeCost(){
     return melodicDegreeCost;
+}
+
+vector<string> Part::getCostNames(){
+    return cost_names;
 }
 
 void Part::add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs){

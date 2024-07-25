@@ -2,8 +2,8 @@
 #include "../../headers/CounterpointUtils.hpp"
 
 FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, 
-        vector<int> s_costs, int bm):
-    CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, s_costs, FOUR_VOICES)
+        vector<int> s_costs, vector<int> imp, int bm):
+    CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, s_costs, imp, FOUR_VOICES)
 {
     species = sp;
 

@@ -167,6 +167,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     //}
 
     costs = IntVarArray(home, 7, 0, 10000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), fifthCostArray.size())), costs);
@@ -216,27 +217,27 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
 
     costs = IntVarArray(home, 10, 0, 10000);
-
-    //set cost[0] to be fifth cost
-    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), fifthCostArray.size())), costs);
-    //set cost[1] to be octave cost
-    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), octaveCostArray.size())), costs);
-    //set cost[2] to be motion cost
-    add_cost(home, 2, thirdSpeciesMotionCosts, costs);
-    //set cost[3] to be melodic cost
-    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), melodicDegreeCost.size())), costs);
-    //need to set cost[4] to be off cost
-    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), offCostArray.size())), costs);
-    //need to set cost[5] to be cambiata cost
-    add_cost(home, 5, cambiataCostArray, costs);
-    //need to set cost[6] to be m2Zero cost
-    add_cost(home, 6, m2ZeroArray, costs);
-    //need to set cost[7] to be third h triad cost
-    add_cost(home, 7, thirdHTriadArray, costs);
-    //need to set cost[8] to be variety cost
-    add_cost(home, 8, varietyCostArray, costs);
-    //need to set cost[9] to be direct cost
-    add_cost(home, 9, directCostArray, costs);
+    cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "cambiata", "m2", "triad3"};
+    //need to set cost[0] to be off cost
+    add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
+    //set cost[1] to be fifth cost
+    add_cost(home, 1, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
+    //set cost[2] to be octave cost
+    add_cost(home, 2, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), octaveCostArray.size())), costs);
+    //need to set cost[3] to be variety cost
+    add_cost(home, 3, varietyCostArray, costs);
+    //set cost[4] to be motion cost
+    add_cost(home, 4, thirdSpeciesMotionCosts, costs);
+    //set cost[5] to be melodic cost
+    add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
+    //need to set cost[6] to be direct cost
+    add_cost(home, 6, directCostArray, costs);
+    //set cost[7] to be cambiata sixth cost
+    add_cost(home, 7, cambiataCostArray, costs);
+    //set cost[8] to be m2 zero cost
+    add_cost(home, 8, m2ZeroArray, costs);
+    //set cost[9] to be triad h third cost
+    add_cost(home, 9, thirdHTriadArray, costs);
     
 }
 
@@ -272,27 +273,27 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
 
     costs = IntVarArray(home, 10, 0, 10000);
-
-    //set cost[0] to be fifth cost
-    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), fifthCostArray.size())), costs);
-    //set cost[1] to be octave cost
-    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), octaveCostArray.size())), costs);
-    //set cost[2] to be motion cost
-    add_cost(home, 2, thirdSpeciesMotionCosts, costs);
-    //set cost[3] to be melodic cost
-    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), melodicDegreeCost.size())), costs);
-    //need to set cost[4] to be off cost
-    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), offCostArray.size())), costs);
-    //need to set cost[5] to be cambiata cost
-    add_cost(home, 5, cambiataCostArray, costs);
-    //need to set cost[6] to be m2Zero cost
-    add_cost(home, 6, m2ZeroArray, costs);
-    //need to set cost[7] to be third h triad cost
-    add_cost(home, 7, thirdHTriadArray, costs);
-    //need to set cost[8] to be variety cost
-    add_cost(home, 8, varietyCostArray, costs);
-    //need to set cost[9] to be direct cost
-    add_cost(home, 9, directCostArray, costs);
+    cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "cambiata", "m2", "triad3"};
+    //need to set cost[0] to be off cost
+    add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
+    //set cost[1] to be fifth cost
+    add_cost(home, 1, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
+    //set cost[2] to be octave cost
+    add_cost(home, 2, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), octaveCostArray.size())), costs);
+    //need to set cost[3] to be variety cost
+    add_cost(home, 3, varietyCostArray, costs);
+    //set cost[4] to be motion cost
+    add_cost(home, 4, thirdSpeciesMotionCosts, costs);
+    //set cost[5] to be melodic cost
+    add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
+    //need to set cost[6] to be direct cost
+    add_cost(home, 6, directCostArray, costs);
+    //set cost[7] to be cambiata sixth cost
+    add_cost(home, 7, cambiataCostArray, costs);
+    //set cost[8] to be m2 zero cost
+    add_cost(home, 8, m2ZeroArray, costs);
+    //set cost[9] to be triad h third cost
+    add_cost(home, 9, thirdHTriadArray, costs);
 }
 
 string ThirdSpeciesCounterpoint::to_string() const {

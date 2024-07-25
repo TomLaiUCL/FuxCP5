@@ -10,8 +10,8 @@
  * @param ub the highest note possible for the counterpoint in MIDI
  */
 ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
-    vector<int> s_costs, int bm) :
-    CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, s_costs, THREE_VOICES){
+    vector<int> s_costs, vector<int> imp, int bm) :
+    CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
     species = sp;
 
     //G9 last chord must have the same fundamental as the cf (used throughout the composition)
@@ -144,7 +144,8 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
         c_sz = counterpoint_2->getCosts().size();
     }
     c_sz+=2;
-    unitedCosts = IntVarArray(*this, c_sz, 0, 10000000);
+    unitedCosts = IntVarArray(*this, 14, 0, 10000000);
+    unitedCostNames = {};
 
     lowest->setCantusPointer(cantusFirmus);
     lowest->setCpPointer(*this, counterpoint_1, counterpoint_2);
@@ -154,6 +155,9 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
 
     uniteCounterpoints();
     uniteCosts();
+
+    orderCosts();
+
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 
 }
@@ -179,20 +183,8 @@ IntLexMinimizeSpace* ThreeVoiceCounterpoint::copy(){
 
 
 string ThreeVoiceCounterpoint::to_string() const {
-    string text = "CantusFirmus : \n";
-    text += cantusFirmus->to_string();
-    text += "Counterpoint 1 : \n";
-    text += counterpoint_1->to_string();  
-    text += "Counterpoint 2 : \n";
-    text += counterpoint_2->to_string(); 
-    text += "Lowest : \n";
-    text += lowest->to_string(); 
-    text += "Succ costs : \n";
-    text += intVarArray_to_string(successiveCostArray); 
-    text += "\n";
-    text += "All costs : \n";
-    text += intVarArray_to_string(unitedCosts); 
-    text += "\n";
+    string text = CounterpointProblem::to_string();
+
     //text += "Upper 1 : \n";
     //text += upper1->to_string(); 
     //text += "Upper 2 : \n";
@@ -213,40 +205,54 @@ void ThreeVoiceCounterpoint::uniteCounterpoints(){
 }
 
 void ThreeVoiceCounterpoint::uniteCosts(){
-    //TODO : THIS WILL CREATE BUGS FROM 3RD SPECIES ONWARDS; TOO BAD
-    for(int i = 0; i < unitedCosts.size()-2; i++){
-        int sz = 0;
-        if(i<counterpoint_1->getCosts().size()){
-            sz++;
-        }
-        if(i<counterpoint_2->getCosts().size()){
-            sz++;
-        }
-        IntVarArgs x(sz);
-        int idx=0;
-        if(i<counterpoint_1->getCosts().size()){
-            x[idx] = counterpoint_1->getCosts()[i];
-            idx++;
-        }
-        if(i<counterpoint_2->getCosts().size()){
-            x[idx] = counterpoint_2->getCosts()[i];
-            idx++;
-        }
-        rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
-    }
-    
-    //add successive cost
-    IntVarArgs y(successiveCostArray.size());
-    for(int i = 0; i < successiveCostArray.size(); i++){
-        y[i] = successiveCostArray[i];
-    }
-    rel(*this, unitedCosts[unitedCosts.size()-2], IRT_EQ, expr(*this, sum(y)));
-    //add triad cost
-    IntVarArgs z(triadCostArray.size());
-    for(int i = 0; i < triadCostArray.size(); i++){
-        z[i] = triadCostArray[i];
-    }
-    rel(*this, unitedCosts[unitedCosts.size()-1], IRT_EQ, expr(*this, sum(z)));
+    int cp1_idx = 0;
+    int cp2_idx = 0;
+    for(int i = 0; i < 14; i++){
+        string name = importanceNames[i];
+        if(name=="succ"){
+            unitedCostNames.push_back(name);
+            rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(IntVarArgs(successiveCostArray))));
+        } else if(name=="triad"){
+            unitedCostNames.push_back(name);
+            rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(IntVarArgs(triadCostArray))));
+        } else {
 
-    cout << unitedCosts << endl;
+            //decides if the cost is present for any counterpoint
+
+            bool cp1_contains = 0;
+            bool cp2_contains = 0;
+            int sz = 0;
+            for(int t = 0; t < counterpoint_1->getCostNames().size(); t++){
+                if(name==counterpoint_1->getCostNames()[t]){
+                    cp1_contains=1;
+                    sz++;
+                }
+            }
+            for(int t = 0; t < counterpoint_2->getCostNames().size(); t++){
+                if(name==counterpoint_2->getCostNames()[t]){
+                    cp2_contains=1;
+                    sz++;
+                }
+            }
+            if(!cp1_contains && !cp2_contains){
+                unitedCostNames.push_back("NOT ADDED");
+            } else {
+                unitedCostNames.push_back(name);
+                //adds the cost to the IntVarArgs
+                IntVarArgs x(sz);
+                int idx=0;
+                if(cp1_contains){
+                    x[idx] = counterpoint_1->getCosts()[cp1_idx];
+                    idx++;
+                    cp1_idx++;
+                }
+                if(cp2_contains){
+                    x[idx] = counterpoint_2->getCosts()[cp2_idx];
+                    idx++;
+                    cp2_idx++;
+                }
+                rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
+            }
+        }
+    }
 }

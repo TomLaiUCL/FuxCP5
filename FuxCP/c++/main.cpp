@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
         cout << "-------------" << endl;
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
-        vector<int> species = {FIRST_SPECIES};
+        vector<int> species = {FIRST_SPECIES, SECOND_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
@@ -32,12 +32,15 @@ int main(int argc, char* argv[]) {
         //penult sixth, non-ciambata, con m after skip, h triad 3rd species, m2 eq zero, no syncopation, pref species slider
         vector<int> specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
 
+
+        vector<int> importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+
         int borrowMode = 1;
 
         // create a new problem
         // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
         auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
-            borrowMode);
+            importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine
         
@@ -53,8 +56,8 @@ int main(int argc, char* argv[]) {
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            if (nb_sol >= 20)
-                break;
+            //if (nb_sol >= 1)
+            //    break;
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==3){
@@ -76,12 +79,14 @@ int main(int argc, char* argv[]) {
         //penult sixth, non-ciambata, con m after skip, h triad 3rd species, m2 eq zero, no syncopation, pref species slider
         vector<int> specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
 
+        vector<int> importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+
         int borrowMode = test->getBMode();
 
         // create a new problem
         // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
         auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
-            borrowMode);
+            importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine
 
@@ -122,12 +127,14 @@ int main(int argc, char* argv[]) {
         //penult sixth, non-ciambata, con m after skip, h triad 3rd species, m2 eq zero, no syncopation, pref species slider
         vector<int> specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
 
+        vector<int> importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+
         int borrowMode = test->getBMode();
 
         // create a new problem
         // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
         auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
-            borrowMode);
+            importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine
 

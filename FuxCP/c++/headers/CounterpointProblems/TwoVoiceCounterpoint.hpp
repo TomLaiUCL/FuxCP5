@@ -29,7 +29,7 @@ public:
      * @param lb the lowest note possible for the counterpoint in MIDI
      * @param ub the highest note possible for the counterpoint in MIDI
      */
-    TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm);
+    TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, vector<int> imp, int bm);
 
     TwoVoiceCounterpoint(TwoVoiceCounterpoint& s);
     IntLexMinimizeSpace* copy() override; 

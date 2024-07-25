@@ -13,8 +13,9 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm) : 
-    CounterpointProblem(cf, k, lb, ub, v_type, m_costs, g_costs, s_costs, TWO_VOICES){
+TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, 
+    vector<int> s_costs, vector<int> imp, int bm) : 
+    CounterpointProblem(cf, k, lb, ub, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES){
     species = sp;
     upper = new Stratum(*this, nMeasures, 0, 127, v_type, lowest->getNotes()); 
     counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
@@ -36,6 +37,10 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     for(int i = 0; i < unitedCosts.size(); i++){
         rel(*this, unitedCosts[i], IRT_EQ, counterpoint_1->getCosts()[i]);
     }
+
+    unitedCostNames = counterpoint_1->getCostNames();
+
+    orderCosts();
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size(), 0, 127);
     rel(*this, solutionArray, IRT_EQ, counterpoint_1->getBranchingNotes());
@@ -62,10 +67,5 @@ IntLexMinimizeSpace* TwoVoiceCounterpoint::copy(){   // todo use 'bool share' in
 string TwoVoiceCounterpoint::to_string() const {
     string text = "";
     text += CounterpointProblem::to_string();
-    text += "TwoVoiceCounterpoint problem object : \n";
-    text += "Cantus Firmus : \n" + cantusFirmus->to_string() + "\n";
-    text += "Counterpoint : \n" +counterpoint_1->to_string() + "\n";  // segmentation fault here was because counterpoint was deleted (but why did it still work when tostring was not virtual?)
-    text += "Lowest : \n" +lowest->to_string() + "\n";
-    text += "Upper : \n" +upper->to_string() + "\n";
     return text;
 }

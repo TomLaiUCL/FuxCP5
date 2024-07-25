@@ -47,6 +47,8 @@ class Part : public Voice {
         vector<int> extended_domain;
         vector<int> off_domain;
 
+        vector<string> cost_names;
+
         int secondCost;
         int thirdCost;
         int fourthCost;
@@ -127,6 +129,8 @@ class Part : public Voice {
         IntVarArray getMelodicDegreeCost();
 
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
+
+        vector<string> getCostNames();
 };
 
 

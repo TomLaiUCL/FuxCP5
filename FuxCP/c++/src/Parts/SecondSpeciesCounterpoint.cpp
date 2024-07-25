@@ -134,7 +134,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV) :
     SecondSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
-    costs = IntVarArray(home, 7, 0, 10000);
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult", "direct"};
 
     /// 2.M2: Two consecutive notes cannot be the same
     //can do better than this?
@@ -183,22 +184,23 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
             (directCostArray[j]==0));
     }
 
-    //set cost[0] to be fifth cost
-    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
-    //set cost[1] to be octave cost
-    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), octaveCostArray.size())), costs);
-    //set cost[2] to be motion cost
-    add_cost(home, 2, secondSpeciesRealMotionCosts, costs);
-    //set cost[3] to be melodic cost
-    add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
-    //need to set cost[4] to be off cost
-    add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
-    //set cost[5] to be penult sixth cost
-    add_cost(home, 5, penultCostArray, costs);
-    //need to set cost[5] to be variety cost
-    add_cost(home, 6, varietyCostArray, costs);
-    //need to set cost[7] to be direct cost
-    add_cost(home, 7, directCostArray, costs);
+    cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "penult"};
+    //need to set cost[0] to be off cost
+    add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
+    //set cost[1] to be fifth cost
+    add_cost(home, 1, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
+    //set cost[2] to be octave cost
+    add_cost(home, 2, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), octaveCostArray.size())), costs);
+    //need to set cost[3] to be variety cost
+    add_cost(home, 3, varietyCostArray, costs);
+    //set cost[4] to be motion cost
+    add_cost(home, 4, secondSpeciesRealMotionCosts, costs);
+    //set cost[5] to be melodic cost
+    add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
+    //need to set cost[6] to be direct cost
+    add_cost(home, 6, directCostArray, costs);
+    //set cost[7] to be penult sixth cost
+    add_cost(home, 7, penultCostArray, costs);
 
 }
 
@@ -206,7 +208,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3) :
     SecondSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
 {
-    costs = IntVarArray(home, 8, 0, 10000);
+    costs = IntVarArray(home, 8, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "variety", "direct", "penult"};
 
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
@@ -230,12 +233,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
     //need to set cost[4] to be off cost
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
-    //set cost[5] to be penult sixth cost
-    add_cost(home, 5, penultCostArray, costs);
     //need to set cost[5] to be variety cost
-    add_cost(home, 6, varietyCostArray, costs);
-    //need to set cost[7] to be direct cost
-    add_cost(home, 7, directCostArray, costs);
+    add_cost(home, 5, varietyCostArray, costs);
+    //need to set cost[6] to be direct cost
+    add_cost(home, 6, directCostArray, costs);
+    //set cost[7] to be penult sixth cost
+    add_cost(home, 7, penultCostArray, costs);
 }
 
 string SecondSpeciesCounterpoint::to_string() const {

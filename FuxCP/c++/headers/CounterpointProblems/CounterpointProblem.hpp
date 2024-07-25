@@ -18,6 +18,7 @@ protected:
     int key;            /// the key of the score
     int lowerBound;     /// the lowest note possible for the counterpoints
     int upperBound;     /// the highest note possible for the counterpoints
+    int n_unique_costs;
     Stratum* lowest;
     IntVarArray successiveCostArray;
     IntVarArray triadCostArray;
@@ -25,7 +26,15 @@ protected:
     Part* counterpoint_2;
     Part* counterpoint_3;
     IntVarArray unitedCosts;
+    IntVarArray sortedCosts;
     IntVarArray solutionArray;
+    vector<int> importance;
+    vector<string> importanceNames;
+    vector<string> unitedCostNames;
+    IntVarArray orderedFactors;
+    IntVarArray finalCosts;
+    unordered_map<string, int> prefs;
+    vector<vector<string>> costLevels;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:
@@ -36,7 +45,7 @@ public:
      * @param lb the lowest note possible for the counterpoints in MIDI
      * @param ub the highest note possible for the counterpoints in MIDI
      */
-    CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int nV);
+    CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, vector<int> imp, int nV);
 
     CounterpointProblem(CounterpointProblem& s);
     virtual IntLexMinimizeSpace* copy(); 
@@ -60,6 +69,10 @@ public:
     virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; delete counterpoint_1; delete counterpoint_2; delete counterpoint_3; }
 
     Home getHome();
+
+    void setPreferenceMap(vector<string> importance_names);
+
+    void orderCosts();
 
 };
 
