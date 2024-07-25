@@ -32,7 +32,7 @@ public:
     TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm);
 
     TwoVoiceCounterpoint(TwoVoiceCounterpoint& s);
-    Space* copy() override; 
+    IntLexMinimizeSpace* copy() override; 
 
     string to_string() const override; 
 

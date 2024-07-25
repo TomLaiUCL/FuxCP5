@@ -9,7 +9,7 @@
 /**
  * This (abstract) class gives a general model for a counterpoint problem. 
  */
-class CounterpointProblem : public Space{
+class CounterpointProblem : public IntLexMinimizeSpace{
 protected:
     CantusFirmus* cantusFirmus;
     // put one counterpoint? or group counterpoints together in a vector<Part*> ? or just leave it like this...
@@ -24,6 +24,7 @@ protected:
     Part* counterpoint_1;
     Part* counterpoint_2;
     Part* counterpoint_3;
+    IntVarArray unitedCosts;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:
@@ -37,9 +38,18 @@ public:
     CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int nV);
 
     CounterpointProblem(CounterpointProblem& s);
-    virtual Space* copy(); 
+    virtual IntLexMinimizeSpace* copy(); 
 
     virtual string to_string() const;  
+
+    /**
+     * Constrain method for bab search
+     * @todo modify this function if you want to use branch and bound
+     * @param _b a space to constrain the current instance of the Problem class with upon finding a solution
+     */
+    virtual void constrain(const IntMinimizeSpace& _b);
+
+    virtual IntVarArgs cost() const;
 
     /// Getters
     //todo add here getters if necessary
@@ -48,7 +58,8 @@ public:
     //todo release the allocated memory (each object created must be deleted)
     virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; delete counterpoint_1; delete counterpoint_2; delete counterpoint_3; }
 
-    Home getHome();  
+    Home getHome();
+
 };
 
 #endif //MYPROJECT_COUNTERPOINTPROBLEM_HPP

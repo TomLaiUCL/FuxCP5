@@ -17,14 +17,13 @@ int main(int argc, char* argv[]) {
         cout << "-------------" << endl;
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
-        vector<int> species = {FIRST_SPECIES};
+        vector<int> species = {FIRST_SPECIES, SECOND_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
-        cantusFirmus = {65,67,69,65,62};
         
         int size = cantusFirmus.size();
-        vector<int> v_type = {1, 2, 1};
+        vector<int> v_type = {1, 2};
 
         vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
         //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
@@ -44,6 +43,8 @@ int main(int argc, char* argv[]) {
         
         BAB<CounterpointProblem> e(problem);
 
+        cout << e.best << endl;
+
         int nb_sol = 0;
         while(CounterpointProblem* pb = e.next()){
             nb_sol++;
@@ -52,7 +53,7 @@ int main(int argc, char* argv[]) {
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            if (nb_sol >= 1)
+            if (nb_sol >= 20)
                 break;
         }
         cout << "No (more) solutions." << endl;

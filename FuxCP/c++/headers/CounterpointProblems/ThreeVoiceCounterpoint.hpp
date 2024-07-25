@@ -19,7 +19,6 @@ protected:
 
     vector<int> species;        /// the species of the counterpoints to generate
     IntVarArray solutionArray;
-    IntVarArray unitedCosts;
 
 public:
     /**
@@ -33,7 +32,7 @@ public:
     ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm);
 
     ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s);
-    Space* copy() override; 
+    IntLexMinimizeSpace* copy() override; 
 
     string to_string() const override;
 

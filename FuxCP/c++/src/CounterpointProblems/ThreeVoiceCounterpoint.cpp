@@ -138,19 +138,17 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size(), 0, 127);
 
     int c_sz = 0;
-    if(counterpoint_1->getSpecies() >= counterpoint_2->getSpecies()){
+    if(counterpoint_1->getCosts().size() >= counterpoint_2->getCosts().size()){
         c_sz = counterpoint_1->getCosts().size();
     } else {
         c_sz = counterpoint_2->getCosts().size();
     }
     c_sz+=2;
-    unitedCosts = IntVarArray(*this, c_sz, 0, 10000);
+    unitedCosts = IntVarArray(*this, c_sz, 0, 10000000);
 
     lowest->setCantusPointer(cantusFirmus);
     lowest->setCpPointer(*this, counterpoint_1, counterpoint_2);
     lowest->setLowest(*this, upper1, upper2);
-
-    cout << counterpoint_1->getBranchingNotes() << endl;
     
     //TEST
 
@@ -164,7 +162,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
 ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : CounterpointProblem(s){
     species = s.species;
     solutionArray.update(*this, s.solutionArray);
-    unitedCosts.update(*this, s.unitedCosts);
     if (s.upper1) {
         upper1 = s.upper1->clone(*this);
     } else {
@@ -177,7 +174,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : Coun
     }
 }
 
-Space* ThreeVoiceCounterpoint::copy(){  
+IntLexMinimizeSpace* ThreeVoiceCounterpoint::copy(){  
     return new ThreeVoiceCounterpoint(*this);
 }
 
@@ -238,6 +235,7 @@ void ThreeVoiceCounterpoint::uniteCosts(){
         }
         rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
     }
+    
     //add successive cost
     IntVarArgs y(successiveCostArray.size());
     for(int i = 0; i < successiveCostArray.size(); i++){
@@ -250,4 +248,6 @@ void ThreeVoiceCounterpoint::uniteCosts(){
         z[i] = triadCostArray[i];
     }
     rel(*this, unitedCosts[unitedCosts.size()-1], IRT_EQ, expr(*this, sum(z)));
+
+    cout << unitedCosts << endl;
 }

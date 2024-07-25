@@ -95,17 +95,17 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     for(int i = 0; i < firstSpeciesMotions.size(); i++){
         //direct motions help creation
         
-        BoolVar both_up = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(c->getMelodicIntervals()[i]>0)); //if both parts are going in the same direction
-        BoolVar both_stay = expr(home, (firstSpeciesMelodicIntervals[i]==0)&&(c->getMelodicIntervals()[i]==0)); //if both parts are staying
-        BoolVar both_down = expr(home, (firstSpeciesMelodicIntervals[i]<0)&&(c->getMelodicIntervals()[i]<0)); //if both parts are going down
+        BoolVar both_up = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(low->getMelodicIntervals()[i]>0)); //if both parts are going in the same direction
+        BoolVar both_stay = expr(home, (firstSpeciesMelodicIntervals[i]==0)&&(low->getMelodicIntervals()[i]==0)); //if both parts are staying
+        BoolVar both_down = expr(home, (firstSpeciesMelodicIntervals[i]<0)&&(low->getMelodicIntervals()[i]<0)); //if both parts are going down
         //oblique motions help creation
-        BoolVar cf_stays_1 = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(c->getMelodicIntervals()[i]==0)); //if the lowest part stays and one goes up
-        BoolVar cf_stays_2 = expr(home, (firstSpeciesMelodicIntervals[i]<0)&&(c->getMelodicIntervals()[i]==0)); //if the lowest part stays and one goes down
-        BoolVar cp_stays_1 = expr(home, (firstSpeciesMelodicIntervals[i]==0)&&(c->getMelodicIntervals()[i]>0)); //if the lowest part goes up and one stays
-        BoolVar cp_stays_2 = expr(home, (firstSpeciesMelodicIntervals[i]==0)&&(c->getMelodicIntervals()[i]<0)); //if the lowest part goes down and one stays
+        BoolVar cf_stays_1 = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(low->getMelodicIntervals()[i]==0)); //if the lowest part stays and one goes up
+        BoolVar cf_stays_2 = expr(home, (firstSpeciesMelodicIntervals[i]<0)&&(low->getMelodicIntervals()[i]==0)); //if the lowest part stays and one goes down
+        BoolVar cp_stays_1 = expr(home, (firstSpeciesMelodicIntervals[i]==0)&&(low->getMelodicIntervals()[i]>0)); //if the lowest part goes up and one stays
+        BoolVar cp_stays_2 = expr(home, (firstSpeciesMelodicIntervals[i]==0)&&(low->getMelodicIntervals()[i]<0)); //if the lowest part goes down and one stays
         //contrary motions help creation
-        BoolVar cpd_cfu = expr(home, (firstSpeciesMelodicIntervals[i]<0)&&(c->getMelodicIntervals()[i]>0)); //if the cf goes up and the cp down
-        BoolVar cpu_cfd = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(c->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
+        BoolVar cpd_cfu = expr(home, (firstSpeciesMelodicIntervals[i]<0)&&(low->getMelodicIntervals()[i]>0)); //if the cf goes up and the cp down
+        BoolVar cpu_cfd = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(low->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
 
         //direct constraints
         rel(home, ((both_up || both_stay || both_down) && (isLowest[i]==1)) >> (firstSpeciesMotions[i]==PARALLEL_MOTION));
@@ -334,12 +334,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 string FirstSpeciesCounterpoint::to_string() const {
     string text = Part::to_string() + "\nFirst species :\n";
     text += "First species first notes: " + intVarArray_to_string(firstSpeciesNotesCp) + "\n";
-    text += "First species harmonic intervals: " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
-    text += "First species melodic intervals: " + intVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
-    text += "First species motion intervals: " + intVarArray_to_string(firstSpeciesMotions) + "\n";
-    text += "Fifth cost : " + intVarArray_to_string(melodicDegreeCost) + "\n";
-    text += "isLowest : " + boolVarArray_to_string(isLowest) + "\n";
-    text += "Costs: " + intVarArray_to_string(costs) + "\n";
     return text;
 }
 

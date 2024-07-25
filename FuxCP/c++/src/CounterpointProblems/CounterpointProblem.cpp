@@ -19,7 +19,7 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int k, int lb, int ub, 
 }
 
 // COPY CONSTRUCTOR
-CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : Space(s){
+CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimizeSpace(s){
     if (s.cantusFirmus) {
         cantusFirmus = s.cantusFirmus->clone(*this);
     } else {
@@ -51,16 +51,35 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : Space(s){
     upperBound = s.upperBound;
     successiveCostArray.update(*this, s.successiveCostArray);
     triadCostArray.update(*this, s.triadCostArray);
+    unitedCosts.update(*this, s.unitedCosts);
 }
 
-Space* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?
+IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?
     return new CounterpointProblem(*this);
 }
 
+void CounterpointProblem::constrain(const IntMinimizeSpace& _b){
+
+    const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
+    
+}
+
+IntVarArgs CounterpointProblem::cost() const{
+
+    IntVarArgs x(unitedCosts.size());
+    for(int i = 0; i < x.size(); i++){
+        x[i] = unitedCosts[i];
+    }
+    return IntVarArgs(unitedCosts);
+
+}
 
 string CounterpointProblem::to_string() const {
     string text = "Counterpoint problem : \n";
     text += cantusFirmus->to_string(); 
+    text += "\n";
+    text = "All costs : \n";
+    text += intVarArray_to_string(unitedCosts); 
     text += "\n";
     return text;
 }

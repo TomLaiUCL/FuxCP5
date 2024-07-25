@@ -31,6 +31,12 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     lowest->setCpPointer(*this, counterpoint_1);
     lowest->setLowest(*this, upper);
 
+    unitedCosts = IntVarArray(*this, counterpoint_1->getCosts().size(), 0, 10000);
+
+    for(int i = 0; i < unitedCosts.size(); i++){
+        rel(*this, unitedCosts[i], IRT_EQ, counterpoint_1->getCosts()[i]);
+    }
+    
     //upper->setNote(*this, 5, counterpoint->getFirstNotes()[5]);
     branch(*this, counterpoint_1->getBranchingNotes(), INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 }
@@ -45,7 +51,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : Counterpoi
     }
 }
 
-Space* TwoVoiceCounterpoint::copy(){   // todo use 'bool share' in copy constructor?
+IntLexMinimizeSpace* TwoVoiceCounterpoint::copy(){   // todo use 'bool share' in copy constructor?
     return new TwoVoiceCounterpoint(*this);
 }
 

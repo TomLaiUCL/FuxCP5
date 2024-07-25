@@ -35,10 +35,6 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lo
     rel(home, h_intervals[h_intervals.size()-1], IRT_NQ, 3);
 }
 
-// IntVarArray Stratum::getBranchingNotes(){
-//     return notes;
-// }
-
 
 string Stratum::to_string() const {
     string text = "Notes : ";

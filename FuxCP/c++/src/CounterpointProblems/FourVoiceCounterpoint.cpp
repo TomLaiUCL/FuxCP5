@@ -10,6 +10,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
     upper1 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
     upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
     upper3 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
+
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], key, lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], key, lowest, 
@@ -100,7 +101,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
     
     int idx = 0;
     
-    // cout << "SUCC SIZE :" + to_string(succ_cost.size()) << endl;
     for(int p1 = 1; p1 < parts.size(); p1++){
         for(int p2 = p1+1; p2 < parts.size(); p2++){
 
@@ -153,7 +153,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
         rel(*this, expr(*this, parts[0]->getMotions()[i]==2 && parts[1]->getMotions()[i]==2), BOT_AND, expr(*this, parts[2]->getMotions()[i]==2), 0);
     }
 
-    //P7 : no suxxessive ascending sixths
+    //P7 : no successive ascending sixths
     for(int p1 = 0; p1 < parts.size(); p1++){
         for(int p2 = p1+1; p2 < parts.size(); p2++){
             for(int j = 1; j < parts[p1]->getFirstHInterval().size()-1; j++){
@@ -199,7 +199,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
 FourVoiceCounterpoint::FourVoiceCounterpoint(FourVoiceCounterpoint& s) : CounterpointProblem(s){
     species = s.species;
     solutionArray.update(*this, s.solutionArray);
-    unitedCosts.update(*this, s.unitedCosts);
     successiveCostArray.update(*this, s.successiveCostArray);
     if (s.upper1) {
         upper1 = s.upper1->clone(*this);
@@ -218,27 +217,13 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(FourVoiceCounterpoint& s) : Counter
     }
 }
 
-Space* FourVoiceCounterpoint::copy(){  
+IntLexMinimizeSpace* FourVoiceCounterpoint::copy(){  
     return new FourVoiceCounterpoint(*this);
 }
 
 string FourVoiceCounterpoint::to_string() const {
-    string text = "CantusFirmus : \n";
-    text += cantusFirmus->to_string();
-    text += "Counterpoint 1 : \n";
-    text += counterpoint_1->to_string();  
-    text += "Counterpoint 2 : \n";
-    text += counterpoint_2->to_string(); 
-    text += "Counterpoint 3 : \n";
-    text += counterpoint_3->to_string(); 
-    text += "Lowest : \n";
-    text += lowest->to_string(); 
-    text += "Succ costs : \n";
-    text += intVarArray_to_string(successiveCostArray); 
-    text += "\n";
-    text += "All costs : \n";
-    text += intVarArray_to_string(unitedCosts); 
-    text += "\n";
+    string text = "";
+    text += CounterpointProblem::to_string();
     //text += "Upper 1 : \n";
     //text += upper1->to_string(); 
     //text += "Upper 2 : \n";
@@ -307,5 +292,4 @@ void FourVoiceCounterpoint::uniteCosts(){
     }
     
     rel(*this, unitedCosts[unitedCosts.size()-1], IRT_EQ, expr(*this, sum(z)));
-    cout << "HEREEEE" << endl;
 }
