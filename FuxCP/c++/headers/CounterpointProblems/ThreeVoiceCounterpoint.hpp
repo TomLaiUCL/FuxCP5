@@ -16,7 +16,7 @@ protected:
 
     Stratum* upper1;
     Stratum* upper2;
-    vector<int> species;        /// the species of the counterpoints to generate
+    vector<Species> species;        /// the species of the counterpoints to generate
 
 public:
     /**
@@ -27,7 +27,7 @@ public:
      * @param lb the lowest note possible for the counterpoint in MIDI
      * @param ub the highest note possible for the counterpoint in MIDI
      */
-    ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, 
+    ThreeVoiceCounterpoint(vector<int> cf, vector<Species> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, 
         vector<int> s_costs, vector<int> imp, int bm);
 
     ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s);

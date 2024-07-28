@@ -252,7 +252,7 @@ const vector<int> CHROMATIC_SCALE = {MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINO
     MINOR_SECOND,MINOR_SECOND,MINOR_SECOND};
 
 /** Part related */
-enum species{
+enum Species{
     FIRST_SPECIES,  //0
     SECOND_SPECIES, //1
     THIRD_SPECIES,  //2
