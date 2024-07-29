@@ -89,13 +89,21 @@ int main(int argc, char* argv[]) {
         //cout << problem->to_string() << endl;
         // create a new search engine
 
-        if(species.size()>=1){
+        if(atoi(argv[1])==125){
+            cout << "HERE" << endl;
+            for(int j = 0; j < problem->getSize(); j++){
+                if(j!=10){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            }
+        }
+        else{
             if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
-                for(int j = 0; j < test->getIdx(); j++){
+                for(int j = 0; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
             } else if(species[0]==SECOND_SPECIES){
-                for(int j = 1; j < test->getIdx(); j++){
+                for(int j = 1; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
             }
@@ -144,8 +152,15 @@ int main(int argc, char* argv[]) {
             importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine
-
-        if(species.size()>=1){
+        if(atoi(argv[1])==125){
+            cout << "HERE" << endl;
+            for(int j = 0; j < problem->getSize(); j++){
+                if(j!=10){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            }
+        }
+        else{
             if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
                 for(int j = 0; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);

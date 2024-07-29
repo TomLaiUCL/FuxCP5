@@ -29,6 +29,8 @@ FuxTest::FuxTest(int testNumber, int i){
         test_3v_1sp_fig110_setter(i);
     } else if(testNumber==111){
         test_3v_1sp_fig111_setter(i);
+    } else if(testNumber==125){
+        test_3v_2sp_fig125_setter(i);
     } else if(testNumber==166){
         test_4v_1sp_fig166_setter(i);
     } else if(testNumber==167){
@@ -207,6 +209,17 @@ void FuxTest::test_3v_1sp_fig111_setter(int i){
     cp =           {69,72,72,74,74,70,69,67,65,77,76,77,
                     65,64,65,62,58,55,53,52,53,50,48,53};
     v_type = {1 ,-2};
+    idx = i;
+    borrowMode = 1;
+}
+
+void FuxTest::test_3v_2sp_fig125_setter(int i){
+    cout << "Fig. 125" << endl;
+    species = {FIRST_SPECIES, SECOND_SPECIES};
+    cantusFirmus = {52,   48,   50,   48,   45,   57,   55,   52,   53,   52};
+    cp =           {64,   64,   65,   64,   65,   64,   67,   67,   69,   68,
+                    00,59,60,59,57,53,55,52,57,59,60,57,59,62,64,62,60,57,59};
+    v_type = {2 ,1};
     idx = i;
     borrowMode = 1;
 }
