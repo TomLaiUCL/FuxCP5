@@ -62,7 +62,7 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* 
         dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
         
         //H7,H8 cf version
-        rel(home, h_intervals[h_intervals.size()-2], IRT_EQ, MINOR_THIRD, Reify(isLowest[isLowest.size()-2], RM_IMP));
+        //rel(home, h_intervals[h_intervals.size()-2], IRT_EQ, MINOR_THIRD, Reify(isLowest[isLowest.size()-2], RM_IMP));
 
         //P1 from Thibault : Perfect consonances cannot be reached by direct motion
         for(int j = 0; j < motions.size(); j++){
@@ -91,8 +91,8 @@ string CantusFirmus::to_string() const {
     string text = "Cantus Firmus notes : ";
     text += intVarArray_to_string(notes);
     text += "\n";
-    text += "M intervals brut : ";
-    text += intVarArray_to_string(m_intervals_brut);
+    text += "H intervals brut : ";
+    text += intVarArray_to_string(h_intervals);
     text += "\n";
     text += "Motions : ";
     text += intVarArray_to_string(motions);

@@ -17,11 +17,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         secondSpeciesNotesCp[secondSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     }
     rel(home, secondSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(notes.size())));
+    cout << notes << endl;
     /// Harmonic intervals for the second species notes
-    secondSpeciesHarmonicIntervals = IntVarArray(home, (nMeasures*notesPerMeasure.at(SECOND_SPECIES))-1, UNISSON, PERFECT_OCTAVE);
-    //rel(home, secondSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(h_intervals.size())));
+    secondSpeciesHarmonicIntervals = IntVarArray(home, (nMeasures*notesPerMeasure.at(SECOND_SPECIES))-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    rel(home, secondSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(h_intervals.size())));
     for(int i = 0; i < secondSpeciesHarmonicIntervals.size(); i++){
-        //rel(home, (secondSpeciesHarmonicIntervals[i])==((secondSpeciesNotesCp[i]-low->getNotes()[floor(i/2)*4])%12));
+        rel(home, (secondSpeciesHarmonicIntervals[i])==((secondSpeciesNotesCp[i]-low->getNotes()[floor(i/2)*4])%12));
     }
 
     /// Melodic intervals for the second species notes
@@ -29,12 +30,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     
     /// link melodic intervals
     for(int i = 0; i < secondSpeciesMelodicIntervals.size(); i++)
-        //rel(home, secondSpeciesMelodicIntervals[i], IRT_EQ, expr(home, secondSpeciesNotesCp[i+1] - secondSpeciesNotesCp[i]));
-    //rel(home, secondSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),m_intervals_brut.size()));
+        rel(home, secondSpeciesMelodicIntervals[i], IRT_EQ, expr(home, secondSpeciesNotesCp[i+1] - secondSpeciesNotesCp[i]));
+    rel(home, secondSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),m_intervals_brut.size()));
 
     secondSpeciesArsisArray = IntVarArray(home, firstSpeciesMelodicIntervals.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
     for(int i = 1; i < secondSpeciesMelodicIntervals.size()-1; i+=2){
-        //rel(home, secondSpeciesArsisArray[floor(i/2)], IRT_EQ, expr(home, secondSpeciesMelodicIntervals[i]+secondSpeciesMelodicIntervals[i+1]));
+        rel(home, secondSpeciesArsisArray[floor(i/2)], IRT_EQ, expr(home, secondSpeciesMelodicIntervals[i]+secondSpeciesMelodicIntervals[i+1]));
     }
 
     secondSpeciesMotions = IntVarArray(home, (nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1), IntSet{-1, CONTRARY_MOTION, OBLIQUE_MOTION, PARALLEL_MOTION});
@@ -42,7 +43,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     //the second motions are between the two arsis notes as are the first motions between thesis notes. this way of doing it takes the correct
     //m intervals between two arsis notes and then calculates the motion with respect to the cantusFirmus
-    /*for(int i = 0; i < secondSpeciesArsisArray.size(); i++){
+    for(int i = 0; i < secondSpeciesArsisArray.size(); i++){
 
         //direct motions help creation
         BoolVar both_up = expr(home, (secondSpeciesArsisArray[i]>0)&&(low->getMelodicIntervals()[i]>0)); //if both parts are going in the same direction
@@ -69,27 +70,26 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         //bass constraints
         rel(home, (isLowest[i]==0) >> (secondSpeciesMotions[i]==-1));
         rel(home, (isLowest[i]==0) >> (secondSpeciesMotionCosts[i]==0));
-    }*/
+    }
 
     //create real motions. we have the thesis-thesis and arsis-arsis motions. now we need the successive m intervals in meas, meaning thesis-arsis inside
     //a measure. to get this, we iterate in increments of 2 starting from i=0
     secondSpeciesRealMotions = IntVarArray(home, secondSpeciesMotions.size(), IntSet{-1, CONTRARY_MOTION, OBLIQUE_MOTION, PARALLEL_MOTION});
     secondSpeciesRealMotionCosts = IntVarArray(home, secondSpeciesRealMotions.size(), IntSet{0, directCost, obliqueCost, contraryCost});
-    /*for(int i = 0; i < secondSpeciesRealMotions.size(); i++){
-        cout << i << endl;
+    for(int i = 0; i < secondSpeciesRealMotions.size(); i++){
             rel(home, (expr(home, abs(secondSpeciesMelodicIntervals[i*2])>4)==1) >> (secondSpeciesRealMotions[i]==secondSpeciesMotions[i]));
             rel(home, (expr(home, abs(secondSpeciesMelodicIntervals[i*2])>4)==0) >> (secondSpeciesRealMotions[i]==firstSpeciesMotions[i]));
 
             rel(home, (expr(home, abs(secondSpeciesMelodicIntervals[i*2])>4)==1) >> (secondSpeciesRealMotionCosts[i]==secondSpeciesMotionCosts[i]));
             rel(home, (expr(home, abs(secondSpeciesMelodicIntervals[i*2])>4)==0) >> (secondSpeciesRealMotionCosts[i]==firstSpeciesMotionCosts[i]));
-    }*/
+    }
 
     //create isDiminution Array
     isDiminution = BoolVarArray(home, (nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1), 0, 1);
 
     for(int i = 0; i < isDiminution.size(); i++){
 
-        /*BoolVar btt3 = BoolVar(home, 0, 1);
+        BoolVar btt3 = BoolVar(home, 0, 1);
         BoolVar btt4 = BoolVar(home, 0, 1);
         BoolVar bta2nd = BoolVar(home, 0, 1);
         BoolVar btt3rd = BoolVar(home, 0, 1);
@@ -102,7 +102,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         rel(home, secondSpeciesMelodicIntervals[i*2+1], IRT_LQ, 2, Reify(bat2nd));
         rel(home, btt3, BOT_OR, btt4, btt3rd);
         rel(home, bta2nd, BOT_AND, btt3rd, band);
-        rel(home, band, BOT_AND, bat2nd, isDiminution[i]);*/
+        rel(home, band, BOT_AND, bat2nd, isDiminution[i]);
 
     }
 
@@ -110,16 +110,18 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     /// Constraints
 
     // 2.H2 : Arsis harmonies cannot be dissonant except if there is a diminution.
-    /*for(int i = 0; i < nMeasures-1; i++){
-        if(i==nMeasures-2){
-            rel(home, secondSpeciesHarmonicIntervals[(i*2)+1]==UNISSON || secondSpeciesHarmonicIntervals[(i*2)+1]==MINOR_THIRD || secondSpeciesHarmonicIntervals[(i*2)+1]==MAJOR_SIXTH);
-        } else {
-            rel(home, isConsonance[(i*2)+1], IRT_EQ, 0, Reify(isDiminution[i]));
-        }
+    for(int i = 0; i < nMeasures-1; i++){
+        //if(i==nMeasures-2){
+        //    rel(home, secondSpeciesHarmonicIntervals[(i*2)+1]==UNISSON || secondSpeciesHarmonicIntervals[(i*2)+1]==MINOR_THIRD || secondSpeciesHarmonicIntervals[(i*2)+1]==MAJOR_SIXTH);
+        //} else {
+        //    
+        //}
+        rel(home, isConsonance[(i*2)+1], IRT_EQ, 0, Reify(isDiminution[i]));
     }
     
     // 2.H3 : penult cost 
-    dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
+    dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
+
     rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]!=7) >> (penultCostArray[0]==penultCost));
     rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==7) >> (penultCostArray[0]==0));
 
@@ -135,7 +137,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     for(int j = 0; j < secondSpeciesMotions.size(); j++){
         rel(home, expr(home, secondSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
             BOT_AND, isLowest[j], 0);
-    }*/
+    }
 
 }
 
@@ -148,12 +150,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     /// 2.M2: Two consecutive notes cannot be the same
     //can do better than this?
-    //rel(home, secondSpeciesMelodicIntervals, IRT_NQ, 0); /// plus efficace que de faire cp[i] /= cp[i+1]
+    rel(home, secondSpeciesMelodicIntervals, IRT_NQ, 0); /// plus efficace que de faire cp[i] /= cp[i+1]
 
     //2.P1 : adapted no direct motion rule from first species to real motions
     for(int j = 0; j < secondSpeciesRealMotions.size(); j++){
-        //rel(home, ((firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH)&&isLowest[j+1]==1) >>
-        //    (secondSpeciesRealMotions[j]!=PARALLEL_MOTION));
+        rel(home, ((firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH)&&isLowest[j+1]==1) >>
+            (secondSpeciesRealMotions[j]!=PARALLEL_MOTION));
     }
     
 
@@ -248,8 +250,9 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 }
 
 string SecondSpeciesCounterpoint::to_string() const {
-    string text = "Second species diminution array : " + boolVarArray_to_string(isDiminution) + "\n";
+    string text = "\nSecond species diminution array : " + boolVarArray_to_string(isDiminution) + "\n";
     text += "Second species isLowest array : " + boolVarArray_to_string(isLowest) + "\n";
+    text += "Second species h intervals : " + intVarArray_to_string(secondSpeciesHarmonicIntervals) + "\n";
     text += "First species : " + FirstSpeciesCounterpoint::to_string() + "\n";
     return text;
 }

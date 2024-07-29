@@ -201,10 +201,12 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
 
         //rel(*this, cfLowest, BOT_XOR, cantusFirmus->getIsLowestIdx(i), 1);
         //rel(*this, cp1Lowest, BOT_XOR, counterpoint_1->getIsLowestIdx(i), 1);
+
         rel(*this, lowest->getFirstNotes()[i], IRT_NQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsLowestIdx(i)));
+        
         if(nVoices==2){
 
-            rel(*this, cantusFirmus->getIsLowestIdx(i), IRT_EQ, 0, Reify(counterpoint_1->getIsLowestIdx(i)));
+            rel(*this, expr(*this, (cantusFirmus->getIsLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsLowestIdx(i))); 
 
         } else if(nVoices==3){
 

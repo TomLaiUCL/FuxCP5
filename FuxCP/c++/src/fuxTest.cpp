@@ -127,8 +127,8 @@ void FuxTest::test_2v_2sp_fig40_setter(int i){
 void FuxTest::test_2v_2sp_fig41_setter(int i){
     cout << "Fig. 41" << endl;
     species = {SECOND_SPECIES};
-    cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; //1sp 2v cf
-    cp =           {0,55,52,53,55,53,52,50,48,52,48,60,59,57,55,59,60,59,57,55,54,50,55,47,50,54,55};
+    cantusFirmus = {55,   60,   59,   55,   60,   64,   62,   67,   64,   60,   62,   59,   57,   55}; //1sp 2v cf
+    cp =           {0 ,55,52,53,55,53,52,50,48,52,48,60,59,57,55,59,60,59,57,55,54,50,55,47,50,54,55};
     v_type = {-1};
     idx = i;
     borrowMode = 1;

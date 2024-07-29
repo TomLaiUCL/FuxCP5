@@ -37,6 +37,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
     if(borrowMode==1 && motherSpecies==FIRST_SPECIES){
         firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
+    } else {
+        firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
     }
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
     
@@ -167,7 +169,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 
     // H4 from Thibault : The key tone is tuned to the first note of the lowest strata
     rel(home, (isLowest[0]==0) >> (firstSpeciesHarmonicIntervals[0]==0));
-    rel(home, (isLowest[isLowest.size()-1]==0) >> (firstSpeciesHarmonicIntervals[firstSpeciesNotesCp.size()-1]==0));
+    rel(home, (isLowest[isLowest.size()-1]==0) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-1]==0));
 
     // H5 from Thibault : The cp and the cf cannot play the same note
     for(int i = 1; i < firstSpeciesNotesCp.size()-1; i++){
