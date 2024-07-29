@@ -26,11 +26,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     /// H3 from Thibault: The last harmonic interval must be a perfect consonance
     dom(*this, counterpoint_1->getHInterval()[counterpoint_1->getHInterval().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
 
-    //rel(*this, counterpoint->getFirstNotes()[2], IRT_EQ, 76);
-    //create_lowest(*this, lowest, cantusFirmus, counterpoint);
-    lowest->setCantusPointer(cantusFirmus);
-    lowest->setCpPointer(*this, counterpoint_1);
-    lowest->setLowest(*this, upper);
+    setLowest(nullptr, nullptr, upper, nullptr, nullptr);
 
     unitedCosts = IntVarArray(*this, counterpoint_1->getCosts().size(), 0, 1000000);
 
@@ -44,9 +40,9 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size(), 0, 127);
     rel(*this, solutionArray, IRT_EQ, counterpoint_1->getBranchingNotes());
-    
-    //upper->setNote(*this, 5, counterpoint->getFirstNotes()[5]);
+
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
 }
 // COPY CONSTRUCTOR
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : CounterpointProblem(s){
@@ -67,6 +63,16 @@ IntLexMinimizeSpace* TwoVoiceCounterpoint::copy(){   // todo use 'bool share' in
 string TwoVoiceCounterpoint::to_string() const {
     string text = "";
     text += CounterpointProblem::to_string();
+    text += "Lowest : \n";
+    text += cantusFirmus->to_string();
+    text += "\n";
+    text += "Counterpoint 1 : \n";
+    text += counterpoint_1->to_string();
+    text += "\n";
+    text += "Solution Array : \n";
+    text += intVarArray_to_string(solutionArray);
+    text += "\n";
+    text += counterpoint_1->to_string();
     return text;
 }
 /*

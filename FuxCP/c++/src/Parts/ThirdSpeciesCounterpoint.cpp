@@ -13,21 +13,26 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
     rel(home, thirdSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(THIRD_SPECIES),(notes.size())));
 
-    thirdSpeciesHarmonicIntervals = IntVarArray(home, h_intervals.size(), UNISSON, PERFECT_OCTAVE);
-    rel(home, thirdSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(THIRD_SPECIES),(h_intervals.size())));
+    thirdSpeciesHarmonicIntervals = IntVarArray(home, h_intervals.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    rel(home, thirdSpeciesHarmonicIntervals, IRT_EQ, h_intervals);
     for(int i = 0; i < thirdSpeciesHarmonicIntervals.size(); i++){
         rel(home, (thirdSpeciesHarmonicIntervals[i])==((thirdSpeciesNotesCp[i]-low->getNotes()[floor(i/4)*4])%12));
     }
-
+    
+    
     thirdSpeciesMelodicIntervals = IntVarArray(home, m_intervals_brut.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
-    rel(home, thirdSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(THIRD_SPECIES),m_intervals_brut.size()));
+    
     for(int i = 0; i < thirdSpeciesMelodicIntervals.size(); i++)
         rel(home, thirdSpeciesMelodicIntervals[i], IRT_EQ, expr(home, thirdSpeciesNotesCp[i+1] - thirdSpeciesNotesCp[i]));
+    
+    rel(home, thirdSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(THIRD_SPECIES),m_intervals_brut.size()));
 
     thirdSpeciesMotions = IntVarArray(home, notes.size()/4, IntSet({-1, CONTRARY_MOTION, OBLIQUE_MOTION, PARALLEL_MOTION}));
     thirdSpeciesMotionCosts = IntVarArray(home, notes.size()/4, IntSet{0, directCost, obliqueCost, contraryCost});
 
     for(int i = 0; i < thirdSpeciesMotions.size(); i++){
+        cout << "OOPRWERT" << endl;
+        cout << low->getMelodicIntervals()[i] << endl;
         //direct motions help creation
         BoolVar both_up = expr(home, (thirdSpeciesMelodicIntervals[(i*4)+3]>0)&&(low->getMelodicIntervals()[i]>0)); //if both parts are going in the same direction
         BoolVar both_stay = expr(home, (thirdSpeciesMelodicIntervals[(i*4)+3]==0)&&(low->getMelodicIntervals()[i]==0)); //if both parts are staying
@@ -42,21 +47,22 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         BoolVar cpu_cfd = expr(home, (thirdSpeciesMelodicIntervals[(i*4)+3]>0)&&(low->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
  
         //direct constraints
-        rel(home, ((both_up || both_stay || both_down) && (isLowest[i]==1)) >> (thirdSpeciesMotions[i]==PARALLEL_MOTION));
-        rel(home, ((both_up || both_stay || both_down) && (isLowest[i]==1)) >> (thirdSpeciesMotionCosts[i]==directCost));
+        rel(home, ((both_up || both_stay || both_down) && (isLowest[i])) >> (thirdSpeciesMotions[i]==PARALLEL_MOTION));
+        rel(home, ((both_up || both_stay || both_down) && (isLowest[i])) >> (thirdSpeciesMotionCosts[i]==directCost));
         //oblique constraints
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i]==1)) >> (thirdSpeciesMotions[i]==OBLIQUE_MOTION));
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i]==1)) >> (thirdSpeciesMotionCosts[i]==obliqueCost));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i])) >> (thirdSpeciesMotions[i]==OBLIQUE_MOTION));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i])) >> (thirdSpeciesMotionCosts[i]==obliqueCost));
         //contrary constraints
-        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i]==1)) >> (thirdSpeciesMotions[i]==CONTRARY_MOTION));
-        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i]==1)) >> (thirdSpeciesMotionCosts[i]==contraryCost));
+        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i])) >> (thirdSpeciesMotions[i]==CONTRARY_MOTION));
+        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i])) >> (thirdSpeciesMotionCosts[i]==contraryCost));
         //bass constraints
-        rel(home, (isLowest[i]==0) >> (thirdSpeciesMotions[i]==-1));
-        rel(home, (isLowest[i]==0) >> (thirdSpeciesMotionCosts[i]==0));
+        rel(home, (!isLowest[i]) >> (thirdSpeciesMotions[i]==-1));
+        rel(home, (!isLowest[i]) >> (thirdSpeciesMotionCosts[i]==0));
     }
     
     is5QNArray = BoolVarArray(home, nMeasures-1, 0, 1);
-    for(int i = 0; i < is5QNArray.size()*4; i+=4){
+    /*for(int i = 0; i < is5QNArray.size()*4; i+=4){
+
         BoolVar case1 = BoolVar(home, 0, 1);
 
         rel(home, ((abs(thirdSpeciesMelodicIntervals[i])<=2) && (abs(thirdSpeciesMelodicIntervals[i+1])<=2) && (abs(thirdSpeciesMelodicIntervals[i+2])<=2) &&
@@ -74,7 +80,8 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
             thirdSpeciesMelodicIntervals[i+2]<0 && thirdSpeciesMelodicIntervals[i+3]<0) >> (case2==1));
 
         rel(home, is5QNArray[i/4], IRT_EQ, expr(home, case1&&case2));
-    }
+
+    }*/
 
     isDiminution = BoolVarArray(home, nMeasures-1, 0, 1);
     for(int i = 0; i < isDiminution.size()*4; i+=4){
@@ -90,6 +97,12 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
             )) >> (isDiminution[i/4]==0));
     }
 
+    m2IntervalsArray = IntVarArray(home, thirdSpeciesNotesCp.size()-2, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    for(int i = 0; i < thirdSpeciesNotesCp.size()-2; i++){
+        //size-2 of notes (butlast butlast) ; from 2 onwards in notes (rest rest)
+        rel(home, m2IntervalsArray[i], IRT_EQ, expr(home, thirdSpeciesNotesCp[i+2]-thirdSpeciesNotesCp[i]));
+    }
+
     cambiataCostArray = IntVarArray(home, nMeasures-1, IntSet({0, cambiataCost}));
 
     m2ZeroArray = IntVarArray(home, thirdSpeciesMelodicIntervals.size()-2, IntSet({0, m2ZeroCost}));
@@ -102,22 +115,20 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
 
     //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
     for(int i = 0; i < is5QNArray.size(); i++){
-        rel(home, (is5QNArray[i]==1) >> (h_intervals[(i*4)+3]==0)||(h_intervals[(i*4)+3]==7));
+        rel(home, (is5QNArray[i]==1) >> (abs(thirdSpeciesHarmonicIntervals[(i*4)+3])==0)||(abs(thirdSpeciesHarmonicIntervals[(i*4)+3])==7));
     }
 
     //3.H2 : any dissonant note implies that it is surrounded by consonant notes
     for(int i = 0; i < isDiminution.size(); i++){
-        rel(home, expr(home, (h_intervals[(i*4)+1]==UNISSON || h_intervals[(i*4)+1]==PERFECT_FIFTH) && 
-            (h_intervals[(i*4)+3]==UNISSON || h_intervals[(i*4)+3]==PERFECT_FIFTH) && isDiminution[i]) || 
-            expr(home, h_intervals[(i*4)+2]==UNISSON || h_intervals[(i*4)+2]==PERFECT_FIFTH));
+        rel(home, expr(home, isConsonance[(i*4)+1] && isConsonance[(i*4)+3] && isDiminution[i]), BOT_OR, isConsonance[(i*4)+2], 1);
     }
 
     //3.H3 : cambiata cost
     for(int i = 0; i < cambiataCostArray.size(); i++){
-        rel(home, (h_intervals[(i*4)+1]==UNISSON || h_intervals[(i*4)+1]==PERFECT_FIFTH)&&(h_intervals[(i*4)+2]==UNISSON || h_intervals[(i*4)+2]==PERFECT_FIFTH)
-            &&(abs(m_intervals_brut[(i*4)+1])<=2) >> (cambiataCostArray[i]==cambiataCost));
-        rel(home, (h_intervals[(i*4)+1]!=UNISSON && h_intervals[(i*4)+1]!=PERFECT_FIFTH)||(h_intervals[(i*4)+2]!=UNISSON && h_intervals[(i*4)+2]!=PERFECT_FIFTH)
-            ||(abs(m_intervals_brut[(i*4)+1])>2) >> (cambiataCostArray[i]==0));
+        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]==UNISSON || thirdSpeciesHarmonicIntervals[(i*4)+1]==PERFECT_FIFTH)&&(thirdSpeciesHarmonicIntervals[(i*4)+2]==UNISSON || thirdSpeciesHarmonicIntervals[(i*4)+2]==PERFECT_FIFTH)
+            &&(abs(thirdSpeciesMelodicIntervals[(i*4)+1])<=2)) >> (cambiataCostArray[i]==cambiataCost));
+        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]!=UNISSON && thirdSpeciesHarmonicIntervals[(i*4)+1]!=PERFECT_FIFTH)||(thirdSpeciesHarmonicIntervals[(i*4)+2]!=UNISSON && thirdSpeciesHarmonicIntervals[(i*4)+2]!=PERFECT_FIFTH)
+            ||(abs(thirdSpeciesMelodicIntervals[(i*4)+1])>2)) >> (cambiataCostArray[i]==0));
     }
     
     //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
@@ -125,13 +136,15 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
 
     //no melodic interval between 9 and 11
     for(int i = 0; i < nMeasures-1; i++){
-        rel(home, abs(m_intervals_brut[(i*4)+3])!=MAJOR_SIXTH && abs(m_intervals_brut[(i*4)+3])!=MINOR_SEVENTH && abs(m_intervals_brut[(i*4)+3])!=MAJOR_SEVENTH);
+        rel(home, abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SIXTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MINOR_SEVENTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SEVENTH);
     }
 
     //no chromatic motion between 3 consecutive notes
-    for(int i = 1; i < thirdSpeciesMelodicIntervals.size(); i++){
-        rel(home, thirdSpeciesMelodicIntervals[i]!=-1 && (thirdSpeciesMelodicIntervals[i-1]+thirdSpeciesMelodicIntervals[i])!=-2);
-        rel(home, thirdSpeciesMelodicIntervals[i]!=1 && (thirdSpeciesMelodicIntervals[i-1]+thirdSpeciesMelodicIntervals[i])!=2);
+    for(int i = 1; i < thirdSpeciesMelodicIntervals.size()-1; i++){
+        //thirdSpeciesMelodicIntervals(except FIRST)
+        //
+        //rel(home, thirdSpeciesMelodicIntervals[i+1]!=-1 && m2IntervalsArray[i]!=-2);
+        //rel(home, thirdSpeciesMelodicIntervals[i+1]!=1 && m2IntervalsArray[i]!=2);
     }
 
     //Marcel's rule
@@ -147,7 +160,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     
     //no battuta adapted for third species
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
-        rel(home, expr(home, thirdSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && m_intervals_brut[(j*4)+3]<-4),
+        rel(home, expr(home, thirdSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && thirdSpeciesMelodicIntervals[(j*4)+3]<-4),
             BOT_AND, isLowest[j], 0);
     }
 }
@@ -157,14 +170,14 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     ThirdSpeciesCounterpoint(home, size, cf, lb, ub, k, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
 {
     //3.H7,H8 adapted
-    rel(home, (isLowest[isLowest.size()-2]==0) >> (h_intervals[h_intervals.size()-2]==MINOR_THIRD));
-    rel(home, (isLowest[isLowest.size()-2]==1) >> (h_intervals[h_intervals.size()-2]==MAJOR_SIXTH));
+    rel(home, (isLowest[isLowest.size()-2]==0) >> (thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
+    rel(home, (isLowest[isLowest.size()-2]==1) >> (thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-2]==MAJOR_SIXTH));
 
-    //3.P1 adapted (why does it make an endless loop???)
-    //for(int j = 0; j < thirdSpeciesMotions.size(); j++){
-    //    rel(home, (firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH) >> 
-    //    (thirdSpeciesMotions[j]!=2));
-    //}
+    //3.P1 adapted
+    for(int j = 0; j < thirdSpeciesMotions.size(); j++){
+        rel(home, (firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH) >> 
+        (thirdSpeciesMotions[j]!=2));
+    }
 
     costs = IntVarArray(home, 7, 0, 10000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2"};
@@ -193,17 +206,17 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     directCostArray = IntVarArray(home, thirdSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
 
     //1.H7,H8 adapted
-    rel(home, h_intervals[h_intervals.size()-1]==UNISSON||h_intervals[h_intervals.size()-1]==MINOR_THIRD||h_intervals[h_intervals.size()-1]==PERFECT_FIFTH||
-        h_intervals[h_intervals.size()-1]==MAJOR_SIXTH);
+    rel(home, thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==UNISSON||thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==MINOR_THIRD||thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==PERFECT_FIFTH||
+        thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==MAJOR_SIXTH);
 
     //3.H6 : harmonic triad should be used on the second or third beat
     thirdHTriadArray = IntVarArray(home, nMeasures-1, IntSet({0, triad3rdCost}));
     for(int i = 0; i < thirdHTriadArray.size(); i++){
-        rel(home, ((h_intervals[(i*4)+1]!=UNISSON&&h_intervals[(i*4)+1]!=MINOR_THIRD&&h_intervals[(i*4)+1]!=MAJOR_THIRD&&h_intervals[(i*4)+1]!=PERFECT_FIFTH)&&
-            (h_intervals[(i*4)+2]!=UNISSON&&h_intervals[(i*4)+2]!=MINOR_THIRD&&h_intervals[(i*4)+2]!=MAJOR_THIRD&&h_intervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
+        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]!=UNISSON&&thirdSpeciesHarmonicIntervals[(i*4)+1]!=MINOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+1]!=MAJOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+1]!=PERFECT_FIFTH)&&
+            (thirdSpeciesHarmonicIntervals[(i*4)+2]!=UNISSON&&thirdSpeciesHarmonicIntervals[(i*4)+2]!=MINOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+2]!=MAJOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
             (thirdHTriadArray[i]==triad3rdCost));
-        rel(home, ((h_intervals[(i*4)+1]==UNISSON||h_intervals[(i*4)+1]==MINOR_THIRD||h_intervals[(i*4)+1]==MAJOR_THIRD||h_intervals[(i*4)+1]==PERFECT_FIFTH)||
-            (h_intervals[(i*4)+2]==UNISSON||h_intervals[(i*4)+2]==MINOR_THIRD||h_intervals[(i*4)+2]==MAJOR_THIRD||h_intervals[(i*4)+2]==PERFECT_FIFTH)) >> 
+        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]==UNISSON||thirdSpeciesHarmonicIntervals[(i*4)+1]==MINOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+1]==MAJOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+1]==PERFECT_FIFTH)||
+            (thirdSpeciesHarmonicIntervals[(i*4)+2]==UNISSON||thirdSpeciesHarmonicIntervals[(i*4)+2]==MINOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+2]==MAJOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+2]==PERFECT_FIFTH)) >> 
             (thirdHTriadArray[i]==0));
     }
 
@@ -219,17 +232,17 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     costs = IntVarArray(home, 10, 0, 10000);
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "cambiata", "m2", "triad3"};
     //need to set cost[0] to be off cost
-    add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
+    add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), offCostArray.size())), costs);
     //set cost[1] to be fifth cost
-    add_cost(home, 1, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
+    add_cost(home, 1, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), fifthCostArray.size())), costs);
     //set cost[2] to be octave cost
-    add_cost(home, 2, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), octaveCostArray.size())), costs);
+    add_cost(home, 2, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), octaveCostArray.size())), costs);
     //need to set cost[3] to be variety cost
     add_cost(home, 3, varietyCostArray, costs);
     //set cost[4] to be motion cost
     add_cost(home, 4, thirdSpeciesMotionCosts, costs);
     //set cost[5] to be melodic cost
-    add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
+    add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), melodicDegreeCost.size())), costs);
     //need to set cost[6] to be direct cost
     add_cost(home, 6, directCostArray, costs);
     //set cost[7] to be cambiata sixth cost
@@ -249,17 +262,17 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     directCostArray = IntVarArray(home, thirdSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
 
     //1.H7,H8 adapted
-    rel(home, h_intervals[h_intervals.size()-1]==UNISSON||h_intervals[h_intervals.size()-1]==MINOR_THIRD||h_intervals[h_intervals.size()-1]==PERFECT_FIFTH||
-        h_intervals[h_intervals.size()-1]==MAJOR_SIXTH);
+    rel(home, thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==UNISSON||thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==MINOR_THIRD||thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==PERFECT_FIFTH||
+        thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==MAJOR_SIXTH);
 
     //3.H6 : harmonic triad should be used on the second or third beat
     thirdHTriadArray = IntVarArray(home, nMeasures-1, IntSet({0, triad3rdCost}));
     for(int i = 0; i < thirdHTriadArray.size(); i++){
-        rel(home, ((h_intervals[(i*4)+1]!=UNISSON&&h_intervals[(i*4)+1]!=MINOR_THIRD&&h_intervals[(i*4)+1]!=MAJOR_THIRD&&h_intervals[(i*4)+1]!=PERFECT_FIFTH)&&
-            (h_intervals[(i*4)+2]!=UNISSON&&h_intervals[(i*4)+2]!=MINOR_THIRD&&h_intervals[(i*4)+2]!=MAJOR_THIRD&&h_intervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
+        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]!=UNISSON&&thirdSpeciesHarmonicIntervals[(i*4)+1]!=MINOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+1]!=MAJOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+1]!=PERFECT_FIFTH)&&
+            (thirdSpeciesHarmonicIntervals[(i*4)+2]!=UNISSON&&thirdSpeciesHarmonicIntervals[(i*4)+2]!=MINOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+2]!=MAJOR_THIRD&&thirdSpeciesHarmonicIntervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
             (thirdHTriadArray[i]==triad3rdCost));
-        rel(home, ((h_intervals[(i*4)+1]==UNISSON||h_intervals[(i*4)+1]==MINOR_THIRD||h_intervals[(i*4)+1]==MAJOR_THIRD||h_intervals[(i*4)+1]==PERFECT_FIFTH)||
-            (h_intervals[(i*4)+2]==UNISSON||h_intervals[(i*4)+2]==MINOR_THIRD||h_intervals[(i*4)+2]==MAJOR_THIRD||h_intervals[(i*4)+2]==PERFECT_FIFTH)) >> 
+        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]==UNISSON||thirdSpeciesHarmonicIntervals[(i*4)+1]==MINOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+1]==MAJOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+1]==PERFECT_FIFTH)||
+            (thirdSpeciesHarmonicIntervals[(i*4)+2]==UNISSON||thirdSpeciesHarmonicIntervals[(i*4)+2]==MINOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+2]==MAJOR_THIRD||thirdSpeciesHarmonicIntervals[(i*4)+2]==PERFECT_FIFTH)) >> 
             (thirdHTriadArray[i]==0));
     }
 
@@ -275,17 +288,17 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     costs = IntVarArray(home, 10, 0, 10000);
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "cambiata", "m2", "triad3"};
     //need to set cost[0] to be off cost
-    add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
+    add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), offCostArray.size())), costs);
     //set cost[1] to be fifth cost
-    add_cost(home, 1, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
+    add_cost(home, 1, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), fifthCostArray.size())), costs);
     //set cost[2] to be octave cost
-    add_cost(home, 2, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), octaveCostArray.size())), costs);
+    add_cost(home, 2, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), octaveCostArray.size())), costs);
     //need to set cost[3] to be variety cost
     add_cost(home, 3, varietyCostArray, costs);
     //set cost[4] to be motion cost
     add_cost(home, 4, thirdSpeciesMotionCosts, costs);
     //set cost[5] to be melodic cost
-    add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), melodicDegreeCost.size())), costs);
+    add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), melodicDegreeCost.size())), costs);
     //need to set cost[6] to be direct cost
     add_cost(home, 6, directCostArray, costs);
     //set cost[7] to be cambiata sixth cost
@@ -297,15 +310,16 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
 }
 
 string ThirdSpeciesCounterpoint::to_string() const {
-    string text = Part::to_string() + "\nThird species : \n";
-    text += "Third species notes : " + intVarArray_to_string(thirdSpeciesNotesCp) + "\n";
-    text += "Third species harmonic intervals : " + intVarArray_to_string(thirdSpeciesHarmonicIntervals) + "\n";
-    text += "Third species melodic intervals : " + intVarArray_to_string(thirdSpeciesMelodicIntervals) + "\n";
-    text += "Third species motion intervals : " + intVarArray_to_string(thirdSpeciesMotions) + "\n";
-    text += "is 5 QN Array : " + boolVarArray_to_string(is5QNArray) + "\n";
-    text += "is Diminution Array : " + boolVarArray_to_string(isDiminution) + "\n";
-    text += "Third h triad cost : " + intVarArray_to_string(thirdHTriadArray) + "\n";
-    text += "Costs: " + intVarArray_to_string(costs) + "\n";
+    string text = Part::to_string() + "\nThird species isConsonance intervals : \n";
+    text += boolVarArray_to_string(isConsonance) += "\n";
+    text += "Third species is Lowest : \n";
+    text += boolVarArray_to_string(isLowest) += "\n";
+    text += "Third species motions : \n";
+    text += intVarArray_to_string(thirdSpeciesMotions) += "\n";
+    text += "Third species h intervals : \n";
+    text += intVarArray_to_string(thirdSpeciesHarmonicIntervals) += "\n";
+    text += "Third species isDiminution array : \n";
+    text += boolVarArray_to_string(isDiminution) += "\n";
     return text;
 }
 
@@ -317,6 +331,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, ThirdSpeciesCounte
     thirdSpeciesMotionCosts.update(home, s.thirdSpeciesMotionCosts);
     is5QNArray.update(home, s.is5QNArray);
     isDiminution.update(home, s.isDiminution);
+    m2IntervalsArray.update(home, s.m2IntervalsArray);
     cambiataCostArray.update(home, s.cambiataCostArray);
     m2ZeroArray.update(home, s.m2ZeroArray);
     thirdHTriadArray.update(home, s.thirdHTriadArray);

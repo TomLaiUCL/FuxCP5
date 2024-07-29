@@ -117,6 +117,10 @@ class Part : public Voice {
 
         virtual int getHIntervalSize();
 
+        BoolVarArray getConsonance();
+
+        BoolVarArray getIsLowest();
+
         int getSecondCost();
         int getThirdCost();
         int getFourthCost();

@@ -18,6 +18,8 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
     counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 6) + cf[0], (6 * v_type[2] + 12) + cf[0], key, lowest, 
         cantusFirmus, v_type[2], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
 
+    setLowest(counterpoint_2, counterpoint_3, upper1, upper2, upper3);
+
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2, counterpoint_3};
 
     triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, not_harmonic_triad_cost, double_fifths_cost, double_thirds_cost,
@@ -168,30 +170,19 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size() + 
         counterpoint_3->getBranchingNotes().size(), 0, 127);
-
-    int c_sz = 0;
-    if((counterpoint_1->getSpecies() >= counterpoint_2->getSpecies()) && (counterpoint_1->getSpecies() >= counterpoint_3->getSpecies())){
-        c_sz = counterpoint_1->getCosts().size();
-    } else if((counterpoint_2->getSpecies() >= counterpoint_1->getSpecies()) && (counterpoint_2->getSpecies() >= counterpoint_3->getSpecies())){
-        c_sz = counterpoint_2->getCosts().size();
-    } else {
-        c_sz = counterpoint_3->getCosts().size();
-    }
-    c_sz+=2;
     
-    unitedCosts = IntVarArray(*this, c_sz, 0, 10000);
-    
-    lowest->setCantusPointer(cantusFirmus);
-    lowest->setCpPointer(*this, counterpoint_1, counterpoint_2, counterpoint_3);
-    lowest->setLowest(*this, upper1, upper2, upper3);
+    unitedCosts = IntVarArray(*this, 14, 0, 10000000);
+    unitedCostNames = {};
     
     //TEST
 
     uniteCounterpoints();
-    
     uniteCosts();
+
+    orderCosts();
     
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     
 }
 
@@ -220,12 +211,29 @@ IntLexMinimizeSpace* FourVoiceCounterpoint::copy(){
 }
 
 string FourVoiceCounterpoint::to_string() const {
-    string text = "";
-    text += CounterpointProblem::to_string();
-    //text += "Upper 1 : \n";
-    //text += upper1->to_string(); 
-    //text += "Upper 2 : \n";
-    //text += upper2->to_string();  
+    string text = CounterpointProblem::to_string();
+    /*
+    text += "Counterpoint 1 : \n";
+    text += counterpoint_1->to_string();
+    text += "\n";
+    text += "Counterpoint 2 : \n";
+    text += counterpoint_2->to_string();
+    text += "\n";
+    text += "Counterpoint 3 : \n";
+    text += counterpoint_3->to_string();
+    text += "\n";
+    text += "Upper 1 : \n";
+    text += upper1->to_string();
+    text += "\n";
+    text += "Upper 2 : \n";
+    text += upper2->to_string();
+    text += "\n";
+    text += "Upper 3 : \n";
+    text += upper3->to_string();
+    text += "\n";*/
+    text += " Solution array : \n";
+    text += intVarArray_to_string(solutionArray);
+    text += "\n";
     return text;
 }
 
@@ -246,48 +254,67 @@ void FourVoiceCounterpoint::uniteCounterpoints(){
 }
 
 void FourVoiceCounterpoint::uniteCosts(){
-    //TODO : THIS WILL CREATE BUGS FROM 3RD SPECIES ONWARDS; TOO BAD
-    
-    for(int i = 0; i < unitedCosts.size()-2; i++){
-        int sz = 0;
-        if(i<counterpoint_1->getCosts().size()){
-            sz++;
+    int cp1_idx = 0;
+    int cp2_idx = 0;
+    int cp3_idx = 0;
+    for(int i = 0; i < 14; i++){
+        string name = importanceNames[i];
+        if(name=="succ"){
+            unitedCostNames.push_back(name);
+            rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(IntVarArgs(successiveCostArray))));
+        } else if(name=="triad"){
+            unitedCostNames.push_back(name);
+            rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(IntVarArgs(triadCostArray))));
+        } else {
+
+            //decides if the cost is present for any counterpoint
+
+            bool cp1_contains = 0;
+            bool cp2_contains = 0;
+            bool cp3_contains = 0;
+            int sz = 0;
+            for(int t = 0; t < counterpoint_1->getCostNames().size(); t++){
+                if(name==counterpoint_1->getCostNames()[t]){
+                    cp1_contains=1;
+                    sz++;
+                }
+            }
+            for(int t = 0; t < counterpoint_2->getCostNames().size(); t++){
+                if(name==counterpoint_2->getCostNames()[t]){
+                    cp2_contains=1;
+                    sz++;
+                }
+            }
+            for(int t = 0; t < counterpoint_3->getCostNames().size(); t++){
+                if(name==counterpoint_3->getCostNames()[t]){
+                    cp3_contains=1;
+                    sz++;
+                }
+            }
+            if(!cp1_contains && !cp2_contains && !cp3_contains){
+                unitedCostNames.push_back("NOT ADDED");
+            } else {
+                unitedCostNames.push_back(name);
+                //adds the cost to the IntVarArgs
+                IntVarArgs x(sz);
+                int idx=0;
+                if(cp1_contains){
+                    x[idx] = counterpoint_1->getCosts()[cp1_idx];
+                    idx++;
+                    cp1_idx++;
+                }
+                if(cp2_contains){
+                    x[idx] = counterpoint_2->getCosts()[cp2_idx];
+                    idx++;
+                    cp2_idx++;
+                }
+                if(cp3_contains){
+                    x[idx] = counterpoint_3->getCosts()[cp3_idx];
+                    idx++;
+                    cp3_idx++;
+                }
+                rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
+            }
         }
-        if(i<counterpoint_2->getCosts().size()){
-            sz++;
-        }
-        if(i<counterpoint_3->getCosts().size()){
-            sz++;
-        }
-        IntVarArgs x(sz);
-        int idx=0;
-        if(i<counterpoint_1->getCosts().size()){
-            x[idx] = counterpoint_1->getCosts()[i];
-            idx++;
-        }
-        if(i<counterpoint_2->getCosts().size()){
-            x[idx] = counterpoint_2->getCosts()[i];
-            idx++;
-        }
-        if(i<counterpoint_3->getCosts().size()){
-            x[idx] = counterpoint_3->getCosts()[i];
-            idx++;
-        }
-        rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
     }
-    
-    //add successive cost
-    IntVarArgs y(successiveCostArray.size());
-    for(int i = 0; i < successiveCostArray.size(); i++){
-        y[i] = successiveCostArray[i];
-    }
-    rel(*this, unitedCosts[unitedCosts.size()-2], IRT_EQ, expr(*this, sum(y)));
-    
-    //add triad cost
-    IntVarArgs z(triadCostArray.size());
-    for(int i = 0; i < triadCostArray.size(); i++){
-        z[i] = triadCostArray[i];
-    }
-    
-    rel(*this, unitedCosts[unitedCosts.size()-1], IRT_EQ, expr(*this, sum(z)));
 }

@@ -12,7 +12,7 @@ Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, i
     nVoices         = nV;
     borrowMode      = bm;
     //lowest          = low;
-    isLowest        = BoolVarArray(home, nMeasures, 0, 1);
+    
     
 
     borrowed_scale = get_all_notes_from_scale(key, BORROWED_SCALE);
@@ -226,6 +226,10 @@ vector<string> Part::getCostNames(){
     return cost_names;
 }
 
+BoolVarArray Part::getConsonance(){
+    return isConsonance;
+}
+
 void Part::add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs){
     int sz = to_be_added.size();
     IntVarArgs args(sz);
@@ -233,4 +237,8 @@ void Part::add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray cos
         args[i] = to_be_added[i];
     }
     rel(home, costs[idx], IRT_EQ, expr(home, sum(args)));
+}
+
+BoolVarArray Part::getIsLowest(){
+    return isLowest;
 }

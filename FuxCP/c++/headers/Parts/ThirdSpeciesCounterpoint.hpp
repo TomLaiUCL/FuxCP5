@@ -14,6 +14,7 @@ protected :
     IntVarArray thirdSpeciesMotionCosts;
     BoolVarArray is5QNArray;
     BoolVarArray isDiminution;
+    IntVarArray m2IntervalsArray;
     IntVarArray cambiataCostArray;
     IntVarArray m2ZeroArray;
     IntVarArray thirdHTriadArray;

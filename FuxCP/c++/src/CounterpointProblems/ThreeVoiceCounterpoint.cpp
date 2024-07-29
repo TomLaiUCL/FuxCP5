@@ -25,17 +25,48 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], key, lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, THREE_VOICES);
 
+    setLowest(counterpoint_2, nullptr, upper1, upper2, nullptr);
+
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2};
     
     triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, counterpoint_1->getTriadCost()}));
 
     //H8 : the triad should be used as much as possible
     for(int i = 0; i < triadCostArray.size(); i++){
-        rel(*this, ((upper1->getHInterval()[i*4]!=MINOR_THIRD || upper1->getHInterval()[i*4]!=MAJOR_THIRD) || upper2->getHInterval()[i*4]!=PERFECT_FIFTH) >>
-            (triadCostArray[i]==counterpoint_1->getTriadCost()));
-        rel(*this, ((upper1->getHInterval()[i*4]==MINOR_THIRD || upper1->getHInterval()[i*4]==MAJOR_THIRD) && upper2->getHInterval()[i*4]==PERFECT_FIFTH) >>
-            (triadCostArray[i]==0));
+        BoolVar h1_3 = BoolVar(*this, 0 ,1);
+        BoolVar h1_4 = BoolVar(*this, 0 ,1);
+        BoolVar h1_third = BoolVar(*this, 0 ,1);
+        BoolVar h1_7 = BoolVar(*this, 0 ,1);
+
+        BoolVar h2_3 = BoolVar(*this, 0 ,1);
+        BoolVar h2_4 = BoolVar(*this, 0 ,1);
+        BoolVar h2_third = BoolVar(*this, 0 ,1);
+        BoolVar h2_7 = BoolVar(*this, 0 ,1);
+
+        BoolVar h_firstPoss = BoolVar(*this, 0, 1);
+        BoolVar h_secondPoss = BoolVar(*this, 0, 1);
+        BoolVar triad = BoolVar(*this, 0, 1);
+        BoolVar not_triad = BoolVar(*this, 0, 1);
+
+        rel(*this, upper1->getHInterval()[i*4], IRT_EQ, 3, Reify(h1_3));
+        rel(*this, upper1->getHInterval()[i*4], IRT_EQ, 4, Reify(h1_4));
+        rel(*this, upper2->getHInterval()[i*4], IRT_EQ, 7, Reify(h2_7));
+        rel(*this, h1_3, BOT_OR, h1_4, h1_third);
+        rel(*this, h1_third, BOT_AND, h2_7, h_firstPoss);
+
+        rel(*this, upper2->getHInterval()[i*4], IRT_EQ, 3, Reify(h2_3));
+        rel(*this, upper2->getHInterval()[i*4], IRT_EQ, 4, Reify(h2_4));
+        rel(*this, upper1->getHInterval()[i*4], IRT_EQ, 7, Reify(h1_7));
+        rel(*this, h2_3, BOT_OR, h2_4, h2_third);
+        rel(*this, h2_third, BOT_AND, h1_7, h_secondPoss);
+
+        rel(*this, h_firstPoss, BOT_OR, h_secondPoss, triad);
+        rel(*this, triad, BOT_XOR, not_triad, 1);
+        rel(*this, triadCostArray[i], IRT_EQ, 0, Reify(triad, RM_IMP));
+        rel(*this, triadCostArray[i], IRT_EQ, counterpoint_1->getTriadCost(), Reify(not_triad, RM_IMP));
     }
+
+    
 
     //M4 variety cost (notes should be as diverse as possible)
     for(int i = 1; i < parts.size(); i++){
@@ -121,7 +152,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     for(int i = 0; i < parts[0]->getMotions().size(); i++){
         rel(*this, expr(*this, parts[0]->getMotions()[i]==2 && parts[1]->getMotions()[i]==2), BOT_AND, expr(*this, parts[2]->getMotions()[i]==2), 0);
     }
-
+    
     //P7 : no suxxessive ascending sixths
     for(int p1 = 0; p1 < parts.size(); p1++){
         for(int p2 = p1+1; p2 < parts.size(); p2++){
@@ -137,19 +168,8 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size(), 0, 127);
 
-    int c_sz = 0;
-    if(counterpoint_1->getCosts().size() >= counterpoint_2->getCosts().size()){
-        c_sz = counterpoint_1->getCosts().size();
-    } else {
-        c_sz = counterpoint_2->getCosts().size();
-    }
-    c_sz+=2;
     unitedCosts = IntVarArray(*this, 14, 0, 10000000);
     unitedCostNames = {};
-
-    lowest->setCantusPointer(cantusFirmus);
-    lowest->setCpPointer(*this, counterpoint_1, counterpoint_2);
-    lowest->setLowest(*this, upper1, upper2);
     
     //TEST
 
@@ -159,6 +179,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     orderCosts();
 
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
 
 }
 
@@ -184,11 +205,21 @@ IntLexMinimizeSpace* ThreeVoiceCounterpoint::copy(){
 
 string ThreeVoiceCounterpoint::to_string() const {
     string text = CounterpointProblem::to_string();
-
-    //text += "Upper 1 : \n";
-    //text += upper1->to_string(); 
-    //text += "Upper 2 : \n";
-    //text += upper2->to_string();  
+    text += "Counterpoint 1 : \n";
+    text += counterpoint_1->to_string();
+    text += "\n";
+    text += "Counterpoint 2 : \n";
+    text += counterpoint_2->to_string();
+    text += "\n";
+    text += "Upper 1 : \n";
+    text += upper1->to_string();
+    text += "\n";
+    text += "Upper 2 : \n";
+    text += upper2->to_string();
+    text += "\n";
+    text += " Solution array : \n";
+    text += intVarArray_to_string(solutionArray);
+    text += "\n";
     return text;
 }
 

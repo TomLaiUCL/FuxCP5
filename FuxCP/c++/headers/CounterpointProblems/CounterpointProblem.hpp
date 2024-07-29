@@ -40,6 +40,7 @@ protected:
     vector<string> unitedCostNames;
     IntVarArray orderedFactors;
     IntVarArray finalCosts;
+    vector<IntVarArray> sorted_voices;
     unordered_map<string, int> prefs;
     vector<vector<string>> costLevels;
     // vector<int> species;        /// the species of the counterpoint to generate
@@ -84,6 +85,10 @@ public:
     int getSize();
 
     int* return_solution();
+
+    IntVarArray getSolutionArray();
+
+    void setLowest(Part* counter2, Part* counter3, Stratum* upper1, Stratum* upper2, Stratum* upper3);
 };
 
 

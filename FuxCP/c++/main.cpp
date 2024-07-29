@@ -20,10 +20,10 @@ int main(int argc, char* argv[]) {
         vector<int> species = {FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
-        vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
+        vector<int> cantusFirmus = {57,60,59,62,60,64}; //1sp 2v cf
         
         int size = cantusFirmus.size();
-        vector<int> v_type = {1, 2};
+        vector<int> v_type = {-1, 2};
 
         vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
         //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
@@ -46,18 +46,17 @@ int main(int argc, char* argv[]) {
         
         BAB<CounterpointProblem> e(problem);
 
-        cout << e.best << endl;
-
         int nb_sol = 0;
         while(CounterpointProblem* pb = e.next()){
+            cout << "HEREEE" << endl;
             nb_sol++;
             cout << "Solution " << nb_sol << ": " << endl;
             cout << pb->to_string() << endl;
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            //if (nb_sol >= 1)
-            //    break;
+            if (nb_sol >= 1)
+                break;
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==3){
@@ -90,8 +89,16 @@ int main(int argc, char* argv[]) {
         //cout << problem->to_string() << endl;
         // create a new search engine
 
-        for(int j = 0; j < test->getIdx(); j++){
-            rel(problem->getHome(), problem->getCounterpoint()->getBranchingNotes()[j], IRT_EQ, test->getCp()[j]);
+        if(species.size()>=1){
+            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
+                for(int j = 0; j < test->getIdx(); j++){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            } else if(species[0]==SECOND_SPECIES){
+                for(int j = 1; j < test->getIdx(); j++){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            }
         }
 
         BAB<CounterpointProblem> e(problem);
@@ -133,13 +140,21 @@ int main(int argc, char* argv[]) {
 
         // create a new problem
         // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-        auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
+        auto* problem = create_problem(cantusFirmus, species, D, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine
 
-        for(int j = 0; j < size; j++){
-            rel(problem->getHome(), problem->getCounterpoint()->getBranchingNotes()[j], IRT_EQ, test->getCp()[j]);
+        if(species.size()>=1){
+            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
+                for(int j = 0; j < problem->getSize(); j++){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            } else if(species[0]==SECOND_SPECIES){
+                for(int j = 1; j < problem->getSize(); j++){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            }
         }
 
         BAB<CounterpointProblem> e(problem);
@@ -147,15 +162,18 @@ int main(int argc, char* argv[]) {
         int nb_sol = 0;
         while(CounterpointProblem* pb = e.next()){
             nb_sol++;
-            cout << "This test passed successfully!" << endl;
+            
             // cout << int_vector_to_string(cantusFirmus) << endl;
-
+            cout << "Solution " << nb_sol << ": " << endl;
+            cout << pb->to_string() << endl;
             delete pb;
             if (nb_sol >= 1)
                 break;
         }
         if(nb_sol!=1){
             cout << "This test did not pass. An error was found!" << endl;
+        } else {
+            cout << "This test passed successfully!" << endl;
         }
     } else {
         throw std::invalid_argument("Wrong amount of arguments!");

@@ -3,6 +3,7 @@
 Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
     nMeasures = nMes; 
     size = nMes*4;
+    isLowest        = BoolVarArray(home, nMeasures, 0, 1);
 
     voice_type = v_type;
 
@@ -12,7 +13,9 @@ Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
     species = sp;
 
     notes = IntVarArray(home, size-3, lowerBound, upperBound);
-    h_intervals = IntVarArray(home, size-3, UNISSON, PERFECT_OCTAVE);
+    //this is so that species other than first species are allowed to go beneath the lowest h_interval, since it is only calculated using the first note
+    //(so 2nd, 3rd or 4th note couldn't be smaller than 0)
+    h_intervals = IntVarArray(home, size-3, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     m_intervals_brut = IntVarArray(home, notes.size()-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     
 }

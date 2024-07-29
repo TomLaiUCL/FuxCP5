@@ -2,13 +2,15 @@
 
 Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type) : Voice(home, nMes, lb, ub, v_type, FIRST_SPECIES){
     // add here any variable initialization that can't be done in Voice constructor and that is independent of the number of voices
-    
+    //notes = IntVarArray(home, nMes*4-3, 0, 127);
+    //h_intervals = IntVarArray(home, notes.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    //m_intervals_brut = IntVarArray(home, notes.size()-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
 }
 
 //if the stratum is in the upper strata, this constructor will create the h_intervals to the lowest stratum
 Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes) : Stratum(home, nMes, lb, ub, v_type){
     for(int i = 0; i < h_intervals.size(); i++){
-        rel(home, h_intervals[i]==((notes[i]-lowestNotes[i])%12));
+        rel(home, (h_intervals[i])==((notes[i]-lowestNotes[i])%12));
     }
 }
 
@@ -40,6 +42,9 @@ string Stratum::to_string() const {
     string text = "Notes : ";
     text += intVarArray_to_string(notes);
     text += "\n";
+    text += "H intervals : ";
+    text += intVarArray_to_string(h_intervals);
+    text += "\n";
     text += "M intervals : ";
     text += intVarArray_to_string(m_intervals_brut);
     text += "\n";
@@ -50,14 +55,6 @@ string Stratum::to_string() const {
 // clone constructor
 Stratum::Stratum(Home home,  Stratum &s) : Voice(home, s){
     // update/clone here all variables that are not in voice
-    //rel(home, notes[1], IRT_EQ, 64);
-    cantus = s.cantus;
-    cp1 = s.cp1;
-    cp2 = s.cp2;
-    cp3 = s.cp3;
-    upper1 = s.upper1;
-    upper2 = s.upper2;
-    upper3 = s.upper3;
 }
 
 Stratum* Stratum::clone(Home home){
@@ -65,24 +62,18 @@ Stratum* Stratum::clone(Home home){
 }
 
 void Stratum::setNote(Home home, int index, IntVar note){
-    rel(home, notes[index*4], IRT_EQ, note);
+    rel(home, notes[index], IRT_EQ, note);
 }
 
-void Stratum::setCantusPointer(Voice* cf){
-    cantus = cf;
-}
-
-
-void Stratum::setCpPointer(Home home, Voice* counter1, Voice* counter2, Voice* counter3){
+void Stratum::setLowest(Home home, Voice* counter1, Stratum* up1, Voice* counter2, Voice* counter3, Stratum* up2, Stratum* up3){
+    /*
     cp1 = counter1;
     cp2 = counter2;
     cp3 = counter3;
-}
-
-void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
     upper1 = up1;
     upper2 = up2;
     upper3 = up3;
+    
     int nVoices = 2;
     if(upper2!=nullptr){
         nVoices ++;
@@ -90,7 +81,7 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
     if(upper3!=nullptr){
         nVoices++;
     }
-    cout << nVoices << endl;
+
     int size = cp1->getNMeasures();
     vector<IntVarArray> sorted_voices = {};
     for(int i = 0; i < size; i++){
@@ -108,22 +99,30 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
 
         sorted(home, voices, sorted_voices[i], order);
 
-        this->setNote(home, i, sorted_voices[i][0]);
+        this->setNote(home, i*4, sorted_voices[i][0]);
 
-        upper1->setNote(home, i, sorted_voices[i][1]);
+        upper1->setNote(home, i*4, sorted_voices[i][1]);
         if(nVoices>=3){
-            upper2->setNote(home, i, sorted_voices[i][2]);
+            upper2->setNote(home, i*4, sorted_voices[i][2]);
         }
         if(nVoices>=4){
-            upper3->setNote(home, i, sorted_voices[i][3]);
+            upper3->setNote(home, i*4, sorted_voices[i][3]);
         }
 
-        //rel(home, this->getFirstNotes()[i], IRT_NQ, cantus->getNotes()[i], Reify(cantus->getIsLowestIdx(i), RM_IMP));
-        rel(home, (this->getFirstNotes()[i]==cantus->getNotes()[i]) >> (cantus->getIsLowestIdx(i)==0));
-        rel(home, (this->getFirstNotes()[i]!=cantus->getNotes()[i]) >> (cantus->getIsLowestIdx(i)==1));
+        BoolVar cfBass = BoolVar(home, 0, 1);
+        BoolVar cp1Bass = BoolVar(home, 0, 1);
+        //rel(home, getFirstNotes()[i], IRT_NQ, cantus->getNotes()[i], Reify(cantus->getIsLowestIdx(i)));
+
+        //rel(home, getFirstNotes()[i], IRT_EQ, cp1->getFirstNotes()[i], Reify(cp1Bass));
+        rel(home, cp1Bass, BOT_IMP, cfBass, cp1->getIsLowestIdx(i));
+
+        rel(home, cfBass, BOT_XOR, cantus->getIsLowestIdx(i), 1);
+        rel(home, cp1Bass, BOT_XOR, cp1->getIsLowestIdx(i), 1);
 
         if(nVoices==2){
-            rel(home, cantus->getIsLowestIdx(i), IRT_EQ, 0, Reify(cp1->getIsLowestIdx(i)));
+
+            //rel(home, cantus->getIsLowestIdx(i), IRT_EQ, 0, Reify(cp1->getIsLowestIdx(i)));
+
         } else if(nVoices==3){
             //rel(home, cantus->getIsLowestIdx(i), IRT_EQ, 0, Reify(cp1->getIsLowestIdx(i)));
             rel(home, ((cantus->getIsLowestIdx(i)==1)&&(this->getFirstNotes()[i]==cp1->getFirstNotes()[i])) >> (cp1->getIsLowestIdx(i)==0));
@@ -146,13 +145,10 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
         if(i > 0){
 
             vector<IntVarArray> corresponding_m_intervals;
-            BoolVar cf_is_lowest = BoolVar(home, 0, 1);
-            BoolVar cp1_is_lowest = BoolVar(home, 0, 1);
+
             BoolVar cp2_is_lowest = BoolVar(home, 0, 1);
             BoolVar cp3_is_lowest = BoolVar(home, 0, 1);
 
-            rel(home, cf_is_lowest, BOT_XOR, cantus->getIsLowestIdx(i), 1);
-            rel(home, cp1_is_lowest, BOT_XOR, cp1->getIsLowestIdx(i), 1);
             if(nVoices>=3){
                 rel(home, cp2_is_lowest, BOT_XOR, cp2->getIsLowestIdx(i), 1);
             }
@@ -166,7 +162,8 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
 
                 if(j==0) curr_cp=cp1;
                 else curr_cp=cp2;
-
+                cout << "SPECIES : " << endl;
+                cout << curr_cp->getSpecies() << endl;
                 if(curr_cp->getSpecies()==FIRST_SPECIES){
                     corresponding_m_intervals.push_back(IntVarArray(home, curr_cp->getMelodicIntervals().slice(0, 4, curr_cp->getMelodicIntervals().size())));
                 } else if(curr_cp->getSpecies()==SECOND_SPECIES){
@@ -180,15 +177,15 @@ void Stratum::setLowest(Home home, Stratum* up1, Stratum* up2, Stratum* up3){
                 }
             }
 
-            rel(home, corresponding_m_intervals[0][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cf_is_lowest,RM_IMP));
-            rel(home, corresponding_m_intervals[1][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp1_is_lowest,RM_IMP));
+            rel(home, corresponding_m_intervals[0][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cfBass, RM_IMP));
+            rel(home, corresponding_m_intervals[1][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp1Bass, RM_IMP));
             if(nVoices>=3){
-                rel(home, corresponding_m_intervals[2][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp2_is_lowest,RM_IMP));
+                rel(home, corresponding_m_intervals[2][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp2_is_lowest));
             }
             if(nVoices>=4){
-                rel(home, corresponding_m_intervals[3][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp3_is_lowest,RM_IMP));
+                rel(home, corresponding_m_intervals[3][i-1], IRT_EQ, m_intervals_brut[i-1], Reify(cp3_is_lowest));
             }
 
         }
-    }
+    }*/
 }
