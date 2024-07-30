@@ -27,7 +27,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
 
-    /*for(int i = 0; i < triadCostArray.size(); i++){
+    for(int i = 0; i < triadCostArray.size(); i++){
 
         IntVar H_b = upper1->getHInterval()[i*4];
         IntVar H_c = upper2->getHInterval()[i*4];
@@ -58,7 +58,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
         rel(*this, expr(*this, H_b_is_fifth + H_c_is_fifth + H_d_is_fifth == 2) >> (triadCostArray[i] == double_fifths_cost));
 
         // Doubling the third, and ensure it is the same type of third (not a major and a minor)
-        rel(*this, expr(*this, H_b_is_third + H_c_is_third + H_d_is_third == 2) >> (triadCostArray[i] == double_thirds_cost));
+        //rel(*this, expr(*this, H_b_is_third + H_c_is_third + H_d_is_third == 2) >> (triadCostArray[i] == double_thirds_cost)); <<
         rel(*this, (H_b_is_third && H_c_is_third) >> (H_b == H_c));
         rel(*this, (H_b_is_third && H_d_is_third) >> (H_b == H_d));
         rel(*this, (H_c_is_third && H_d_is_third) >> (H_c == H_d));
@@ -73,7 +73,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
         // Best case : 5 8 3
         rel(*this, (H_b_is_fifth && H_c_is_octave && H_d_is_third) >> (triadCostArray[i] == 0)); 
     
-    }*/
+    }
     
     //M4 variety cost (notes should be as diverse as possible)
     for(int i = 1; i < parts.size(); i++){
