@@ -27,7 +27,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
 
-    for(int i = 0; i < triadCostArray.size(); i++){
+    /*for(int i = 0; i < triadCostArray.size(); i++){
 
         IntVar H_b = upper1->getHInterval()[i*4];
         IntVar H_c = upper2->getHInterval()[i*4];
@@ -73,7 +73,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
         // Best case : 5 8 3
         rel(*this, (H_b_is_fifth && H_c_is_octave && H_d_is_third) >> (triadCostArray[i] == 0)); 
     
-    }
+    }*/
     
     //M4 variety cost (notes should be as diverse as possible)
     for(int i = 1; i < parts.size(); i++){
@@ -105,8 +105,11 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
     
     for(int p1 = 1; p1 < parts.size(); p1++){
         for(int p2 = p1+1; p2 < parts.size(); p2++){
-
-            if(parts[p1]->getSpecies()!=SECOND_SPECIES && parts[p2]->getSpecies()!=SECOND_SPECIES){
+            cout << "Mother species 3 voices : " << endl;
+            // cout << "Part 1 : " << to_string(parts[p1].species) << endl;
+            // cout << "Part 2 : " << to_string(parts[p2].species) << endl;
+            cout << species[p1-1] << endl;
+            if(species[p1-1]!=SECOND_SPECIES && species[p2-1]!=SECOND_SPECIES){
                 
                 for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     // cout << "IDX : " + to_string(idx) << endl;
@@ -116,7 +119,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
                     idx++;
                 }        
             }
-            else if(parts[p1]->getSpecies()==SECOND_SPECIES){
+            else if(species[p1-1]==SECOND_SPECIES){
                 
                 for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
@@ -132,7 +135,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
                     idx++;
                 }
             }
-            else if(parts[p2]->getSpecies()==SECOND_SPECIES){
+            else if(species[p2-1]==SECOND_SPECIES){
                 for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
                     (parts[p2]->getFirstHInterval()[i]==UNISSON || parts[p2]->getFirstHInterval()[i]==PERFECT_FIFTH)) && 
@@ -149,13 +152,13 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
             }
         }
     }
-
+    
     //P6 : no move in same direction
     for(int i = 0; i < parts[0]->getMotions().size(); i++){
         rel(*this, expr(*this, parts[0]->getMotions()[i]==2 && parts[1]->getMotions()[i]==2), BOT_AND, expr(*this, parts[2]->getMotions()[i]==2), 0);
     }
-
-    //P7 : no successive ascending sixths
+    
+    //P7 : no suxxessive ascending sixths
     for(int p1 = 0; p1 < parts.size(); p1++){
         for(int p2 = p1+1; p2 < parts.size(); p2++){
             for(int j = 1; j < parts[p1]->getFirstHInterval().size()-1; j++){
@@ -182,11 +185,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<int> sp, int
         for(int p2 = 1; p2 < parts.size(); p2++){
             if(p1!=p2 && parts[p1]->getSpecies()==SECOND_SPECIES){
                 if(!containsThirdSpecies){
-                    for(int i = 0; i < parts[p1]->getBranchingNotes().size()-4; i++){
-                        rel(*this, parts[p1]->getMelodicIntervals().slice(0, notesPerMeasure.at(SECOND_SPECIES), parts[p1]->getMelodicIntervals().size())[i], 
-                            IRT_NQ, 0);
-                    }
-                    //the last notes can be the same
                     for(int i = 0; i < parts[p1]->getBranchingNotes().size()-4; i++){
                         rel(*this, parts[p1]->getMelodicIntervals().slice(0, notesPerMeasure.at(SECOND_SPECIES), parts[p1]->getMelodicIntervals().size())[i], 
                             IRT_NQ, 0);

@@ -39,6 +39,8 @@ FuxTest::FuxTest(int testNumber, int i){
         test_4v_1sp_fig167_setter(i);
     } else if(testNumber==176){
         test_4v_2sp_fig176_setter(i);
+    } else if(testNumber==183){
+        test_4v_3sp_fig183_setter(i);
     }
     else {
         throw std::invalid_argument("This test number has not been implemented (yet)");
@@ -271,6 +273,18 @@ void FuxTest::test_4v_2sp_fig176_setter(int i){
                     65,   69,   72,   74,   70,   69,   69,   71,   74,   73,   74,
                     57,   57,   55,   57,   58,   60,   60,   62,   57,   64,   57};
     v_type = {2, 3, 1};
+    idx = i;
+    borrowMode = 1;
+}
+
+void FuxTest::test_4v_3sp_fig183_setter(int i){
+    cout << "Fig. 183" << endl;
+    species = {THIRD_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {64,         60,         62,         60,         57,         69,         67,         64,         65,         64};
+    cp =           {71,64,71,72,69,72,69,67,65,62,64,65,67,64,65,67,69,65,69,71,72,69,72,74,76,71,76,74,72,76,72,71,69,74,69,71,68,
+                    56,         57,         57,         55,         60,         57,         59,         60,         62,         59,
+                    52,         53,         50,         52,         53,         53,         52,         57,         50,         52};
+    v_type = {0 ,-1, -2};
     idx = i;
     borrowMode = 1;
 }
