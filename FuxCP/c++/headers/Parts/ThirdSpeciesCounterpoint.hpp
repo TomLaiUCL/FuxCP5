@@ -18,6 +18,7 @@ protected :
     IntVarArray cambiataCostArray;
     IntVarArray m2ZeroArray;
     IntVarArray thirdHTriadArray;
+    IntVarArray thirdSpeciesAbsMelodic;
 
 public:
 
