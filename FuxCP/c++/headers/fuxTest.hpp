@@ -49,6 +49,8 @@ public:
 
     void test_4v_1sp_fig166_setter(int i);
     void test_4v_1sp_fig167_setter(int i);
+
+    void test_4v_2sp_fig176_setter(int i);
 };
 
 #endif

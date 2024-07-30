@@ -90,7 +90,6 @@ int main(int argc, char* argv[]) {
         // create a new search engine
 
         if(atoi(argv[1])==125){
-            cout << "HERE" << endl;
             for(int j = 0; j < problem->getSize(); j++){
                 if(j!=10){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
@@ -103,6 +102,7 @@ int main(int argc, char* argv[]) {
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
             } else if(species[0]==SECOND_SPECIES){
+                cout << "HERE" << endl;
                 for(int j = 1; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }

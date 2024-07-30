@@ -31,10 +31,10 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lo
 
 Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes, int nV1, int nV2) : Stratum(home, nMes, lb, ub, v_type, lowestNotes){
     //G8 Last chord can only consist of notes of the harmonic triad
-    dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(TRIAD)));
+    //dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(TRIAD)));
 
     //H12 Last chord cannot include a minor third
-    rel(home, h_intervals[h_intervals.size()-1], IRT_NQ, 3);
+    //rel(home, h_intervals[h_intervals.size()-1], IRT_NQ, 3);
 }
 
 

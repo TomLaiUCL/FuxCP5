@@ -166,6 +166,36 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
         }
     }
 
+    //TODO : RECHEKC THIS CONSTRAINT
+
+    //2.M2, have to write it here since it has a weird interaction with the third species
+    bool containsThirdSpecies = 0;
+    for(int i = 1; i < parts.size(); i++){
+        if(parts[i]->getSpecies()==THIRD_SPECIES){
+            containsThirdSpecies=1;
+            break;
+        }
+    }
+    for(int p1 = 1; p1 < parts.size(); p1++){
+        for(int p2 = 1; p2 < parts.size(); p2++){
+            if(p1!=p2 && parts[p1]->getSpecies()==SECOND_SPECIES){
+                if(!containsThirdSpecies){
+                    for(int i = 0; i < parts[p1]->getBranchingNotes().size()-4; i++){
+                        rel(*this, parts[p1]->getMelodicIntervals().slice(0, notesPerMeasure.at(SECOND_SPECIES), parts[p1]->getMelodicIntervals().size())[i], 
+                            IRT_NQ, 0);
+                    }
+                } else {
+                    for(int i = 0; i < parts[p1]->getBranchingNotes().size()-4; i++){
+                        rel(*this, parts[p1]->getMelodicIntervals().slice(0, notesPerMeasure.at(SECOND_SPECIES), parts[p1]->getMelodicIntervals().size())[i], 
+                            IRT_NQ, 0);
+                    }
+                    //no unison in the two last notes
+                    rel(*this, parts[p1]->getBranchingNotes()[parts[p1]->getBranchingNotes().size()-2], IRT_NQ, parts[p1]->getBranchingNotes()[parts[p1]->getBranchingNotes().size()-1]);
+                }
+            }
+        }
+    }
+
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size(), 0, 127);
 
     unitedCosts = IntVarArray(*this, 14, 0, 10000000);

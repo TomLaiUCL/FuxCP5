@@ -120,11 +120,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     }
     
     // 2.H3 : penult cost 
-    dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
-
-    rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]!=7) >> (penultCostArray[0]==penultCost));
-    rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==7) >> (penultCostArray[0]==0));
-
+    //TODO : RECHECK
+    //dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
+    
+    rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]!=PERFECT_FIFTH) >> (penultCostArray[0]==penultCost));
+    rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==PERFECT_FIFTH) >> (penultCostArray[0]==0));
+    
     // 2.M1 : If the two voices are getting so close that there is no contrary motion possible without crossing each other, then the melodic interval of the counterpoint can be an octave leap.
     //TODO : check if the expression makes sense when I have internet connection
     for(int j = 0; j < firstSpeciesMelodicIntervals.size(); j++){
@@ -183,6 +184,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
 
+
+
     //P1 3 voices version
     for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
         //set a cost when it is reached through direct motion, it is 0 when not
@@ -222,7 +225,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
 
-    //P1 3 voices version
+    //P1 4 voices version
     for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
         //set a cost when it is reached through direct motion, it is 0 when not
         rel(home, (secondSpeciesRealMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
