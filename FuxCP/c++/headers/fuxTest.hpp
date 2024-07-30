@@ -47,6 +47,8 @@ public:
 
     void test_3v_2sp_fig125_setter(int i);
 
+    void test_3v_3sp_fig133_setter(int i);
+
     void test_4v_1sp_fig166_setter(int i);
     void test_4v_1sp_fig167_setter(int i);
 

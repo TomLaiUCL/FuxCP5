@@ -31,8 +31,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     thirdSpeciesMotionCosts = IntVarArray(home, notes.size()/4, IntSet{0, directCost, obliqueCost, contraryCost});
 
     for(int i = 0; i < thirdSpeciesMotions.size(); i++){
-        cout << "OOPRWERT" << endl;
-        cout << low->getMelodicIntervals()[i] << endl;
+
         //direct motions help creation
         BoolVar both_up = expr(home, (thirdSpeciesMelodicIntervals[(i*4)+3]>0)&&(low->getMelodicIntervals()[i]>0)); //if both parts are going in the same direction
         BoolVar both_stay = expr(home, (thirdSpeciesMelodicIntervals[(i*4)+3]==0)&&(low->getMelodicIntervals()[i]==0)); //if both parts are staying
@@ -61,8 +60,8 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
     
     is5QNArray = BoolVarArray(home, nMeasures-1, 0, 1);
-    /*for(int i = 0; i < is5QNArray.size()*4; i+=4){
-
+    for(int i = 0; i < is5QNArray.size()*4; i+=4){
+/*
         BoolVar case1 = BoolVar(home, 0, 1);
 
         rel(home, ((abs(thirdSpeciesMelodicIntervals[i])<=2) && (abs(thirdSpeciesMelodicIntervals[i+1])<=2) && (abs(thirdSpeciesMelodicIntervals[i+2])<=2) &&
@@ -80,21 +79,61 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
             thirdSpeciesMelodicIntervals[i+2]<0 && thirdSpeciesMelodicIntervals[i+3]<0) >> (case2==1));
 
         rel(home, is5QNArray[i/4], IRT_EQ, expr(home, case1&&case2));
+*/
 
-    }*/
+        /*BoolVar b1 = BoolVar(home, 0, 1);
+        BoolVar b2 = BoolVar(home, 0, 1);
+        BoolVar b3 = BoolVar(home, 0, 1);
+        BoolVar b4 = BoolVar(home, 0, 1);
+        BoolVar bb1 = BoolVar(home, 0, 1);
+        BoolVar bb2 = BoolVar(home, 0, 1);
+        BoolVar bb3 = BoolVar(home, 0, 1);
+        BoolVar bb4 = BoolVar(home, 0, 1);
+        BoolVar band1 = BoolVar(home, 0, 1);
+        BoolVar band2 = BoolVar(home, 0, 1);
+        BoolVar band3 = BoolVar(home, 0, 1);
+        BoolVar beq1 = BoolVar(home, 0, 1);
+        BoolVar beq2 = BoolVar(home, 0, 1);
+        BoolVar beq3 = BoolVar(home, 0, 1);
 
-    isDiminution = BoolVarArray(home, nMeasures-1, 0, 1);
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i])), IRT_LQ, 2), Reify(b1);
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i+1])), IRT_LQ, 2), Reify(b2);
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i+2])), IRT_LQ, 2), Reify(b3);
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i+3])), IRT_LQ, 2), Reify(b4);
+
+        rel(home, thirdSpeciesMelodicIntervals[i], IRT_GQ, 0, Reify(bb1));
+        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_GQ, 0, Reify(bb2));
+        rel(home, thirdSpeciesMelodicIntervals[i+2], IRT_GQ, 0, Reify(bb3));
+        rel(home, thirdSpeciesMelodicIntervals[i+3], IRT_GQ, 0, Reify(bb4));
+
+        rel(home, b1, BOT_AND, b2, band1);
+        rel(home, b3, BOT_AND, b4, band2);
+        rel(home, band1, BOT_AND, band2, band3);
+
+        rel(home, bb1, BOT_EQV, bb2, beq1);
+        rel(home, bb3, BOT_EQV, bb4, beq2);
+        rel(home, beq1, BOT_EQV, beq2, beq3);
+        rel(home, band3, BOT_AND, beq3, is5QNArray[i/4]);*/
+    }
+
+    isDiminution = BoolVarArray(home, (nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1), 0, 1);
     for(int i = 0; i < isDiminution.size()*4; i+=4){
-        //thirdMelodic[i+1], thirdMelodic[i+2], thirdMelodicIntervals[i+1]+thirdMelodicIntervals[i+2]+thirdMelodicIntervals[i+3]+thirdMelodicIntervals[i+4]
-        // mta, mat, mtt
-        rel(home, (abs(thirdSpeciesMelodicIntervals[i+1])<=MAJOR_SECOND && abs(thirdSpeciesMelodicIntervals[i+2])<=MAJOR_SECOND && 
-            (abs(thirdSpeciesMelodicIntervals[i+1]+thirdSpeciesMelodicIntervals[i+2]+thirdSpeciesMelodicIntervals[i+3])==MINOR_THIRD
-            || abs(thirdSpeciesMelodicIntervals[i+1]+thirdSpeciesMelodicIntervals[i+2]+thirdSpeciesMelodicIntervals[i+3])==MAJOR_THIRD
-            )) >> (isDiminution[i/4]==1));
-        rel(home, (abs(thirdSpeciesMelodicIntervals[i+1])>MAJOR_SECOND || abs(thirdSpeciesMelodicIntervals[i+2])>MAJOR_SECOND ||
-            (abs(thirdSpeciesMelodicIntervals[i+1]+thirdSpeciesMelodicIntervals[i+2]+thirdSpeciesMelodicIntervals[i+3])!=MINOR_THIRD
-            && abs(thirdSpeciesMelodicIntervals[i+1]+thirdSpeciesMelodicIntervals[i+2]+thirdSpeciesMelodicIntervals[i+3])!=MAJOR_THIRD
-            )) >> (isDiminution[i/4]==0));
+
+        /*BoolVar btt3 = BoolVar(home, 0, 1);
+        BoolVar btt4 = BoolVar(home, 0, 1);
+        BoolVar bta2nd = BoolVar(home, 0, 1);
+        BoolVar btt3rd = BoolVar(home, 0, 1);
+        BoolVar bat2nd = BoolVar(home, 0, 1);
+        BoolVar band = BoolVar(home, 0, 1);
+        IntVar addition = expr(home, abs(thirdSpeciesMelodicIntervals[i+1]+thirdSpeciesMelodicIntervals[i+2]+thirdSpeciesMelodicIntervals[i+3]));
+        rel(home, addition, IRT_EQ, 3, Reify(btt3));
+        rel(home, addition, IRT_EQ, 4, Reify(btt4));
+        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_LQ, 2, Reify(bta2nd));
+        rel(home, thirdSpeciesMelodicIntervals[i+2], IRT_LQ, 2, Reify(bat2nd));
+        rel(home, btt3, BOT_OR, btt4, btt3rd);
+        rel(home, bta2nd, BOT_AND, btt3rd, band);
+        rel(home, band, BOT_AND, bat2nd, isDiminution[i/4]);*/
+
     }
 
     m2IntervalsArray = IntVarArray(home, thirdSpeciesNotesCp.size()-2, -PERFECT_OCTAVE, PERFECT_OCTAVE);
@@ -108,19 +147,26 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     m2ZeroArray = IntVarArray(home, thirdSpeciesMelodicIntervals.size()-2, IntSet({0, m2ZeroCost}));
 
     //third note of the penultimate measure must be below the fourth one
-    rel(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2], IRT_GR, 1);
+    //rel(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2], IRT_GR, 1);
     //second one must also be more distant than a semi tone from the last note of the penultimate measure
     rel(home, expr(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-3]+thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2])
         , IRT_NQ, 1);
-
+    /*
     //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
     for(int i = 0; i < is5QNArray.size(); i++){
         rel(home, (is5QNArray[i]==1) >> (abs(thirdSpeciesHarmonicIntervals[(i*4)+3])==0)||(abs(thirdSpeciesHarmonicIntervals[(i*4)+3])==7));
-    }
+    }*/
 
     //3.H2 : any dissonant note implies that it is surrounded by consonant notes
     for(int i = 0; i < isDiminution.size(); i++){
-        rel(home, expr(home, isConsonance[(i*4)+1] && isConsonance[(i*4)+3] && isDiminution[i]), BOT_OR, isConsonance[(i*4)+2], 1);
+        //BoolVar band1 = BoolVar(home, 0, 1);
+        //BoolVar band2 = BoolVar(home, 0, 1);
+        //BoolVar band3 = BoolVar(home, 0, 1);
+
+        //rel(home, isConsonance[(i*4)+1], BOT_AND, isConsonance[(i*4)+3], band1);
+        //rel(home, isConsonance[(i*4)+2], BOT_OR, isDiminution[i], band2);
+        //rel(home, isConsonance[(i*4)+2], BOT_OR, band1, band3);
+        //rel(home, band2, BOT_AND, band3, 1);
     }
 
     //3.H3 : cambiata cost
@@ -132,7 +178,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
     
     //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
-    rel(home, (c->getIsLowestIdx(c->getNotes().size()-2)) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
+    //rel(home, (c->getIsLowestIdx(c->getNotes().size()-2)) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
 
     //no melodic interval between 9 and 11
     for(int i = 0; i < nMeasures-1; i++){
@@ -141,10 +187,18 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
 
     //no chromatic motion between 3 consecutive notes
     for(int i = 1; i < thirdSpeciesMelodicIntervals.size()-1; i++){
-        //thirdSpeciesMelodicIntervals(except FIRST)
-        //
-        //rel(home, thirdSpeciesMelodicIntervals[i+1]!=-1 && m2IntervalsArray[i]!=-2);
-        //rel(home, thirdSpeciesMelodicIntervals[i+1]!=1 && m2IntervalsArray[i]!=2);
+        BoolVar b1 = BoolVar(home, 0, 1);
+        BoolVar b2 = BoolVar(home, 0, 1);
+        BoolVar b3 = BoolVar(home, 0, 1);
+        BoolVar b4 = BoolVar(home, 0, 1);
+
+        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_EQ, 1, Reify(b1));
+        rel(home, m2IntervalsArray[i], IRT_EQ, 2, Reify(b2));
+        rel(home, b1, BOT_AND, b2, 0);
+
+        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_EQ, -1, Reify(b3));
+        rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
+        rel(home, b3, BOT_AND, b4, 0);
     }
 
     //Marcel's rule
@@ -169,14 +223,12 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     ThirdSpeciesCounterpoint(home, size, cf, lb, ub, k, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
 {
-    //3.H7,H8 adapted
-    rel(home, (isLowest[isLowest.size()-2]==0) >> (thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
-    rel(home, (isLowest[isLowest.size()-2]==1) >> (thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-2]==MAJOR_SIXTH));
+    
 
     //3.P1 adapted
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
         rel(home, (firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH) >> 
-        (thirdSpeciesMotions[j]!=2));
+            (thirdSpeciesMotions[j]!=2));
     }
 
     costs = IntVarArray(home, 7, 0, 10000);
