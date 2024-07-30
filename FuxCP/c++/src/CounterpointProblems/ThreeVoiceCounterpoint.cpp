@@ -71,7 +71,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
     //M4 variety cost (notes should be as diverse as possible)
     for(int i = 1; i < parts.size(); i++){
         Part* p = parts[i];
-        int mSpec = p->getSpecies();
         int temp = 0;
         IntVarArray notes = p->getBranchingNotes();
         for(int j = 0; j < p->getHIntervalSize()-1; j++){
@@ -102,9 +101,8 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
             cout << "Mother species 3 voices : " << endl;
             // cout << "Part 1 : " << to_string(parts[p1].species) << endl;
             // cout << "Part 2 : " << to_string(parts[p2].species) << endl;
-            //cout << parts[p1]->getSpecies() << endl;
-            cout << parts[p2]->getSpecies() << endl;
-            if(parts[p1]->getSpecies()!=SECOND_SPECIES && parts[p2]->getSpecies()!=SECOND_SPECIES){
+            cout << species[p1-1] << endl;
+            if(species[p1-1]!=SECOND_SPECIES && species[p2-1]!=SECOND_SPECIES){
                 
                 for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     // cout << "IDX : " + to_string(idx) << endl;
@@ -114,7 +112,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
                     idx++;
                 }        
             }
-            else if(parts[p1]->getSpecies()==SECOND_SPECIES){
+            else if(species[p1-1]==SECOND_SPECIES){
                 
                 for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
@@ -130,7 +128,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
                     idx++;
                 }
             }
-            else if(parts[p2]->getSpecies()==SECOND_SPECIES){
+            else if(species[p2-1]==SECOND_SPECIES){
                 for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
                     (parts[p2]->getFirstHInterval()[i]==UNISSON || parts[p2]->getFirstHInterval()[i]==PERFECT_FIFTH)) && 

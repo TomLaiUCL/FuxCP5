@@ -20,6 +20,9 @@ Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> can
             case THIRD_SPECIES:
                 return new ThirdSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
                 break;
+            case FOURTH_SPECIES:
+                return new FourthSpeciesCounterpoint(home, nMeasures, cantusFirmus, lowerBound, upperBound, key, low, c, v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
+                break;
             default:
                 throw std::invalid_argument("Species not implemented");
             }

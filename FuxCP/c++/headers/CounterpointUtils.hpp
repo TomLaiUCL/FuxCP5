@@ -8,6 +8,7 @@
 #include "Parts/FirstSpeciesCounterpoint.hpp"
 #include "Parts/SecondSpeciesCounterpoint.hpp"
 #include "Parts/ThirdSpeciesCounterpoint.hpp"
+#include "Parts/FourthSpeciesCounterpoint.hpp"
 
 using namespace std;
 using namespace Gecode;
