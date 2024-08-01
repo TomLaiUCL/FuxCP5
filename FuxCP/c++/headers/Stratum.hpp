@@ -47,8 +47,6 @@ class Stratum : public Voice{
         void setNote(Home home, int index, IntVar note);
         void setMInterval(int index);   // these two functions will be called from the create strata part of the Problem files. The create strata code is done index by index.
 
-        void setLowest(Home home, Voice* counter1, Stratum* up1, Voice* counter2=nullptr, Voice* counter3=nullptr, Stratum* up2=nullptr, Stratum* up3=nullptr);
-
         void setHIntervals(Home home);
 
 
