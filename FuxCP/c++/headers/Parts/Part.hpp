@@ -139,6 +139,7 @@ class Part : public Voice {
         int getOctaveCost();
         int getHFifthCost();
         int getHOctaveCost();
+        int getDirectCost();
 
         IntVarArray getMelodicDegreeCost();
 
@@ -153,6 +154,8 @@ class Part : public Voice {
         IntVarArray getFirstSpeciesMIntervals();
 
         IntVarArray getFirstSpeciesMotions();
+
+        IntVarArray getDirectCostArray();
 
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 

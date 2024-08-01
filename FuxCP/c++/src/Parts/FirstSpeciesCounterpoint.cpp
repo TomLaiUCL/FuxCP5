@@ -171,7 +171,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     H7_1_2v_penultimateSixthOrThird(home, this);
 
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth
-    M2_1_melodicIntervalsNotExceedMinorSixth(home, this);
+    M2_1_2v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     /// Motion rules
     //P1 from Thibault : Perfect consonances cannot be reached by direct motion
@@ -214,24 +214,13 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     //dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH, PERFECT_OCTAVE}));
 
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
-    dom(home, firstSpeciesMelodicIntervals, IntSet({-UNISSON, -MINOR_SECOND, -MAJOR_SECOND, -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FOURTH, -TRITONE,
-            -PERFECT_FIFTH, -MINOR_SIXTH, -PERFECT_OCTAVE, UNISSON, MINOR_SECOND, MAJOR_SECOND, MINOR_THIRD, MAJOR_THIRD, PERFECT_FOURTH, TRITONE,
-            PERFECT_FIFTH, MINOR_SIXTH, PERFECT_OCTAVE}));
+    M2_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     //P1 3 voices version
-    for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
-        //set a cost when it is reached through direct motion, it is 0 when not
-        rel(home, (firstSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
-            (directCostArray[j]==directMoveCost));
-        rel(home, (firstSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
-            (directCostArray[j]==0));
-    }
+    P1_1_3v_noDirectMotionFromPerfectConsonance(home, this);
 
     //P3 from Thibault : no battuta
-    for(int j = 0; j < firstSpeciesMotions.size(); j++){
-        rel(home, expr(home, firstSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
-            BOT_AND, isLowest[j], 0);
-    }
+    P3_1_noBattuta(home, this);
 
     costs = IntVarArray(home, 7, 0, 1000000);
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct"};
@@ -264,27 +253,16 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
 
     //H7
-    dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH}));
+    H7_1_4v_penultimateSixthOrThird(home, this);
     
-    //M2 : melodic intervals cannot exceed a minor sixth BUT also include an octave (adapted four voices version)
-    dom(home, firstSpeciesMelodicIntervals, IntSet({-UNISSON, -MINOR_SECOND, -MAJOR_SECOND, -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FOURTH, -TRITONE,
-            -PERFECT_FIFTH, -MINOR_SIXTH, -PERFECT_OCTAVE, UNISSON, MINOR_SECOND, MAJOR_SECOND, MINOR_THIRD, MAJOR_THIRD, PERFECT_FOURTH, TRITONE,
-            PERFECT_FIFTH, MINOR_SIXTH, PERFECT_OCTAVE}));
+    /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
+    M2_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     //P1 3 voices version
-    for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
-        //set a cost when it is reached through direct motion, it is 0 when not
-        rel(home, (firstSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
-            (directCostArray[j]==directMoveCost));
-        rel(home, (firstSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
-            (directCostArray[j]==0));
-    }
+    P1_1_3v_noDirectMotionFromPerfectConsonance(home, this);
 
     //P3 from Thibault : no battuta
-    for(int j = 0; j < firstSpeciesMotions.size(); j++){
-        rel(home, expr(home, firstSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
-            BOT_AND, isLowest[j], 0);
-    }
+    P3_1_noBattuta(home, this);
 
     costs = IntVarArray(home, 7, 0, 1000000);
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct"};

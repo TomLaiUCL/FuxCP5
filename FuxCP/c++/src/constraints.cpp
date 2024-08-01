@@ -53,7 +53,7 @@ void H7_1_2v_penultimateSixthOrThird(Home home, Part* part){
         Reify(part->getIsLowest()[part->getIsLowest().size()-2], RM_IMP));
 }
 
-void M2_1_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
+void M2_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
     rel(home, part->getFirstSpeciesMIntervals(), IRT_LQ, MINOR_SIXTH);
     rel(home, part->getFirstSpeciesMIntervals(), IRT_GQ, -MINOR_SIXTH);
 }
@@ -72,4 +72,24 @@ void P3_1_noBattuta(Home home, Part* part){
         rel(home, expr(home, part->getFirstSpeciesMotions()[j]==CONTRARY_MOTION && part->getFirstSpeciesHIntervals()[j+1]==0 && 
             part->getFirstSpeciesMIntervals()[j]<-4), BOT_AND, part->getIsLowest()[j], 0);
     }
+}
+
+void M2_1_3v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
+    dom(home, part->getMelodicIntervals(), IntSet({-UNISSON, -MINOR_SECOND, -MAJOR_SECOND, -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FOURTH, -TRITONE,
+            -PERFECT_FIFTH, -MINOR_SIXTH, -PERFECT_OCTAVE, UNISSON, MINOR_SECOND, MAJOR_SECOND, MINOR_THIRD, MAJOR_THIRD, PERFECT_FOURTH, TRITONE,
+            PERFECT_FIFTH, MINOR_SIXTH, PERFECT_OCTAVE}));
+}
+
+void P1_1_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
+    for(int j = 0; j < part->getFirstSpeciesMotions().size()-1; j++){
+        //set a cost when it is reached through direct motion, it is 0 when not
+        rel(home, (part->getFirstSpeciesMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||part->getFirstSpeciesHIntervals()[j+1]==7))>>
+            (part->getDirectCostArray()[j]==part->getDirectCost()));
+        rel(home, (part->getFirstSpeciesMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0&&part->getFirstSpeciesHIntervals()[j+1]!=7))>>
+            (part->getDirectCostArray()[j]==0));
+    }
+}
+
+void H7_1_4v_penultimateSixthOrThird(Home home, Part* part){
+    dom(home, part->getFirstSpeciesHIntervals()[part->getFirstSpeciesHIntervals().size()-2], IntSet({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH}));
 }

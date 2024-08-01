@@ -280,3 +280,11 @@ int Part::getHOctaveCost(){
 IntVarArray Part::getFirstSpeciesMotions(){
     return firstSpeciesMotions;
 }
+
+IntVarArray Part::getDirectCostArray(){
+    return directCostArray;
+}
+
+int Part::getDirectCost(){
+    return directCost;
+}

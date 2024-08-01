@@ -19,10 +19,16 @@ void H6_1_preferImperfectConsonances(Home home, Part* part);
 
 void H7_1_2v_penultimateSixthOrThird(Home home, Part* part);
 
-void M2_1_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
+void M2_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
 
 void P1_1_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
 void P3_1_noBattuta(Home home, Part* part);
+
+void M2_1_3v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
+
+void P1_1_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
+
+void H7_1_4v_penultimateSixthOrThird(Home home, Part* part);
 
 #endif
