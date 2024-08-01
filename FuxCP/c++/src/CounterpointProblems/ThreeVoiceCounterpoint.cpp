@@ -9,9 +9,9 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
+ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> sp, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
     vector<int> s_costs, vector<int> imp, int bm) :
-    CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
+    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
     species = sp;
 
     //G9 last chord must have the same fundamental as the cf (used throughout the composition)
@@ -20,9 +20,9 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     upper1 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
     upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
 
-    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], key, lowest, 
+    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, THREE_VOICES);
-    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], key, lowest, 
+    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, THREE_VOICES);
 
     setLowest(counterpoint_2, nullptr, upper1, upper2, nullptr);

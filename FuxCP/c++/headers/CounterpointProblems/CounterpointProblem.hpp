@@ -22,7 +22,6 @@ protected:
     // put one counterpoint? or group counterpoints together in a vector<Part*> ? or just leave it like this...
 
     int nMeasures;      /// the number of measures in the score to generate
-    int key;            /// the key of the score
     int lowerBound;     /// the lowest note possible for the counterpoints
     int upperBound;     /// the highest note possible for the counterpoints
     int n_unique_costs;
@@ -53,7 +52,7 @@ public:
      * @param lb the lowest note possible for the counterpoints in MIDI
      * @param ub the highest note possible for the counterpoints in MIDI
      */
-    CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, vector<int> imp, int nV);
+    CounterpointProblem(vector<int> cf, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, vector<int> imp, int nV);
 
     CounterpointProblem(CounterpointProblem& s);
     virtual IntLexMinimizeSpace* copy(); 

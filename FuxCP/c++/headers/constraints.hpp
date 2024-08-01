@@ -5,6 +5,10 @@ class Part;
 
 #include "Parts/Part.hpp"
 
+void initializeIsOffArray(Home home, Part* part);
+
+void G4_counterpointMustBeInTheSameKey(Home home, Part* part);
+
 void G6_noChromaticMelodies(Home home, Part* part, int mSpec);
 
 void G7_melodicIntervalsShouldBeSmall(Home home, Part* part, int mSpec);

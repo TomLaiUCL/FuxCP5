@@ -3,9 +3,9 @@
 /**
  * GENERAL CONSTRUCTOR
  */
-FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
+FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,
      int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
-    Part(home, nMes, mSpecies, cf, lb, ub, k, v_type, m_costs, g_costs, s_costs, nV, bm)
+    Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm)
 {
     motherSpecies =         mSpecies;
     cout << "Lower bound : " << endl;
@@ -226,9 +226,9 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     }*/
 }   
 
-FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, 
+FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
-    FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
+    FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
     //Must start with a perfect consonance
     //dom(home, fourthSpeciesHIntervals[1], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));

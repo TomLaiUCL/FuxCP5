@@ -1,9 +1,9 @@
 #include "../../headers/CounterpointProblems/FourVoiceCounterpoint.hpp"
 #include "../../headers/CounterpointUtils.hpp"
 
-FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, 
+FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, 
         vector<int> s_costs, vector<int> imp, int bm):
-    CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, s_costs, imp, FOUR_VOICES)
+    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, FOUR_VOICES)
 {
     species = sp;
 
@@ -11,11 +11,11 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
     upper3 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
 
-    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], key, lowest, 
+    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
-    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], key, lowest, 
+    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
-    counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 6) + cf[0], (6 * v_type[2] + 12) + cf[0], key, lowest, 
+    counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 6) + cf[0], (6 * v_type[2] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[2], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
 
     setLowest(counterpoint_2, counterpoint_3, upper1, upper2, upper3);

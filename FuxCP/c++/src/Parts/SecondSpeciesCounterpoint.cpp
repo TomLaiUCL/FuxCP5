@@ -7,9 +7,9 @@
 /**
  * Second species constructor. Does general constructing. Then calls the general first species constructor
  */
-SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, int mSpec, Stratum* low, CantusFirmus* c, int v_type
+SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int mSpec, Stratum* low, CantusFirmus* c, int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
-    FirstSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV) /// super constructor. Applies all rules for the first species to the 1st note of each measure
+    FirstSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV) /// super constructor. Applies all rules for the first species to the 1st note of each measure
 {
     /// Second species notes in the counterpoint
     secondSpeciesNotesCp = IntVarArray(home, (nMeasures*notesPerMeasure.at(SECOND_SPECIES))-1, IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
@@ -142,9 +142,9 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
 }
 
-SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type
+SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, Stratum* low, CantusFirmus* c, int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV) :
-    SecondSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
+    SecondSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
     costs = IntVarArray(home, 6, 0, 1000000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult"};
@@ -175,9 +175,9 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
 }
 
-SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, 
+SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, Stratum* low, CantusFirmus* c, int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2) :
-    SecondSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
+    SecondSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
 {
     costs = IntVarArray(home, 8, 0, 1000000);
 
@@ -215,9 +215,9 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
 }
 
-SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type, 
+SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, Stratum* low, CantusFirmus* c, int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3) :
-    SecondSpeciesCounterpoint(home, size, cf, lb, ub, k, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
+    SecondSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
 {
     costs = IntVarArray(home, 8, 0, 1000000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "variety", "direct", "penult"};

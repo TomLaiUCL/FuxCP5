@@ -25,7 +25,6 @@ using namespace std;
 class Part : public Voice {
     protected:
         int species;
-        int key;
         int nVoices;
         int borrowMode;
         //Stratum* lowest;
@@ -87,14 +86,13 @@ class Part : public Voice {
         IntVarArray firstSpeciesMotions;
         IntVarArray firstSpeciesMotionCosts;
     public:
-        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs,
+        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs,
             vector<int> s_costs, int nV, int bm);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
         Part(Home home, Part& s);  // clone constructor
 
         int getSpecies() { return species; }
-        int getKey() { return key; }
 
         /// must be implemented in the child classes, returns the variables to branch on
         // virtual IntVarArray getBranchingNotes();
@@ -140,6 +138,7 @@ class Part : public Voice {
         int getHFifthCost();
         int getHOctaveCost();
         int getDirectCost();
+        int getBorrowCost();
 
         IntVarArray getMelodicDegreeCost();
 
@@ -156,6 +155,12 @@ class Part : public Voice {
         IntVarArray getFirstSpeciesMotions();
 
         IntVarArray getDirectCostArray();
+
+        BoolVarArray getIsOffArray();
+
+        vector<int> getOffDomain();
+
+        IntVarArray getOffCostArray();
 
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 

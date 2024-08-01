@@ -39,7 +39,7 @@ public:
      * @param bm parameter specifying if borrow Mode is enabled or not
      * @param nV the number of voices - as it is a 2 voice constructor, this parameter contains the number of voices
      */
-    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**
@@ -60,7 +60,7 @@ public:
      * @param bm parameter specifying if borrow Mode is enabled or not
      * @param nV the number of voices - as it is a 2 voice constructor, this parameter is passed to the general constructor
      */
-    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**
@@ -82,7 +82,7 @@ public:
      * @param nV1 the number of voices - this parameter is there to differenciate it from other number of voices
      * @param nV2 the number of voices - as it is a 3 voice constructor, this parameter is passed to the general constructor
      */
-    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2);
 
     /**
@@ -105,7 +105,7 @@ public:
      * @param nV2 the number of voices - this parameter is there to differenciate it from other number of voices
      * @param nV3 the number of voices - as it is a 4 voice constructor, this parameter is passed to the general constructor
      */
-    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3);
 
     /**

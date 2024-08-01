@@ -45,10 +45,10 @@ public:
      * @param bm parameter specifying if borrow Mode is enabled or not
      * @param nV the number of voices - as it is a 2 voice constructor, this parameter contains the number of voices
      */
-    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
+    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
-    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
     , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**

@@ -5,19 +5,18 @@
 #include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
-Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
+Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
     int nV, int bm) : 
     Voice(home, nMes, lb, ub, v_type, sp){
-    key             = k;
     nVoices         = nV;
     borrowMode      = bm;
     //lowest          = low;
     
     
 
-    borrowed_scale = get_all_notes_from_scale(key, BORROWED_SCALE);
-    scale = get_all_notes_from_scale(key, MAJOR_SCALE);
-    chromatic_scale = get_all_notes_from_scale(key, CHROMATIC_SCALE);
+    borrowed_scale = get_all_notes_from_scale(cf[0]%12, BORROWED_SCALE);
+    scale = get_all_notes_from_scale(cf[0]%12, MAJOR_SCALE);
+    chromatic_scale = get_all_notes_from_scale(cf[0]%12, CHROMATIC_SCALE);
     cp_range = {};
 
     secondCost = m_costs[0];
@@ -83,7 +82,6 @@ string Part::to_string() const{
 
 
 Part::Part(Home home, Part& s) : Voice(home, s) {
-    key = s.key;
     nVoices = s.nVoices;
     borrowMode = s.borrowMode;
     //lowest = s.lowest;
@@ -287,4 +285,20 @@ IntVarArray Part::getDirectCostArray(){
 
 int Part::getDirectCost(){
     return directCost;
+}
+
+BoolVarArray Part::getIsOffArray(){
+    return is_off;
+}
+
+vector<int> Part::getOffDomain(){
+    return off_domain;
+}
+
+IntVarArray Part::getOffCostArray(){
+    return offCostArray;
+}
+
+int Part::getBorrowCost(){
+    return borrowCost;
 }

@@ -4,8 +4,8 @@
 
 #include "../../headers/Parts/CantusFirmus.hpp"
 
-CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, int k, Stratum* low, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int nV) :
-    Part(home, size, CANTUS_FIRMUS, cf, 0, 127, k, v_type, m_costs, g_costs, s_costs, nV, -1){
+CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int nV) :
+    Part(home, size, CANTUS_FIRMUS, cf, 0, 127, v_type, m_costs, g_costs, s_costs, nV, -1){
     cf_vector = cf;
     notes = IntVarArray(home, size, lowerBound, upperBound);
     /// Melodic intervals for the first species notes

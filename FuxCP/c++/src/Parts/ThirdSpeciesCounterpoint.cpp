@@ -3,9 +3,9 @@
 /**
  * Third species general constructor
  */
-ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, int mSpec, Stratum* low, CantusFirmus* c, 
+ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int mSpec, Stratum* low, CantusFirmus* c, 
     int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
-    FirstSpeciesCounterpoint(home, size, cf, lb, ub, k, THIRD_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
+    FirstSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
     thirdSpeciesNotesCp = IntVarArray(home, notes.size(), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
     if(borrowMode==1){
@@ -204,9 +204,9 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
 }
 
-ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type,
+ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, Stratum* low, CantusFirmus* c, int v_type,
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
-    ThirdSpeciesCounterpoint(home, size, cf, lb, ub, k, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
+    ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
 {
     //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
     rel(home, (c->getIsLowestIdx(c->getNotes().size()-2)) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
@@ -236,9 +236,9 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     add_cost(home, 6, m2ZeroArray, costs);
 }
 
-ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type,
+ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, Stratum* low, CantusFirmus* c, int v_type,
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2):
-    ThirdSpeciesCounterpoint(home, size, cf, lb, ub, k, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV2)
+    ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV2)
 {
     varietyCostArray = IntVarArray(home, 3*(thirdSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, thirdSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
@@ -292,9 +292,9 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     
 }
 
-ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type,
+ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<int> cf,int lb, int ub, Stratum* low, CantusFirmus* c, int v_type,
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
-    ThirdSpeciesCounterpoint(home, size, cf, lb, ub, k, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV3)
+    ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV3)
 {
     varietyCostArray = IntVarArray(home, 3*(thirdSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, thirdSpeciesMotions.size()-1,IntSet({0, directMoveCost}));

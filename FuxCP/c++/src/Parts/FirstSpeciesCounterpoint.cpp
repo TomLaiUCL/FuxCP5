@@ -8,12 +8,11 @@
  * GENERAL CONSTRUCTOR
  */
 
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, int mSpecies, Stratum* low, CantusFirmus* c,
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,
      int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
-        Part(home, nMes, mSpecies, cf, lb, ub, k, v_type, m_costs, g_costs, s_costs, nV, bm) { /// super constructor
+        Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm) { /// super constructor
 
     motherSpecies =         mSpecies;
-
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
@@ -26,63 +25,39 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     } else {
         extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
     }
-
     off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
 
     /// First species notes in the counterpoint
     firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+
     if(borrowMode==1 && motherSpecies==FIRST_SPECIES){
         firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     } else {
         firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
     }
+
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
     
     /// Harmonic intervals for the first species notes
     firstSpeciesHarmonicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES), -PERFECT_OCTAVE, PERFECT_OCTAVE);
-
-    rel(home, firstSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),h_intervals.size()));
-
+    
     for(int i = 0; i < firstSpeciesHarmonicIntervals.size(); i++){
         rel(home, (firstSpeciesHarmonicIntervals[i])==((firstSpeciesNotesCp[i]-low->getNotes()[i*4])%12));
     }
+
+    rel(home, firstSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),h_intervals.size()));
     
     /// Melodic intervals for the first species notes
     firstSpeciesMelodicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-    /**
-     * melodic intervals are linked in first species specific constructors EXCLUSIVELY, since the way m_intervals are calculated differentiates
-     * from the species which extend the first species.
-     */
-    
-    ///link melodic intervals
     for(int i = 0; i < firstSpeciesMelodicIntervals.size(); i++)
       rel(home, firstSpeciesMelodicIntervals[i], IRT_EQ, expr(home, firstSpeciesNotesCp[i+1] - firstSpeciesNotesCp[i]));
     
     //create the is off array which determines if a notes is borrowed or not
     is_off = BoolVarArray(home, notes.size(), 0, 1);
-    for(int i = 0; i < is_off.size(); i++){
-        IntVarArray res = IntVarArray(home, off_domain.size(), 0, 1);
-        IntVar sm = IntVar(home, 0, off_domain.size());
-        for(int l = 0; l < off_domain.size(); l++){      // TODO il y a d'office une meilleure manière de faire que double boucle for
-            BoolVar b1 = BoolVar(home, 0, 1);
-            rel(home, notes[i], IRT_EQ, off_domain[l], Reify(b1));   // REIFY RM_PMI?
-            ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);
-        }
-        IntVarArgs x(res.size());
-        for(int t = 0; t < off_domain.size(); t++){
-            x[t] = res[t];
-        }
-        rel(home, sm, IRT_EQ, expr(home, sum(x)));
-        rel(home, sm, IRT_GR, 0, Reify(is_off[i]));  // REIFY RM_PMI?*/
-    }
+    initializeIsOffArray(home, this);
 
     //create off_cost array
     offCostArray = IntVarArray(home, is_off.size(), IntSet({0, borrowCost}));
-    //set the cost for borrowing this note
-    for(int i = 0; i < is_off.size(); i++){
-        rel(home, (is_off[i]==0) >> (offCostArray[i]==0));
-        rel(home, (is_off[i]==1) >> (offCostArray[i]==borrowCost));
-    }
     
     melodicDegreeCost = IntVarArray(home, m_intervals_brut.size(), IntSet({secondCost, thirdCost, fourthCost, tritoneCost, fifthCost, 
         sixthCost, seventhCost, octaveCost}));
@@ -120,7 +95,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         //bass constraints
         rel(home, (this->isLowest[i]==0) >> (firstSpeciesMotions[i]==-1));
         rel(home, (this->isLowest[i]==0) >> (firstSpeciesMotionCosts[i]==0));
-        //rel(home, firstSpeciesMotionCosts[i], IRT_EQ, 0, Reify(isLowest[i], RM_IMP));
 
     }
     
@@ -134,6 +108,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
             (h_intervals[i]==MINOR_SIXTH)||(h_intervals[i]==MAJOR_SIXTH)||(h_intervals[i]==PERFECT_OCTAVE)), IRT_EQ, isConsonance[i]);
     }
     /// General rules
+
+    //G4 : 
+    G4_counterpointMustBeInTheSameKey(home, this);
 
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
     G6_noChromaticMelodies(home, this, motherSpecies);
@@ -161,9 +138,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
  * 2 VOICES CONSTRUCTOR
  */
 
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c, int v_type
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c, int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV) :
-        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV) ///call the general constructor
+        FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV) ///call the general constructor
 {
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
 
@@ -201,9 +178,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
  * 3 VOICES CONSTRUCTOR
  */
 
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, 
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub,  Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2) : 
-    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2) ///call the general constructor
+    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2) ///call the general constructor
 {
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
 
@@ -244,9 +221,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
  * 4 VOICES CONSTRUCTOR
  */
 
-FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int k, Stratum* low, CantusFirmus* c,  int v_type, 
+FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
-    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, k, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
+    FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
 {
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));

@@ -15,8 +15,6 @@ int main(int argc, char* argv[]) {
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
-        int upper_bound_domain = 72;
-        int lower_bound_domain = 60;
         vector<Species> species = {FIRST_SPECIES, FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
@@ -40,7 +38,7 @@ int main(int argc, char* argv[]) {
 
         // create a new problem
         // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-        auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
+        auto* problem = create_problem(cantusFirmus, species, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine
@@ -63,8 +61,6 @@ int main(int argc, char* argv[]) {
         cout << "No (more) solutions." << endl;
     } else if(argc==3){
         FuxTest* test = new FuxTest(atoi(argv[1]), atoi(argv[2]));
-        int upper_bound_domain = 72;
-        int lower_bound_domain = 60;
         vector<Species> species = test->getSpList();
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
@@ -86,7 +82,7 @@ int main(int argc, char* argv[]) {
 
         // create a new problem
         // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-        auto* problem = create_problem(cantusFirmus, species, C, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
+        auto* problem = create_problem(cantusFirmus, species, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine
@@ -134,8 +130,6 @@ int main(int argc, char* argv[]) {
         cout << "No (more) solutions." << endl;
     } else if(argc==2){
         FuxTest* test = new FuxTest(atoi(argv[1]));
-        int upper_bound_domain = 72;
-        int lower_bound_domain = 60;
         vector<Species> species = test->getSpList();
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
@@ -157,7 +151,7 @@ int main(int argc, char* argv[]) {
 
         // create a new problem
         // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-        auto* problem = create_problem(cantusFirmus, species, D, lower_bound_domain, upper_bound_domain, v_type, melodic_params, general_params, specific_params,
+        auto* problem = create_problem(cantusFirmus, species, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
         //cout << problem->to_string() << endl;
         // create a new search engine

@@ -1,5 +1,30 @@
 #include "../headers/constraints.hpp"
 
+void initializeIsOffArray(Home home, Part* part){
+    for(int i = 0; i < part->getIsOffArray().size(); i++){
+        IntVarArray res = IntVarArray(home, part->getOffDomain().size(), 0, 1);
+        IntVar sm = IntVar(home, 0, part->getOffDomain().size());
+        for(int l = 0; l < part->getOffDomain().size(); l++){      // TODO il y a d'office une meilleure manière de faire que double boucle for
+            BoolVar b1 = BoolVar(home, 0, 1);
+            rel(home, part->getNotes()[i], IRT_EQ, part->getOffDomain()[l], Reify(b1));   // REIFY RM_PMI?
+            ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);
+        }
+        IntVarArgs x(res.size());
+        for(int t = 0; t < part->getOffDomain().size(); t++){
+            x[t] = res[t];
+        }
+        rel(home, sm, IRT_EQ, expr(home, sum(x)));
+        rel(home, sm, IRT_GR, 0, Reify(part->getIsOffArray()[i]));  // REIFY RM_PMI?*/
+    }
+}
+
+void G4_counterpointMustBeInTheSameKey(Home home, Part* part){
+    for(int i = 0; i < part->getIsOffArray().size(); i++){
+        rel(home, (part->getIsOffArray()[i]==0) >> (part->getOffCostArray()[i]==0));
+        rel(home, (part->getIsOffArray()[i]==1) >> (part->getOffCostArray()[i]==part->getBorrowCost()));
+    }
+}
+
 void G6_noChromaticMelodies(Home home, Part* part, int mSpec){
     for(int i = 0; i < part->getMelodicIntervals().size()-1; i+=4/notesPerMeasure.at(mSpec)){
         rel(home, expr(home, part->getMelodicIntervals()[i]==1), BOT_AND, expr(home, part->getMelodicIntervals()[i+1]==1), 0);

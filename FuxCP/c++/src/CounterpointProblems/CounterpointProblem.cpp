@@ -8,14 +8,13 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-CounterpointProblem::CounterpointProblem(vector<int> cf, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs,
+CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs,
     vector<int> imp, int nV){
     nMeasures = cf.size();
-    key = k;
     lowerBound = ((6 * v_type) - 6) + cf[0];
     upperBound = ((6 * v_type) + 12) + cf[0];
     lowest = new Stratum(*this, nMeasures, 0, 127, v_type);
-    cantusFirmus = new CantusFirmus(*this, nMeasures, cf, key, lowest, v_type, m_costs, g_costs, s_costs, nV);
+    cantusFirmus = new CantusFirmus(*this, nMeasures, cf, lowest, v_type, m_costs, g_costs, s_costs, nV);
     importance = imp;
     n_unique_costs = 0;
     importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "motion", "melodic", "direct", "penult", "syncopation" ,"cambiata", "m2", "triad3"};
@@ -69,7 +68,6 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
     }
     nMeasures = s.nMeasures; 
     importance = s.importance;
-    key = s.key;
     lowerBound = s.lowerBound;
     upperBound = s.upperBound;
     prefs = s.prefs;
