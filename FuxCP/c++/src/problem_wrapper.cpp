@@ -4,6 +4,9 @@
 #include "../headers/Utilities.hpp"
 #include "../headers/CounterpointUtils.hpp"
 
+std::vector<Species> convertToSpeciesVector(const std::vector<int>& intVec); 
+
+
 /**
  * Wraps the Problem constructor.
  * @todo modify this to include any parameters your Problem constructor requires
@@ -30,7 +33,9 @@ void* create_new_problem(int* cantusFirmus, int size, int n_cp, int* splist, int
     vector<int> spec(int_pointer_to_vector(specific, 7));
     vector<int> imp(int_pointer_to_vector(importance, 14));
     // return (void*) new Problem(cf, size, n_cp, sp, vt, b_mode, min_skips, gen, mot, mel, spec, imp, t_off, sc, scale_size, chr, chrom_size, brw, borrow_size);
-    return create_problem(cf, sp, C, 0, 127, vt, mel, gen, spec, b_mode);
+
+    vector<Species> speciesList = convertToSpeciesVector(sp);
+    return create_problem(cf, speciesList, C, 0, 127, vt, mel, gen, spec, imp, b_mode);
 }
 
 /**
@@ -92,4 +97,42 @@ void* return_next_solution_space(void* solver){
 
 int search_stopped(void* solver){
     return static_cast<int>(static_cast<Base<CounterpointProblem>*>(solver)->stopped());
+}
+
+
+
+
+
+// UTILITY FUNCTION JUST FOR PROBLEMWRAPPER
+// Conversion function from std::vector<int> to std::vector<species>, DOES NOT HANDLE CANTUS FIRMUS because it is not supposed to be in spList
+std::vector<Species> convertToSpeciesVector(const std::vector<int>& intVec) {
+    std::vector<Species> speciesVec;
+    speciesVec.reserve(intVec.size()); // Reserve space to avoid multiple allocations
+    
+    for (int value : intVec) {
+        switch (value) {
+            case 1:
+                speciesVec.push_back(FIRST_SPECIES);
+                break;
+            case 2:
+                speciesVec.push_back(SECOND_SPECIES);
+                break;
+            case 3:
+                speciesVec.push_back(THIRD_SPECIES);
+                break;
+            case 4:
+                speciesVec.push_back(FOURTH_SPECIES);
+                break;
+            case 5:
+                speciesVec.push_back(FIFTH_SPECIES);
+                break;
+            default:
+                std::cerr << "Warning: Value " << value << " is out of range for species enum\n";
+                // Handle out of range values if needed
+                // throw std::out_of_range("Value out of range for species enum");
+                // speciesVec.push_back(static_cast<species>(0)); // Or handle it appropriately
+                break;
+        }
+    }
+    return speciesVec;
 }

@@ -13,7 +13,7 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, 
+TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int k, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, 
     vector<int> s_costs, vector<int> imp, int bm) : 
     CounterpointProblem(cf, k, lb, ub, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES){
     species = sp;

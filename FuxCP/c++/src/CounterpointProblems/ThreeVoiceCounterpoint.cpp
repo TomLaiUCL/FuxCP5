@@ -9,7 +9,7 @@
  * @param lb the lowest note possible for the counterpoint in MIDI
  * @param ub the highest note possible for the counterpoint in MIDI
  */
-ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
+ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> sp, int k, int lb, int ub, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
     vector<int> s_costs, vector<int> imp, int bm) :
     CounterpointProblem(cf, k, lb, ub, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
     species = sp;
@@ -208,6 +208,9 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<int> sp, i
 
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+
+
+    writeToLogFile(("solution array size : " + std::to_string(solutionArray.size())).c_str());
 
 }
 

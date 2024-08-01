@@ -1,6 +1,7 @@
 #ifndef FUX_TESTS_HPP
 #define FUX_TEST_HPP
 
+#include "Utilities.hpp"
 #include "Parts/Part.hpp"
 
 using namespace Gecode;
@@ -9,7 +10,7 @@ using namespace std;
 class FuxTest{
 
 protected:
-    vector<int> species;
+    vector<Species> spList;
     vector<int> cantusFirmus;
     vector<int> v_type;
     int borrowMode;
@@ -22,7 +23,7 @@ public:
 
     FuxTest(int testNumber, int i);
 
-    vector<int> getSpList();
+    vector<Species> getSpList();
     vector<int> getCf();
     vector<int> getVType();
     int getBMode();

@@ -17,10 +17,18 @@ int main(int argc, char* argv[]) {
         cout << "-------------" << endl;
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
+<<<<<<< HEAD
         vector<int> species = {FOURTH_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         vector<int> cantusFirmus = {57,60,59,62,60,64}; //1sp 2v cf
+=======
+        vector<Species> species = {FIRST_SPECIES, FIRST_SPECIES};
+        //la do si re do mi fa mi re do si la
+        //57 60 59 62 60 64 65 64 62 60 59 57
+        // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
+        vector<int> cantusFirmus = {60, 62, 65, 64, 67, 65, 64, 62, 60};
+>>>>>>> diego
         
         int size = cantusFirmus.size();
         vector<int> v_type = {-1, 2};
@@ -52,6 +60,7 @@ int main(int argc, char* argv[]) {
             nb_sol++;
             cout << "Solution " << nb_sol << ": " << endl;
             cout << pb->to_string() << endl;
+            cout << pb->getSize() << endl;
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
@@ -63,7 +72,7 @@ int main(int argc, char* argv[]) {
         FuxTest* test = new FuxTest(atoi(argv[1]), atoi(argv[2]));
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
-        vector<int> species = test->getSpList();
+        vector<Species> species = test->getSpList();
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         vector<int> cantusFirmus = test->getCf();
@@ -134,7 +143,7 @@ int main(int argc, char* argv[]) {
         FuxTest* test = new FuxTest(atoi(argv[1]));
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
-        vector<int> species = test->getSpList();
+        vector<Species> species = test->getSpList();
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         vector<int> cantusFirmus = test->getCf();
