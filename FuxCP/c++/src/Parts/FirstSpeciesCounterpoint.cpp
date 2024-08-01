@@ -13,10 +13,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         Part(home, nMes, mSpecies, cf, lb, ub, k, v_type, m_costs, g_costs, s_costs, nV, bm) { /// super constructor
 
     motherSpecies =         mSpecies;
-    cout << "Lower bound : " << endl;
-    cout << lowerBound << endl;
-    cout << "Upper bound : " << endl;
-    cout << upperBound << endl;
 
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
@@ -140,58 +136,25 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// General rules
 
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
-    
-    for(int i = 0; i < m_intervals_brut.size()-1; i+=4/notesPerMeasure.at(motherSpecies)){
-        rel(home, expr(home, m_intervals_brut[i]==1), BOT_AND, expr(home, m_intervals_brut[i+1]==1), 0);
-        rel(home, expr(home, m_intervals_brut[i]==-1), BOT_AND, expr(home, m_intervals_brut[i+1]==-1), 0);
-    }
-    
+    G6_noChromaticMelodies(home, this, motherSpecies);
+
     // G7 : melodic intervals should be small (works for 1st, 2nd and 3rd species)
-    int idx = 0;
-    for(int i = 0; i < m_intervals_brut.size(); i+=4/notesPerMeasure.at(motherSpecies)){
-        rel(home, (abs(m_intervals_brut[i])<MINOR_THIRD) >> (melodicDegreeCost[i]==secondCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_THIRD || abs(m_intervals_brut[i])==MAJOR_THIRD) >> (melodicDegreeCost[i]==thirdCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_FOURTH) >> (melodicDegreeCost[i]==fourthCost));
-        rel(home, (abs(m_intervals_brut[i])==TRITONE) >> (melodicDegreeCost[i]==tritoneCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_FIFTH) >> (melodicDegreeCost[i]==fifthCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_SIXTH || abs(m_intervals_brut[i])==MAJOR_SIXTH) >> (melodicDegreeCost[i]==sixthCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_SEVENTH || abs(m_intervals_brut[i])==MAJOR_SEVENTH) >> (melodicDegreeCost[i]==seventhCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_OCTAVE) >> (melodicDegreeCost[i]==octaveCost));
-        idx++;
-    }
+    G7_melodicIntervalsShouldBeSmall(home, this, motherSpecies);
     
     /// Harmonic rules
-    //todo put each rule in a function so it is easy to call them in different constructors depending on the species calling the first species
     /// H1 from Thibault: All harmonic intervals must be consonances
-    dom(home, firstSpeciesHarmonicIntervals, IntSet(IntArgs(CONSONANCES)));
+    H1_1_harmonicIntrvalsAreConsonances(home, this);
     
     //H2 and H3 are found in the TwoVoiceCounterpoint class, since these rules are 2 voice specific
 
     // H4 from Thibault : The key tone is tuned to the first note of the lowest strata
-    rel(home, (isLowest[0]==0) >> (firstSpeciesHarmonicIntervals[0]==0));
-    rel(home, (isLowest[isLowest.size()-1]==0) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-1]==0));
+    H4_1_keyToneIsTuned(home, this);
 
     // H5 from Thibault : The cp and the cf cannot play the same note
-    for(int i = 1; i < firstSpeciesNotesCp.size()-1; i++){
-        rel(home, firstSpeciesNotesCp[i], IRT_NQ, c->getNotes()[i]);
-    }
+    H5_1_cpAndCfDifferentNotes(home, this, c);
 
     // H6 from Thibault : Imperfect consonances are preferred
-    for(int i = 0; i < h_intervals.size(); i++){
-        rel(home, octaveCostArray[i], IRT_EQ, h_octaveCost, Reify(expr(home, h_intervals[i]==UNISSON), RM_PMI));
-        rel(home, octaveCostArray[i], IRT_EQ, 0, Reify(expr(home, h_intervals[i]!=UNISSON), RM_PMI));
-        //rel(home, (h_intervals[i]==UNISSON) >> (octaveCostArray[i]==1));
-        //rel(home, (h_intervals[i]!=UNISSON) >> (octaveCostArray[i]==0));
-
-        rel(home, fifthCostArray[i], IRT_EQ, h_fifthCost, Reify(expr(home, h_intervals[i]==PERFECT_FIFTH), RM_PMI));
-        rel(home, fifthCostArray[i], IRT_EQ, 0, Reify(expr(home, h_intervals[i]!=PERFECT_FIFTH), RM_PMI));
-        //rel(home, (h_intervals[i]==PERFECT_FIFTH) >> (fifthCostArray[i]==1));
-        //rel(home, (h_intervals[i]!=PERFECT_FIFTH) >> (fifthCostArray[i]==0));
-
-        //rel(home, fifthCostArray[i], IRT_EQ, 0);
-        //rel(home, octaveCostArray[i], IRT_EQ, 0);
-    }
-    
+    H6_1_preferImperfectConsonances(home, this);
 }
 
 /**
@@ -205,30 +168,19 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
 
     //H7,H8 from Thibault : penultimate note major sixth or minor third
-
-    int p = firstSpeciesNotesCp.size()-2;
-    rel(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IRT_EQ, MAJOR_SIXTH, Reify(isLowest[isLowest.size()-2], RM_IMP));
+    H7_1_2v_penultimateSixthOrThird(home, this);
 
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth
-    rel(home, firstSpeciesMelodicIntervals, IRT_LQ, MINOR_SIXTH);
-    rel(home, firstSpeciesMelodicIntervals, IRT_GQ, -MINOR_SIXTH);
+    M2_1_melodicIntervalsNotExceedMinorSixth(home, this);
 
     /// Motion rules
     //P1 from Thibault : Perfect consonances cannot be reached by direct motion
-    for(int j = 0; j < firstSpeciesMotions.size(); j++){
-
-        rel(home, ((firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH)&&isLowest[j+1]==1) >>
-            (firstSpeciesMotions[j]!=PARALLEL_MOTION));
-
-    }
+    P1_1_2v_noDirectMotionFromPerfectConsonance(home, this);
 
     //P2 from Thibault : already done when creating motions array
     
     //P3 from Thibault : no battuta
-    for(int j = 0; j < firstSpeciesMotions.size(); j++){
-        rel(home, expr(home, firstSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
-            BOT_AND, isLowest[j], 0);
-    }
+    P3_1_noBattuta(home, this);
 
     costs = IntVarArray(home, 5, 0, 1000000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow"};
@@ -369,11 +321,6 @@ string FirstSpeciesCounterpoint::to_string() const {
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, FirstSpeciesCounterpoint &s) : Part(home, s){
     motherSpecies = s.motherSpecies;
     //cantus = s.cantus;
-    firstSpeciesNotesCp.update(home, s.firstSpeciesNotesCp);
-    firstSpeciesHarmonicIntervals.update(home, s.firstSpeciesHarmonicIntervals);
-    firstSpeciesMelodicIntervals.update(home, s.firstSpeciesMelodicIntervals);
-    firstSpeciesMotions.update(home, s.firstSpeciesMotions);
-    firstSpeciesMotionCosts.update(home, s.firstSpeciesMotionCosts);
 }
 
 FirstSpeciesCounterpoint* FirstSpeciesCounterpoint::clone(Home home){

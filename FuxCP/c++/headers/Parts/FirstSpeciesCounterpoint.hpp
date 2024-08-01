@@ -18,11 +18,6 @@ class FirstSpeciesCounterpoint : public Part{
 protected:
     int motherSpecies;                          /// The species from which this is called.
     CantusFirmus* cantus;
-    IntVarArray firstSpeciesNotesCp;            /// The notes of the counterpoint that have to follow the rules for the first species
-    IntVarArray firstSpeciesHarmonicIntervals;  /// The harmonic intervals between the notes that have to follow the 1st species rules and the lowest stratum
-    IntVarArray firstSpeciesMelodicIntervals;   /// The melodic intervals between the notes that have to follow the 1st species rules
-    IntVarArray firstSpeciesMotions;
-    IntVarArray firstSpeciesMotionCosts;
 public:
     /**
      * General constructor. It takes the mother species as an argument and calls the super constructor from the part class.

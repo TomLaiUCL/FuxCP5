@@ -17,18 +17,11 @@ int main(int argc, char* argv[]) {
         cout << "-------------" << endl;
         int upper_bound_domain = 72;
         int lower_bound_domain = 60;
-<<<<<<< HEAD
-        vector<int> species = {FOURTH_SPECIES};
-        //la do si re do mi fa mi re do si la
-        //57 60 59 62 60 64 65 64 62 60 59 57
-        vector<int> cantusFirmus = {57,60,59,62,60,64}; //1sp 2v cf
-=======
         vector<Species> species = {FIRST_SPECIES, FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
         vector<int> cantusFirmus = {60, 62, 65, 64, 67, 65, 64, 62, 60};
->>>>>>> diego
         
         int size = cantusFirmus.size();
         vector<int> v_type = {-1, 2};

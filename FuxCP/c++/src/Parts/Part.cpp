@@ -140,6 +140,12 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     directCostArray.update(home, s.directCostArray);
     isConsonance.update(home, s.isConsonance);
 
+    firstSpeciesHarmonicIntervals.update(home, s.firstSpeciesHarmonicIntervals);
+    firstSpeciesNotesCp.update(home, s.firstSpeciesNotesCp);
+    firstSpeciesMelodicIntervals.update(home, s.firstSpeciesMelodicIntervals);
+    firstSpeciesMotions.update(home, s.firstSpeciesMotions);
+    firstSpeciesMotionCosts.update(home, s.firstSpeciesMotionCosts);
+
 //    mIntervalsCp.update(home, s.mIntervalsCp);
 //    motionsCfCp.update(home, s.motionsCfCp);
 }
@@ -241,4 +247,36 @@ void Part::add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray cos
 
 BoolVarArray Part::getIsLowest(){
     return isLowest;
+}
+
+IntVarArray Part::getFirstSpeciesHIntervals(){
+    return firstSpeciesHarmonicIntervals;
+}
+
+IntVarArray Part::getFirstSpeciesNotes(){
+    return firstSpeciesNotesCp;
+}
+
+IntVarArray Part::getFirstSpeciesMIntervals(){
+    return firstSpeciesMelodicIntervals;
+}
+
+IntVarArray Part::getFifthCostArray(){
+    return fifthCostArray;
+}
+
+IntVarArray Part::getOctaveCostArray(){
+    return octaveCostArray;
+}
+
+int Part::getHFifthCost(){
+    return h_fifthCost;
+}
+
+int Part::getHOctaveCost(){
+    return h_octaveCost;
+}
+
+IntVarArray Part::getFirstSpeciesMotions(){
+    return firstSpeciesMotions;
 }

@@ -8,6 +8,7 @@
 #include "../Utilities.hpp"
 #include "../Voice.hpp"
 #include "../Stratum.hpp"
+#include "../constraints.hpp"
 
 #include "gecode/kernel.hh"
 #include "gecode/int.hh"
@@ -78,6 +79,13 @@ class Part : public Voice {
         int directCost;
         int obliqueCost;
         int contraryCost;
+
+        //First Species specific variables
+        IntVarArray firstSpeciesNotesCp;
+        IntVarArray firstSpeciesHarmonicIntervals;
+        IntVarArray firstSpeciesMelodicIntervals;
+        IntVarArray firstSpeciesMotions;
+        IntVarArray firstSpeciesMotionCosts;
     public:
         Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int k, int v_type, vector<int> m_costs, vector<int> g_costs,
             vector<int> s_costs, int nV, int bm);
@@ -129,8 +137,22 @@ class Part : public Voice {
         int getSixthCost();
         int getSeventhCost();
         int getOctaveCost();
+        int getHFifthCost();
+        int getHOctaveCost();
 
         IntVarArray getMelodicDegreeCost();
+
+        IntVarArray getFirstSpeciesHIntervals();
+
+        IntVarArray getFirstSpeciesNotes();
+
+        IntVarArray getFifthCostArray();
+
+        IntVarArray getOctaveCostArray();
+
+        IntVarArray getFirstSpeciesMIntervals();
+
+        IntVarArray getFirstSpeciesMotions();
 
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 
