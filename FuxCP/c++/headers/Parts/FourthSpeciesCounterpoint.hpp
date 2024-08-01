@@ -21,6 +21,8 @@ protected:
     IntVarArray m2IntervalsArray;
     IntVarArray firstHInterval;
     BoolVarArray isNoSyncopeArray;
+    IntVarArray m2ZeroArray;
+    IntVarArray snycopeCostArray;
     
 public:
     /**

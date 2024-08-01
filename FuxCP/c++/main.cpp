@@ -96,12 +96,19 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+        else if(atoi(argv[1])==74){
+            for(int j = 0; j < test->getIdx(); j++){
+                if(j!=0){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            }
+        }
         else{
-            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
+            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES || species[0]==FOURTH_SPECIES){
                 for(int j = 0; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
-            } else if(species[0]==SECOND_SPECIES){
+            } else if(species[0]==SECOND_SPECIES ){
                 cout << "HERE" << endl;
                 for(int j = 1; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
@@ -161,7 +168,7 @@ int main(int argc, char* argv[]) {
             }
         }
         else{
-            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
+            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES || species[0]==FOURTH_SPECIES){
                 for(int j = 0; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }

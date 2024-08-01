@@ -21,7 +21,9 @@ FuxTest::FuxTest(int testNumber, int i){
         test_2v_2sp_fig42_setter(i);
     } else if(testNumber==55){
         test_2v_3sp_fig55_setter(i);
-    } else if(testNumber==108){
+    } else if(testNumber==74){
+        test_2v_4sp_fig74_setter(i);
+    }else if(testNumber==108){
         test_3v_1sp_fig108_setter(i);
     } else if(testNumber==109){
         test_3v_1sp_fig109_setter(i);
@@ -170,6 +172,16 @@ void FuxTest::test_2v_3sp_fig55_setter(int i){
     cout << "CP size : " << endl;
     cout << cp.size() << endl;
     v_type = {1};
+    idx = i;
+    borrowMode = 1;
+}
+
+void FuxTest::test_2v_4sp_fig74_setter(int i){
+    cout << "Fig. 74" << endl;
+    species = {FOURTH_SPECIES};
+    cantusFirmus = {62,   65,   64,   62,   67,   65,   69,   67,   65,   64,   62}; //1sp 2v cf
+    cp =           {0 ,50,50,62,62,60,60,59,59,64,64,62,62,65,65,64,64,62,62,61,62};
+    v_type = {-1};
     idx = i;
     borrowMode = 1;
 }

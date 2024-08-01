@@ -21,10 +21,10 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, int sp, int k, int lb
     counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, key, lowest, cantusFirmus, v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
 
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
-    dom(*this, counterpoint_1->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    //dom(*this, counterpoint_1->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
 
     /// H3 from Thibault: The last harmonic interval must be a perfect consonance
-    dom(*this, counterpoint_1->getHInterval()[counterpoint_1->getHInterval().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    //dom(*this, counterpoint_1->getHInterval()[counterpoint_1->getHInterval().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
 
     setLowest(nullptr, nullptr, upper, nullptr, nullptr);
 
