@@ -3,7 +3,7 @@
 Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
     nMeasures = nMes; 
     size = nMes*4;
-    isLowest        = BoolVarArray(home, nMeasures, 0, 1);
+    isNotLowest        = BoolVarArray(home, nMeasures, 0, 1);
 
     voice_type = v_type;
 
@@ -39,7 +39,7 @@ Voice::Voice(Home home, Voice &s){
     voice_type = s.voice_type;
     notes.update(home, s.notes);
     h_intervals.update(home, s.h_intervals);
-    isLowest.update(home, s.isLowest);
+    isNotLowest.update(home, s.isNotLowest);
     m_intervals_brut.update(home, s.m_intervals_brut);
     motions.update(home, s.motions);
 }
@@ -52,8 +52,8 @@ IntVarArgs Voice::getFirstNotes(){
     return notes.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES),notes.size());
 }
 
-BoolVar Voice::getIsLowestIdx(int idx){
-    return isLowest[idx];
+BoolVar Voice::getIsNotLowestIdx(int idx){
+    return isNotLowest[idx];
 }
 
 IntVarArray Voice::getMelodicIntervals(){

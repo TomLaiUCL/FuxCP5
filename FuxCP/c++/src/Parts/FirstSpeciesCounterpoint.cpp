@@ -84,17 +84,17 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         BoolVar cpu_cfd = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(low->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
 
         //direct constraints
-        rel(home, ((both_up || both_stay || both_down) && (this->isLowest[i]==1)) >> (firstSpeciesMotions[i]==PARALLEL_MOTION));
-        rel(home, ((both_up || both_stay || both_down) && (this->isLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==directCost));
+        rel(home, ((both_up || both_stay || both_down) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotions[i]==PARALLEL_MOTION));
+        rel(home, ((both_up || both_stay || both_down) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==directCost));
         //oblique constraints
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (this->isLowest[i]==1)) >> (firstSpeciesMotions[i]==OBLIQUE_MOTION));
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (this->isLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==obliqueCost));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotions[i]==OBLIQUE_MOTION));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==obliqueCost));
         //contrary constraints
-        rel(home, ((cpd_cfu || cpu_cfd) && (this->isLowest[i]==1)) >> (firstSpeciesMotions[i]==CONTRARY_MOTION));
-        rel(home, ((cpd_cfu || cpu_cfd) && (this->isLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==contraryCost));
+        rel(home, ((cpd_cfu || cpu_cfd) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotions[i]==CONTRARY_MOTION));
+        rel(home, ((cpd_cfu || cpu_cfd) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==contraryCost));
         //bass constraints
-        rel(home, (this->isLowest[i]==0) >> (firstSpeciesMotions[i]==-1));
-        rel(home, (this->isLowest[i]==0) >> (firstSpeciesMotionCosts[i]==0));
+        rel(home, (this->isNotLowest[i]==0) >> (firstSpeciesMotions[i]==-1));
+        rel(home, (this->isNotLowest[i]==0) >> (firstSpeciesMotionCosts[i]==0));
 
     }
     
@@ -112,9 +112,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     //G4 : 
     G4_counterpointMustBeInTheSameKey(home, this);
 
-    // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
-    G6_noChromaticMelodies(home, this, motherSpecies);
-
     // G7 : melodic intervals should be small (works for 1st, 2nd and 3rd species)
     G7_melodicIntervalsShouldBeSmall(home, this, motherSpecies);
     
@@ -126,9 +123,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 
     // H4 from Thibault : The key tone is tuned to the first note of the lowest strata
     H4_1_keyToneIsTuned(home, this);
-
-    // H5 from Thibault : The cp and the cf cannot play the same note
-    H5_1_cpAndCfDifferentNotes(home, this, c);
 
     // H6 from Thibault : Imperfect consonances are preferred
     H6_1_preferImperfectConsonances(home, this);
@@ -187,6 +181,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
 
+    
     //H7
     //dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH, PERFECT_OCTAVE}));
 
@@ -267,7 +262,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 string FirstSpeciesCounterpoint::to_string() const {
     string text = Part::to_string() + "\nFirst species :\n";
     text += "First species first notes: " + intVarArray_to_string(firstSpeciesNotesCp) + "\n";
-    text += "First species isLowest array : " + boolVarArray_to_string(isLowest) + "\n";
+    text += "First species isLowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
     text += "First species h intervals : " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
     return text;
 }

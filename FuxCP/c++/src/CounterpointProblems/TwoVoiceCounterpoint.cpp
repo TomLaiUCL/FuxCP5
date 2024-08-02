@@ -20,11 +20,17 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     upper = new Stratum(*this, nMeasures, 0, 127, v_type, lowest->getNotes()); 
     counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, lowest, cantusFirmus, v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
 
+    // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
+    G6_noChromaticMelodies(*this, counterpoint_1, species);
+
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
-    //dom(*this, counterpoint_1->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    H2_1_startWithPerfectConsonance(*this, counterpoint_1);
 
     /// H3 from Thibault: The last harmonic interval must be a perfect consonance
-    //dom(*this, counterpoint_1->getHInterval()[counterpoint_1->getHInterval().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    H3_1_endWithPerfectConsonance(*this, counterpoint_1);
+
+    // H5 from Thibault : The cp and the cf cannot play the same note
+    H5_1_cpAndCfDifferentNotes(*this, counterpoint_1, cantusFirmus);
 
     setLowest(nullptr, nullptr, upper, nullptr, nullptr);
 

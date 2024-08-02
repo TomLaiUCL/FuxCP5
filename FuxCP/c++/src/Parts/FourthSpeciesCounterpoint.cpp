@@ -185,7 +185,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     }
 
     //4.H2 : If the cantusFirmus is in the upper part, then no hamonic seventh
-    for(int j = 1; j < c->getIsLowest().size(); j++){
+    for(int j = 1; j < c->getIsNotLowest().size(); j++){
         BoolVar band = BoolVar(home, 0, 1);
         rel(home, (!c->getIsLowestIdx(j)) >> (band));
         rel(home, firstHInterval[j], IRT_NQ, MINOR_SEVENTH, Reify(band, RM_IMP));

@@ -59,17 +59,17 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         BoolVar cpu_cfd = expr(home, (secondSpeciesArsisArray[i]>0)&&(low->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
  
         //direct constraints
-        rel(home, ((both_up || both_stay || both_down) && (isLowest[i]==1)) >> (secondSpeciesMotions[i]==PARALLEL_MOTION));
-        rel(home, ((both_up || both_stay || both_down) && (isLowest[i]==1)) >> (secondSpeciesMotionCosts[i]==directCost));
+        rel(home, ((both_up || both_stay || both_down) && (isNotLowest[i]==1)) >> (secondSpeciesMotions[i]==PARALLEL_MOTION));
+        rel(home, ((both_up || both_stay || both_down) && (isNotLowest[i]==1)) >> (secondSpeciesMotionCosts[i]==directCost));
         //oblique constraints
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i]==1)) >> (secondSpeciesMotions[i]==OBLIQUE_MOTION));
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i]==1)) >> (secondSpeciesMotionCosts[i]==obliqueCost));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isNotLowest[i]==1)) >> (secondSpeciesMotions[i]==OBLIQUE_MOTION));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isNotLowest[i]==1)) >> (secondSpeciesMotionCosts[i]==obliqueCost));
         //contrary constraints
-        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i]==1)) >> (secondSpeciesMotions[i]==CONTRARY_MOTION));
-        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i]==1)) >> (secondSpeciesMotionCosts[i]==contraryCost));
+        rel(home, ((cpd_cfu || cpu_cfd) && (isNotLowest[i]==1)) >> (secondSpeciesMotions[i]==CONTRARY_MOTION));
+        rel(home, ((cpd_cfu || cpu_cfd) && (isNotLowest[i]==1)) >> (secondSpeciesMotionCosts[i]==contraryCost));
         //bass constraints
-        rel(home, (isLowest[i]==0) >> (secondSpeciesMotions[i]==-1));
-        rel(home, (isLowest[i]==0) >> (secondSpeciesMotionCosts[i]==0));
+        rel(home, (isNotLowest[i]==0) >> (secondSpeciesMotions[i]==-1));
+        rel(home, (isNotLowest[i]==0) >> (secondSpeciesMotionCosts[i]==0));
     }
 
     //create real motions. we have the thesis-thesis and arsis-arsis motions. now we need the successive m intervals in meas, meaning thesis-arsis inside
@@ -130,14 +130,14 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     //TODO : check if the expression makes sense when I have internet connection
     for(int j = 0; j < firstSpeciesMelodicIntervals.size(); j++){
         rel(home, firstSpeciesMelodicIntervals[j], IRT_EQ, 12, Reify(expr(home,(abs(firstSpeciesHarmonicIntervals[j])>=4)&&
-            (expr(home, expr(home, abs(low->getMelodicIntervals()[j])>0) == isLowest[j]))), RM_PMI));
+            (expr(home, expr(home, abs(low->getMelodicIntervals()[j])>0) == isNotLowest[j]))), RM_PMI));
     }
     
 
     //2.P2 : battuta adapted
     for(int j = 0; j < secondSpeciesMotions.size(); j++){
         rel(home, expr(home, secondSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
-            BOT_AND, isLowest[j], 0);
+            BOT_AND, isNotLowest[j], 0);
     }
 
 }
@@ -155,7 +155,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     //2.P1 : adapted no direct motion rule from first species to real motions
     for(int j = 0; j < secondSpeciesRealMotions.size(); j++){
-        rel(home, ((firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH)&&isLowest[j+1]==1) >>
+        rel(home, ((firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH)&&isNotLowest[j+1]==1) >>
             (secondSpeciesRealMotions[j]!=PARALLEL_MOTION));
     }
     
@@ -183,8 +183,6 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
-
-
 
     //P1 3 voices version
     for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
@@ -254,7 +252,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
 string SecondSpeciesCounterpoint::to_string() const {
     string text = "\nSecond species diminution array : " + boolVarArray_to_string(isDiminution) + "\n";
-    text += "Second species isLowest array : " + boolVarArray_to_string(isLowest) + "\n";
+    text += "Second species isLowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
     text += "Second species h intervals : " + intVarArray_to_string(secondSpeciesHarmonicIntervals) + "\n";
     text += "First species : " + FirstSpeciesCounterpoint::to_string() + "\n";
     return text;

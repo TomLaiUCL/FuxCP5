@@ -13,9 +13,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     vector<int> s_costs, vector<int> imp, int bm) :
     CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
     species = sp;
-
-    //G9 last chord must have the same fundamental as the cf (used throughout the composition)
-    rel(*this, expr(*this, lowest->getNotes()[lowest->getNotes().size()-1]%12), IRT_EQ, expr(*this, cantusFirmus->getNotes()[cantusFirmus->getNotes().size()-1]%12));
+    
 
     upper1 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
     upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
@@ -28,171 +26,42 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     setLowest(counterpoint_2, nullptr, upper1, upper2, nullptr);
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2};
-    
+
     triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, counterpoint_1->getTriadCost()}));
 
-    //H8 : the triad should be used as much as possible
-    for(int i = 0; i < triadCostArray.size(); i++){
-        BoolVar h1_3 = BoolVar(*this, 0 ,1);
-        BoolVar h1_4 = BoolVar(*this, 0 ,1);
-        BoolVar h1_third = BoolVar(*this, 0 ,1);
-        BoolVar h1_7 = BoolVar(*this, 0 ,1);
-
-        BoolVar h2_3 = BoolVar(*this, 0 ,1);
-        BoolVar h2_4 = BoolVar(*this, 0 ,1);
-        BoolVar h2_third = BoolVar(*this, 0 ,1);
-        BoolVar h2_7 = BoolVar(*this, 0 ,1);
-
-        BoolVar h_firstPoss = BoolVar(*this, 0, 1);
-        BoolVar h_secondPoss = BoolVar(*this, 0, 1);
-        BoolVar triad = BoolVar(*this, 0, 1);
-        BoolVar not_triad = BoolVar(*this, 0, 1);
-
-        rel(*this, upper1->getHInterval()[i*4], IRT_EQ, 3, Reify(h1_3));
-        rel(*this, upper1->getHInterval()[i*4], IRT_EQ, 4, Reify(h1_4));
-        rel(*this, upper2->getHInterval()[i*4], IRT_EQ, 7, Reify(h2_7));
-        rel(*this, h1_3, BOT_OR, h1_4, h1_third);
-        rel(*this, h1_third, BOT_AND, h2_7, h_firstPoss);
-
-        rel(*this, upper2->getHInterval()[i*4], IRT_EQ, 3, Reify(h2_3));
-        rel(*this, upper2->getHInterval()[i*4], IRT_EQ, 4, Reify(h2_4));
-        rel(*this, upper1->getHInterval()[i*4], IRT_EQ, 7, Reify(h1_7));
-        rel(*this, h2_3, BOT_OR, h2_4, h2_third);
-        rel(*this, h2_third, BOT_AND, h1_7, h_secondPoss);
-
-        rel(*this, h_firstPoss, BOT_OR, h_secondPoss, triad);
-        rel(*this, triad, BOT_XOR, not_triad, 1);
-        rel(*this, triadCostArray[i], IRT_EQ, 0, Reify(triad, RM_IMP));
-        rel(*this, triadCostArray[i], IRT_EQ, counterpoint_1->getTriadCost(), Reify(not_triad, RM_IMP));
-    }
-
-    
-
-    //M4 variety cost (notes should be as diverse as possible)
-    for(int i = 1; i < parts.size(); i++){
-        Part* p = parts[i];
-        int temp = 0;
-        IntVarArray notes = p->getBranchingNotes();
-        for(int j = 0; j < p->getHIntervalSize()-1; j++){
-            int upbnd = 0;
-            if(j+3<p->getHIntervalSize()){
-                upbnd = j+4;
-            } else {upbnd = p->getHIntervalSize();}
-            for(int k = j+1; k < upbnd;k++){
-                //setting a cost if notes inside a window are the same in a part
-                rel(*this, (notes[j]==notes[k])>>(p->getVarietyArray(temp)==p->getVarietyCost()));
-                rel(*this, (notes[j]!=notes[k])>>(p->getVarietyArray(temp)==0));
-                temp++;
-            }
-            
-        }
-    }
-    
-    //P4 avoid successive perfect consonances
     int scc_cz = ((cantusFirmus->getSize()/4)-1);
+    bool containsThirdSpecies = 0;
 
     successiveCostArray = IntVarArray(*this, scc_cz, IntSet({0, counterpoint_1->getSuccCost()}));
     
-    int idx = 0;
-   
-    // cout << "SUCC SIZE :" + to_string(succ_cost.size()) << endl;
-    for(int p1 = 1; p1 < parts.size(); p1++){
-        for(int p2 = p1+1; p2 < parts.size(); p2++){
-            cout << "Mother species 3 voices : " << endl;
-            // cout << "Part 1 : " << to_string(parts[p1].species) << endl;
-            // cout << "Part 2 : " << to_string(parts[p2].species) << endl;
-            cout << species[p1-1] << endl;
-            if(species[p1-1]!=SECOND_SPECIES && species[p2-1]!=SECOND_SPECIES){
-                
-                for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
-                    // cout << "IDX : " + to_string(idx) << endl;
-                    rel(*this, successiveCostArray[idx], IRT_EQ, counterpoint_1->getSuccCost(), 
-                        Reify(expr(*this, (parts[p1]->getFirstHInterval()[i]==0 || parts[p1]->getFirstHInterval()[i]==7) &&
-                            (parts[p2]->getFirstHInterval()[i]==0 || parts[p2]->getFirstHInterval()[i]==7))));
-                    idx++;
-                }        
-            }
-            else if(species[p1-1]==SECOND_SPECIES){
-                
-                for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
-                    BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
-                    (parts[p2]->getFirstHInterval()[i]==UNISSON || parts[p2]->getFirstHInterval()[i]==PERFECT_FIFTH)) && 
-                        ((parts[p1]->getFirstHInterval()[i+1]==UNISSON || parts[p1]->getFirstHInterval()[i+1]==PERFECT_FIFTH) && 
-                    (parts[p2]->getFirstHInterval()[i+1]==UNISSON || parts[p2]->getFirstHInterval()[i+1]==PERFECT_FIFTH)));
-                    BoolVar case2 = expr(*this, (parts[p1]->getFirstHInterval()[i]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i]!=PERFECT_FIFTH) || 
-                        (parts[p1]->getFirstHInterval()[i+1]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i+1]!=PERFECT_FIFTH) || 
-                        ((parts[p1]->getSecondHInterval()[i]==3 || parts[p2]->getSecondHInterval()[i]==3) && 
-                        (parts[p1]->getSecondHInterval()[i]==4 || parts[p2]->getSecondHInterval()[i]==4)));
-                    //first expression states that the melodic succ interval is not a third, second that we have successive fifths
-                    rel(*this, successiveCostArray[idx], IRT_EQ, counterpoint_1->getSuccCost(), Reify(expr(*this, (case1==1 || case2==1)), RM_IMP));
-                    idx++;
-                }
-            }
-            else if(species[p2-1]==SECOND_SPECIES){
-                for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
-                    BoolVar case1 = expr(*this, ((parts[p1]->getFirstHInterval()[i]==UNISSON || parts[p1]->getFirstHInterval()[i]==PERFECT_FIFTH) && 
-                    (parts[p2]->getFirstHInterval()[i]==UNISSON || parts[p2]->getFirstHInterval()[i]==PERFECT_FIFTH)) && 
-                        ((parts[p1]->getFirstHInterval()[i+1]==UNISSON || parts[p1]->getFirstHInterval()[i+1]==PERFECT_FIFTH) && 
-                    (parts[p2]->getFirstHInterval()[i+1]==UNISSON || parts[p2]->getFirstHInterval()[i+1]==PERFECT_FIFTH)));
-                    BoolVar case2 = expr(*this, (parts[p1]->getFirstHInterval()[i]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i]!=PERFECT_FIFTH) || 
-                        (parts[p1]->getFirstHInterval()[i+1]!=PERFECT_FIFTH || parts[p2]->getFirstHInterval()[i+1]!=PERFECT_FIFTH) || 
-                        ((parts[p1]->getSecondHInterval()[i]==3 || parts[p2]->getSecondHInterval()[i]==3) && 
-                        (parts[p1]->getSecondHInterval()[i]==4 || parts[p2]->getSecondHInterval()[i]==4)));
-                    //first expression states that the melodic succ interval is not a third, second that we have successive fifths
-                    rel(*this, successiveCostArray[idx], IRT_EQ, counterpoint_1->getSuccCost(), Reify(expr(*this, (case1==1 || case2==1)), RM_IMP));
-                    idx++;
-                }
-            }
-        }
+    //G9 last chord must have the same fundamental as the cf (used throughout the composition)
+    G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+
+    for(int p = 1; p < parts.size(); p++){
+        // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
+        G6_noChromaticMelodies(*this, parts[p], sp[p-1]);
+
+        // H5 from Thibault : The cp and the cf cannot play the same note
+        H5_1_cpAndCfDifferentNotes(*this, parts[p], cantusFirmus);
     }
+
+    //H8 : the triad should be used as much as possible
+    H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper1, upper2);
+
+    //M4 variety cost (notes should be as diverse as possible)
+    M4_varietyCost(*this, parts);
+    
+    //P4 avoid successive perfect consonances
+    P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
     
     //P6 : no move in same direction
-    for(int i = 0; i < parts[0]->getMotions().size(); i++){
-        rel(*this, expr(*this, parts[0]->getMotions()[i]==2 && parts[1]->getMotions()[i]==2), BOT_AND, expr(*this, parts[2]->getMotions()[i]==2), 0);
-    }
+    P6_noMoveInSameDirection(*this, parts);
     
     //P7 : no suxxessive ascending sixths
-    for(int p1 = 0; p1 < parts.size(); p1++){
-        for(int p2 = p1+1; p2 < parts.size(); p2++){
-            for(int j = 1; j < parts[p1]->getFirstHInterval().size()-1; j++){
-                rel(*this, ((parts[p1]->getFirstHInterval()[j-1]!=MINOR_SIXTH && parts[p1]->getFirstHInterval()[j-1]!=MAJOR_SIXTH) && 
-                    (parts[p2]->getFirstHInterval()[j-1]!=MINOR_SIXTH && parts[p2]->getFirstHInterval()[j-1]!=MAJOR_SIXTH)) || (
-                        (parts[p1]->getFirstHInterval()[j]!=MINOR_SIXTH && parts[p1]->getFirstHInterval()[j]!=MAJOR_SIXTH) && 
-                    (parts[p2]->getFirstHInterval()[j]!=MINOR_SIXTH && parts[p2]->getFirstHInterval()[j]!=MAJOR_SIXTH)) || (
-                        parts[p1]->getFirstMInterval()[j]>0 || parts[p2]->getFirstMInterval()[j] > 0));
-            }
-        }
-    }
-
-    //TODO : RECHEKC THIS CONSTRAINT
+    P7_noSuccessiveAscendingSixths(*this, parts);
 
     //2.M2, have to write it here since it has a weird interaction with the third species
-    bool containsThirdSpecies = 0;
-    for(int i = 1; i < parts.size(); i++){
-        if(parts[i]->getSpecies()==THIRD_SPECIES){
-            containsThirdSpecies=1;
-            break;
-        }
-    }
-    for(int p1 = 1; p1 < parts.size(); p1++){
-        for(int p2 = 1; p2 < parts.size(); p2++){
-            if(p1!=p2 && parts[p1]->getSpecies()==SECOND_SPECIES){
-                if(!containsThirdSpecies){
-                    for(int i = 0; i < parts[p1]->getBranchingNotes().size()-4; i++){
-                        rel(*this, parts[p1]->getMelodicIntervals().slice(0, notesPerMeasure.at(SECOND_SPECIES), parts[p1]->getMelodicIntervals().size())[i], 
-                            IRT_NQ, 0);
-                    }
-                } else {
-                    for(int i = 0; i < parts[p1]->getBranchingNotes().size()-4; i++){
-                        rel(*this, parts[p1]->getMelodicIntervals().slice(0, notesPerMeasure.at(SECOND_SPECIES), parts[p1]->getMelodicIntervals().size())[i], 
-                            IRT_NQ, 0);
-                    }
-                    //no unison in the two last notes
-                    rel(*this, parts[p1]->getBranchingNotes()[parts[p1]->getBranchingNotes().size()-2], IRT_NQ, parts[p1]->getBranchingNotes()[parts[p1]->getBranchingNotes().size()-1]);
-                }
-            }
-        }
-    }
+    M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size(), 0, 127);
 

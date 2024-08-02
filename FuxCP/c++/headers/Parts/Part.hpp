@@ -125,7 +125,7 @@ class Part : public Voice {
 
         BoolVarArray getConsonance();
 
-        BoolVarArray getIsLowest();
+        BoolVarArray getIsNotLowest();
 
         int getSecondCost();
         int getThirdCost();

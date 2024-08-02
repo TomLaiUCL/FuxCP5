@@ -46,17 +46,17 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         BoolVar cpu_cfd = expr(home, (thirdSpeciesMelodicIntervals[(i*4)+3]>0)&&(low->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
  
         //direct constraints
-        rel(home, ((both_up || both_stay || both_down) && (isLowest[i])) >> (thirdSpeciesMotions[i]==PARALLEL_MOTION));
-        rel(home, ((both_up || both_stay || both_down) && (isLowest[i])) >> (thirdSpeciesMotionCosts[i]==directCost));
+        rel(home, ((both_up || both_stay || both_down) && (isNotLowest[i])) >> (thirdSpeciesMotions[i]==PARALLEL_MOTION));
+        rel(home, ((both_up || both_stay || both_down) && (isNotLowest[i])) >> (thirdSpeciesMotionCosts[i]==directCost));
         //oblique constraints
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i])) >> (thirdSpeciesMotions[i]==OBLIQUE_MOTION));
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i])) >> (thirdSpeciesMotionCosts[i]==obliqueCost));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isNotLowest[i])) >> (thirdSpeciesMotions[i]==OBLIQUE_MOTION));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isNotLowest[i])) >> (thirdSpeciesMotionCosts[i]==obliqueCost));
         //contrary constraints
-        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i])) >> (thirdSpeciesMotions[i]==CONTRARY_MOTION));
-        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i])) >> (thirdSpeciesMotionCosts[i]==contraryCost));
+        rel(home, ((cpd_cfu || cpu_cfd) && (isNotLowest[i])) >> (thirdSpeciesMotions[i]==CONTRARY_MOTION));
+        rel(home, ((cpd_cfu || cpu_cfd) && (isNotLowest[i])) >> (thirdSpeciesMotionCosts[i]==contraryCost));
         //bass constraints
-        rel(home, (!isLowest[i]) >> (thirdSpeciesMotions[i]==-1));
-        rel(home, (!isLowest[i]) >> (thirdSpeciesMotionCosts[i]==0));
+        rel(home, (!isNotLowest[i]) >> (thirdSpeciesMotions[i]==-1));
+        rel(home, (!isNotLowest[i]) >> (thirdSpeciesMotionCosts[i]==0));
     }
     
     thirdSpeciesAbsMelodic = IntVarArray(home, thirdSpeciesMelodicIntervals.size(), UNISSON, PERFECT_OCTAVE);
@@ -200,7 +200,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     //no battuta adapted for third species
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
         rel(home, expr(home, thirdSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && thirdSpeciesMelodicIntervals[(j*4)+3]<-4),
-            BOT_AND, isLowest[j], 0);
+            BOT_AND, isNotLowest[j], 0);
     }
 }
 
@@ -209,7 +209,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
 {
     //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
-    rel(home, (c->getIsLowestIdx(c->getNotes().size()-2)) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
+    rel(home, (c->getIsNotLowestIdx(c->getNotes().size()-2)) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
 
     //3.P1 adapted
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
@@ -351,7 +351,7 @@ string ThirdSpeciesCounterpoint::to_string() const {
     string text = Part::to_string() + "\nThird species isConsonance intervals : \n";
     text += boolVarArray_to_string(isConsonance) += "\n";
     text += "Third species is Lowest : \n";
-    text += boolVarArray_to_string(isLowest) += "\n";
+    text += boolVarArray_to_string(isNotLowest) += "\n";
     text += "Third species motions : \n";
     text += intVarArray_to_string(thirdSpeciesMotions) += "\n";
     text += "Third species h intervals : \n";

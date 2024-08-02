@@ -43,13 +43,13 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         BoolVar cpu_cfd = expr(home, (m_intervals_brut[i]>0)&&(low->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
 
         //direct constraints
-        rel(home, ((both_up || both_stay || both_down) && (isLowest[i]==1)) >> (motions[i]==PARALLEL_MOTION));
+        rel(home, ((both_up || both_stay || both_down) && (isNotLowest[i]==1)) >> (motions[i]==PARALLEL_MOTION));
         //oblique constraints
-        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isLowest[i]==1)) >> (motions[i]==OBLIQUE_MOTION));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (isNotLowest[i]==1)) >> (motions[i]==OBLIQUE_MOTION));
         //contrary constraints
-        rel(home, ((cpd_cfu || cpu_cfd) && (isLowest[i]==1)) >> (motions[i]==CONTRARY_MOTION));
+        rel(home, ((cpd_cfu || cpu_cfd) && (isNotLowest[i]==1)) >> (motions[i]==CONTRARY_MOTION));
         //bass constraints
-        rel(home, (isLowest[i]==0) >> (motions[i]==-1));
+        rel(home, (isNotLowest[i]==0) >> (motions[i]==-1));
     }
 
     dom(home, h_intervals, IntSet(CONSONANCES));
@@ -70,7 +70,7 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
             //BoolVar case1 = BoolVar(home, 0, 1);
             //rel(home, isLowest[j+1], BOT_AND, pCons, case1);
             //rel(home, motions[j], IRT_NQ, PARALLEL_MOTION, Reify(case1));
-            rel(home, ((h_intervals[j+1]==UNISSON || h_intervals[j+1]==PERFECT_FIFTH)&&isLowest[j+1]==1) >>
+            rel(home, ((h_intervals[j+1]==UNISSON || h_intervals[j+1]==PERFECT_FIFTH)&&isNotLowest[j+1]==1) >>
                 (motions[j]!=PARALLEL_MOTION));
             //rel(home, ((h_intervals[j+1]!=UNISSON && h_intervals[j+1]!=PERFECT_FIFTH)||isLowest[j+1]==0) >>
             //    (motions[j]==PARALLEL_MOTION));
@@ -98,7 +98,7 @@ string CantusFirmus::to_string() const {
     text += intVarArray_to_string(motions);
     text += "\n";
     text += "is Lowest : ";
-    text += boolVarArray_to_string(isLowest);
+    text += boolVarArray_to_string(isNotLowest);
     text += "\n";
     return text;
 }

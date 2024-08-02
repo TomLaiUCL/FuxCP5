@@ -243,8 +243,8 @@ void Part::add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray cos
     rel(home, costs[idx], IRT_EQ, expr(home, sum(args)));
 }
 
-BoolVarArray Part::getIsLowest(){
-    return isLowest;
+BoolVarArray Part::getIsNotLowest(){
+    return isNotLowest;
 }
 
 IntVarArray Part::getFirstSpeciesHIntervals(){
