@@ -197,10 +197,10 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "variety", "direct", "penult"};
 
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
-    directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
+    directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, 2, directMoveCost}));
 
     //P1 4 voices version
-    P1_2_3v_noDirectMotionFromPerfectConsonance(home, this);
+    P1_2_4v_noDirectMotionFromPerfectConsonance(home, this);
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
