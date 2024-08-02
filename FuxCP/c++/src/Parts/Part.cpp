@@ -144,6 +144,12 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     firstSpeciesMotions.update(home, s.firstSpeciesMotions);
     firstSpeciesMotionCosts.update(home, s.firstSpeciesMotionCosts);
 
+    isDiminution.update(home, s.isDiminution);
+    penultCostArray.update(home, s.penultCostArray);
+    secondSpeciesMotions.update(home, s.secondSpeciesMotions);
+    secondSpeciesMelodicIntervals.update(home, s.secondSpeciesMelodicIntervals);
+    secondSpeciesRealMotions.update(home, s.secondSpeciesRealMotions);
+
 //    mIntervalsCp.update(home, s.mIntervalsCp);
 //    motionsCfCp.update(home, s.motionsCfCp);
 }
@@ -301,4 +307,32 @@ IntVarArray Part::getOffCostArray(){
 
 int Part::getBorrowCost(){
     return borrowCost;
+}
+
+BoolVarArray Part::getIsDiminution(){
+    return isDiminution;
+}
+
+int Part::getPenultCost(){
+    return penultCost;
+}
+
+IntVarArray Part::getPenultCostArray(){
+    return penultCostArray;
+}
+
+IntVarArray Part::getSecondSpeciesMotions(){
+    return secondSpeciesMotions;
+}
+
+IntVarArray Part::getSecondSpeciesMIntervals(){
+    return secondSpeciesMelodicIntervals;
+}
+
+IntVarArray Part::getSecondSpeciesRealMotions(){
+    return secondSpeciesRealMotions;
+}
+
+int Part::getDirectMoveCost(){
+    return directMoveCost;
 }

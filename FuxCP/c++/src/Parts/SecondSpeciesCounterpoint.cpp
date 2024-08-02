@@ -110,21 +110,10 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     /// Constraints
 
     // 2.H2 : Arsis harmonies cannot be dissonant except if there is a diminution.
-    for(int i = 0; i < nMeasures-1; i++){
-        //if(i==nMeasures-2){
-        //    rel(home, secondSpeciesHarmonicIntervals[(i*2)+1]==UNISSON || secondSpeciesHarmonicIntervals[(i*2)+1]==MINOR_THIRD || secondSpeciesHarmonicIntervals[(i*2)+1]==MAJOR_SIXTH);
-        //} else {
-        //    
-        //}
-        rel(home, isConsonance[(i*2)+1], IRT_EQ, 0, Reify(isDiminution[i]));
-    }
+    H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
     
-    // 2.H3 : penult cost 
-    //TODO : RECHECK
-    //dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
-    
-    rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]!=PERFECT_FIFTH) >> (penultCostArray[0]==penultCost));
-    rel(home, (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==PERFECT_FIFTH) >> (penultCostArray[0]==0));
+    // 2.H3 : penult cost
+    H3_2_penultimateNoteDomain(home, this);
     
     // 2.M1 : If the two voices are getting so close that there is no contrary motion possible without crossing each other, then the melodic interval of the counterpoint can be an octave leap.
     //TODO : check if the expression makes sense when I have internet connection
@@ -135,10 +124,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     
 
     //2.P2 : battuta adapted
-    for(int j = 0; j < secondSpeciesMotions.size(); j++){
-        rel(home, expr(home, secondSpeciesMotions[j]==CONTRARY_MOTION && firstSpeciesHarmonicIntervals[j+1]==0 && firstSpeciesMelodicIntervals[j]<-4),
-            BOT_AND, isNotLowest[j], 0);
-    }
+    P3_2_noBattuta(home, this);
 
 }
 
@@ -151,14 +137,10 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     /// 2.M2: Two consecutive notes cannot be the same
     //can do better than this?
-    rel(home, secondSpeciesMelodicIntervals, IRT_NQ, 0); /// plus efficace que de faire cp[i] /= cp[i+1]
+    M2_2_2v_twoConsecutiveNotesAreNotTheSame(home, this);
 
     //2.P1 : adapted no direct motion rule from first species to real motions
-    for(int j = 0; j < secondSpeciesRealMotions.size(); j++){
-        rel(home, ((firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH)&&isNotLowest[j+1]==1) >>
-            (secondSpeciesRealMotions[j]!=PARALLEL_MOTION));
-    }
-    
+    P1_2_2v_noDirectMotionFromPerfectConsonance(home, this);
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
@@ -185,13 +167,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
 
     //P1 3 voices version
-    for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
-        //set a cost when it is reached through direct motion, it is 0 when not
-        rel(home, (secondSpeciesRealMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
-            (directCostArray[j]==directMoveCost));
-        rel(home, (secondSpeciesRealMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
-            (directCostArray[j]==0));
-    }
+    P1_2_3v_noDirectMotionFromPerfectConsonance(home, this);
 
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "penult"};
     //need to set cost[0] to be off cost
@@ -224,13 +200,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
 
     //P1 4 voices version
-    for(int j = 0; j < firstSpeciesMotions.size()-1; j++){
-        //set a cost when it is reached through direct motion, it is 0 when not
-        rel(home, (secondSpeciesRealMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
-            (directCostArray[j]==directMoveCost));
-        rel(home, (secondSpeciesRealMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
-            (directCostArray[j]==0));
-    }
+    P1_2_3v_noDirectMotionFromPerfectConsonance(home, this);
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
@@ -272,13 +242,9 @@ string SecondSpeciesCounterpoint::to_string() const {
 SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, SecondSpeciesCounterpoint &s): FirstSpeciesCounterpoint(home, s){  
     secondSpeciesNotesCp.update(home, s.secondSpeciesNotesCp);
     secondSpeciesHarmonicIntervals.update(home, s.secondSpeciesHarmonicIntervals);
-    secondSpeciesMotions.update(home, s.secondSpeciesMotions);
     secondSpeciesMotionCosts.update(home, s.secondSpeciesMotionCosts);
-    secondSpeciesMelodicIntervals.update(home, s.secondSpeciesMelodicIntervals);
-    secondSpeciesRealMotions.update(home, s.secondSpeciesRealMotions);
     secondSpeciesRealMotionCosts.update(home, s.secondSpeciesRealMotionCosts);
-    isDiminution.update(home, s.isDiminution);
-    penultCostArray.update(home, s.penultCostArray);
+    
     secondSpeciesArsisArray.update(home, s.secondSpeciesArsisArray);
 }
 

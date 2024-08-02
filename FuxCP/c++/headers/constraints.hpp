@@ -19,7 +19,11 @@ void H1_1_harmonicIntrvalsAreConsonances(Home home, Part* part);
 
 void H2_1_startWithPerfectConsonance(Home home, Part* part);
 
+void H2_2_arsisHarmoniesCannotBeDisonnant(Home home, Part* part);
+
 void H3_1_endWithPerfectConsonance(Home home, Part* part);
+
+void H3_2_penultimateNoteDomain(Home home, Part* part);
 
 void H4_1_keyToneIsTuned(Home home, Part* part);
 
@@ -35,13 +39,21 @@ void H8_4v_preferHarmonicTriad(Home home, IntVarArray triadCostArray, Stratum* u
 
 void M2_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
 
+void M2_2_2v_twoConsecutiveNotesAreNotTheSame(Home home, Part* part);
+
 void M2_2_3v_melodicIntervalsNotExceedMinorSixth(Home home, vector<Part*> parts, bool containsThirdSpecies);
 
 void M4_varietyCost(Home home, vector<Part*> parts);
 
 void P1_1_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
+void P1_2_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
+
+void P1_2_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
+
 void P3_1_noBattuta(Home home, Part* part);
+
+void P3_2_noBattuta(Home home, Part* part);
 
 void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray successiveCostArray, vector<Species> species);
 

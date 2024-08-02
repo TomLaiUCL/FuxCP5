@@ -59,8 +59,21 @@ void H2_1_startWithPerfectConsonance(Home home, Part* part){
     dom(home, part->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
 }
 
+void H2_2_arsisHarmoniesCannotBeDisonnant(Home home, Part* part){
+    for(int i = 0; i < part->getNMeasures()-1; i++){
+        rel(home, part->getConsonance()[(i*2)+1], IRT_EQ, 0, Reify(part->getIsDiminution()[i]));
+    }
+}
+
 void H3_1_endWithPerfectConsonance(Home home, Part* part){
     dom(home, part->getHInterval()[part->getHInterval().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
+}
+
+void H3_2_penultimateNoteDomain(Home home, Part* part){
+    //dom(home, part->getHInterval()[part->getHInterval().size()-3], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
+
+    rel(home, (part->getHInterval()[part->getHInterval().size()-3]!=PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==part->getPenultCost()));
+    rel(home, (part->getHInterval()[part->getHInterval().size()-3]==PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==0));
 }
 
 void H4_1_keyToneIsTuned(Home home, Part* part){
@@ -181,6 +194,10 @@ void M2_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
     rel(home, part->getFirstSpeciesMIntervals(), IRT_GQ, -MINOR_SIXTH);
 }
 
+void M2_2_2v_twoConsecutiveNotesAreNotTheSame(Home home, Part* part){
+    rel(home, part->getSecondSpeciesMIntervals(), IRT_NQ, 0); /// plus efficace que de faire cp[i] /= cp[i+1]
+}
+
 void M2_2_3v_melodicIntervalsNotExceedMinorSixth(Home home, vector<Part*> parts, bool containsThirdSpecies){
     for(int i = 1; i < parts.size(); i++){
         if(parts[i]->getSpecies()==THIRD_SPECIES){
@@ -239,9 +256,33 @@ void P1_1_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
     }
 }
 
+void P1_2_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
+    for(int j = 0; j < part->getSecondSpeciesRealMotions().size(); j++){
+        rel(home, ((part->getFirstSpeciesHIntervals()[j+1]==UNISSON || part->getFirstSpeciesHIntervals()[j+1]==PERFECT_FIFTH)&&part->getIsNotLowest()[j+1]==1) >>
+            (part->getSecondSpeciesRealMotions()[j]!=PARALLEL_MOTION));
+    }
+}
+
+void P1_2_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
+    for(int j = 0; j < part->getFirstSpeciesMotions().size()-1; j++){
+        //set a cost when it is reached through direct motion, it is 0 when not
+        rel(home, (part->getSecondSpeciesRealMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||part->getFirstSpeciesHIntervals()[j+1]==7))>>
+            (part->getDirectCostArray()[j]==part->getDirectMoveCost()));
+        rel(home, (part->getSecondSpeciesRealMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0&&part->getFirstSpeciesHIntervals()[j+1]!=7))>>
+            (part->getDirectCostArray()[j]==0));
+    }
+}
+
 void P3_1_noBattuta(Home home, Part* part){
     for(int j = 0; j < part->getFirstSpeciesMotions().size(); j++){
         rel(home, expr(home, part->getFirstSpeciesMotions()[j]==CONTRARY_MOTION && part->getFirstSpeciesHIntervals()[j+1]==0 && 
+            part->getFirstSpeciesMIntervals()[j]<-4), BOT_AND, part->getIsNotLowest()[j], 0);
+    }
+}
+
+void P3_2_noBattuta(Home home, Part* part){
+    for(int j = 0; j < part->getSecondSpeciesMotions().size(); j++){
+        rel(home, expr(home, part->getSecondSpeciesMotions()[j]==CONTRARY_MOTION && part->getFirstSpeciesHIntervals()[j+1]==0 && 
             part->getFirstSpeciesMIntervals()[j]<-4), BOT_AND, part->getIsNotLowest()[j], 0);
     }
 }

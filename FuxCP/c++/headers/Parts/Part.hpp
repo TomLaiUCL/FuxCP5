@@ -85,6 +85,13 @@ class Part : public Voice {
         IntVarArray firstSpeciesMelodicIntervals;
         IntVarArray firstSpeciesMotions;
         IntVarArray firstSpeciesMotionCosts;
+
+        //Second species specific variables
+        BoolVarArray isDiminution;
+        IntVarArray penultCostArray;
+        IntVarArray secondSpeciesMotions;
+        IntVarArray secondSpeciesMelodicIntervals;      /// The melodic intervals between the notes that have to follow the 2nd species rules
+        IntVarArray secondSpeciesRealMotions;
     public:
         Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs,
             vector<int> s_costs, int nV, int bm);
@@ -139,6 +146,8 @@ class Part : public Voice {
         int getHOctaveCost();
         int getDirectCost();
         int getBorrowCost();
+        int getPenultCost();
+        int getDirectMoveCost();
 
         IntVarArray getMelodicDegreeCost();
 
@@ -161,6 +170,16 @@ class Part : public Voice {
         vector<int> getOffDomain();
 
         IntVarArray getOffCostArray();
+
+        BoolVarArray getIsDiminution();
+
+        IntVarArray getPenultCostArray();
+
+        IntVarArray getSecondSpeciesMotions();
+
+        IntVarArray getSecondSpeciesMIntervals();
+
+        IntVarArray getSecondSpeciesRealMotions();
 
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 
