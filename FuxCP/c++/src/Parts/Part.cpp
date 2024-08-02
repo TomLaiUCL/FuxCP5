@@ -74,7 +74,7 @@ string Part::to_string() const{
     part += "Part notes : \n";
     part += intVarArray_to_string(notes);
     part += "\n";
-    part += "M intervals : " + intVarArray_to_string(m_intervals_brut) + "\n";
+    part += "is Highest : " + boolVarArray_to_string(isHighest) + "\n";
     return part;
 }
 

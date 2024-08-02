@@ -53,6 +53,8 @@ void M4_varietyCost(Home home, vector<Part*> parts);
 
 void P1_1_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
+void P1_1_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
+
 void P1_2_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
 void P1_2_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part);

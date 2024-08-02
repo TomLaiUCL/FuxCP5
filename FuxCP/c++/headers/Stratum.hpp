@@ -49,7 +49,7 @@ class Stratum : public Voice{
 
         void setHIntervals(Home home);
 
-
+        
 };
 
 

@@ -100,6 +100,9 @@ string CantusFirmus::to_string() const {
     text += "is Lowest : ";
     text += boolVarArray_to_string(isNotLowest);
     text += "\n";
+    text += "is Highest : ";
+    text += boolVarArray_to_string(isHighest);
+    text += "\n";
     return text;
 }
 

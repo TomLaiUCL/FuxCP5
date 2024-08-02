@@ -32,6 +32,7 @@ class Voice{
         IntVarArray motions;
 
         BoolVarArray isNotLowest;
+        BoolVarArray isHighest;
         // motions ? (w/r to lowest)
 
         // Stratum lowestStratum;
@@ -61,6 +62,8 @@ class Voice{
         virtual IntVarArgs getFirstNotes();
 
         BoolVar getIsNotLowestIdx(int idx);
+
+        BoolVarArray getIsHighest();
 
         IntVarArray getHInterval();
 

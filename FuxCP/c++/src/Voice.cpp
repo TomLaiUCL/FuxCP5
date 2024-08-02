@@ -4,6 +4,7 @@ Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
     nMeasures = nMes; 
     size = nMes*4;
     isNotLowest        = BoolVarArray(home, nMeasures, 0, 1);
+    isHighest          = BoolVarArray(home, nMeasures, 0, 1);
 
     voice_type = v_type;
 
@@ -40,6 +41,7 @@ Voice::Voice(Home home, Voice &s){
     notes.update(home, s.notes);
     h_intervals.update(home, s.h_intervals);
     isNotLowest.update(home, s.isNotLowest);
+    isHighest.update(home, s.isHighest);
     m_intervals_brut.update(home, s.m_intervals_brut);
     motions.update(home, s.motions);
 }
@@ -70,4 +72,8 @@ int Voice::getSpecies(){
 
 IntVarArgs Voice::getSecondHInterval(){
     return h_intervals.slice(2,4,h_intervals.size());
+}
+
+BoolVarArray Voice::getIsHighest(){
+    return isHighest;
 }

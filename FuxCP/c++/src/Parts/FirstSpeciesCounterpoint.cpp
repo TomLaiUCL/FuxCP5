@@ -218,8 +218,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     FirstSpeciesCounterpoint(home, nMes, cf, lb, ub, FIRST_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
 {
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
+
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
-    directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
+    directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, 2, directMoveCost}));
 
     //H7
     H7_1_4v_penultimateSixthOrThird(home, this);
@@ -227,8 +228,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
     M2_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
-    //P1 3 voices version
-    P1_1_3v_noDirectMotionFromPerfectConsonance(home, this);
+    //P1 4 voices version
+    P1_1_4v_noDirectMotionFromPerfectConsonance(home, this);
 
     //P3 from Thibault : no battuta
     P3_1_noBattuta(home, this);

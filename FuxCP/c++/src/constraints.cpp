@@ -280,6 +280,24 @@ void P1_1_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
     }
 }
 
+void P1_1_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
+    for(int j = 0; j < part->getFirstSpeciesMotions().size()-1; j++){
+
+        rel(home, (!part->getIsNotLowest()[j]) >> (part->getDirectCostArray()[j]==0));
+
+        rel(home, (part->getIsNotLowest()[j] && !part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||
+            part->getFirstSpeciesHIntervals()[j+1]==7))) >> (part->getDirectCostArray()[j]==2));
+        rel(home, (part->getIsNotLowest()[j] && !part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0 &&
+            part->getFirstSpeciesHIntervals()[j+1]!=7))) >> (part->getDirectCostArray()[j]==0));
+
+        rel(home, (part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||
+            part->getFirstSpeciesHIntervals()[j+1]==7))) >> (part->getDirectCostArray()[j]==part->getDirectCost()));
+        rel(home, (part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0 &&
+            part->getFirstSpeciesHIntervals()[j+1]!=7))) >> (part->getDirectCostArray()[j]==0));
+
+    }
+}
+
 void P1_2_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
     for(int j = 0; j < part->getSecondSpeciesRealMotions().size(); j++){
         rel(home, ((part->getFirstSpeciesHIntervals()[j+1]==UNISSON || part->getFirstSpeciesHIntervals()[j+1]==PERFECT_FIFTH)&&part->getIsNotLowest()[j+1]==1) >>
