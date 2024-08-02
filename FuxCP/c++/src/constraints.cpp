@@ -55,6 +55,12 @@ void H1_1_harmonicIntrvalsAreConsonances(Home home, Part* part){
     dom(home, part->getFirstSpeciesHIntervals(), IntSet(IntArgs(CONSONANCES)));
 }
 
+void H1_3_fiveConsecutiveNotesByJointDegree(Home home, Part* part){
+    for(int i = 0; i < part->getIs5QNArray().size(); i++){
+        rel(home, (part->getIs5QNArray()[i]) >> (part->getConsonance()[(i*4)+2]));
+    }
+}
+
 void H2_1_startWithPerfectConsonance(Home home, Part* part){
     dom(home, part->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
 }
@@ -62,6 +68,15 @@ void H2_1_startWithPerfectConsonance(Home home, Part* part){
 void H2_2_arsisHarmoniesCannotBeDisonnant(Home home, Part* part){
     for(int i = 0; i < part->getNMeasures()-1; i++){
         rel(home, part->getConsonance()[(i*2)+1], IRT_EQ, 0, Reify(part->getIsDiminution()[i]));
+    }
+}
+
+void H2_3_disonanceImpliesDiminution(Home home, Part* part){
+    for(int i = 0; i < part->getIsDiminution().size(); i++){
+        BoolVar band1 = BoolVar(home, 0, 1);
+        BoolVar band2 = BoolVar(home, 0, 1);
+
+        rel(home, part->getConsonance()[(i*4)+2], BOT_OR, part->getIsDiminution()[i], 1);
     }
 }
 
@@ -74,6 +89,15 @@ void H3_2_penultimateNoteDomain(Home home, Part* part){
 
     rel(home, (part->getHInterval()[part->getHInterval().size()-3]!=PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==part->getPenultCost()));
     rel(home, (part->getHInterval()[part->getHInterval().size()-3]==PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==0));
+}
+
+void H3_3_cambiataCost(Home home, Part* part){
+    for(int i = 0; i < part->getCambiataCostArray().size(); i++){
+        rel(home, ((part->getThirdSpeciesHIntervals()[(i*4)+1]==UNISSON || part->getThirdSpeciesHIntervals()[(i*4)+1]==PERFECT_FIFTH)&&(part->getThirdSpeciesHIntervals()[(i*4)+2]==UNISSON || part->getThirdSpeciesHIntervals()[(i*4)+2]==PERFECT_FIFTH)
+            &&(abs(part->getThirdSpeciesMIntervals()[(i*4)+1])<=2)) >> (part->getCambiataCostArray()[i]==part->getCambiataCost()));
+        rel(home, ((part->getThirdSpeciesHIntervals()[(i*4)+1]!=UNISSON && part->getThirdSpeciesHIntervals()[(i*4)+1]!=PERFECT_FIFTH)||(part->getThirdSpeciesHIntervals()[(i*4)+2]!=UNISSON && part->getThirdSpeciesHIntervals()[(i*4)+2]!=PERFECT_FIFTH)
+            ||(abs(part->getThirdSpeciesMIntervals()[(i*4)+1])>2)) >> (part->getCambiataCostArray()[i]==0));
+    }
 }
 
 void H4_1_keyToneIsTuned(Home home, Part* part){

@@ -17,13 +17,19 @@ void G9_lastChordSameAsFundamental(Home home, Stratum* lowest, Part* cantusFirmu
 
 void H1_1_harmonicIntrvalsAreConsonances(Home home, Part* part);
 
+void H1_3_fiveConsecutiveNotesByJointDegree(Home home, Part* part);
+
 void H2_1_startWithPerfectConsonance(Home home, Part* part);
 
 void H2_2_arsisHarmoniesCannotBeDisonnant(Home home, Part* part);
 
+void H2_3_disonanceImpliesDiminution(Home home, Part* part);
+
 void H3_1_endWithPerfectConsonance(Home home, Part* part);
 
 void H3_2_penultimateNoteDomain(Home home, Part* part);
+
+void H3_3_cambiataCost(Home home, Part* part);
 
 void H4_1_keyToneIsTuned(Home home, Part* part);
 

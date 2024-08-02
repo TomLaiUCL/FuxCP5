@@ -139,32 +139,14 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         , IRT_NQ, 1);
     
     //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
-    for(int i = 0; i < is5QNArray.size(); i++){
-        rel(home, (is5QNArray[i]) >> (isConsonance[(i*4)+2]));
-    }
+    H1_3_fiveConsecutiveNotesByJointDegree(home, this);
 
     //3.H2 : any dissonant note implies that it is surrounded by consonant notes
-    for(int i = 0; i < isDiminution.size(); i++){
-        BoolVar band1 = BoolVar(home, 0, 1);
-        BoolVar band2 = BoolVar(home, 0, 1);
-        //BoolVar band3 = BoolVar(home, 0, 1);
-
-        //rel(home, isConsonance[(i*4)+1], BOT_AND, isConsonance[(i*4)+3], band1);
-        //rel(home, band1, BOT_AND, isDiminution[i], band2);
-        rel(home, isConsonance[(i*4)+2], BOT_OR, isDiminution[i], 1);
-        //rel(home, isConsonance[(i*4)+2] || (isConsonance[(i*4)+1] && isConsonance[(i*4)+3] && isDiminution[i]));
-    }
+    H2_3_disonanceImpliesDiminution(home, this);
 
     //3.H3 : cambiata cost
-    for(int i = 0; i < cambiataCostArray.size(); i++){
-        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]==UNISSON || thirdSpeciesHarmonicIntervals[(i*4)+1]==PERFECT_FIFTH)&&(thirdSpeciesHarmonicIntervals[(i*4)+2]==UNISSON || thirdSpeciesHarmonicIntervals[(i*4)+2]==PERFECT_FIFTH)
-            &&(abs(thirdSpeciesMelodicIntervals[(i*4)+1])<=2)) >> (cambiataCostArray[i]==cambiataCost));
-        rel(home, ((thirdSpeciesHarmonicIntervals[(i*4)+1]!=UNISSON && thirdSpeciesHarmonicIntervals[(i*4)+1]!=PERFECT_FIFTH)||(thirdSpeciesHarmonicIntervals[(i*4)+2]!=UNISSON && thirdSpeciesHarmonicIntervals[(i*4)+2]!=PERFECT_FIFTH)
-            ||(abs(thirdSpeciesMelodicIntervals[(i*4)+1])>2)) >> (cambiataCostArray[i]==0));
-    }
+    H3_3_cambiataCost(home, this);
     
-    
-
     //no melodic interval between 9 and 11
     for(int i = 0; i < nMeasures-1; i++){
         rel(home, abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SIXTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MINOR_SEVENTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SEVENTH);
@@ -185,8 +167,6 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
         rel(home, b3, BOT_AND, b4, 0);
     }
-
-    //Marcel's rule
 
     //3.M1 : each note and its two beats further peer are preferred to be different
     //i + i+1 + i+2
@@ -363,14 +343,9 @@ string ThirdSpeciesCounterpoint::to_string() const {
 
 ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, ThirdSpeciesCounterpoint &s): FirstSpeciesCounterpoint(home, s){  
     thirdSpeciesNotesCp.update(home, s.thirdSpeciesNotesCp);
-    thirdSpeciesHarmonicIntervals.update(home, s.thirdSpeciesHarmonicIntervals);
-    thirdSpeciesMelodicIntervals.update(home, s.thirdSpeciesMelodicIntervals);
     thirdSpeciesMotions.update(home, s.thirdSpeciesMotions);
     thirdSpeciesMotionCosts.update(home, s.thirdSpeciesMotionCosts);
-    is5QNArray.update(home, s.is5QNArray);
-    isDiminution.update(home, s.isDiminution);
     m2IntervalsArray.update(home, s.m2IntervalsArray);
-    cambiataCostArray.update(home, s.cambiataCostArray);
     m2ZeroArray.update(home, s.m2ZeroArray);
     thirdHTriadArray.update(home, s.thirdHTriadArray);
     thirdSpeciesAbsMelodic.update(home, s.thirdSpeciesAbsMelodic);

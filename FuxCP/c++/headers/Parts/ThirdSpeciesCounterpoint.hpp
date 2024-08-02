@@ -8,14 +8,10 @@
 class ThirdSpeciesCounterpoint : public FirstSpeciesCounterpoint {
 protected :
     IntVarArray thirdSpeciesNotesCp;               /// The notes of the counterpoint that have to follow the rules for the 2nd species
-    IntVarArray thirdSpeciesHarmonicIntervals;     /// The harmonic intervals between the notes that have to follow the 2nd species rules and the cantus firmus
-    IntVarArray thirdSpeciesMelodicIntervals;      /// The melodic intervals between the notes that have to follow the 2nd species rules
     IntVarArray thirdSpeciesMotions;               /// This array is the array of REAL motions
     IntVarArray thirdSpeciesMotionCosts;
-    BoolVarArray is5QNArray;
     BoolVarArray isDiminution;
     IntVarArray m2IntervalsArray;
-    IntVarArray cambiataCostArray;
     IntVarArray m2ZeroArray;
     IntVarArray thirdHTriadArray;
     IntVarArray thirdSpeciesAbsMelodic;

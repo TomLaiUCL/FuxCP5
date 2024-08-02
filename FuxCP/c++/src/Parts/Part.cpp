@@ -150,6 +150,11 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     secondSpeciesMelodicIntervals.update(home, s.secondSpeciesMelodicIntervals);
     secondSpeciesRealMotions.update(home, s.secondSpeciesRealMotions);
 
+    is5QNArray.update(home, s.is5QNArray);
+    thirdSpeciesHarmonicIntervals.update(home, s.thirdSpeciesHarmonicIntervals);
+    thirdSpeciesMelodicIntervals.update(home, s.thirdSpeciesMelodicIntervals);
+    cambiataCostArray.update(home, s.cambiataCostArray);
+
 //    mIntervalsCp.update(home, s.mIntervalsCp);
 //    motionsCfCp.update(home, s.motionsCfCp);
 }
@@ -335,4 +340,24 @@ IntVarArray Part::getSecondSpeciesRealMotions(){
 
 int Part::getDirectMoveCost(){
     return directMoveCost;
+}
+
+BoolVarArray Part::getIs5QNArray(){
+    return is5QNArray;
+}
+
+IntVarArray Part::getThirdSpeciesHIntervals(){
+    return thirdSpeciesHarmonicIntervals;
+}
+
+IntVarArray Part::getThirdSpeciesMIntervals(){
+    return thirdSpeciesMelodicIntervals;
+}
+
+int Part::getCambiataCost(){
+    return cambiataCost;
+}
+
+IntVarArray Part::getCambiataCostArray(){
+    return cambiataCostArray;
 }
