@@ -52,7 +52,7 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         rel(home, (isNotLowest[i]==0) >> (motions[i]==-1));
     }
 
-    dom(home, h_intervals, IntSet(CONSONANCES));
+    //dom(home, h_intervals, IntSet(CONSONANCES));
 
     if(nV==TWO_VOICES){
         /// H2 from Thibault: The first harmonic interval must be a perfect consonance
@@ -62,24 +62,23 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
         
         //H7,H8 cf version
-        //rel(home, h_intervals[h_intervals.size()-2], IRT_EQ, MINOR_THIRD, Reify(isLowest[isLowest.size()-2], RM_IMP));
+        rel(home, h_intervals[h_intervals.size()-2], IRT_EQ, MINOR_THIRD, Reify(isNotLowest[isNotLowest.size()-2], RM_IMP));
 
         //P1 from Thibault : Perfect consonances cannot be reached by direct motion
         for(int j = 0; j < motions.size(); j++){
-            //BoolVar pCons = expr(home, (h_intervals[j+1]==UNISSON || h_intervals[j+1]==PERFECT_FIFTH));
-            //BoolVar case1 = BoolVar(home, 0, 1);
-            //rel(home, isLowest[j+1], BOT_AND, pCons, case1);
-            //rel(home, motions[j], IRT_NQ, PARALLEL_MOTION, Reify(case1));
+
             rel(home, ((h_intervals[j+1]==UNISSON || h_intervals[j+1]==PERFECT_FIFTH)&&isNotLowest[j+1]==1) >>
                 (motions[j]!=PARALLEL_MOTION));
-            //rel(home, ((h_intervals[j+1]!=UNISSON && h_intervals[j+1]!=PERFECT_FIFTH)||isLowest[j+1]==0) >>
-            //    (motions[j]==PARALLEL_MOTION));
+
         }
     } else {
         //H7,H8 cf version, 3v adapted
-        rel(home, h_intervals[h_intervals.size()-2]==UNISSON||h_intervals[h_intervals.size()-2]==MINOR_THIRD||h_intervals[h_intervals.size()-2]==PERFECT_FIFTH
-            ||h_intervals[h_intervals.size()-2]==MAJOR_SIXTH);
+        //rel(home, h_intervals[h_intervals.size()-2]==UNISSON||h_intervals[h_intervals.size()-2]==MINOR_THIRD||h_intervals[h_intervals.size()-2]==PERFECT_FIFTH
+        //    ||h_intervals[h_intervals.size()-2]==MAJOR_SIXTH);
     }
+
+    //No battuta
+    P3_0_noBattuta(home, this);
 }
 
 // IntVarArray CantusFirmus::getBranchingNotes(){

@@ -11,8 +11,6 @@ Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_ty
     nVoices         = nV;
     borrowMode      = bm;
     //lowest          = low;
-    
-    
 
     borrowed_scale = get_all_notes_from_scale(cf[0]%12, BORROWED_SCALE);
     scale = get_all_notes_from_scale(cf[0]%12, MAJOR_SCALE);
@@ -86,7 +84,6 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     borrowMode = s.borrowMode;
     //lowest = s.lowest;
     
-
     borrowed_scale = s.borrowed_scale;
     scale = s.scale;
     chromatic_scale = s.chromatic_scale;
@@ -154,6 +151,9 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     thirdSpeciesHarmonicIntervals.update(home, s.thirdSpeciesHarmonicIntervals);
     thirdSpeciesMelodicIntervals.update(home, s.thirdSpeciesMelodicIntervals);
     cambiataCostArray.update(home, s.cambiataCostArray);
+
+    isNoSyncopeArray.update(home, s.isNoSyncopeArray);
+    snycopeCostArray.update(home, s.snycopeCostArray);
 
 //    mIntervalsCp.update(home, s.mIntervalsCp);
 //    motionsCfCp.update(home, s.motionsCfCp);
@@ -360,4 +360,12 @@ int Part::getCambiataCost(){
 
 IntVarArray Part::getCambiataCostArray(){
     return cambiataCostArray;
+}
+
+BoolVarArray Part::getNoSyncope(){
+    return isNoSyncopeArray;
+}
+
+IntVarArray Part::getSyncopeCostArray(){
+    return snycopeCostArray;
 }

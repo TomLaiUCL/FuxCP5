@@ -49,6 +49,9 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
 
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    if(species==FOURTH_SPECIES){
+        branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
     
 }
 // COPY CONSTRUCTOR

@@ -47,22 +47,21 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
 
     //H8 : the triad should be used as much as possible
     H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper1, upper2);
-
     //M4 variety cost (notes should be as diverse as possible)
     M4_varietyCost(*this, parts);
-    
     //P4 avoid successive perfect consonances
     P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
-    
     //P6 : no move in same direction
-    P6_noMoveInSameDirection(*this, parts);
+    if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES){
+        P6_noMoveInSameDirection(*this, parts);
+    }
     
     //P7 : no suxxessive ascending sixths
     P7_noSuccessiveAscendingSixths(*this, parts);
 
     //2.M2, have to write it here since it has a weird interaction with the third species
     M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
-
+    
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size(), 0, 127);
 
     unitedCosts = IntVarArray(*this, 14, 0, 10000000);
@@ -77,6 +76,12 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
 
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    if(species[0]==FOURTH_SPECIES){
+        branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
+    if(species[1]==FOURTH_SPECIES){
+        branch(*this, counterpoint_2->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
 
 
     writeToLogFile(("solution array size : " + std::to_string(solutionArray.size())).c_str());

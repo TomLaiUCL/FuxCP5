@@ -48,6 +48,7 @@ class Voice{
 
         int getLowerBound() { return lowerBound; }
         int getUpperBound() { return upperBound; }
+        int getSpecies() { return species; }
 
         IntVarArray getNotes() { return notes; }
         IntVarArray getMelodicIntervals();
@@ -66,8 +67,6 @@ class Voice{
         BoolVarArray getIsHighest();
 
         IntVarArray getHInterval();
-
-        int getSpecies();
 
         IntVarArgs getSecondHInterval();
 };

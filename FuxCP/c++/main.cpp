@@ -15,14 +15,14 @@ int main(int argc, char* argv[]) {
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
-        vector<Species> species = {FIRST_SPECIES, FIRST_SPECIES};
+        vector<Species> species = {FOURTH_SPECIES, FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
-        vector<int> cantusFirmus = {60, 62, 65, 64, 67, 65, 64, 62, 60};
+        vector<int> cantusFirmus = {64,   60,   62,   60,   57,   69,   67,   64,   65,   64};
         
         int size = cantusFirmus.size();
-        vector<int> v_type = {-1, 2};
+        vector<int> v_type = {1, -2};
 
         vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
         //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
@@ -102,13 +102,12 @@ int main(int argc, char* argv[]) {
             }
         }
         else{
-            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES || species[0]==FOURTH_SPECIES){
-                for(int j = 0; j < problem->getSize(); j++){
+            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES ){
+                for(int j = 0; j < test->getIdx(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
-            } else if(species[0]==SECOND_SPECIES ){
-                cout << "HERE" << endl;
-                for(int j = 1; j < problem->getSize(); j++){
+            } else if(species[0]==SECOND_SPECIES || species[0]==FOURTH_SPECIES){
+                for(int j = 1; j < test->getIdx(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
             }
@@ -164,11 +163,11 @@ int main(int argc, char* argv[]) {
             }
         }
         else{
-            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES || species[0]==FOURTH_SPECIES){
+            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
                 for(int j = 0; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
-            } else if(species[0]==SECOND_SPECIES){
+            } else if(species[0]==SECOND_SPECIES || species[0]==FOURTH_SPECIES){
                 for(int j = 1; j < problem->getSize(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }

@@ -1,28 +1,38 @@
-#ifndef FUXCP_BASE_FOURTHSPECIESCOUNTERPOINT_HPP
-#define FUXCP_BASE_FOURTHSPECIESCOUNTERPOINT_HPP
+#ifndef FUXCP_BASE_FIFTHSPECIESCOUNTERPOINT_HPP
+#define FUXCP_BASE_FIFTHSPECIESCOUNTERPOINT_HPP
 
 #include "Part.hpp"
 #include "CantusFirmus.hpp"
 #include "../constraints.hpp"
 
-/**
- * This class represents a counterpoint of the first species. It inherits from the Part class.
- * todo modify it so it also works for 3 and 4 voices. Add the appropriate constraints by making a constructor that takes the number of voices as a parameter
- * todo maybe it should take a Stratum (object or just IntVarArray) for the lowest voice or something like that depending on the formalization
- */
-class FourthSpeciesCounterpoint : public Part{
+class FifthSpeciesCounterpoint : public Part{
+
 protected:
 
     int motherSpecies;                          /// The species from which this is called.
+    int solutionLength;
+    int m2Len;
     CantusFirmus* cantus;
-    IntVarArray fourthSpeciesNotesCp;
-    IntVarArray fourthSpeciesHIntervals;
-    IntVarArray fourthSpeciesMelodicIntervals;
-    IntVarArray m2IntervalsArray;
+    IntVarArray fifthSpeciesNotesCp;
+    IntVarArray fifthSpeciesHIntervals;
     IntVarArray firstHInterval;
-    IntVarArray m2ZeroArray;
-    
+    IntVarArray fifthSpeciesSuccMIntervals;
+    IntVarArray fifthSpeciesMIntervals;
+    IntVarArray fifthSpeciesMTAIntervals;
+    IntVarArray fifthSpeciesM2Intervals;
+    IntVarArray fifthSpeciesMAllIntervals;
+    IntVarArray fifthSpeciesMotions;
+    IntVarArray fifthSpeciesMotionsCosts;
+    IntVarArray speciesArray;
+    BoolVarArray isNthSpeciesArray;
+    BoolVarArray isConstrainedArray;
+    BoolVarArray isMostlyThirdArray;
+    BoolVarArray isThirdSpeciesArray;
+    BoolVarArray isFourthSpeciesArray;
+    BoolVarArray isConstrainedArray;
+
 public:
+
     /**
      * General constructor. It takes the mother species as an argument and calls the super constructor from the part class.
      * Additionally, it sets all the 1st species specific variables as well as the general rules that have to be applied
@@ -43,17 +53,8 @@ public:
      * @param bm parameter specifying if borrow Mode is enabled or not
      * @param nV the number of voices - as it is a 2 voice constructor, this parameter contains the number of voices
      */
-    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
+    FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV);
-
-    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
-    , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
-
-    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
-    , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2);
-
-    FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
-    , vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3);
 
     /**
      * This function returns a string with the characteristics of the counterpoint. It calls the to_string() method from
@@ -67,8 +68,8 @@ public:
     /// Copy function
     // virtual Space *copy() override;
 
-    FourthSpeciesCounterpoint(Home home, FourthSpeciesCounterpoint& s); // clone constructor
-    FourthSpeciesCounterpoint* clone(Home home) override;
+    FifthSpeciesCounterpoint(Home home, FifthSpeciesCounterpoint& s); // clone constructor
+    FifthSpeciesCounterpoint* clone(Home home) override;
 
     virtual IntVarArray getBranchingNotes() override;
 
@@ -80,6 +81,8 @@ public:
 
     int getHIntervalSize() override;
 
+    void createSpeciesArrays(Home home);
+
 };
 
-#endif //FUXCP_BASE_FIRSTSPECIESCOUNTERPOINT_HPP
+#endif

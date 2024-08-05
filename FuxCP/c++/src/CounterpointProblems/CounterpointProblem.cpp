@@ -164,12 +164,25 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
     for(int i = 0; i < size; i++){
         IntVarArray voices = IntVarArray(*this, nVoices, 0, 127);
         rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
-        rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
+        if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
+            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
+        } else{
+            rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
+        }
         if(nVoices>=3){
-            rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
+            if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
+                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
+            } else{
+                cout << "HERE UwU" << endl;
+                rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
+            }
         }
         if(nVoices>=4){
-            rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
+            if(counterpoint_3->getSpecies()==FOURTH_SPECIES && i!=size-1){
+                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
+            } else{
+                rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
+            }
         }
         IntVarArray order = IntVarArray(*this, nVoices, 0, nVoices-1);
         sorted_voices.push_back(IntVarArray(*this, nVoices, 0, 127));
@@ -192,24 +205,42 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
 
         rel(*this, lowest->getFirstNotes()[i], IRT_NQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsNotLowestIdx(i)));
         
-        if(nVoices==2){
+        if(nVoices>=2){
+            if(counterpoint_1->getSpecies()!=FOURTH_SPECIES || i==size-1){
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowestIdx(i)));
+            } else {
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowestIdx(i)));
+            }
 
-            rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowestIdx(i))); 
+        } 
+        if(nVoices==3){
 
-        } else if(nVoices==3){
-
-            rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowestIdx(i))); //else it is the cp1
             rel(*this, expr(*this, counterpoint_1->getIsNotLowestIdx(i)!=cantusFirmus->getIsNotLowestIdx(i)), IRT_EQ, counterpoint_2->getIsNotLowestIdx(i)); //else it is the cp2 (in 3 voices)
-
-        } else {
-
-            rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowestIdx(i)));
-            rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(counterpoint_1->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowestIdx(i)));
+            
+        }  
+        if(nVoices==4){
+            
+            if(counterpoint_2->getSpecies()!=FOURTH_SPECIES || i==size-1){
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(counterpoint_1->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowestIdx(i)));
+            } else {
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(counterpoint_1->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowestIdx(i)));
+            }
             rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1) && (counterpoint_1->getIsNotLowestIdx(i)==1) && (counterpoint_2->getIsNotLowestIdx(i)==1)), IRT_NQ, counterpoint_3->getIsNotLowestIdx(i));
 
             rel(*this, upper3->getFirstNotes()[i], IRT_EQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsHighest()[i]));
-            rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
-            rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
+
+            if(counterpoint_1->getSpecies()!=FOURTH_SPECIES || i==size-1){
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
+            } else {
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
+            }
+
+            if(counterpoint_2->getSpecies()!=FOURTH_SPECIES || i==size-1){
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
+            } else {
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
+            }
+
             rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0) && (counterpoint_1->getIsHighest()[i]==0) && (counterpoint_2->getIsHighest()[i]==0)), IRT_EQ, counterpoint_3->getIsHighest()[i]);
         }
 

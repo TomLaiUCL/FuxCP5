@@ -7,6 +7,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
      int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm)
 {
+    
     motherSpecies =         mSpecies;
     cout << "Lower bound : " << endl;
     cout << lowerBound << endl;
@@ -15,6 +16,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
+    
     /*
     if borrowMode is enabled, the extended domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
     that he does like to borrow notes, so the borrow cost should just do the job and still allow borrowed notes, not outright forbid them
@@ -42,6 +44,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
             rel(home, (fourthSpeciesHIntervals[i])==((fourthSpeciesNotesCp[i]-low->getNotes()[floor(i/2)*4])%12));
         }
     }
+
 
     firstHInterval = IntVarArray(home, fourthSpeciesHIntervals.slice(0, 2, fourthSpeciesHIntervals.size()));
 
@@ -103,15 +106,15 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 
     isConsonance = BoolVarArray(home, h_intervals.size(), 0, 1);
     for(int i = 0; i < isConsonance.size(); i++){
-        rel(home, expr(home, (h_intervals[i]==UNISSON)||(h_intervals[i]==MINOR_THIRD)||(h_intervals[i]==MAJOR_THIRD)||(h_intervals[i]==PERFECT_FIFTH)||
-            (h_intervals[i]==MINOR_SIXTH)||(h_intervals[i]==MAJOR_SIXTH)||(h_intervals[i]==PERFECT_OCTAVE)), IRT_EQ, isConsonance[i]);
+        rel(home, expr(home, (abs(h_intervals[i])==UNISSON)||(abs(h_intervals[i])==MINOR_THIRD)||(abs(h_intervals[i])==MAJOR_THIRD)||(abs(h_intervals[i])==PERFECT_FIFTH)||
+            (abs(h_intervals[i])==MINOR_SIXTH)||(abs(h_intervals[i])==MAJOR_SIXTH)||(abs(h_intervals[i])==PERFECT_OCTAVE)), IRT_EQ, isConsonance[i]);
     }
 
     isNoSyncopeArray = BoolVarArray(home, nMeasures-1, 0, 1);
     for(int i = 0; i < isNoSyncopeArray.size(); i++){
         rel(home, fourthSpeciesMelodicIntervals[(i*2)+1], IRT_EQ, 0, Reify(isNoSyncopeArray[i]));
     }
-
+    
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
     
     for(int i = 0; i < m_intervals_brut.size()-1; i+=4/notesPerMeasure.at(FOURTH_SPECIES)){
@@ -137,66 +140,26 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     snycopeCostArray = IntVarArray(home, (fourthSpeciesMelodicIntervals.size())/2, IntSet({0, syncopationCost}));
     
     //link them
-    //rel(home, fourthSpeciesNotesCp, IRT_EQ, notes.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), notes.size()));
+    rel(home, fourthSpeciesNotesCp, IRT_EQ, notes.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), notes.size()));
     rel(home, fourthSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FOURTH_SPECIES),m_intervals_brut.size()));
     rel(home, fourthSpeciesHIntervals, IRT_EQ, h_intervals.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), h_intervals.size()));
 
-    //4.H1 : arsis harmonies must be consonant
-    /*dom(home, fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-3], IntSet({-MAJOR_SEVENTH, -MINOR_SEVENTH, -MAJOR_SECOND, -MINOR_SECOND, UNISSON,
-        MINOR_SECOND, MAJOR_SECOND, MINOR_SEVENTH, MAJOR_SEVENTH}));
-
-    for(int i = 1; i < fourthSpeciesHIntervals.size(); i+=2){
-        if(i==1){ //if first interval
-            dom(home, fourthSpeciesHIntervals[i], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
-                -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
-        } else if(i==fourthSpeciesHIntervals.size()-2){ //if penultimate interval
-            dom(home, fourthSpeciesHIntervals[i], IntSet({-MAJOR_SIXTH, -MINOR_THIRD, UNISSON, MINOR_THIRD, MAJOR_SIXTH}));
-        } else {
-            BoolVar lowerStays = BoolVar(home, 0, 1);
-            BoolVar notLowestAndLowerStays = BoolVar(home, 0, 1);
-            BoolVar lowerNotStays = BoolVar(home, 0, 1);
-            BoolVar notLowestAndNotLowerStays = BoolVar(home, 0, 1);
-            IntVar hDis = IntVar(home, -11, 11);
-            IntVar hCons = IntVar(home, -11, 11);
-
-            rel(home, low->getMelodicIntervals()[(floor(i/2)-1)*4], IRT_EQ, 0, Reify(lowerStays));
-            rel(home, lowerStays, BOT_AND, isLowest[floor(i/2)], notLowestAndLowerStays);
-            rel(home, low->getMelodicIntervals()[(floor(i/2)-1)*4], IRT_NQ, 0, Reify(lowerNotStays));
-            rel(home, lowerNotStays, BOT_AND, isLowest[floor(i/2)], notLowestAndNotLowerStays);
-
-            dom(home, hDis, IntSet({MINOR_SECOND, MAJOR_SECOND, PERFECT_FOURTH, AUGMENTED_FOURTH, MINOR_SEVENTH, MAJOR_SEVENTH,
-                -MINOR_SECOND, -MAJOR_SECOND, -PERFECT_FOURTH, -AUGMENTED_FOURTH, -MINOR_SEVENTH, -MAJOR_SEVENTH}));
-            dom(home, hCons, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, 
-                -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH}));
-
-            rel(home, hDis, IRT_EQ, fourthSpeciesHIntervals[i], Reify(notLowestAndLowerStays));
-            rel(home, hCons, IRT_EQ, fourthSpeciesHIntervals[i], Reify(notLowestAndNotLowerStays));
-        }
-    }
-    dom(home, fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-1], IntSet({-PERFECT_FIFTH, -MAJOR_THIRD, UNISSON, MAJOR_THIRD, PERFECT_FIFTH}));
-
-    for(int i = 0; i < isNoSyncopeArray.size(); i++){
-        rel(home, (isNoSyncopeArray[i]) >> (fourthSpeciesHIntervals[(i*2)+1]!=MINOR_SECOND && fourthSpeciesHIntervals[(i*2)+1]!=MAJOR_SECOND &&
-            fourthSpeciesHIntervals[(i*2)+1]!=PERFECT_FOURTH && fourthSpeciesHIntervals[(i*2)+1]!=AUGMENTED_FOURTH && 
-            fourthSpeciesHIntervals[(i*2)+1]!=MINOR_SEVENTH && fourthSpeciesHIntervals[(i*2)+1]!=MAJOR_SEVENTH &&
-                fourthSpeciesHIntervals[(i*2)+1]!=-MINOR_SECOND && fourthSpeciesHIntervals[(i*2)+1]!=-MAJOR_SECOND && 
-                fourthSpeciesHIntervals[(i*2)+1]!=-PERFECT_FOURTH && fourthSpeciesHIntervals[(i*2)+1]!=-AUGMENTED_FOURTH &&
-                fourthSpeciesHIntervals[(i*2)+1]!=-MINOR_SEVENTH && fourthSpeciesHIntervals[(i*2)+1]!=-MAJOR_SEVENTH));
-    }
+    //4.H1 : arsis harmonies must be consonant (complex in anton's code)
+   for(int i = 1; i < fourthSpeciesHIntervals.size()-1; i+=2){
+        dom(home, fourthSpeciesHIntervals[i], IntSet(CONSONANCES));
+   }
 
     //4.H2 : If the cantusFirmus is in the upper part, then no hamonic seventh
     for(int j = 1; j < c->getIsNotLowest().size(); j++){
-        BoolVar band = BoolVar(home, 0, 1);
-        rel(home, (!c->getIsLowestIdx(j)) >> (band));
-        rel(home, firstHInterval[j], IRT_NQ, MINOR_SEVENTH, Reify(band, RM_IMP));
-        rel(home, firstHInterval[j], IRT_NQ, MAJOR_SEVENTH, Reify(band, RM_IMP));
+        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MINOR_SEVENTH && firstHInterval[j]!=-MINOR_SEVENTH));
+        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MAJOR_SEVENTH && firstHInterval[j]!=-MAJOR_SEVENTH));
     }
-
+    
     //Melodic intervals cannot be greater than Minor Sixth (except octave)
     dom(home, fourthSpeciesMelodicIntervals, IntSet({UNISSON, -PERFECT_OCTAVE, -MINOR_SIXTH, -PERFECT_FIFTH, -AUGMENTED_FOURTH, -PERFECT_FOURTH, 
         -MAJOR_THIRD, -MINOR_THIRD, -MAJOR_SECOND, -MINOR_SECOND, PERFECT_OCTAVE, MINOR_SIXTH, PERFECT_FIFTH, AUGMENTED_FOURTH, PERFECT_FOURTH, 
         MAJOR_THIRD, MINOR_THIRD, MAJOR_SECOND, MINOR_SECOND}));
-
+    
     //no chromatic motion between 3 consecutive notes
     for(int i = 1; i < fourthSpeciesMelodicIntervals.size()-1; i++){
         BoolVar b1 = BoolVar(home, 0, 1);
@@ -212,18 +175,39 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
         rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
         rel(home, b3, BOT_AND, b4, 0);
     }
-
+    
     //4.M1 Arsis half notes should be the same as their next halves in thesis
     for(int i = 0; i < snycopeCostArray.size(); i++){
         rel(home, (fourthSpeciesMelodicIntervals[(i*2)+1]!=0) >> (snycopeCostArray[i]==syncopationCost));
         rel(home, (fourthSpeciesMelodicIntervals[(i*2)+1]==0) >> (snycopeCostArray[i]==0));
     }
-
+    
     //4.M2 notes and two beats further are preferred to be different
     for(int i = 0; i < m2ZeroArray.size(); i++){
         rel(home, (fourthSpeciesNotesCp[(i*2)+1]==fourthSpeciesNotesCp[(i*2)+5]) >> (m2ZeroArray[i]==m2ZeroCost));
         rel(home, (fourthSpeciesNotesCp[(i*2)+1]!=fourthSpeciesNotesCp[(i*2)+5]) >> (m2ZeroArray[i]==0));
-    }*/
+    }
+    
+    //4.P1
+    for(int i = 1; i < nMeasures-1; i++){
+        //BoolVar bnot = BoolVar(home, 0, 1);
+        //rel(home, isConsonance[(i*4)], BOT_EQV, BoolVar(home, 0,0), bnot);
+        //rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_LE, 0, Reify(bnot, RM_IMP));
+        //rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_GQ, -2, Reify(bnot, RM_IMP));
+
+        //rel(home, (isConsonance[i*4]==0) >> (fourthSpeciesMelodicIntervals[(i*2)]==-MINOR_SECOND || fourthSpeciesMelodicIntervals[(i*2)]==-MAJOR_SECOND));
+    }
+
+    //4.P2
+    for(int i = 0; i < nMeasures-1; i++){
+        BoolVar buni = BoolVar(home, 0, 1);
+        BoolVar band = BoolVar(home, 0, 1);
+        rel(home, fourthSpeciesHIntervals[(i*2)+1], IRT_EQ, UNISSON, buni);
+        rel(home, expr(home, !c->getIsNotLowestIdx(i)), BOT_AND, buni, band);
+        rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 1, Reify(band, RM_IMP));
+        rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 2, Reify(band, RM_IMP));
+    }
+    
 }   
 
 FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
@@ -231,10 +215,10 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
     //Must start with a perfect consonance
-    //dom(home, fourthSpeciesHIntervals[1], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));
+    dom(home, fourthSpeciesHIntervals[1], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));
 
     //4.H3 Penult note condition
-    //ite(home, isLowest[isLowest.size()-2], IntVar(home, 9, 9), IntVar(home, 3, 3), fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]);
+    rel(home, (isNotLowest[isNotLowest.size()-2]) >> (fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MAJOR_SIXTH));
 
     costs = IntVarArray(home, 6, 0, 1000000);
     cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation"};
@@ -253,6 +237,63 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     add_cost(home, 5, snycopeCostArray, costs);
 }
 
+FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
+    vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2):
+    FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
+{
+    varietyCostArray = IntVarArray(home, 3*(fourthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
+
+    //dom(home, h_intervals[h_intervals.size()-3], IntSet({-MAJOR_SEVENTH, -MINOR_SEVENTH, -MAJOR_SECOND, -MINOR_SECOND, UNISSON, MINOR_SECOND,
+    //    MAJOR_SECOND, MINOR_SEVENTH, MAJOR_SEVENTH}));
+
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation", "variety"};
+
+    //set cost[0] to be fifth cost
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(1, 4/notesPerMeasure.at(FOURTH_SPECIES), fifthCostArray.size())), costs);
+    //set cost[1] to be octave cost
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(1, 4/notesPerMeasure.at(FOURTH_SPECIES), octaveCostArray.size())), costs);
+    //set cost[2] to be melodic cost
+    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
+    //set cost[3] to be off cost
+    add_cost(home, 3, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
+    //need to set cost[4] to be m2Zero cost
+    add_cost(home, 4, m2ZeroArray, costs);
+    //need to set cost[5] to be syncopation cost
+    add_cost(home, 5, snycopeCostArray, costs);
+    //need to set cost[6] to be variety cost
+    add_cost(home, 6, varietyCostArray, costs);
+    
+}
+
+FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
+    vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
+    FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
+{
+    varietyCostArray = IntVarArray(home, 3*(fourthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
+
+    //dom(home, h_intervals[h_intervals.size()-3], IntSet({-MAJOR_SEVENTH, -MINOR_SEVENTH, -MAJOR_SECOND, -MINOR_SECOND, UNISSON, MINOR_SECOND,
+    //    MAJOR_SECOND, MINOR_SEVENTH, MAJOR_SEVENTH}));
+
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation", "variety"};
+
+    //set cost[0] to be fifth cost
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(1, 4/notesPerMeasure.at(FOURTH_SPECIES), fifthCostArray.size())), costs);
+    //set cost[1] to be octave cost
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(1, 4/notesPerMeasure.at(FOURTH_SPECIES), octaveCostArray.size())), costs);
+    //set cost[2] to be melodic cost
+    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
+    //set cost[3] to be off cost
+    add_cost(home, 3, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
+    //need to set cost[4] to be m2Zero cost
+    add_cost(home, 4, m2ZeroArray, costs);
+    //need to set cost[5] to be syncopation cost
+    add_cost(home, 5, snycopeCostArray, costs);
+    //need to set cost[6] to be variety cost
+    add_cost(home, 6, varietyCostArray, costs);
+}
+
 /**
  * This function returns a string with the characteristics of the counterpoint. It calls the to_string() method from
  * the Part class and adds 1st species specific characteristics.
@@ -262,6 +303,8 @@ string FourthSpeciesCounterpoint::to_string() const {
     string text = Part::to_string() + "\nFourth species :\n";
     text += "No Syncope array : " + boolVarArray_to_string(isNoSyncopeArray) + "\n";
     text += "H intervals array : " + intVarArray_to_string(fourthSpeciesHIntervals) + "\n";
+    text += "M intervals array : " + intVarArray_to_string(fourthSpeciesMelodicIntervals) + "\n";
+    text += "Consonance array : " + boolVarArray_to_string(isConsonance) + "\n";
     return text;
 }
 
@@ -273,9 +316,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, FourthSpeciesCou
     fourthSpeciesMelodicIntervals.update(home, s.fourthSpeciesMelodicIntervals);
     m2IntervalsArray.update(home, s.m2IntervalsArray);
     firstHInterval.update(home, s.firstHInterval);
-    isNoSyncopeArray.update(home, s.isNoSyncopeArray);
     m2ZeroArray.update(home, s.m2ZeroArray);
-    snycopeCostArray.update(home, s.snycopeCostArray);
 }
 
 FourthSpeciesCounterpoint* FourthSpeciesCounterpoint::clone(Home home){
@@ -299,5 +340,5 @@ IntVarArray FourthSpeciesCounterpoint::getFirstMInterval(){
 }
 
 int FourthSpeciesCounterpoint::getHIntervalSize(){
-    return h_intervals.size();
+    return fourthSpeciesHIntervals.size();
 }

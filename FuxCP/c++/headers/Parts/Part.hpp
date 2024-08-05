@@ -98,14 +98,16 @@ class Part : public Voice {
         IntVarArray thirdSpeciesMelodicIntervals;      /// The melodic intervals between the notes that have to follow the 2nd species rules
         BoolVarArray is5QNArray;
         IntVarArray cambiataCostArray;
+
+        //
+        BoolVarArray isNoSyncopeArray;
+        IntVarArray snycopeCostArray;
     public:
         Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs,
             vector<int> s_costs, int nV, int bm);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
         Part(Home home, Part& s);  // clone constructor
-
-        int getSpecies() { return species; }
 
         /// must be implemented in the child classes, returns the variables to branch on
         // virtual IntVarArray getBranchingNotes();
@@ -195,6 +197,10 @@ class Part : public Voice {
         IntVarArray getThirdSpeciesMIntervals();
 
         IntVarArray getCambiataCostArray();
+
+        BoolVarArray getNoSyncope();
+
+        IntVarArray getSyncopeCostArray();
 
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 

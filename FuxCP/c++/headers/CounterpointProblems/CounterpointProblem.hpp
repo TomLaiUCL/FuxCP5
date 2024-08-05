@@ -70,7 +70,7 @@ public:
 
     /// Getters
     //todo add here getters if necessary
-    Part* getCounterpoint(){ return counterpoint_1; }
+    //Part* getCounterpoint(){ return counterpoint_1; }
     ///destructor
     //todo release the allocated memory (each object created must be deleted)
     virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; delete counterpoint_1; delete counterpoint_2; delete counterpoint_3; }

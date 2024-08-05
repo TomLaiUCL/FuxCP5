@@ -307,7 +307,7 @@ void P1_2_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
 
 void P1_2_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
     for(int j = 0; j < part->getFirstSpeciesMotions().size()-1; j++){
-        //set a cost when it is reached through direct motion, it is 0 when not
+        
         rel(home, (part->getSecondSpeciesRealMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||part->getFirstSpeciesHIntervals()[j+1]==7))>>
             (part->getDirectCostArray()[j]==part->getDirectMoveCost()));
         rel(home, (part->getSecondSpeciesRealMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0&&part->getFirstSpeciesHIntervals()[j+1]!=7))>>
@@ -333,6 +333,13 @@ void P1_2_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
     }
 }
 
+void P3_0_noBattuta(Home home, Part* part){
+    for(int j = 0; j < part->getMotions().size(); j++){
+        rel(home, expr(home, part->getMotions()[j]==CONTRARY_MOTION && part->getHInterval()[j+1]==0 && 
+            part->getMelodicIntervals()[j]<-4), BOT_AND, part->getIsNotLowest()[j], 0);
+    }
+}
+
 void P3_1_noBattuta(Home home, Part* part){
     for(int j = 0; j < part->getFirstSpeciesMotions().size(); j++){
         rel(home, expr(home, part->getFirstSpeciesMotions()[j]==CONTRARY_MOTION && part->getFirstSpeciesHIntervals()[j+1]==0 && 
@@ -353,7 +360,7 @@ void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray s
     // cout << "SUCC SIZE :" + to_string(succ_cost.size()) << endl;
     for(int p1 = 1; p1 < parts.size(); p1++){
         for(int p2 = p1+1; p2 < parts.size(); p2++){
-            if(species[p1-1]!=SECOND_SPECIES && species[p2-1]!=SECOND_SPECIES){
+            if(species[p1-1]!=SECOND_SPECIES && species[p2-1]!=SECOND_SPECIES && (species[p1-1]!=FOURTH_SPECIES &&  species[p2-1]!=FOURTH_SPECIES)){
                 
                 for(int i = 0; i < parts[p1]->getFirstHInterval().size()-1; i++){
                     // cout << "IDX : " + to_string(idx) << endl;
@@ -392,6 +399,44 @@ void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray s
                     //first expression states that the melodic succ interval is not a third, second that we have successive fifths
                     rel(home, successiveCostArray[idx], IRT_EQ, parts[p1]->getSuccCost(), Reify(expr(home, (case1==1 || case2==1)), RM_IMP));
                     idx++;
+                }
+            }
+            else {
+                
+                IntVarArray tempHIntervals = IntVarArray(home, parts[p1]->getNMeasures(), 0, PERFECT_OCTAVE);
+                if(species[p1-1]==FOURTH_SPECIES && species[p2-1]==FOURTH_SPECIES){
+                    for(int i = 0; i < tempHIntervals.size()-1; i++){
+                        rel(home, tempHIntervals[i] == abs(parts[p1]->getNotes()[(i*4)+2]-parts[p2]->getNotes()[(i*4)+2])%12);
+                    }
+                } else if(species[p1-1]==FOURTH_SPECIES && species[p2-1]!=FOURTH_SPECIES){
+                    for(int i = 0; i < tempHIntervals.size()-1; i++){
+                        rel(home, tempHIntervals[i] == abs(parts[p1]->getNotes()[(i*4)+2]-parts[p2]->getNotes()[(i*4)])%12);
+                    }
+                } else if(species[p1-1]!=FOURTH_SPECIES && species[p2-1]==FOURTH_SPECIES){
+                    for(int i = 0; i < tempHIntervals.size()-1; i++){
+                        rel(home, tempHIntervals[i] == abs(parts[p1]->getNotes()[(i*4)]-parts[p2]->getNotes()[(i*4)+2])%12);
+                    }
+                }
+                rel(home, tempHIntervals[tempHIntervals.size()-1] == abs(parts[p1]->getNotes()[parts[p1]->getNotes().size()-1]-
+                    parts[p2]->getNotes()[parts[p2]->getNotes().size()-1])%12);
+
+                for(int i = 0; i < tempHIntervals.size()-1; i++){
+                    BoolVar firstNotFifth = BoolVar(home, 0, 1);
+                    BoolVar secondNotFifth = BoolVar(home, 0, 1);
+                    BoolVar noSuccFifth = BoolVar(home, 0, 1);
+
+                    BoolVar succPCons = BoolVar(home, 0, 1);
+                    BoolVar succPConsNotFifth = BoolVar(home, 0, 1);
+
+                    rel(home, tempHIntervals[i], IRT_NQ, 7, Reify(firstNotFifth));
+                    rel(home, tempHIntervals[i+1], IRT_NQ, 7, Reify(secondNotFifth));
+                    rel(home, firstNotFifth, BOT_OR, secondNotFifth, noSuccFifth);
+
+                    rel(home, ((tempHIntervals[i]==UNISSON || tempHIntervals[i]==PERFECT_FIFTH)&&(tempHIntervals[i+1]==UNISSON || 
+                        tempHIntervals[i+1]==PERFECT_FIFTH)) >> (succPCons));
+                    rel(home, noSuccFifth, BOT_AND, succPCons, succPConsNotFifth);
+                    rel(home, succPConsNotFifth >> (successiveCostArray[i]==parts[p1]->getSuccCost()));
+                    rel(home, !succPConsNotFifth >> (successiveCostArray[i]==0));
                 }
             }
         }

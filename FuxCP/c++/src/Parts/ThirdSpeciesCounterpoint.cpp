@@ -277,7 +277,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV3)
 {
     varietyCostArray = IntVarArray(home, 3*(thirdSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
-    directCostArray = IntVarArray(home, thirdSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
+    directCostArray = IntVarArray(home, thirdSpeciesMotions.size()-1,IntSet({0, 2, directMoveCost}));
 
     //1.H7,H8 adapted
     //rel(home, thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==UNISSON||thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==MINOR_THIRD||thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-1]==PERFECT_FIFTH||

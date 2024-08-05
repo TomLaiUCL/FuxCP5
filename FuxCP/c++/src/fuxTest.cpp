@@ -35,6 +35,8 @@ FuxTest::FuxTest(int testNumber, int i){
         test_3v_2sp_fig125_setter(i);
     } else if(testNumber==133){
         test_3v_3sp_fig133_setter(i);
+    } else if(testNumber==146){
+        test_3v_4sp_fig146_setter(i);
     } else if(testNumber==166){
         test_4v_1sp_fig166_setter(i);
     } else if(testNumber==167){
@@ -181,6 +183,7 @@ void FuxTest::test_2v_4sp_fig74_setter(int i){
     spList = {FOURTH_SPECIES};
     cantusFirmus = {62,   65,   64,   62,   67,   65,   69,   67,   65,   64,   62}; //1sp 2v cf
     cp =           {0 ,50,50,62,62,60,60,59,59,64,64,62,62,65,65,64,64,62,62,61,62};
+    cout << cp.size() << endl;
     v_type = {-1};
     idx = i;
     borrowMode = 1;
@@ -249,6 +252,17 @@ void FuxTest::test_3v_3sp_fig133_setter(int i){
     cp =           {53,50,53,55,57,53,57,59,60,52,55,57,59,62,59,57,55,57,59,61,62,64,65,62,60,57,60,62,64,62,60,59,57,62,57,59,61,57,59,60,62,
                     50,         50,         48,         55,         52,         50,         53,         48,         50,         57,         50};
     v_type = {-1 ,-2};
+    idx = i;
+    borrowMode = 1;
+}
+
+void FuxTest::test_3v_4sp_fig146_setter(int i){
+    cout << "Fig. 146" << endl;
+    spList = {FOURTH_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {64,   60,   62,   60,   57,   69,   67,   64,   65,   64};
+    cp =           {00,76,76,72,72,71,71,69,69,72,72,74,74,72,72,69,69,71,68,
+                    52,   57,   55,   57,   53,   53,   52,   48,   50,   52};
+    v_type = {1 ,-2};
     idx = i;
     borrowMode = 1;
 }

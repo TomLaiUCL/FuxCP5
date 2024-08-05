@@ -3,6 +3,7 @@
 Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
     nMeasures = nMes; 
     size = nMes*4;
+    species = sp;
     isNotLowest        = BoolVarArray(home, nMeasures, 0, 1);
     isHighest          = BoolVarArray(home, nMeasures, 0, 1);
 
@@ -10,8 +11,6 @@ Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
 
     lowerBound = lb;
     upperBound = ub;
-
-    species = sp;
 
     notes = IntVarArray(home, size-3, lowerBound, upperBound);
     //this is so that species other than first species are allowed to go beneath the lowest h_interval, since it is only calculated using the first note
@@ -64,10 +63,6 @@ IntVarArray Voice::getMelodicIntervals(){
 
 IntVarArray Voice::getHInterval(){
     return h_intervals;
-}
-
-int Voice::getSpecies(){
-    return species;
 }
 
 IntVarArgs Voice::getSecondHInterval(){

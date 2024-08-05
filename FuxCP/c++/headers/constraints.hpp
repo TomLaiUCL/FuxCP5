@@ -61,6 +61,8 @@ void P1_2_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
 void P1_2_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
+void P3_0_noBattuta(Home home, Part* part);
+
 void P3_1_noBattuta(Home home, Part* part);
 
 void P3_2_noBattuta(Home home, Part* part);
