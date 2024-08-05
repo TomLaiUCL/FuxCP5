@@ -155,6 +155,8 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     isNoSyncopeArray.update(home, s.isNoSyncopeArray);
     snycopeCostArray.update(home, s.snycopeCostArray);
 
+    speciesArray.update(home, s.speciesArray);
+
 //    mIntervalsCp.update(home, s.mIntervalsCp);
 //    motionsCfCp.update(home, s.motionsCfCp);
 }
@@ -368,4 +370,8 @@ BoolVarArray Part::getNoSyncope(){
 
 IntVarArray Part::getSyncopeCostArray(){
     return snycopeCostArray;
+}
+
+IntVarArray Part::getSpeciesArray(){
+    return speciesArray;
 }

@@ -23,13 +23,12 @@ protected:
     IntVarArray fifthSpeciesMAllIntervals;
     IntVarArray fifthSpeciesMotions;
     IntVarArray fifthSpeciesMotionsCosts;
-    IntVarArray speciesArray;
     BoolVarArray isNthSpeciesArray;
     BoolVarArray isConstrainedArray;
     BoolVarArray isMostlyThirdArray;
     BoolVarArray isThirdSpeciesArray;
     BoolVarArray isFourthSpeciesArray;
-    BoolVarArray isConstrainedArray;
+    BoolVarArray isNotCambiata;
 
 public:
 
@@ -55,6 +54,9 @@ public:
      */
     FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,  int v_type
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV);
+
+    FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, vector<int> m_costs
+    , vector<int> g_costs, vector<int> s_costs, int bm, int nV);
 
     /**
      * This function returns a string with the characteristics of the counterpoint. It calls the to_string() method from

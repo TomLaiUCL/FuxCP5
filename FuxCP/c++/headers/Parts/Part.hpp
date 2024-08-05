@@ -37,6 +37,7 @@ class Part : public Voice {
         IntVarArray varietyCostArray;
         IntVarArray directCostArray;
         BoolVarArray isConsonance;
+        IntVarArray speciesArray;
 
         vector<int> borrowed_scale;
         vector<int> scale;
@@ -201,6 +202,8 @@ class Part : public Voice {
         BoolVarArray getNoSyncope();
 
         IntVarArray getSyncopeCostArray();
+
+        IntVarArray getSpeciesArray();
 
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 

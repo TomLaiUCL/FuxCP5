@@ -24,7 +24,9 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     G6_noChromaticMelodies(*this, counterpoint_1, species);
 
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
-    H2_1_startWithPerfectConsonance(*this, counterpoint_1);
+    if(species!=FIFTH_SPECIES){
+        H2_1_startWithPerfectConsonance(*this, counterpoint_1);
+    }
 
     /// H3 from Thibault: The last harmonic interval must be a perfect consonance
     H3_1_endWithPerfectConsonance(*this, counterpoint_1);
@@ -48,10 +50,14 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     rel(*this, solutionArray, IRT_EQ, counterpoint_1->getBranchingNotes());
 
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
-    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    if(species==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
     if(species==FOURTH_SPECIES){
         branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
+    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    
     
 }
 // COPY CONSTRUCTOR
