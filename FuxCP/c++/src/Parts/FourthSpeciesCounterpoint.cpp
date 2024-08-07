@@ -39,7 +39,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     for(int i = 1; i < fourthSpeciesHIntervals.size(); i++){
         if(i%2==0){
             cout << i << endl;
-            rel(home, (fourthSpeciesHIntervals[i])==((fourthSpeciesNotesCp[i]-low->getNotes()[(i/2)*4])%12));
+            rel(home, (fourthSpeciesHIntervals[i])==((fourthSpeciesNotesCp[i]-low->getNotes()[(i/2)*4])%12)); 
         } else {
             rel(home, (fourthSpeciesHIntervals[i])==((fourthSpeciesNotesCp[i]-low->getNotes()[floor(i/2)*4])%12));
         }
@@ -190,12 +190,12 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     
     //4.P1
     for(int i = 1; i < nMeasures-1; i++){
-        //BoolVar bnot = BoolVar(home, 0, 1);
-        //rel(home, isConsonance[(i*4)], BOT_EQV, BoolVar(home, 0,0), bnot);
-        //rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_LE, 0, Reify(bnot, RM_IMP));
-        //rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_GQ, -2, Reify(bnot, RM_IMP));
+        BoolVar bnot = BoolVar(home, 0, 1);
+        rel(home, isConsonance[(i*4)], BOT_EQV, BoolVar(home, 0,0), bnot);
+        rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_LE, 0, Reify(bnot, RM_IMP));
+        rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_GQ, -2, Reify(bnot, RM_IMP));
 
-        //rel(home, (isConsonance[i*4]==0) >> (fourthSpeciesMelodicIntervals[(i*2)]==-MINOR_SECOND || fourthSpeciesMelodicIntervals[(i*2)]==-MAJOR_SECOND));
+        rel(home, (isConsonance[i*4]==0) >> (fourthSpeciesMelodicIntervals[(i*2)]==-MINOR_SECOND || fourthSpeciesMelodicIntervals[(i*2)]==-MAJOR_SECOND));
     }
 
     //4.P2
