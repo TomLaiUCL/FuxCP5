@@ -29,6 +29,7 @@ protected:
     BoolVarArray isThirdSpeciesArray;
     BoolVarArray isFourthSpeciesArray;
     BoolVarArray isNotCambiata;
+    IntVarArray m2ZeroCostArray;
 
 public:
 

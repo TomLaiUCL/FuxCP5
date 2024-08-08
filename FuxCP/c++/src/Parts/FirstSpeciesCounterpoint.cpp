@@ -188,6 +188,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
     M2_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
+    //1.P1
+    P1_1_3v_noDirectMotionFromPerfectConsonance(home, this);
+
     //P3 from Thibault : no battuta
     P3_1_noBattuta(home, this);
 

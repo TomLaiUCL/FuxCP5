@@ -145,15 +145,17 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     rel(home, fourthSpeciesHIntervals, IRT_EQ, h_intervals.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), h_intervals.size()));
 
     //4.H1 : arsis harmonies must be consonant (complex in anton's code)
-   for(int i = 1; i < fourthSpeciesHIntervals.size()-1; i+=2){
+    for(int i = 1; i < fourthSpeciesHIntervals.size()-1; i+=2){
         dom(home, fourthSpeciesHIntervals[i], IntSet(CONSONANCES));
-   }
-
-    //4.H2 : If the cantusFirmus is in the upper part, then no hamonic seventh
-    for(int j = 1; j < c->getIsNotLowest().size(); j++){
-        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MINOR_SEVENTH && firstHInterval[j]!=-MINOR_SEVENTH));
-        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MAJOR_SEVENTH && firstHInterval[j]!=-MAJOR_SEVENTH));
     }
+
+    //4.H3 Penult note condition
+    rel(home, (isNotLowest[isNotLowest.size()-2]) >> (fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MINOR_SEVENTH || 
+        fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MINOR_SEVENTH || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MAJOR_SEVENTH
+        || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MAJOR_SEVENTH));
+    rel(home, (!isNotLowest[isNotLowest.size()-2]) >> (fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MINOR_SECOND || 
+        fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MINOR_SECOND || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MAJOR_SECOND
+        || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MAJOR_SECOND));
     
     //Melodic intervals cannot be greater than Minor Sixth (except octave)
     dom(home, fourthSpeciesMelodicIntervals, IntSet({UNISSON, -PERFECT_OCTAVE, -MINOR_SIXTH, -PERFECT_FIFTH, -AUGMENTED_FOURTH, -PERFECT_FOURTH, 
@@ -214,11 +216,15 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
-    //Must start with a perfect consonance
-    dom(home, fourthSpeciesHIntervals[1], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));
 
-    //4.H3 Penult note condition
-    rel(home, (isNotLowest[isNotLowest.size()-2]) >> (fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MAJOR_SIXTH));
+    //4.H2 : If the 4th species is the lowest stratum, then no hamonic seventh
+    for(int j = 1; j < c->getIsNotLowest().size(); j++){
+        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MINOR_SEVENTH && firstHInterval[j]!=-MINOR_SEVENTH));
+        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MAJOR_SEVENTH && firstHInterval[j]!=-MAJOR_SEVENTH));
+    }
+
+    //Must start with a perfect consonance (since 1.H2 applies to the first note, which is most likely a rest in 4th species)
+    dom(home, fourthSpeciesHIntervals[1], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));
 
     costs = IntVarArray(home, 6, 0, 1000000);
     cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation"};
@@ -243,8 +249,11 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 {
     varietyCostArray = IntVarArray(home, 3*(fourthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
 
-    //dom(home, h_intervals[h_intervals.size()-3], IntSet({-MAJOR_SEVENTH, -MINOR_SEVENTH, -MAJOR_SECOND, -MINOR_SECOND, UNISSON, MINOR_SECOND,
-    //    MAJOR_SECOND, MINOR_SEVENTH, MAJOR_SEVENTH}));
+    //4.P5
+    for(int j = 0; j < nMeasures-1; j++){
+        rel(home, (low->getMelodicIntervals()[j]==0)==(isConsonance[(j*4)+2]==0));
+        rel(home, (low->getMelodicIntervals()[j]!=0)==(isConsonance[(j*4)+2]==1));
+    }
 
     costs = IntVarArray(home, 7, 0, 1000000);
     cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation", "variety"};
@@ -272,8 +281,11 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 {
     varietyCostArray = IntVarArray(home, 3*(fourthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
 
-    //dom(home, h_intervals[h_intervals.size()-3], IntSet({-MAJOR_SEVENTH, -MINOR_SEVENTH, -MAJOR_SECOND, -MINOR_SECOND, UNISSON, MINOR_SECOND,
-    //    MAJOR_SECOND, MINOR_SEVENTH, MAJOR_SEVENTH}));
+    //4.P5
+    for(int j = 0; j < nMeasures-1; j++){
+        rel(home, (low->getMelodicIntervals()[j]==0)==(isConsonance[(j*4)+2]==0));
+        rel(home, (low->getMelodicIntervals()[j]!=0)==(isConsonance[(j*4)+2]==1));
+    }
 
     costs = IntVarArray(home, 7, 0, 1000000);
     cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation", "variety"};

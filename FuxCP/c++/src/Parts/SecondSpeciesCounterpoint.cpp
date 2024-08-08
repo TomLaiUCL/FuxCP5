@@ -224,6 +224,7 @@ string SecondSpeciesCounterpoint::to_string() const {
     string text = "\nSecond species diminution array : " + boolVarArray_to_string(isDiminution) + "\n";
     text += "Second species isLowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
     text += "Second species h intervals : " + intVarArray_to_string(secondSpeciesHarmonicIntervals) + "\n";
+    text += "Second species direct Move Cost : " + intVarArray_to_string(directCostArray) + "\n";
     text += "First species : " + FirstSpeciesCounterpoint::to_string() + "\n";
     return text;
 }

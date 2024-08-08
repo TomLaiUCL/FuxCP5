@@ -72,6 +72,10 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     uniteCounterpoints();
     uniteCosts();
 
+    for(int i = 0; i < unitedCostNames.size(); i++){
+        cout << unitedCostNames[i] << endl;
+    }
+
     orderCosts();
 
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());

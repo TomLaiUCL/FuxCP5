@@ -306,13 +306,14 @@ void P1_2_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
 }
 
 void P1_2_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
+
     for(int j = 0; j < part->getFirstSpeciesMotions().size()-1; j++){
-        
         rel(home, (part->getSecondSpeciesRealMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||part->getFirstSpeciesHIntervals()[j+1]==7))>>
             (part->getDirectCostArray()[j]==part->getDirectMoveCost()));
         rel(home, (part->getSecondSpeciesRealMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0&&part->getFirstSpeciesHIntervals()[j+1]!=7))>>
             (part->getDirectCostArray()[j]==0));
     }
+    
 }
 
 void P1_2_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part){

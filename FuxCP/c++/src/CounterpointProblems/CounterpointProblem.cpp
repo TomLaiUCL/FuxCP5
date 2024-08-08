@@ -110,7 +110,6 @@ string CounterpointProblem::to_string() const {
     text += "\n";
     text += "All costs : \n";
     text += intVarArray_to_string(unitedCosts); 
-    text += "\n";
     text += "Lowest : \n";
     text += lowest->to_string();
     text += "\n";
@@ -173,7 +172,6 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
             if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
             } else{
-                cout << "HERE UwU" << endl;
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
             }
         }
