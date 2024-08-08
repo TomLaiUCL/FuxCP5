@@ -264,6 +264,7 @@ string FirstSpeciesCounterpoint::to_string() const {
     string text = Part::to_string() + "\nFirst species :\n";
     text += "First species first notes: " + intVarArray_to_string(firstSpeciesNotesCp) + "\n";
     text += "First species isLowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
+    text += "First species motions : " + intVarArray_to_string(firstSpeciesMotions) + "\n";
     text += "First species h intervals : " + intVarArray_to_string(firstSpeciesHarmonicIntervals) + "\n";
     return text;
 }

@@ -35,7 +35,7 @@ void* create_new_problem(int* cantusFirmus, int size, int n_cp, int* splist, int
     // return (void*) new Problem(cf, size, n_cp, sp, vt, b_mode, min_skips, gen, mot, mel, spec, imp, t_off, sc, scale_size, chr, chrom_size, brw, borrow_size);
 
     vector<Species> speciesList = convertToSpeciesVector(sp);
-    return create_problem(cf, speciesList, C, 0, 127, vt, mel, gen, spec, imp, b_mode);
+    return create_problem(cf, speciesList, vt, mel, gen, spec, imp, b_mode);
 }
 
 /**

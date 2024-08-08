@@ -52,7 +52,8 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         rel(home, (isNotLowest[i]==0) >> (motions[i]==-1));
     }
 
-    //dom(home, h_intervals, IntSet(CONSONANCES));
+    dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+        -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
 
     if(nV==TWO_VOICES){
         /// H2 from Thibault: The first harmonic interval must be a perfect consonance

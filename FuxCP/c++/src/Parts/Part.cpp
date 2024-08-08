@@ -69,10 +69,9 @@ Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_ty
 
 string Part::to_string() const{
     string part = "Part characteristics :\n";
-    part += "Part notes : \n";
-    part += intVarArray_to_string(notes);
+    part += "Part costs : \n";
+    part += intVarArray_to_string(costs);
     part += "\n";
-    part += "is Highest : " + boolVarArray_to_string(isHighest) + "\n";
     return part;
 }
 

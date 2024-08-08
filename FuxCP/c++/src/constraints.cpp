@@ -52,7 +52,8 @@ void G9_lastChordSameAsFundamental(Home home, Stratum* lowest, Part* cantusFirmu
 }   
 
 void H1_1_harmonicIntrvalsAreConsonances(Home home, Part* part){
-    dom(home, part->getFirstSpeciesHIntervals(), IntSet(IntArgs(CONSONANCES)));
+    dom(home, part->getFirstSpeciesHIntervals(), IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+        -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
 }
 
 void H1_3_fiveConsecutiveNotesByJointDegree(Home home, Part* part){
@@ -144,15 +145,15 @@ void H8_3v_preferHarmonicTriad(Home home, Part* part, IntVarArray triadCostArray
         BoolVar triad = BoolVar(home, 0, 1);
         BoolVar not_triad = BoolVar(home, 0, 1);
 
-        rel(home, upper1->getHInterval()[i*4], IRT_EQ, 3, Reify(h1_3));
-        rel(home, upper1->getHInterval()[i*4], IRT_EQ, 4, Reify(h1_4));
-        rel(home, upper2->getHInterval()[i*4], IRT_EQ, 7, Reify(h2_7));
+        rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 3, Reify(h1_3));
+        rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 4, Reify(h1_4));
+        rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 7, Reify(h2_7));
         rel(home, h1_3, BOT_OR, h1_4, h1_third);
         rel(home, h1_third, BOT_AND, h2_7, h_firstPoss);
 
-        rel(home, upper2->getHInterval()[i*4], IRT_EQ, 3, Reify(h2_3));
-        rel(home, upper2->getHInterval()[i*4], IRT_EQ, 4, Reify(h2_4));
-        rel(home, upper1->getHInterval()[i*4], IRT_EQ, 7, Reify(h1_7));
+        rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 3, Reify(h2_3));
+        rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 4, Reify(h2_4));
+        rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 7, Reify(h1_7));
         rel(home, h2_3, BOT_OR, h2_4, h2_third);
         rel(home, h2_third, BOT_AND, h1_7, h_secondPoss);
 
@@ -313,7 +314,7 @@ void P1_2_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
         rel(home, (part->getSecondSpeciesRealMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0&&part->getFirstSpeciesHIntervals()[j+1]!=7))>>
             (part->getDirectCostArray()[j]==0));
     }
-    
+
 }
 
 void P1_2_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part){

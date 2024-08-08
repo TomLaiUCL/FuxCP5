@@ -34,9 +34,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     rel(home, secondSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),m_intervals_brut.size()));
 
     secondSpeciesArsisArray = IntVarArray(home, firstSpeciesMelodicIntervals.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
-    for(int i = 1; i < secondSpeciesMelodicIntervals.size()-1; i+=2){
-        rel(home, secondSpeciesArsisArray[floor(i/2)], IRT_EQ, expr(home, secondSpeciesMelodicIntervals[i]+secondSpeciesMelodicIntervals[i+1]));
+
+    for(int i = 0; i < secondSpeciesArsisArray.size()-1; i++){
+        rel(home, secondSpeciesArsisArray[i], IRT_EQ, expr(home, secondSpeciesNotesCp[(i*2)+3]-secondSpeciesNotesCp[(i*2)+1]));
     }
+    rel(home, secondSpeciesArsisArray[secondSpeciesArsisArray.size()-1], IRT_EQ, expr(home, secondSpeciesNotesCp[secondSpeciesNotesCp.size()-2]-
+        secondSpeciesNotesCp[secondSpeciesNotesCp.size()-1]));
 
     secondSpeciesMotions = IntVarArray(home, (nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1), IntSet{-1, CONTRARY_MOTION, OBLIQUE_MOTION, PARALLEL_MOTION});
     secondSpeciesMotionCosts = IntVarArray(home, (nMeasures* notesPerMeasure.at(FIRST_SPECIES) -1), IntSet{0, directCost, obliqueCost, contraryCost});
@@ -224,7 +227,7 @@ string SecondSpeciesCounterpoint::to_string() const {
     string text = "\nSecond species diminution array : " + boolVarArray_to_string(isDiminution) + "\n";
     text += "Second species isLowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
     text += "Second species h intervals : " + intVarArray_to_string(secondSpeciesHarmonicIntervals) + "\n";
-    text += "Second species direct Move Cost : " + intVarArray_to_string(directCostArray) + "\n";
+    text += "Second species arsis intervals : " + intVarArray_to_string(secondSpeciesArsisArray) + "\n";
     text += "First species : " + FirstSpeciesCounterpoint::to_string() + "\n";
     return text;
 }
@@ -243,6 +246,8 @@ string SecondSpeciesCounterpoint::to_string() const {
 SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, SecondSpeciesCounterpoint &s): FirstSpeciesCounterpoint(home, s){  
     secondSpeciesNotesCp.update(home, s.secondSpeciesNotesCp);
     secondSpeciesHarmonicIntervals.update(home, s.secondSpeciesHarmonicIntervals);
+    secondSpeciesMelodicIntervals.update(home, s.secondSpeciesMelodicIntervals);
+    secondSpeciesMotions.update(home, s.secondSpeciesMotions);
     secondSpeciesMotionCosts.update(home, s.secondSpeciesMotionCosts);
     secondSpeciesRealMotionCosts.update(home, s.secondSpeciesRealMotionCosts);
     
