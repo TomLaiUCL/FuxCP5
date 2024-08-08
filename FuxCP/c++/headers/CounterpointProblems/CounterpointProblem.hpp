@@ -42,6 +42,8 @@ protected:
     vector<IntVarArray> sorted_voices;
     unordered_map<string, int> prefs;
     vector<vector<string>> costLevels;
+
+    IntVar globalCost;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:
@@ -64,7 +66,7 @@ public:
      * @todo modify this function if you want to use branch and bound
      * @param _b a space to constrain the current instance of the Problem class with upon finding a solution
      */
-    virtual void constrain(const IntMinimizeSpace& _b);
+    virtual void constrain(const IntLexMinimizeSpace& _b);
 
     virtual IntVarArgs cost() const;
 
