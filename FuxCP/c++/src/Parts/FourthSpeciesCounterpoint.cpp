@@ -145,12 +145,12 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     }
 
     //4.H3 Penult note condition
-    rel(home, (isNotLowest[isNotLowest.size()-2]) >> (fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MINOR_SEVENTH || 
+    /*rel(home, (isNotLowest[isNotLowest.size()-2]) >> (fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MINOR_SEVENTH || 
         fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MINOR_SEVENTH || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MAJOR_SEVENTH
         || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MAJOR_SEVENTH));
     rel(home, (!isNotLowest[isNotLowest.size()-2]) >> (fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MINOR_SECOND || 
         fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MINOR_SECOND || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==MAJOR_SECOND
-        || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MAJOR_SECOND));
+        || fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-2]==-MAJOR_SECOND));*/
     
     //Melodic intervals cannot be greater than Minor Sixth (except octave)
     dom(home, fourthSpeciesMelodicIntervals, IntSet({UNISSON, -PERFECT_OCTAVE, -MINOR_SIXTH, -PERFECT_FIFTH, -AUGMENTED_FOURTH, -PERFECT_FOURTH, 

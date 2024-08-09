@@ -234,7 +234,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */ 
 
     //Only one possible value for non constrained variables
-    for(int i = 0; i < fifthSpeciesNotesCp.size()-1; i++){
+    /*for(int i = 0; i < fifthSpeciesNotesCp.size()-1; i++){
         rel(home, fifthSpeciesNotesCp[i], IRT_EQ, fifthSpeciesNotesCp[i+1], Reify(isNthSpeciesArray[(i*5)], RM_IMP));
     }
     
@@ -276,7 +276,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         BoolVar band1 = BoolVar(home, 0, 1);
 
         rel(home, expr(home, isConsonance[(i*4)+2] || isThirdSpeciesArray[(i*4)+2]), BOT_OR, isDiminution[i], 1);
-    }
+    }*/
 
     /** ===========================================================================
      *                             MELODIC CONSTRAINS
@@ -284,7 +284,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */ 
 
     //no melodic interval between MAJOR_SIXTH and MAJOR_SEVENTH
-    for(int i = 0; i < fifthSpeciesMAllIntervals.size(); i++){
+    /*for(int i = 0; i < fifthSpeciesMAllIntervals.size(); i++){
         rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MAJOR_SIXTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
         rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MINOR_SEVENTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
         rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MAJOR_SEVENTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
@@ -309,7 +309,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
             Reify(expr(home, isFourthSpeciesArray[(i*4)]==1 && isConstrainedArray[(i*4)+2]), RM_IMP));
 
         //rel(home, (isFourthSpeciesArray[(i*4)]==1 && isConstrainedArray[(i*4)+2]==1) >> (fifthSpeciesNotesCp[(i*4)]!=fifthSpeciesNotesCp[(i*4)+2]));
-    }
+    }*/
 
     /** ===========================================================================
      *                             MOTION CONSTRAINS
@@ -317,7 +317,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */ 
 
     //no battuta kind of motion
-    for(int i = 0; i < fifthSpeciesMotions.size(); i++){
+    /*for(int i = 0; i < fifthSpeciesMotions.size(); i++){
         BoolVar isCM = BoolVar(home, 0, 1);
         BoolVar isOct = BoolVar(home, 0, 1);
         BoolVar isCPDown = BoolVar(home, 0, 1);
@@ -352,7 +352,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     }*/
     
     //no second dissonant note if the cantusFirmus is at the bass
-    for(int i = 0; i < nMeasures-1; i++){
+    /*for(int i = 0; i < nMeasures-1; i++){
         BoolVar bUni = BoolVar(home, 0, 1);
         BoolVar bAnd = BoolVar(home, 0, 1);
         BoolVar isCst = BoolVar(home, 0, 1);
@@ -364,7 +364,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, bAnd, BOT_AND, isCst, bAndCst);
         rel(home, fifthSpeciesHIntervals[((i+1)*4)], IRT_NQ, 1, Reify(bAndCst, RM_IMP));
         rel(home, fifthSpeciesHIntervals[((i+1)*4)], IRT_NQ, 2, Reify(bAndCst, RM_IMP));
-    }
+    }*/
 
     //Imperfect consonances are preferred
     fifthCostArray = IntVarArray(home, notes.size(), IntSet({0, fifthCost}));
