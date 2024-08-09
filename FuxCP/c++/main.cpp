@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
         vector<int> cantusFirmus = {64,   60,   62,   60,   57,   69,   67,   64,   65,   64};
         
         int size = cantusFirmus.size();
-        vector<int> v_type = {3, -1};
+        vector<int> v_type = {2, 3, 2};
 
         vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
         //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
@@ -55,8 +55,8 @@ int main(int argc, char* argv[]) {
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            //if (nb_sol >= 1)
-            //    break;
+            if (nb_sol >= 1)
+                break;
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==3){

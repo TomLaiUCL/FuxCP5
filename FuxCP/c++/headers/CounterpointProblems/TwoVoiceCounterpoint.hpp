@@ -17,7 +17,6 @@
  */
 class TwoVoiceCounterpoint : public CounterpointProblem{
 protected:
-    Stratum* upper;
     Species species;        /// the species of the counterpoint to generate
 
 public:
@@ -42,7 +41,6 @@ public:
 
     ///destructor
     //todo release the allocated memory (each object created must be deleted) WILL THE COUNTERPOINTPROBLEM DESTRUCTOR BE AUTOMATICALLY CALLED?
-    ~TwoVoiceCounterpoint() { delete upper; }  
 
 };
 

@@ -14,8 +14,6 @@
 class ThreeVoiceCounterpoint : public CounterpointProblem{
 protected:
 
-    Stratum* upper1;
-    Stratum* upper2;
     vector<Species> species;        /// the species of the counterpoints to generate
 
 public:
@@ -39,12 +37,7 @@ public:
     // Part* getCounterpoint(){ return counterpoint; }
     //todo add here other getters if necessary
 
-    ///destructor
-    //todo release the allocated memory (each object created must be deleted)
-    ~ThreeVoiceCounterpoint(){
-        delete upper1;
-        delete upper2;
-    }  
+    ///destructor 
 
     void uniteCounterpoints();
 

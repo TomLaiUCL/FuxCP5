@@ -29,6 +29,9 @@ protected:
     Part* counterpoint_1;
     Part* counterpoint_2;
     Part* counterpoint_3;
+    Stratum* upper_1;
+    Stratum* upper_2;
+    Stratum* upper_3;
     IntVarArray unitedCosts;
     IntVarArray sortedCosts;
     IntVarArray solutionArray;
@@ -73,7 +76,8 @@ public:
     //Part* getCounterpoint(){ return counterpoint_1; }
     ///destructor
     //todo release the allocated memory (each object created must be deleted)
-    virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; delete counterpoint_1; delete counterpoint_2; delete counterpoint_3; }
+    virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; delete counterpoint_1; delete counterpoint_2; delete counterpoint_3; delete upper_1;
+        delete upper_2, delete upper_3;}
 
     Home getHome();
 

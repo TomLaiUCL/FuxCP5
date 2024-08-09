@@ -17,7 +17,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     vector<int> s_costs, vector<int> imp, int bm) : 
     CounterpointProblem(cf, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES){
     species = sp;
-    upper = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes()); 
+    upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes()); 
     counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, (6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0], lowest, cantusFirmus, 
         v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
 
@@ -35,7 +35,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     // H5 from Thibault : The cp and the cf cannot play the same note
     H5_1_cpAndCfDifferentNotes(*this, counterpoint_1, cantusFirmus);
 
-    setLowest(nullptr, nullptr, upper, nullptr, nullptr);
+    setLowest(nullptr, nullptr, upper_1, nullptr, nullptr);
 
     unitedCosts = IntVarArray(*this, counterpoint_1->getCosts().size(), 0, 1000000);
 
@@ -65,11 +65,6 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : CounterpointProblem(s){
     //counterpoint = s.counterpoint;
     species = s.species;
-    if (s.upper) {
-        upper = s.upper->clone(*this);
-    } else {
-        upper = nullptr;
-    }
 }
 
 IntLexMinimizeSpace* TwoVoiceCounterpoint::copy(){   // todo use 'bool share' in copy constructor?
@@ -82,9 +77,6 @@ string TwoVoiceCounterpoint::to_string() const {
     text += CounterpointProblem::to_string();
     text += "Lowest : \n";
     text += cantusFirmus->to_string();
-    text += "\n";
-    text += "Upper : \n";
-    text += upper->to_string();
     text += "\n";
     text += "Counterpoint 1 : \n";
     text += counterpoint_1->to_string();

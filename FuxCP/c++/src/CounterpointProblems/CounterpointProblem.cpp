@@ -64,6 +64,21 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
     } else {
         counterpoint_3 = nullptr;
     }
+    if(s.upper_1){
+        upper_1 = s.upper_1->clone(*this);
+    } else {
+        upper_1 = nullptr;
+    }
+    if(s.upper_2){
+        upper_2 = s.upper_2->clone(*this);
+    } else {
+        upper_2 = nullptr;
+    }
+    if(s.upper_3){
+        upper_3 = s.upper_3->clone(*this);
+    } else {
+        upper_3 = nullptr;
+    }
     nMeasures = s.nMeasures; 
     importance = s.importance;
     prefs = s.prefs;
@@ -92,7 +107,9 @@ IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in 
 void CounterpointProblem::constrain(const IntLexMinimizeSpace& _b){
 
     const CounterpointProblem &b = static_cast<const CounterpointProblem &>(_b);
-    rel(*this, globalCost, IRT_LQ, b.globalCost);
+    IntVar current_sum = IntVar(*this, 0, 2000000);
+    max(*this, finalCosts, current_sum);
+    //rel(*this, globalCost, IRT_LQ, b.globalCost);
 }
 
 IntVarArgs CounterpointProblem::cost() const{
@@ -337,7 +354,7 @@ Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type
 
     Gecode::Search::Options opts;   
     /**@todo add here any options you want*/
-    // opts.stop = &global_timeout;
+    opts.stop = &global_timeout;
     opts.threads = 32;
 
     if (type == bab_solver)

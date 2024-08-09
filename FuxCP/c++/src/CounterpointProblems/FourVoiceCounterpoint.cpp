@@ -7,9 +7,9 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 {
     species = sp;
 
-    upper1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
-    upper2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
-    upper3 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
+    upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
+    upper_2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
+    upper_3 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
 
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
@@ -18,7 +18,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 6) + cf[0], (6 * v_type[2] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[2], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
 
-    setLowest(counterpoint_2, counterpoint_3, upper1, upper2, upper3);
+    setLowest(counterpoint_2, counterpoint_3, upper_1, upper_2, upper_3);
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2, counterpoint_3};
 
@@ -32,7 +32,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     successiveCostArray = IntVarArray(*this, scc_cz, IntSet({0, counterpoint_1->getSuccCost()}));
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
-    H8_4v_preferHarmonicTriad(*this, triadCostArray, upper1, upper2, upper3);
+    H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
     
     //M4 variety cost (notes should be as diverse as possible)
     M4_varietyCost(*this, parts);
@@ -131,21 +131,6 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 // COPY CONSTRUCTOR
 FourVoiceCounterpoint::FourVoiceCounterpoint(FourVoiceCounterpoint& s) : CounterpointProblem(s){
     species = s.species;
-    if (s.upper1) {
-        upper1 = s.upper1->clone(*this);
-    } else {
-        upper1 = nullptr;
-    }
-    if (s.upper2) {
-        upper2 = s.upper2->clone(*this);
-    } else {
-        upper2 = nullptr;
-    }
-    if (s.upper3) {
-        upper3 = s.upper3->clone(*this);
-    } else {
-        upper3 = nullptr;
-    }
 }
 
 IntLexMinimizeSpace* FourVoiceCounterpoint::copy(){  
@@ -162,15 +147,6 @@ string FourVoiceCounterpoint::to_string() const {
     text += "\n";
     text += "Counterpoint 3 : \n";
     text += counterpoint_3->to_string();
-    text += "\n";
-    text += "Upper 1 : \n";
-    text += upper1->to_string();
-    text += "\n";
-    text += "Upper 2 : \n";
-    text += upper2->to_string();
-    text += "\n";
-    text += "Upper 3 : \n";
-    text += upper3->to_string();
     text += "\n";
     text += " Solution array : \n";
     text += intVarArray_to_string(solutionArray);

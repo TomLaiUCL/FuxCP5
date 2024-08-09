@@ -15,15 +15,15 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     species = sp;
     
 
-    upper1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
-    upper2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
+    upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
+    upper_2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
 
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, THREE_VOICES);
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, THREE_VOICES);
 
-    setLowest(counterpoint_2, nullptr, upper1, upper2, nullptr);
+    setLowest(counterpoint_2, nullptr, upper_1, upper_2, nullptr);
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2};
 
@@ -46,7 +46,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     }
 
     //H8 : the triad should be used as much as possible
-    H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper1, upper2);
+    H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper_1, upper_2);
     //M4 variety cost (notes should be as diverse as possible)
     M4_varietyCost(*this, parts);
 
@@ -132,16 +132,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
 // COPY CONSTRUCTOR
 ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s) : CounterpointProblem(s){
     species = s.species;
-    if (s.upper1) {
-        upper1 = s.upper1->clone(*this);
-    } else {
-        upper1 = nullptr;
-    }
-    if (s.upper2) {
-        upper2 = s.upper2->clone(*this);
-    } else {
-        upper2 = nullptr;
-    }
 }
 
 IntLexMinimizeSpace* ThreeVoiceCounterpoint::copy(){  
@@ -156,12 +146,6 @@ string ThreeVoiceCounterpoint::to_string() const {
     text += "\n";
     text += "Counterpoint 2 : \n";
     text += counterpoint_2->to_string();
-    text += "\n";
-    text += "Upper 1 : \n";
-    text += upper1->to_string();
-    text += "\n";
-    text += "Upper 2 : \n";
-    text += upper2->to_string();
     text += "\n";
     text += " Solution array : \n";
     text += intVarArray_to_string(solutionArray);
