@@ -133,8 +133,8 @@ int main(int argc, char* argv[]) {
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            if (nb_sol >= 1)
-                break;
+            //if (nb_sol >= 1)
+            //    break;
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==3){

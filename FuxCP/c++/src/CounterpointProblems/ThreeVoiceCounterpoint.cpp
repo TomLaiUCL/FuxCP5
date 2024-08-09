@@ -147,6 +147,9 @@ string ThreeVoiceCounterpoint::to_string() const {
     text += "Counterpoint 2 : \n";
     text += counterpoint_2->to_string();
     text += "\n";
+    text += "Successive cost array : \n";
+    text += intVarArray_to_string(successiveCostArray);
+    text += "\n";
     text += " Solution array : \n";
     text += intVarArray_to_string(solutionArray);
     text += "\n";

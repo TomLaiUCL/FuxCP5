@@ -423,6 +423,8 @@ void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray s
                     parts[p2]->getNotes()[parts[p2]->getNotes().size()-1])%12);
 
                 for(int i = 0; i < tempHIntervals.size()-1; i++){
+                    cout << i << endl;
+                    cout << successiveCostArray.size() << endl;
                     BoolVar firstNotFifth = BoolVar(home, 0, 1);
                     BoolVar secondNotFifth = BoolVar(home, 0, 1);
                     BoolVar noSuccFifth = BoolVar(home, 0, 1);
@@ -434,8 +436,8 @@ void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray s
                     rel(home, tempHIntervals[i+1], IRT_NQ, 7, Reify(secondNotFifth));
                     rel(home, firstNotFifth, BOT_OR, secondNotFifth, noSuccFifth);
 
-                    rel(home, ((tempHIntervals[i]==UNISSON || tempHIntervals[i]==PERFECT_FIFTH)&&(tempHIntervals[i+1]==UNISSON || 
-                        tempHIntervals[i+1]==PERFECT_FIFTH)) >> (succPCons));
+                    rel(home, expr(home, tempHIntervals[i]==UNISSON || tempHIntervals[i]==PERFECT_FIFTH), BOT_AND, 
+                        expr(home, tempHIntervals[i+1]==UNISSON || tempHIntervals[i+1]==PERFECT_FIFTH), succPCons);
                     rel(home, noSuccFifth, BOT_AND, succPCons, succPConsNotFifth);
                     rel(home, succPConsNotFifth >> (successiveCostArray[i]==parts[p1]->getSuccCost()));
                     rel(home, !succPConsNotFifth >> (successiveCostArray[i]==0));
