@@ -163,20 +163,26 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
         rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
         if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
+        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i!=size-1) {
+            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
         } else{
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
         }
         if(nVoices>=3){
             if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-            } else{
+            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i!=size-1) {
+                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
+            }else{
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
             }
         }
         if(nVoices>=4){
             if(counterpoint_3->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-            } else{
+            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i!=size-1) {
+                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
+            }else{
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
             }
         }
@@ -202,7 +208,7 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
         rel(*this, lowest->getFirstNotes()[i], IRT_NQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsNotLowest()[i]));
         
         if(nVoices>=2){
-            if(counterpoint_1->getSpecies()!=FOURTH_SPECIES || i==size-1){
+            if((counterpoint_1->getSpecies()!=FOURTH_SPECIES && counterpoint_1->getSpecies()!=FIFTH_SPECIES) || i==size-1){
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
             } else {
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
@@ -216,7 +222,7 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
         }  
         if(nVoices==4){
             
-            if(counterpoint_2->getSpecies()!=FOURTH_SPECIES || i==size-1){
+            if((counterpoint_2->getSpecies()!=FOURTH_SPECIES && counterpoint_2->getSpecies()!=FIFTH_SPECIES) || i==size-1){
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i]));
             } else {
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i]));
@@ -225,13 +231,13 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
 
             rel(*this, upper3->getFirstNotes()[i], IRT_EQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsHighest()[i]));
 
-            if(counterpoint_1->getSpecies()!=FOURTH_SPECIES || i==size-1){
+            if((counterpoint_1->getSpecies()!=FOURTH_SPECIES && counterpoint_1->getSpecies()!=FIFTH_SPECIES) || i==size-1){
                 rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
             } else {
                 rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
             }
 
-            if(counterpoint_2->getSpecies()!=FOURTH_SPECIES || i==size-1){
+            if((counterpoint_2->getSpecies()!=FOURTH_SPECIES && counterpoint_2->getSpecies()!=FIFTH_SPECIES) || i==size-1){
                 rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
             } else {
                 rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
@@ -260,14 +266,13 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
                     corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(3, 4, curr_cp->getMelodicIntervals().size())));
                 } else if(curr_cp->getSpecies()==FOURTH_SPECIES){
                     corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
-                } else{
+                } else if(curr_cp->getSpecies()==FIFTH_SPECIES){
                     corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
                 }
             }
 
             rel(*this, (cantusFirmus->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[0][i-1]));
             rel(*this, (counterpoint_1->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[1][i-1]));
-
             if(nVoices>=3){
                 rel(*this, (counterpoint_2->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[2][i-1]));
             }

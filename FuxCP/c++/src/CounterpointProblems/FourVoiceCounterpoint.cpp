@@ -36,12 +36,31 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     
     //M4 variety cost (notes should be as diverse as possible)
     M4_varietyCost(*this, parts);
+
+    //two fifth species counterpoints should be as different as possible
+    for(int p1 = 1; p1 < parts.size(); p1++){
+        for(int p2 = p1+1; p2 < parts.size(); p2++){
+            if(parts[p1]->getSpecies()==FIFTH_SPECIES && parts[p2]->getSpecies()==FIFTH_SPECIES){
+                BoolVarArray isSameSpecies = BoolVarArray(*this, parts[p1]->getNotes().size(), 0, 1);
+                IntVarArray isSameSpeciesInt = IntVarArray(*this, parts[p1]->getNotes().size(), 0, 1);
+                IntVar percentageSame = IntVar(*this, 0, parts[p1]->getNotes().size());
+                for(int i = 0; i < parts[p1]->getNotes().size(); i++){
+                    rel(*this, parts[p1]->getSpeciesArray()[i], IRT_EQ, parts[p2]->getSpeciesArray()[i], Reify(isSameSpecies[i]));
+                    rel(*this, isSameSpeciesInt[i], IRT_EQ, 1, Reify(isSameSpecies[i]));
+                }
+                rel(*this, percentageSame, IRT_EQ, expr(*this, sum(isSameSpeciesInt)));
+                rel(*this, percentageSame, IRT_LE, floor(parts[p1]->getNotes().size()/2));
+            }
+        }
+    }
     
     //P4 avoid successive perfect consonances
     P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
     
     //P6 : no move in same direction
-    P6_noMoveInSameDirection(*this, parts);
+    if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES&&counterpoint_3->getSpecies()!=FOURTH_SPECIES){
+        P6_noMoveInSameDirection(*this, parts);
+    }
     
     //P7 : no suxxessive ascending sixths
     P7_noSuccessiveAscendingSixths(*this, parts);
@@ -63,8 +82,50 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     orderCosts();
     
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
-    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+
+    if(species[0]==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
+    }
+    if(species[1]==FIFTH_SPECIES){
+        branch(*this, counterpoint_2->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
+    }
+    if(species[2]==FIFTH_SPECIES){
+        branch(*this, counterpoint_3->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
+    }
+
+    if(species[0]==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+    if(species[1]==FIFTH_SPECIES){
+        branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+    if(species[2]==FIFTH_SPECIES){
+        branch(*this, counterpoint_3->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+
+    if(species[0]==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+    if(species[1]==FIFTH_SPECIES){
+        branch(*this, counterpoint_2->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+    if(species[2]==FIFTH_SPECIES){
+        branch(*this, counterpoint_3->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
     
+
+    if(species[0]==FOURTH_SPECIES){
+        branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
+    if(species[1]==FOURTH_SPECIES){
+        branch(*this, counterpoint_2->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
+    if(species[2]==FOURTH_SPECIES){
+        branch(*this, counterpoint_3->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
+    
+    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+
 }
 
 // COPY CONSTRUCTOR

@@ -49,6 +49,20 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper1, upper2);
     //M4 variety cost (notes should be as diverse as possible)
     M4_varietyCost(*this, parts);
+
+    //two fifth species counterpoints should be as different as possible
+    if(counterpoint_1->getSpecies()==FIFTH_SPECIES && counterpoint_2->getSpecies()==FIFTH_SPECIES){
+        BoolVarArray isSameSpecies = BoolVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
+        IntVarArray isSameSpeciesInt = IntVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
+        IntVar percentageSame = IntVar(*this, 0, counterpoint_1->getNotes().size());
+        for(int i = 0; i < counterpoint_1->getNotes().size(); i++){
+            rel(*this, counterpoint_1->getSpeciesArray()[i], IRT_EQ, counterpoint_2->getSpeciesArray()[i], Reify(isSameSpecies[i]));
+            rel(*this, isSameSpeciesInt[i], IRT_EQ, 1, Reify(isSameSpecies[i]));
+        }
+        rel(*this, percentageSame, IRT_EQ, expr(*this, sum(isSameSpeciesInt)));
+        rel(*this, percentageSame, IRT_LE, floor(counterpoint_1->getNotes().size()/2));
+    }
+
     //P4 avoid successive perfect consonances
     P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
     //P6 : no move in same direction
@@ -78,15 +92,38 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
 
     orderCosts();
 
-    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+
+    if(species[0]==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
+    }
+    if(species[1]==FIFTH_SPECIES){
+        branch(*this, counterpoint_2->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
+    }
+
+    if(species[0]==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+    if(species[1]==FIFTH_SPECIES){
+        branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+
+    if(species[0]==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+    if(species[1]==FIFTH_SPECIES){
+        branch(*this, counterpoint_2->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+    }
+    
+
     if(species[0]==FOURTH_SPECIES){
         branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
     if(species[1]==FOURTH_SPECIES){
         branch(*this, counterpoint_2->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
-
+    
+    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 
     writeToLogFile(("solution array size : " + std::to_string(solutionArray.size())).c_str());
 

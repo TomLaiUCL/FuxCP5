@@ -83,6 +83,9 @@ string TwoVoiceCounterpoint::to_string() const {
     text += "Lowest : \n";
     text += cantusFirmus->to_string();
     text += "\n";
+    text += "Upper : \n";
+    text += upper->to_string();
+    text += "\n";
     text += "Counterpoint 1 : \n";
     text += counterpoint_1->to_string();
     text += "\n";
