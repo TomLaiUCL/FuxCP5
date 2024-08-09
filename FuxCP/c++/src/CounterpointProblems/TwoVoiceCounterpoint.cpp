@@ -17,8 +17,9 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     vector<int> s_costs, vector<int> imp, int bm) : 
     CounterpointProblem(cf, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES){
     species = sp;
-    upper = new Stratum(*this, nMeasures, 0, 127, v_type, lowest->getNotes()); 
-    counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, lowerBound, upperBound, lowest, cantusFirmus, v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
+    upper = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes()); 
+    counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, (6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0], lowest, cantusFirmus, 
+        v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
 
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
     G6_noChromaticMelodies(*this, counterpoint_1, species);

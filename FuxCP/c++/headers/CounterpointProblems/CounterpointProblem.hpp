@@ -22,8 +22,6 @@ protected:
     // put one counterpoint? or group counterpoints together in a vector<Part*> ? or just leave it like this...
 
     int nMeasures;      /// the number of measures in the score to generate
-    int lowerBound;     /// the lowest note possible for the counterpoints
-    int upperBound;     /// the highest note possible for the counterpoints
     int n_unique_costs;
     Stratum* lowest;
     IntVarArray successiveCostArray;
@@ -66,9 +64,9 @@ public:
      * @todo modify this function if you want to use branch and bound
      * @param _b a space to constrain the current instance of the Problem class with upon finding a solution
      */
-    virtual void constrain(const IntLexMinimizeSpace& _b);
+    void constrain(const IntLexMinimizeSpace& _b);
 
-    virtual IntVarArgs cost() const;
+    IntVarArgs cost() const;
 
     /// Getters
     //todo add here getters if necessary

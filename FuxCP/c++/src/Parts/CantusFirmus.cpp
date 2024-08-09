@@ -82,11 +82,6 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
     P3_0_noBattuta(home, this);
 }
 
-// IntVarArray CantusFirmus::getBranchingNotes(){
-//     return notes;
-// }
-
-
 string CantusFirmus::to_string() const {
     string text = "Cantus Firmus notes : ";
     text += intVarArray_to_string(notes);
@@ -109,7 +104,7 @@ string CantusFirmus::to_string() const {
 
 // clone constructor
 CantusFirmus::CantusFirmus(Home home, CantusFirmus &s) : Part(home, s){
-    //notes.update(home, s.notes);
+    
 }
 
 CantusFirmus* CantusFirmus::clone(Home home){

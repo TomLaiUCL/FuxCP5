@@ -1,13 +1,8 @@
 #include "../headers/Voice.hpp"
 
-Voice::Voice(Home home, int nMes, int lb, int ub, int v_type, int sp){
+Voice::Voice(Home home, int nMes, int lb, int ub){
     nMeasures = nMes; 
     size = nMes*4;
-    species = sp;
-    isNotLowest        = BoolVarArray(home, nMeasures, 0, 1);
-    isHighest          = BoolVarArray(home, nMeasures, 0, 1);
-
-    voice_type = v_type;
 
     lowerBound = lb;
     upperBound = ub;
@@ -35,12 +30,8 @@ Voice::Voice(Home home, Voice &s){
     size = s.size;
     lowerBound = s.lowerBound;
     upperBound = s.upperBound;
-    species = s.species;
-    voice_type = s.voice_type;
     notes.update(home, s.notes);
     h_intervals.update(home, s.h_intervals);
-    isNotLowest.update(home, s.isNotLowest);
-    isHighest.update(home, s.isHighest);
     m_intervals_brut.update(home, s.m_intervals_brut);
     motions.update(home, s.motions);
 }
@@ -53,10 +44,6 @@ IntVarArgs Voice::getFirstNotes(){
     return notes.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES),notes.size());
 }
 
-BoolVar Voice::getIsNotLowestIdx(int idx){
-    return isNotLowest[idx];
-}
-
 IntVarArray Voice::getMelodicIntervals(){
     return m_intervals_brut;
 }
@@ -67,8 +54,4 @@ IntVarArray Voice::getHInterval(){
 
 IntVarArgs Voice::getSecondHInterval(){
     return h_intervals.slice(2,4,h_intervals.size());
-}
-
-BoolVarArray Voice::getIsHighest(){
-    return isHighest;
 }

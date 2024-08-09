@@ -10,7 +10,6 @@ protected :
     IntVarArray thirdSpeciesNotesCp;               /// The notes of the counterpoint that have to follow the rules for the 2nd species
     IntVarArray thirdSpeciesMotions;               /// This array is the array of REAL motions
     IntVarArray thirdSpeciesMotionCosts;
-    BoolVarArray isDiminution;
     IntVarArray m2IntervalsArray;
     IntVarArray m2ZeroArray;
     IntVarArray thirdHTriadArray;

@@ -15,8 +15,8 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     species = sp;
     
 
-    upper1 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
-    upper2 = new Stratum(*this, nMeasures, 0, 127, -1, lowest->getNotes(), THREE_VOICES);
+    upper1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
+    upper2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
 
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, THREE_VOICES);

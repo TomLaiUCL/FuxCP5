@@ -3,16 +3,11 @@
 /**
  * GENERAL CONSTRUCTOR
  */
-FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,
+FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Species mSpecies, Stratum* low, CantusFirmus* c,
      int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm)
 {
-    
-    motherSpecies =         mSpecies;
-    cout << "Lower bound : " << endl;
-    cout << lowerBound << endl;
-    cout << "Upper bound : " << endl;
-    cout << upperBound << endl;
+
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
@@ -205,7 +200,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
         BoolVar buni = BoolVar(home, 0, 1);
         BoolVar band = BoolVar(home, 0, 1);
         rel(home, fourthSpeciesHIntervals[(i*2)+1], IRT_EQ, UNISSON, buni);
-        rel(home, expr(home, !c->getIsNotLowestIdx(i)), BOT_AND, buni, band);
+        rel(home, expr(home, !c->getIsNotLowest()[i]), BOT_AND, buni, band);
         rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 1, Reify(band, RM_IMP));
         rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 2, Reify(band, RM_IMP));
     }
@@ -219,8 +214,8 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 
     //4.H2 : If the 4th species is the lowest stratum, then no hamonic seventh
     for(int j = 1; j < c->getIsNotLowest().size(); j++){
-        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MINOR_SEVENTH && firstHInterval[j]!=-MINOR_SEVENTH));
-        rel(home, (getIsNotLowestIdx(j)==0) >> (firstHInterval[j]!=MAJOR_SEVENTH && firstHInterval[j]!=-MAJOR_SEVENTH));
+        rel(home, (getIsNotLowest()[j]==0) >> (firstHInterval[j]!=MINOR_SEVENTH && firstHInterval[j]!=-MINOR_SEVENTH));
+        rel(home, (getIsNotLowest()[j]==0) >> (firstHInterval[j]!=MAJOR_SEVENTH && firstHInterval[j]!=-MAJOR_SEVENTH));
     }
 
     //Must start with a perfect consonance (since 1.H2 applies to the first note, which is most likely a rest in 4th species)
@@ -322,7 +317,6 @@ string FourthSpeciesCounterpoint::to_string() const {
 
 // clone constructor
 FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, FourthSpeciesCounterpoint &s) : Part(home, s){
-    motherSpecies = s.motherSpecies;
     fourthSpeciesNotesCp.update(home, s.fourthSpeciesNotesCp);
     fourthSpeciesHIntervals.update(home, s.fourthSpeciesHIntervals);
     fourthSpeciesMelodicIntervals.update(home, s.fourthSpeciesMelodicIntervals);

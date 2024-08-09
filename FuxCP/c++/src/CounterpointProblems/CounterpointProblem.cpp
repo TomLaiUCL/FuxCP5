@@ -11,9 +11,7 @@
 CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs,
     vector<int> imp, int nV){
     nMeasures = cf.size();
-    lowerBound = ((6 * v_type) - 6) + cf[0];
-    upperBound = ((6 * v_type) + 12) + cf[0];
-    lowest = new Stratum(*this, nMeasures, 0, 127, v_type);
+    lowest = new Stratum(*this, nMeasures, 0, 127);
     cantusFirmus = new CantusFirmus(*this, nMeasures, cf, lowest, v_type, m_costs, g_costs, s_costs, nV);
     importance = imp;
     n_unique_costs = 0;
@@ -68,8 +66,6 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
     }
     nMeasures = s.nMeasures; 
     importance = s.importance;
-    lowerBound = s.lowerBound;
-    upperBound = s.upperBound;
     prefs = s.prefs;
     sorted_voices = s.sorted_voices;
     unitedCostNames = s.unitedCostNames;
@@ -95,7 +91,7 @@ IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in 
 
 void CounterpointProblem::constrain(const IntLexMinimizeSpace& _b){
 
-    const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
+    const CounterpointProblem &b = static_cast<const CounterpointProblem &>(_b);
     rel(*this, globalCost, IRT_LQ, b.globalCost);
 }
 
@@ -203,29 +199,29 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
         BoolVar cp1Lowest = BoolVar(*this, 0, 1);
         BoolVar cp1Bass = BoolVar(*this, 0, 1);
 
-        rel(*this, lowest->getFirstNotes()[i], IRT_NQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsNotLowestIdx(i)));
+        rel(*this, lowest->getFirstNotes()[i], IRT_NQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsNotLowest()[i]));
         
         if(nVoices>=2){
             if(counterpoint_1->getSpecies()!=FOURTH_SPECIES || i==size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowestIdx(i)));
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
             } else {
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowestIdx(i)));
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
             }
 
         } 
         if(nVoices==3){
 
-            rel(*this, expr(*this, counterpoint_1->getIsNotLowestIdx(i)!=cantusFirmus->getIsNotLowestIdx(i)), IRT_EQ, counterpoint_2->getIsNotLowestIdx(i)); //else it is the cp2 (in 3 voices)
+            rel(*this, expr(*this, counterpoint_1->getIsNotLowest()[i]!=cantusFirmus->getIsNotLowest()[i]), IRT_EQ, counterpoint_2->getIsNotLowest()[i]); //else it is the cp2 (in 3 voices)
             
         }  
         if(nVoices==4){
             
             if(counterpoint_2->getSpecies()!=FOURTH_SPECIES || i==size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(counterpoint_1->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowestIdx(i)));
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i]));
             } else {
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1)&&(counterpoint_1->getIsNotLowestIdx(i)==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowestIdx(i)));
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i]));
             }
-            rel(*this, expr(*this, (cantusFirmus->getIsNotLowestIdx(i)==1) && (counterpoint_1->getIsNotLowestIdx(i)==1) && (counterpoint_2->getIsNotLowestIdx(i)==1)), IRT_NQ, counterpoint_3->getIsNotLowestIdx(i));
+            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1) && (counterpoint_1->getIsNotLowest()[i]==1) && (counterpoint_2->getIsNotLowest()[i]==1)), IRT_NQ, counterpoint_3->getIsNotLowest()[i]);
 
             rel(*this, upper3->getFirstNotes()[i], IRT_EQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsHighest()[i]));
 
@@ -250,7 +246,7 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
 
             corresponding_m_intervals.push_back(cantusFirmus->getMelodicIntervals());
             for(int j = 0; j < nVoices-1; j++){
-                Voice* curr_cp;
+                Part* curr_cp;
 
                 if(j==0) curr_cp=counterpoint_1;
                 else if(j==1) curr_cp=counterpoint_2;
@@ -269,14 +265,14 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
                 }
             }
 
-            rel(*this, (cantusFirmus->getIsNotLowestIdx(i)==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[0][i-1]));
-            rel(*this, (counterpoint_1->getIsNotLowestIdx(i)==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[1][i-1]));
+            rel(*this, (cantusFirmus->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[0][i-1]));
+            rel(*this, (counterpoint_1->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[1][i-1]));
 
             if(nVoices>=3){
-                rel(*this, (counterpoint_2->getIsNotLowestIdx(i)==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[2][i-1]));
+                rel(*this, (counterpoint_2->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[2][i-1]));
             }
             if(nVoices>=4){
-                rel(*this, (counterpoint_3->getIsNotLowestIdx(i)==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[3][i-1]));
+                rel(*this, (counterpoint_3->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[3][i-1]));
             }
 
         }

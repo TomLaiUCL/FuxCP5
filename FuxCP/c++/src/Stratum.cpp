@@ -1,6 +1,6 @@
 #include "../headers/Stratum.hpp"
 
-Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type) : Voice(home, nMes, lb, ub, v_type, FIRST_SPECIES){
+Stratum::Stratum(Home home, int nMes, int lb, int ub) : Voice(home, nMes, lb, ub){
     // add here any variable initialization that can't be done in Voice constructor and that is independent of the number of voices
     //notes = IntVarArray(home, nMes*4-3, 0, 127);
     //h_intervals = IntVarArray(home, notes.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
@@ -8,33 +8,33 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type) : Voice(home, 
 }
 
 //if the stratum is in the upper strata, this constructor will create the h_intervals to the lowest stratum
-Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes) : Stratum(home, nMes, lb, ub, v_type){
+Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes) : Stratum(home, nMes, lb, ub){
     for(int i = 0; i < h_intervals.size(); i++){
         rel(home, (h_intervals[i])==((notes[i]-lowestNotes[i])%12));
     }
 }
 
 //this constructor applies 3rd voice specific constraints which apply to the upper strata
-Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes, int nV) : Stratum(home, nMes, lb, ub, v_type, lowestNotes){
+Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, int nV) : Stratum(home, nMes, lb, ub, lowestNotes){
 
     //G8 Last chord can only consist of notes of the harmonic triad
-    dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(TRIAD)));
+    dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
 
     //H10 No tenths in last chord
-    rel(home, ((notes[notes.size()-4]-lowestNotes[lowestNotes.size()-1])>12) >> (h_intervals[h_intervals.size()-1]!=MINOR_THIRD && 
-        h_intervals[h_intervals.size()-4]!=MAJOR_THIRD));
+    rel(home, ((notes[notes.size()-4]-lowestNotes[lowestNotes.size()-1])>12) >> (expr(home, abs(h_intervals[h_intervals.size()-1]))!=MINOR_THIRD && 
+        expr(home, abs(h_intervals[h_intervals.size()-4]))!=MAJOR_THIRD));
 
     //H12 Last chord cannot include a minor third
-    rel(home, h_intervals[h_intervals.size()-1], IRT_NQ, 3);
+    rel(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IRT_NQ, 3);
 
 }
 
-Stratum::Stratum(Home home, int nMes, int lb, int ub, int v_type, IntVarArray lowestNotes, int nV1, int nV2) : Stratum(home, nMes, lb, ub, v_type, lowestNotes){
+Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, int nV1, int nV2) : Stratum(home, nMes, lb, ub, lowestNotes){
     //G8 Last chord can only consist of notes of the harmonic triad
-    dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(TRIAD)));
+    dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
 
     //H12 Last chord cannot include a minor third
-    rel(home, h_intervals[h_intervals.size()-1], IRT_NQ, 3);
+    rel(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IRT_NQ, 3);
 }
 
 

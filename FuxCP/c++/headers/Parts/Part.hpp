@@ -24,9 +24,10 @@ using namespace std;
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
 class Part : public Voice {
     protected:
-        int species;
+        Species species;
         int nVoices;
         int borrowMode;
+        int voice_type;
         //Stratum* lowest;
         IntVarArray melodicDegreeCost;
         IntVarArray fifthCostArray;
@@ -38,6 +39,8 @@ class Part : public Voice {
         IntVarArray directCostArray;
         BoolVarArray isConsonance;
         IntVarArray speciesArray;
+        BoolVarArray isNotLowest;
+        BoolVarArray isHighest;
 
         vector<int> borrowed_scale;
         vector<int> scale;
@@ -91,20 +94,20 @@ class Part : public Voice {
         BoolVarArray isDiminution;
         IntVarArray penultCostArray;
         IntVarArray secondSpeciesMotions;
-        IntVarArray secondSpeciesMelodicIntervals;      /// The melodic intervals between the notes that have to follow the 2nd species rules
+        IntVarArray secondSpeciesMelodicIntervals;
         IntVarArray secondSpeciesRealMotions;
 
         //Third species specific variables
-        IntVarArray thirdSpeciesHarmonicIntervals;     /// The harmonic intervals between the notes that have to follow the 2nd species rules and the cantus firmus
-        IntVarArray thirdSpeciesMelodicIntervals;      /// The melodic intervals between the notes that have to follow the 2nd species rules
+        IntVarArray thirdSpeciesHarmonicIntervals;
+        IntVarArray thirdSpeciesMelodicIntervals;
         BoolVarArray is5QNArray;
         IntVarArray cambiataCostArray;
 
-        //
+        //Fourth species specific variables
         BoolVarArray isNoSyncopeArray;
         IntVarArray snycopeCostArray;
     public:
-        Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs,
+        Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs,
             vector<int> s_costs, int nV, int bm);
 
         // Part(Part& s); (no longer copy constructor since not a space anymore. Now just a clone constructor to deep copy the object (called by the Space's copy constructor))
@@ -124,10 +127,14 @@ class Part : public Voice {
         virtual IntVarArray getFirstMInterval();
 
         virtual IntVarArray getMotions();
+        
+        int getSpecies() { return species; }
 
         IntVarArray getPartNotes();
 
         IntVarArray getCosts();
+
+        BoolVarArray getIsHighest();
 
         int getSuccCost();
 

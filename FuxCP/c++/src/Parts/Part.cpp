@@ -5,12 +5,16 @@
 #include "../../headers/Parts/Part.hpp"
 
 /// This class represents a part, so it creates all the variables associated to that part and posts the constraints that are species independent
-Part::Part(Home home, int nMes, int sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
+Part::Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
     int nV, int bm) : 
-    Voice(home, nMes, lb, ub, v_type, sp){
+    Voice(home, nMes, lb, ub){
     nVoices         = nV;
+    species = sp;
     borrowMode      = bm;
+    voice_type      = v_type;
     //lowest          = low;
+    isNotLowest        = BoolVarArray(home, nMeasures, 0, 1);
+    isHighest          = BoolVarArray(home, nMeasures, 0, 1);
 
     borrowed_scale = get_all_notes_from_scale(cf[0]%12, BORROWED_SCALE);
     scale = get_all_notes_from_scale(cf[0]%12, MAJOR_SCALE);
@@ -81,11 +85,12 @@ string Part::to_string() const{
 Part::Part(Home home, Part& s) : Voice(home, s) {
     nVoices = s.nVoices;
     borrowMode = s.borrowMode;
-    //lowest = s.lowest;
     
     borrowed_scale = s.borrowed_scale;
     scale = s.scale;
     chromatic_scale = s.chromatic_scale;
+    species = s.species;
+    voice_type = s.voice_type;
     
     cp_range = s.cp_range;
 
@@ -133,6 +138,8 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     varietyCostArray.update(home, s.varietyCostArray);
     directCostArray.update(home, s.directCostArray);
     isConsonance.update(home, s.isConsonance);
+    isNotLowest.update(home, s.isNotLowest);
+    isHighest.update(home, s.isHighest);
 
     firstSpeciesHarmonicIntervals.update(home, s.firstSpeciesHarmonicIntervals);
     firstSpeciesNotesCp.update(home, s.firstSpeciesNotesCp);
@@ -373,4 +380,8 @@ IntVarArray Part::getSyncopeCostArray(){
 
 IntVarArray Part::getSpeciesArray(){
     return speciesArray;
+}
+
+BoolVarArray Part::getIsHighest(){
+    return isHighest;
 }

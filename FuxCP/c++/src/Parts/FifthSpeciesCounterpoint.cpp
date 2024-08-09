@@ -3,11 +3,10 @@
 /**
  * GENERAL CONSTRUCTOR
  */
-FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, int mSpecies, Stratum* low, CantusFirmus* c,
+FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Species mSpecies, Stratum* low, CantusFirmus* c,
     int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm)
 {
-    motherSpecies =         mSpecies;
 
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
@@ -279,8 +278,8 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
 
     //If the cantusFirmus is in the upper part, then no hamonic seventh
     for(int j = 1; j < c->getIsNotLowest().size(); j++){
-        rel(home, (getIsNotLowestIdx(j)==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MINOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MINOR_SEVENTH));
-        rel(home, (getIsNotLowestIdx(j)==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MAJOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MAJOR_SEVENTH));
+        rel(home, (getIsNotLowest()[j]==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MINOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MINOR_SEVENTH));
+        rel(home, (getIsNotLowest()[j]==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MAJOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MAJOR_SEVENTH));
     }
 
     /** ===========================================================================
@@ -540,7 +539,6 @@ string FifthSpeciesCounterpoint::to_string() const {
 
 // clone constructor
 FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, FifthSpeciesCounterpoint &s) : Part(home, s){
-    motherSpecies = s.motherSpecies;
     solutionLength = s.solutionLength;
     m2Len = s.m2Len;
     fifthSpeciesNotesCp.update(home, s.fifthSpeciesNotesCp);
@@ -618,6 +616,8 @@ void FifthSpeciesCounterpoint::createSpeciesArrays(Home home){
         BoolVar b14 = BoolVar(home, 0, 1);
 
         rel(home, speciesArray[i+2], IRT_EQ, FOURTH_SPECIES, Reify(b34));
+        //the following line works to allow quarter notes after fourth species, but behaves weird
+        //rel(home, expr(home, speciesArray[i+4]==FOURTH_SPECIES), BOT_OR, expr(home, speciesArray[i+4]==THIRD_SPECIES), b14);
         rel(home, speciesArray[i+4], IRT_EQ, FOURTH_SPECIES, Reify(b14));
         rel(home, speciesArray[i+3], IRT_EQ, -1, Reify(b34, RM_IMP));
         rel(home, b34, BOT_EQV, b14, 1);
