@@ -47,6 +47,15 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
 
     //H8 : the triad should be used as much as possible
     H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper_1, upper_2);
+
+    for(int v1 = 0; v1 < parts.size(); v1++){
+        for(int v2 = v1+1; v2 < parts.size(); v2++){
+            for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
+                rel(*this, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);
+            }
+        }
+    }
+
     //M4 variety cost (notes should be as diverse as possible)
     M4_varietyCost(*this, parts);
 

@@ -43,6 +43,14 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
     H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
+
+    for(int v1 = 0; v1 < parts.size(); v1++){
+        for(int v2 = v1+1; v2 < parts.size(); v2++){
+            for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
+                rel(*this, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);
+            }
+        }
+    }
     
     //M4 variety cost (notes should be as diverse as possible)
     M4_varietyCost(*this, parts);
