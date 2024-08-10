@@ -756,7 +756,7 @@
         (print "sol-pitches :")
         (print sol-pitches)
         (let (
-            (basic-rythmics (get-basic-rythmics *species-list *cf-len sol-pitches))
+            (basic-rythmics (get-basic-rythmics *species-list *cf-len sol-pitches sol))
             (sol-voices (make-list *N-COUNTERPOINTS :initial-element nil))
             )
 
@@ -802,7 +802,6 @@
 ; - species-list: the species [1 2 3 4]
 ; - len: the length of the cantus-firmus
 ; - sol-pitches: the whole solution array
-; - counterpoints: the counterpoints we are working with (only useful for the 5th species as it needs the extended-cp-domain)
 ; - sol: the solutino space (only useful for the 5th species)
 ; return format = '('(rythmics-1 pitches-1) '(rythmics-2 pitches-2) ... '(rythmics-n pitches-n))
 ; examples:
@@ -812,7 +811,7 @@
 ; ((3) 5) -> ((1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1 (pitches))
 ; ((4) 5) -> ~((-1/2 1 1 1 1/2 1/2 1 (pitches)) depending on the counterpoint
 
-(defun get-basic-rythmics (species-list len sol-pitches)
+(defun get-basic-rythmics (species-list len sol-pitches sol)
     (print "get-basic-rythmics function entered")
     (setq len-1 (- len 1))
     (setq len-2 (- len 2))
@@ -868,35 +867,38 @@
                     ; remove all the notes we've just considered from sol-pitches
                     (setf sol-pitches (subseq sol-pitches (- (* 4 len) 3)))
                 ))
-                (4 (error "The fourth species is not implemented yet in get-basic-rythmics function.")
-                ;; (progn 
-                ;;     (setf (nth i rythmic+pitches) (build-rythmic-pattern
-                ;;         (get-4th-species-array len-2)
-                ;;         (get-4th-notes-array (subseq sol-pitches 0 (* 2 len-1)) (+ (* 4 len-1) 1))
-                ;;     ))
-                ;;     (setf j 0)
-                ;;     (dotimes (k *cf-penult-index)
-                ;;         (setf j (+ j 2))
-                ;;         ; if we have a note that creates a hidden fifth (direct motion to a fifth), then remove the note
-                ;;         (if (and
-                ;;             (eq 7 (nth (+ 1 j) (gil::g-values sol (first (h-intervals (nth i counterpoints))))))
-                ;;             (eq DIRECT (nth j (gil::g-values sol (first (motions (nth i counterpoints))))))
-                ;;             )
-                ;;             (setf (nth j (first (nth i rythmic+pitches))) -1/2)
-                ;;         )
-                ;;     )
-                ;;     (setf sol-pitches (subseq sol-pitches (* 2 len-1)))
-                ;; )
+                (4 ;(error "The fourth species is not implemented yet in get-basic-rythmics function.")
+                (progn 
+                    (setf (nth i rythmic+pitches) (build-rythmic-pattern
+                        (get-4th-species-array len-2)
+                        (get-4th-notes-array (subseq sol-pitches 0 (* 2 len-1)) (+ (* 4 len-1) 1))
+                    ))
+                    ;; (setf j 0)
+                    ;; (dotimes (k *cf-penult-index)
+                    ;;     (setf j (+ j 2))
+                    ;;     ; if we have a note that creates a hidden fifth (direct motion to a fifth), then remove the note
+                    ;;     (if (and
+                    ;;         (eq 7 (nth (+ 1 j) (gil::g-values sol (first (h-intervals (nth i counterpoints))))))
+                    ;;         (eq DIRECT (nth j (gil::g-values sol (first (motions (nth i counterpoints))))))
+                    ;;         )
+                    ;;         (setf (nth j (first (nth i rythmic+pitches))) -1/2)
+                    ;;     )
+                    ;; )
+                    (setf sol-pitches (subseq sol-pitches (* 2 len-1)))
                 )
-                (5 (error "The fifth species is not implemented yet in get-basic-rythmics function.")
-                ;; (let (
-                ;;         (sol-species (gil::g-values sol (species-arr (nth i counterpoints)))) ; store the values of the solution
-                ;;     )                    
-                ;;     (setf (nth i rythmic+pitches) 
-                ;;         (parse-species-to-om-rythmic sol-species sol-pitches (extended-cp-domain (nth i counterpoints)))
-                ;;     )
-                ;;     (setf sol-pitches (subseq sol-pitches (solution-len (nth i counterpoints))))
-                ;; )
+                )
+                (5 ;; (error "The fifth species is not implemented yet in get-basic-rythmics function.")
+                (let (
+                        ;; (sol-species (gil::g-values sol (species-arr (nth i counterpoints)))) ;; store the values of the solution
+                        (sol-species (species-array-to-int-array sol i len)) ;; get the solution array from Gecode
+                        (ext-cp-dom (ext-domain-to-int-array sol i)) ;; get the extended cp domain from Gecode
+                    )                    
+                    (setf (nth i rythmic+pitches) 
+                        (parse-species-to-om-rythmic sol-species sol-pitches ext-cp-dom)
+                    )
+                    ;; (setf sol-pitches (subseq sol-pitches (solution-len (nth i counterpoints))))
+                    (setf sol-pitches (subseq sol-pitches (- (* len 4) 3)))
+                )
                 )
             )
         ))
@@ -1202,5 +1204,290 @@
     (cond
     ((equal v "Yes") 1)
     ((equal v "No")  0)
+    )
+)
+
+
+
+
+
+; 4SP AND 5SP SPECIFIC 
+
+; build the rythmic pattern for open music from the species array
+; - species-arr: array of integer for species
+; - cp-arr: array of integer for counterpoint notes
+; - rythmic-arr: array of integer for the rythmic (supposed to be nil and then filled by the recursive function)
+; - notes-arr: array of interger for notes (supposed to be nil and then filled by the recursive function)
+; - b-debug: boolean to print debug info
+; note: this function has noting to do with GECODE
+(defun build-rythmic-pattern (species-arr cp-arr &optional (rythmic-arr nil) (notes-arr nil) (extended-cp-domain nil) (b-debug nil))
+    ; print debug info
+    (if b-debug
+        (progn
+        (print "Current species and notes:")
+        (print species-arr)
+        (print cp-arr)
+        (print "Current answer:")
+        (print rythmic-arr)
+        (print notes-arr)
+        )
+    )
+    ; base case
+    (if (null species-arr)
+        ; then return the rythmic pattern
+        (list rythmic-arr notes-arr)
+    )
+
+    (let (
+        (sn (first species-arr)) ; current species
+        (sn+1 (second species-arr)) ; next species
+        (sn+2 (third species-arr)) ; next next species
+        (sn+3 (fourth species-arr)) ; next next next species
+        (cn (first cp-arr)) ; current counterpoint note
+        (cn+1 (second cp-arr)) ; next counterpoint note
+        (cn+2 (third cp-arr)) ; next next counterpoint note
+        (cn+3 (fourth cp-arr)) ; next next next counterpoint note
+    )
+        ; replace all nil by -1 for the species
+        (if (null sn) (setf sn -1))
+        (if (null sn+1) (setf sn+1 -1))
+        (if (null sn+2) (setf sn+2 -1))
+        (if (null sn+3) (setf sn+3 -1))
+        ; replace all nil by -1 for the counterpoint
+        (if (null cn) (setf cn -1))
+        (if (null cn+1) (setf cn+1 -1))
+        (if (null cn+2) (setf cn+2 -1))
+        (if (null cn+3) (setf cn+3 -1))
+
+        (if b-debug
+            (progn
+            (print (format nil "sn: ~a, sn+1: ~a, sn+2: ~a, sn+3: ~a" sn sn+1 sn+2 sn+3))
+            (print (format nil "cn: ~a, cn+1: ~a, cn+2: ~a, cn+3: ~a" cn cn+1 cn+2 cn+3))
+            )
+        )
+
+        (cond
+            ; 1 if it is the last note [1 -1 ...]
+            ((and (eq sn 1) (eq sn+1 -1))
+                (list (append rythmic-arr (list 1)) (append notes-arr (list cn)))
+            )
+
+            ; if [4 0 4 ...] -> which syncope ?
+            ((and (eq sn 4) (eq sn+1 0) (eq sn+2 4))
+            (if (/= cn cn+2) ; syncopation but different notes ?
+                ; then same as half note
+                (if (eq sn+3 3)
+                    ; then 1/2 + 1/4 if [4 0 4 3] (syncopation catch up by a quarter note)
+                    (build-rythmic-pattern
+                        (nthcdr 3 species-arr)
+                        (nthcdr 3 cp-arr)
+                        (append rythmic-arr (list 1/2 1/4))
+                        (append notes-arr (list cn cn+2))
+                        extended-cp-domain
+                    )
+                    ; else 1/2 + 1/2 if [4 0 4 0] (basic syncopation)
+                    (build-rythmic-pattern
+                        (nthcdr 4 species-arr)
+                        (nthcdr 4 cp-arr)
+                        (append rythmic-arr (list 1/2 1/2))
+                        (append notes-arr (list cn cn+2))
+                        extended-cp-domain
+                    )
+                )
+                ; else same as full note syncopated
+                (if (eq sn+3 3)
+                    ; then 3/4 if [4 0 4 3] (syncopation catch up by a quarter note)
+                    (build-rythmic-pattern
+                        (nthcdr 3 species-arr)
+                        (nthcdr 3 cp-arr)
+                        (append rythmic-arr (list 3/4))
+                        (append notes-arr (list cn))
+                        extended-cp-domain
+                    )
+                    ; else 1 if [4 0 4 0] (basic syncopation)
+                    (build-rythmic-pattern
+                        (nthcdr 4 species-arr)
+                        (nthcdr 4 cp-arr)
+                        (append rythmic-arr (list 1))
+                        (append notes-arr (list cn))
+                        extended-cp-domain
+                    )
+                )
+            ))
+
+            ; 1/8 note (croche) if cn == cn+1 AND [!0 (3 or 4) ...]
+            ((and (eq cn cn+1) (/= sn 0) (or (eq sn+1 3) (eq sn+1 4)))
+                (if (>= (lastone notes-arr) cn)
+                    ; then eighth note with the next lower note
+                    (build-rythmic-pattern
+                        (nthcdr 1 species-arr)
+                        (nthcdr 1 cp-arr)
+                        (append rythmic-arr (list 1/8 1/8))
+                        (append notes-arr (list cn (find-next-note cn 'lower extended-cp-domain)))
+                        extended-cp-domain
+                    )
+                    ; else eighth note with the next higher note
+                    (build-rythmic-pattern
+                        (nthcdr 1 species-arr)
+                        (nthcdr 1 cp-arr)
+                        (append rythmic-arr (list 1/8 1/8))
+                        (append notes-arr (list cn (find-next-note cn 'higher extended-cp-domain)))
+                        extended-cp-domain
+                    )
+                )
+            )
+
+            ; silence if [0 0 ...]
+            ((and (eq sn 0) (eq sn+1 0))
+                (build-rythmic-pattern
+                    (nthcdr 2 species-arr)
+                    (nthcdr 2 cp-arr)
+                    (append rythmic-arr (list -1/2))
+                    notes-arr
+                    extended-cp-domain
+                )
+            )
+
+            ; 1 if [1 0 0 0] (full note)
+            ((and (eq sn 1) (eq sn+1 0) (eq sn+2 0) (eq sn+3 0))
+                (build-rythmic-pattern
+                    (nthcdr 4 species-arr)
+                    (nthcdr 4 cp-arr)
+                    (append rythmic-arr (list 1))
+                    (append notes-arr (list cn))
+                    extended-cp-domain
+                )
+            )
+            
+            ; 1/2 if [2 0 ...] (half note)
+            ((and (eq sn 2) (eq sn+1 0))
+                (build-rythmic-pattern
+                    (nthcdr 2 species-arr)
+                    (nthcdr 2 cp-arr)
+                    (append rythmic-arr (list 1/2))
+                    (append notes-arr (list cn))
+                    extended-cp-domain
+                )
+            )
+
+            ; 1/4 if [3 ...] (quarter note)
+            ((eq sn 3)
+                (build-rythmic-pattern
+                    (nthcdr 1 species-arr)
+                    (nthcdr 1 cp-arr)
+                    (append rythmic-arr (list 1/4))
+                    (append notes-arr (list cn))
+                    extended-cp-domain
+                )
+            )
+
+            ; 1/2 if [4 0 1 ...] (penultimate note for the 4th species)
+            ((and (eq sn 4) (eq sn+1 0) (eq sn+2 1))
+                (build-rythmic-pattern
+                    (nthcdr 2 species-arr)
+                    (nthcdr 2 cp-arr)
+                    (append rythmic-arr (list 1/2))
+                    (append notes-arr (list cn))
+                    extended-cp-domain
+                )
+            )
+        )
+    )
+)
+
+
+; return a species array for a 4th species counterpoint
+; - len-2: the length of the counterpoint - 2
+(defun get-4th-species-array (len-2)
+    (append (list 0 0) (get-n-4040 len-2) (list 4 0 1))
+)
+
+; return a note array for a 4th species counterpoint
+; - len: the length of the cantus firmus
+(defun get-4th-notes-array (cp len)
+    (let* (
+        (notes (make-list len :initial-element 0)) ; notes that we don't care about can be 0
+    )
+        (loop
+        for n from 2 below len by 2 ; we move from 4 to 4 (4 0 4 ...) after the silence (0 0) at the start
+        for p in cp
+        do
+            (setf (nth n notes) p)
+        )
+        notes
+    )
+)
+
+; return a list with n * (4 0 4 0), used to build the rythmic pattern for the 4th species
+; - n: the number of times the pattern is repeated
+(defun get-n-4040 (n)
+    (if (eq n 0)
+        nil
+        (append (list 4 0 4 0) (get-n-4040 (- n 1)))
+    )
+)
+
+
+
+; parse the species array to get the corresponding rythmic pattern for open music
+; - species-arr: array of integer for species (returned by the next-solution algorithm)
+; - cp-arr: array of integer for counterpoint notes (returned by the next-solution algorithm)
+; note: this function has noting to do with GECODE
+(defun parse-species-to-om-rythmic (species-arr cp-arr extended-cp-domain)
+    ; replace the last element of the species array by 1
+    (setf (first (last species-arr)) 1)
+    (build-rythmic-pattern species-arr cp-arr nil nil extended-cp-domain)
+)
+
+
+
+
+; return the last element of a list
+(defun lastone (l)
+    (first (last l))
+)
+
+; return the rest of a list without its last element
+(defun restbutlast (l)
+    (butlast (rest l))
+)
+
+; return the penultimate element of a list
+(defun penult (l)
+    (nth (- (length l) 2) l)
+)
+
+
+; find the next @type note in the borrowed scale,
+; if there is no note in the range then return the note of the other @type
+; - note: integer for the current note
+; - type: atom [lower | higher] for the type of note to find
+; note: this function has noting to do with GECODE
+(defun find-next-note (note type extended-cp-domain)
+    (let (
+        ; first sort the scale corresponding to the type
+        (sorted-scale (if (eq type 'lower)
+            (sort extended-cp-domain #'>)
+            (sort extended-cp-domain #'<)
+        ))
+        )
+        (if (eq type 'lower)
+            ; then we search the first note in the sorted scale that is lower than the current note
+            (progn
+                (loop for n in sorted-scale do
+                    (if (< n note) (return-from find-next-note n))
+                )
+                ; no note so we return the penultimate element of the sorted scale
+                (penult sorted-scale)
+            )
+            ; else we search the first note in the sorted scale that is higher than the current note
+            (progn
+                (loop for n in sorted-scale do
+                    (if (> n note) (return-from find-next-note n))
+                )
+                ; no note so we return the penultimate element of the sorted scale
+                (penult sorted-scale)
+            )
+        )
     )
 )

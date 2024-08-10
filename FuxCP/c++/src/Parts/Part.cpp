@@ -314,6 +314,10 @@ vector<int> Part::getOffDomain(){
     return off_domain;
 }
 
+vector<int> Part::getExtendedDomain(){
+    return extended_domain;
+}
+
 IntVarArray Part::getOffCostArray(){
     return offCostArray;
 }

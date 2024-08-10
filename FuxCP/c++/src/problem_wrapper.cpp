@@ -74,6 +74,24 @@ int* return_solution(void* sp){
     return static_cast<CounterpointProblem*>(sp)->return_solution();
 }
 
+
+// =========== NEEDED BY 5SP PARSER =================
+
+int* return_species_array_5sp(void* sp, int ctp_index){
+    return static_cast<CounterpointProblem*>(sp)->get_species_array_5sp(ctp_index);
+}
+
+int* return_extended_cp_domain(void* sp, int ctp_index){
+    return static_cast<CounterpointProblem*>(sp)->get_extended_cp_domain(ctp_index);
+}
+
+int get_extended_cp_domain_size(void* sp, int ctp_index){
+    return static_cast<CounterpointProblem*>(sp)->get_ext_cp_domain_size(ctp_index);
+}
+
+// ====================================================
+
+
 /**
  * creates a search engine for Problem objects
  * @param sp a void* pointer to a Problem object

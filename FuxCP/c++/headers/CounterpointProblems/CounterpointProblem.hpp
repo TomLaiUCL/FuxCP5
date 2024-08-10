@@ -91,6 +91,10 @@ public:
 
     IntVarArray getSolutionArray();
 
+    int* get_species_array_5sp(int ctp_index);
+    int* get_extended_cp_domain(int ctp_index);
+    int  get_ext_cp_domain_size(int ctp_index);
+
     void setLowest(Part* counter2, Part* counter3, Stratum* upper1, Stratum* upper2, Stratum* upper3);
 };
 

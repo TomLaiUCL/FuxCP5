@@ -18,9 +18,10 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     CounterpointProblem(cf, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES){
     species = sp;
     upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes()); 
+    
     counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, (6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0], lowest, cantusFirmus, 
         v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
-
+    
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
     G6_noChromaticMelodies(*this, counterpoint_1, species);
 
@@ -52,10 +53,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
 
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     if(species==FIFTH_SPECIES){
-        branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
-    }
-    if(species==FOURTH_SPECIES){
-        //branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+        branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
     }
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
     

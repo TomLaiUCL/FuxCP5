@@ -512,9 +512,9 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     cost_names = {"fifth", "octave", "borrow", "melodic", "motion", "cambiata", "m2", "syncopation"};
 
     //set cost[0] to be fifth cost
-    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(1, 4/notesPerMeasure.at(FIFTH_SPECIES), fifthCostArray.size())), costs);
+    add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIFTH_SPECIES), fifthCostArray.size())), costs);
     //set cost[1] to be octave cost
-    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(1, 4/notesPerMeasure.at(FIFTH_SPECIES), octaveCostArray.size())), costs);
+    add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(0, 4/notesPerMeasure.at(FIFTH_SPECIES), octaveCostArray.size())), costs);
     //set cost[2] to be off cost
     add_cost(home, 2, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIFTH_SPECIES), offCostArray.size())), costs);
     //set cost[3] to be melodic cost
@@ -647,7 +647,7 @@ string FifthSpeciesCounterpoint::to_string() const {
     text += "Fifth species notes : " + intVarArray_to_string(fifthSpeciesNotesCp) + "\n";
     text += "M Intervals array : " + intVarArray_to_string(fifthSpeciesSuccMIntervals) + "\n";
     text += "isMostlyThird : " + boolVarArray_to_string(isMostlyThirdArray) + "\n";
-    text += "Species array : " + intVarArray_to_string(speciesArray) + "\n";
+    text += "M Intervals array : " + intVarArray_to_string(fifthSpeciesMIntervals) + "\n";
     return text;
 }
 

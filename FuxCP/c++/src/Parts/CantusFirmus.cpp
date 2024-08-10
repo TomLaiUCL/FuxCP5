@@ -17,10 +17,7 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
     for(int i = 0; i < size; i++){
         rel(home, h_intervals[i], IRT_EQ, expr(home, (notes[i]-low->getFirstNotes()[i])%12));
     }
-    /// link aux variables de la part
-    //rel(home, active_notes, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
 
-    /// The cantus firmus is deterministic, so the values are assigned. It is useful to have it as an IntVarArray for > 3 voices.
     for(int i = 0; i < size; i++)
         rel(home, notes[i], IRT_EQ, cf_vector[i]);
 

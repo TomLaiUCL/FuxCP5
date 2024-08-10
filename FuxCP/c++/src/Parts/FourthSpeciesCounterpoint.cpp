@@ -213,13 +213,16 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
-
+    
     //4.H2 : If the 4th species is the lowest stratum, then no hamonic seventh
-    for(int j = 1; j < c->getIsNotLowest().size(); j++){
-        rel(home, (getIsNotLowest()[j]==0) >> (firstHInterval[j]!=MINOR_SEVENTH && firstHInterval[j]!=-MINOR_SEVENTH));
-        rel(home, (getIsNotLowest()[j]==0) >> (firstHInterval[j]!=MAJOR_SEVENTH && firstHInterval[j]!=-MAJOR_SEVENTH));
-    }
+    for(int j = 1; j < getIsNotLowest().size(); j++){
+        //rel(home, (getIsNotLowest()[j]==0) >> (firstHInterval[j]!=MINOR_SEVENTH && firstHInterval[j]!=-MINOR_SEVENTH));
+        //rel(home, (getIsNotLowest()[j]==0) >> (firstHInterval[j]!=MAJOR_SEVENTH && firstHInterval[j]!=-MAJOR_SEVENTH));
 
+        rel(home, (getIsNotLowest()[j]==0) >> (fourthSpeciesHIntervals[(j*2)]!=MINOR_SEVENTH && fourthSpeciesHIntervals[(j*2)]!=-MINOR_SEVENTH));
+        rel(home, (getIsNotLowest()[j]==0) >> (fourthSpeciesHIntervals[(j*2)]!=MAJOR_SEVENTH && fourthSpeciesHIntervals[(j*2)]!=-MAJOR_SEVENTH));
+    }
+    cout << "HEREEEEEEEEEEEE" << endl;
     //Must start with a perfect consonance (since 1.H2 applies to the first note, which is most likely a rest in 4th species)
     dom(home, fourthSpeciesHIntervals[1], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));
 
