@@ -43,7 +43,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     }
 
 
-    firstHInterval = IntVarArray(home, fourthSpeciesHIntervals.slice(0, 2, fourthSpeciesHIntervals.size()));
+    firstHInterval = IntVarArray(home, fourthSpeciesHIntervals.slice(2, 2, fourthSpeciesHIntervals.size()));
 
     //m-intervals : arsis and next thesis
     //m-succ-intervals : thesis and arsis in same measure
@@ -244,7 +244,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2):
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
 {
-    varietyCostArray = IntVarArray(home, 3*(fourthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
+    varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
 
     //4.P5
     for(int j = 0; j < nMeasures-1; j++){
@@ -276,7 +276,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
 {
-    varietyCostArray = IntVarArray(home, 3*(fourthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
+    varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
 
     //4.P5
     for(int j = 0; j < nMeasures-1; j++){
@@ -313,7 +313,7 @@ string FourthSpeciesCounterpoint::to_string() const {
     text += "No Syncope array : " + boolVarArray_to_string(isNoSyncopeArray) + "\n";
     text += "H intervals array : " + intVarArray_to_string(fourthSpeciesHIntervals) + "\n";
     text += "M intervals array : " + intVarArray_to_string(fourthSpeciesMelodicIntervals) + "\n";
-    text += "offCost array : " + intVarArray_to_string(offCostArray) + "\n";
+    text += "Variety array : " + intVarArray_to_string(varietyCostArray) + "\n";
     return text;
 }
 
@@ -349,5 +349,5 @@ IntVarArray FourthSpeciesCounterpoint::getFirstMInterval(){
 }
 
 int FourthSpeciesCounterpoint::getHIntervalSize(){
-    return fourthSpeciesHIntervals.size();
+    return fourthSpeciesHIntervals.size()-1;
 }

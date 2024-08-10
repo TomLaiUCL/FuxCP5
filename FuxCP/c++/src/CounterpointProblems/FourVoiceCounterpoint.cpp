@@ -31,6 +31,16 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 
     successiveCostArray = IntVarArray(*this, scc_cz, IntSet({0, counterpoint_1->getSuccCost()}));
 
+    G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+
+    for(int p = 1; p < parts.size(); p++){
+        // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
+        G6_noChromaticMelodies(*this, parts[p], sp[p-1]);
+
+        // H5 from Thibault : The cp and the cf cannot play the same note
+        H5_1_cpAndCfDifferentNotes(*this, parts[p], cantusFirmus);
+    }
+
     //H8 : harmonic triads are preferred, adapted for 4 voices
     H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
     
