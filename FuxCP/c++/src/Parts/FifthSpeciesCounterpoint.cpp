@@ -647,7 +647,7 @@ string FifthSpeciesCounterpoint::to_string() const {
     text += "Fifth species notes : " + intVarArray_to_string(fifthSpeciesNotesCp) + "\n";
     text += "M Intervals array : " + intVarArray_to_string(fifthSpeciesSuccMIntervals) + "\n";
     text += "isMostlyThird : " + boolVarArray_to_string(isMostlyThirdArray) + "\n";
-    text += "M Intervals array : " + intVarArray_to_string(fifthSpeciesMIntervals) + "\n";
+    text += "not Lowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
     return text;
 }
 
