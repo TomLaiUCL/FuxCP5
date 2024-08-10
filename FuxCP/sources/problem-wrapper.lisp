@@ -119,6 +119,66 @@
         (sp :pointer) ; a void* cast of a Problem object that is a solution of the problem.
 )
 
+
+;; ============= NEEDED BY 5SP PARSER ==================
+
+(cffi::defcfun ("return_species_array_5sp" return-species-array-5sp) :pointer
+    "Returns a int* that are the values of the species array for the fifth species, of the ctp-index'th counterpoint."
+        (sp :pointer) ; a void* cast of a Problem object that is a solution of the problem.
+        (ctp-index :int) ; the index of the counterpoint (is it the first, the second or the third counterpoint)
+)
+
+(cffi::defcfun ("return_extended_cp_domain" return-extended-cp-domain) :pointer
+    "Returns a int* that are the values of the extebded cp domain (for the fifth species parser), of the ctp-index'th counterpoint."
+        (sp :pointer) ; a void* cast of a Problem object that is a solution of the problem.
+        (ctp-index :int) ; the index of the counterpoint (is it the first, the second or the third counterpoint)
+)
+
+(cffi::defcfun ("get_extended_cp_domain_size" get-extended-cp-domain-size) :int
+    "Returns the size of the extended cp domain."
+        (sp :pointer) ; a void* cast of a Problem*
+        (ctp-index :int)
+)
+
+
+(defun species-array-to-int-array (sp ctp-index cf-len)
+    "Returns the values the variables have taken in the solution as a list of integers. Casts a int* into a list of numbers."
+    "sp is a void* cast of a Problem* that is a solution to the problem. Calling this funciton on a non-solution 
+        will result in an error."
+    
+        (if (cffi::null-pointer-p sp)
+            (error "Error when retrieving species array for the fifth species.")
+        )
+    (let* (
+            (size (- (* cf-len 4) 3))
+            (ptr (return-species-array-5sp sp ctp-index))
+        )
+        (loop for i from 0 below size
+            collect (cffi::mem-aref ptr :int i)
+        )
+    )
+)
+
+(defun ext-domain-to-int-array (sp ctp-index)
+    "Returns the values the variables have taken in the solution as a list of integers. Casts a int* into a list of numbers."
+    "sp is a void* cast of a Problem* that is a solution to the problem. Calling this funciton on a non-solution 
+        will result in an error."
+        (if (cffi::null-pointer-p sp) ; TODO check
+            (error "No (more) solutions.")
+        )
+    (let* (
+            (size (get-extended-cp-domain-size sp ctp-index))
+            (ptr (return-extended-cp-domain sp ctp-index))
+        )
+        (loop for i from 0 below size
+            collect (cffi::mem-aref ptr :int i)
+        )
+    )
+)
+
+
+;;  ======================================================
+
 (defun solution-to-int-array (sp)
     "Returns the values the variables have taken in the solution as a list of integers. Casts a int* into a list of numbers."
     "sp is a void* cast of a Problem* that is a solution to the problem. Calling this funciton on a non-solution 

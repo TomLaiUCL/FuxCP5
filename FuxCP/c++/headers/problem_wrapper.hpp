@@ -58,6 +58,11 @@ void* return_next_solution_space(void* solver);
 int search_stopped(void* solver);
 
 
+int* return_species_array_5sp(void* sp, int ctp_index); 
+int* return_extended_cp_domain(void* sp, int ctp_index);
+int get_extended_cp_domain_size(void* sp, int ctp_index);
+
+
 #ifdef __cplusplus
 };
 #endif

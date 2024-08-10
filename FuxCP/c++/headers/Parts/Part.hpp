@@ -186,6 +186,8 @@ class Part : public Voice {
 
         vector<int> getOffDomain();
 
+        vector<int> getExtendedDomain();
+
         IntVarArray getOffCostArray();
 
         BoolVarArray getIsDiminution();

@@ -324,12 +324,99 @@ int* CounterpointProblem::return_solution(){
     string message = "return_solution method. Solution : [";
     int* solution = new int[solutionArray.size()];
     for(int i = 0; i < solutionArray.size(); i++){
-        solution[i] = solutionArray[i].val();       // TODO : modify!!
+        solution[i] = solutionArray[i].val();       
         message += std::to_string(solution[i]) + " ";
     }
     message += "]\n";
     writeToLogFile(message.c_str());
     return solution;
+}
+
+
+int* CounterpointProblem::get_species_array_5sp(int ctp_index){  
+
+    FifthSpeciesCounterpoint* fifth_sp_ctp; 
+    if (ctp_index == 0) fifth_sp_ctp = dynamic_cast<FifthSpeciesCounterpoint*>(counterpoint_1); 
+    else if (ctp_index == 1) fifth_sp_ctp = dynamic_cast<FifthSpeciesCounterpoint*>(counterpoint_2); 
+    else if (ctp_index == 2) fifth_sp_ctp = dynamic_cast<FifthSpeciesCounterpoint*>(counterpoint_3); 
+    else{
+        writeToLogFile("invalid value of ctp_index given as argument to get_species_array_5sp");
+        return nullptr;
+    }
+
+    if (!fifth_sp_ctp){
+        cout << "type cast of part to fifth species failed " << endl;
+        writeToLogFile("type cast of part to fifth species failed");
+        return nullptr;
+    }
+
+    IntVarArray speciesArray = fifth_sp_ctp->getSpeciesArray();
+
+    string message = "return_species_array method. Species array : [";
+    int* solution = new int[speciesArray.size()];
+    for(int i = 0; i < speciesArray.size(); i++){
+        
+        switch (speciesArray[i].val())
+        {
+        case FIRST_SPECIES:
+            solution[i] = 1;
+            break;
+
+        case SECOND_SPECIES:
+            solution[i] = 2;
+            break;
+
+        case THIRD_SPECIES:
+            solution[i] = 3;
+            break;
+
+        case FOURTH_SPECIES:
+            solution[i] = 4;
+            break;
+
+        case -1:
+            solution[i] = 0;
+            break;
+
+        default:
+            cout << "invalid value in species array" << endl;
+            writeToLogFile("invalid value in species array");
+            return nullptr;
+        }
+        message += std::to_string(solution[i]) + " ";
+    }
+    message += "]\n";
+    writeToLogFile(message.c_str());
+    return solution;
+}
+
+
+int* CounterpointProblem::get_extended_cp_domain(int ctp_index){
+    vector<int> ext_cp_dom;
+    if(ctp_index == 0) ext_cp_dom = counterpoint_1->getExtendedDomain();
+    else if(ctp_index == 1) ext_cp_dom = counterpoint_2->getExtendedDomain();
+    else if(ctp_index == 2) ext_cp_dom = counterpoint_3->getExtendedDomain();
+    else{
+        writeToLogFile("invalid value of ctp_index given as argument to get_extended_cp_domain");
+        return nullptr;
+    }
+    int* ext_cp_dom_array = ext_cp_dom.data();
+    return ext_cp_dom_array;
+}
+
+int CounterpointProblem::get_ext_cp_domain_size(int ctp_index){
+    int cpDomSize;
+    if(ctp_index == 0) cpDomSize = counterpoint_1->getExtendedDomain().size();
+    else if(ctp_index == 1) cpDomSize = counterpoint_2->getExtendedDomain().size();
+    else if(ctp_index == 2) cpDomSize = counterpoint_3->getExtendedDomain().size();
+    else{
+        writeToLogFile("invalid value of ctp_index given as argument to get_extended_cp_domain");
+        return -1;
+    }
+
+    string message = "getextcpdomainsize function called. size = " + std::to_string(cpDomSize) + "\n";
+    writeToLogFile(message.c_str());
+    return cpDomSize;
 }
 
 
