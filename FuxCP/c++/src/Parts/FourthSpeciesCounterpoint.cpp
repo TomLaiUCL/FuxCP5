@@ -28,6 +28,8 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     if(borrowMode==1){
         fourthSpeciesNotesCp[fourthSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     }
+    
+    sol = IntVarArray(home, fourthSpeciesNotesCp.slice(1,1,fourthSpeciesNotesCp.size()));
 
     fourthSpeciesHIntervals = IntVarArray(home, (nMeasures*notesPerMeasure.at(FOURTH_SPECIES))-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
 
@@ -229,9 +231,9 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     //set cost[1] to be octave cost
     add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(1, 4/notesPerMeasure.at(FOURTH_SPECIES), octaveCostArray.size())), costs);
     //set cost[2] to be melodic cost
-    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
+    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
     //set cost[3] to be off cost
-    add_cost(home, 3, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
+    add_cost(home, 3, IntVarArray(home, offCostArray.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
     //need to set cost[4] to be m2Zero cost
     add_cost(home, 4, m2ZeroArray, costs);
     //need to set cost[5] to be syncopation cost
@@ -258,9 +260,9 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     //set cost[1] to be octave cost
     add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(1, 4/notesPerMeasure.at(FOURTH_SPECIES), octaveCostArray.size())), costs);
     //set cost[2] to be melodic cost
-    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
+    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
     //set cost[3] to be off cost
-    add_cost(home, 3, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
+    add_cost(home, 3, IntVarArray(home, offCostArray.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
     //need to set cost[4] to be m2Zero cost
     add_cost(home, 4, m2ZeroArray, costs);
     //need to set cost[5] to be syncopation cost
@@ -290,9 +292,9 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     //set cost[1] to be octave cost
     add_cost(home, 1, IntVarArray(home, octaveCostArray.slice(1, 4/notesPerMeasure.at(FOURTH_SPECIES), octaveCostArray.size())), costs);
     //set cost[2] to be melodic cost
-    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
+    add_cost(home, 2, IntVarArray(home, melodicDegreeCost.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), melodicDegreeCost.size())), costs);
     //set cost[3] to be off cost
-    add_cost(home, 3, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
+    add_cost(home, 3, IntVarArray(home, offCostArray.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), offCostArray.size())), costs);
     //need to set cost[4] to be m2Zero cost
     add_cost(home, 4, m2ZeroArray, costs);
     //need to set cost[5] to be syncopation cost
@@ -311,7 +313,7 @@ string FourthSpeciesCounterpoint::to_string() const {
     text += "No Syncope array : " + boolVarArray_to_string(isNoSyncopeArray) + "\n";
     text += "H intervals array : " + intVarArray_to_string(fourthSpeciesHIntervals) + "\n";
     text += "M intervals array : " + intVarArray_to_string(fourthSpeciesMelodicIntervals) + "\n";
-    text += "Consonance array : " + boolVarArray_to_string(isConsonance) + "\n";
+    text += "offCost array : " + intVarArray_to_string(offCostArray) + "\n";
     return text;
 }
 
@@ -323,6 +325,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, FourthSpeciesCou
     m2IntervalsArray.update(home, s.m2IntervalsArray);
     firstHInterval.update(home, s.firstHInterval);
     m2ZeroArray.update(home, s.m2ZeroArray);
+    sol.update(home, s.sol);
 }
 
 FourthSpeciesCounterpoint* FourthSpeciesCounterpoint::clone(Home home){
@@ -330,7 +333,7 @@ FourthSpeciesCounterpoint* FourthSpeciesCounterpoint::clone(Home home){
 }
 
 IntVarArray FourthSpeciesCounterpoint::getBranchingNotes(){
-    return fourthSpeciesNotesCp;
+    return sol;
 }
 
 IntVarArray FourthSpeciesCounterpoint::getFirstHInterval(){

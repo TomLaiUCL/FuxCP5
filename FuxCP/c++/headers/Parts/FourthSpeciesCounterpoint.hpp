@@ -20,6 +20,7 @@ protected:
     IntVarArray m2IntervalsArray;
     IntVarArray firstHInterval;
     IntVarArray m2ZeroArray;
+    IntVarArray sol;
     
 public:
     /**
