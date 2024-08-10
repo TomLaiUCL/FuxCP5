@@ -112,7 +112,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
         rel(home, fourthSpeciesMelodicIntervals[(i*2)+1], IRT_EQ, 0, Reify(isNoSyncopeArray[i]));
     }
     
-    // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
+    // G6 : no chromatic melodies
     
     for(int i = 0; i < m_intervals_brut.size()-1; i+=4/notesPerMeasure.at(FOURTH_SPECIES)){
         rel(home, expr(home, m_intervals_brut[i]==1), BOT_AND, expr(home, m_intervals_brut[i+1]==1), 0);

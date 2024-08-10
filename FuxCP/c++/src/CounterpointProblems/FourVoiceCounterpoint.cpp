@@ -38,20 +38,16 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     M4_varietyCost(*this, parts);
 
     //two fifth species counterpoints should be as different as possible
-    for(int p1 = 1; p1 < parts.size(); p1++){
-        for(int p2 = p1+1; p2 < parts.size(); p2++){
-            if(parts[p1]->getSpecies()==FIFTH_SPECIES && parts[p2]->getSpecies()==FIFTH_SPECIES){
-                BoolVarArray isSameSpecies = BoolVarArray(*this, parts[p1]->getNotes().size(), 0, 1);
-                IntVarArray isSameSpeciesInt = IntVarArray(*this, parts[p1]->getNotes().size(), 0, 1);
-                IntVar percentageSame = IntVar(*this, 0, parts[p1]->getNotes().size());
-                for(int i = 0; i < parts[p1]->getNotes().size(); i++){
-                    rel(*this, parts[p1]->getSpeciesArray()[i], IRT_EQ, parts[p2]->getSpeciesArray()[i], Reify(isSameSpecies[i]));
-                    rel(*this, isSameSpeciesInt[i], IRT_EQ, 1, Reify(isSameSpecies[i]));
-                }
-                rel(*this, percentageSame, IRT_EQ, expr(*this, sum(isSameSpeciesInt)));
-                rel(*this, percentageSame, IRT_LE, floor(parts[p1]->getNotes().size()/2));
-            }
+    if(counterpoint_1->getSpecies()==FIFTH_SPECIES && counterpoint_3->getSpecies()==FIFTH_SPECIES){
+        BoolVarArray isSameSpecies = BoolVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
+        IntVarArray isSameSpeciesInt = IntVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
+        IntVar percentageSame = IntVar(*this, 0, counterpoint_1->getNotes().size());
+        for(int i = 0; i < counterpoint_1->getNotes().size(); i++){
+            rel(*this, counterpoint_1->getSpeciesArray()[i], IRT_EQ, counterpoint_3->getSpeciesArray()[i], Reify(isSameSpecies[i]));
+            rel(*this, isSameSpeciesInt[i], IRT_EQ, 1, Reify(isSameSpecies[i]));
         }
+        rel(*this, percentageSame, IRT_EQ, expr(*this, sum(isSameSpeciesInt)));
+        rel(*this, percentageSame, IRT_LE, floor(counterpoint_1->getNotes().size()/2));
     }
     
     //P4 avoid successive perfect consonances
@@ -94,23 +90,23 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     }
 
     if(species[0]==FIFTH_SPECIES){
-        branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        //branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[1]==FIFTH_SPECIES){
-        branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        //branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[2]==FIFTH_SPECIES){
-        branch(*this, counterpoint_3->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        //branch(*this, counterpoint_3->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
 
     if(species[0]==FIFTH_SPECIES){
-        branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        //branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[1]==FIFTH_SPECIES){
-        branch(*this, counterpoint_2->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        //branch(*this, counterpoint_2->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[2]==FIFTH_SPECIES){
-        branch(*this, counterpoint_3->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        //branch(*this, counterpoint_3->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     
 

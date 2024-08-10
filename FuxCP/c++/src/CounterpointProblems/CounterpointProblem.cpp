@@ -180,16 +180,24 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
         rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
         if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
-        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i!=size-1) {
-            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
+        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES) {
+            if(i==0){
+                rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
+            } else {
+                rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
+            }
         } else{
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
         }
         if(nVoices>=3){
             if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i!=size-1) {
-                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
+            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES) {
+                if(i==0){
+                    rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
+                } else {
+                    rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
+                }
             }else{
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
             }
@@ -197,8 +205,12 @@ void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Strat
         if(nVoices>=4){
             if(counterpoint_3->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i!=size-1) {
-                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
+            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES) {
+                if(i==0){
+                    rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
+                } else {
+                    rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
+                }
             }else{
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
             }
