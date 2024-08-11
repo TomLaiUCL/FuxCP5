@@ -42,6 +42,8 @@ public:
 
     CounterpointProblem* test_1sp_H1();
     CounterpointProblem* test_1sp_H2();
+    CounterpointProblem* test_1sp_H3();
+    CounterpointProblem* test_1sp_H3_2();
 
     void test_2v_1sp_fig22_setter(int i);
     void test_2v_1sp_fig23_setter(int i);
