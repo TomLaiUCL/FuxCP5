@@ -18,6 +18,10 @@ FuxTest::FuxTest(char* test){
         problem = test_1sp_H3();
     } else if(strcmp(test, "1H33")==0){
         problem = test_1sp_H3_2();
+    } else if(strcmp(test, "1H41")==0){
+        problem = test_1sp_H4_1();
+    } else if(strcmp(test, "1H42")==0){
+        problem = test_1sp_H4_2();
     }
     BAB<CounterpointProblem> e(problem);
     int nb_sol = 0;
@@ -120,6 +124,24 @@ CounterpointProblem* FuxTest::test_1sp_H3_2(){
             importance, borrowMode);
     rel(problem->getHome(), problem->getSolutionArray()[(problem->getSize()/2)-1], IRT_EQ, 67); //does not work since it is not a consonant
     rel(problem->getHome(), problem->getSolutionArray()[(problem->getSize())-1], IRT_EQ, 65); //does not work since it is not a consonant
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_1sp_H4_1(){
+    spList = {FIRST_SPECIES};
+    v_type = {1};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 67); //does not work since it is not a consonant
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_1sp_H4_2(){
+    spList = {FIRST_SPECIES};
+    v_type = {1};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-1], IRT_EQ, 67); //does not work since it is not a consonant
     return problem;
 }
 

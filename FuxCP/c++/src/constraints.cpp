@@ -102,8 +102,8 @@ void H3_3_cambiataCost(Home home, Part* part){
 }
 
 void H4_1_keyToneIsTuned(Home home, Part* part){
-    rel(home, (part->getIsNotLowest()[0]==0) >> (part->getFirstHInterval()[0]==0));
-    rel(home, (part->getIsNotLowest()[part->getIsNotLowest().size()-1]==0) >> (part->getFirstHInterval()[part->getFirstHInterval().size()-1]==0));
+    rel(home, (part->getIsNotLowest()[0]==1) >> (part->getFirstHInterval()[0]==0));
+    rel(home, (part->getIsNotLowest()[part->getIsNotLowest().size()-1]==1) >> (part->getFirstHInterval()[part->getFirstHInterval().size()-1]==0));
 }
 
 void H5_1_cpAndCfDifferentNotes(Home home, Part* part, Part* cf){
