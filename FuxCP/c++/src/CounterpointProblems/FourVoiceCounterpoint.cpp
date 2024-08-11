@@ -41,6 +41,8 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
         H5_1_cpAndCfDifferentNotes(*this, parts[p], cantusFirmus);
     }
 
+    H5_1_differentNotes(*this, parts);
+
     //H8 : harmonic triads are preferred, adapted for 4 voices
     H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
 

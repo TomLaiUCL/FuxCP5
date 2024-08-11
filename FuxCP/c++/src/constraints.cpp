@@ -112,6 +112,16 @@ void H5_1_cpAndCfDifferentNotes(Home home, Part* part, Part* cf){
     }
 }
 
+void H5_1_differentNotes(Home home, vector<Part*> parts){
+    for(int v1 = 1; v1 < parts.size(); v1++){
+        for(int v2 = v1+1; v2 < parts.size(); v2++){
+            for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
+                rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);
+            }
+        }
+    }
+}
+
 void H6_1_preferImperfectConsonances(Home home, Part* part){
     for(int i = 0; i < part->getHInterval().size(); i++){
         rel(home, part->getOctaveCostArray()[i], IRT_EQ, part->getHOctaveCost(), Reify(expr(home, part->getHInterval()[i]==UNISSON), RM_PMI));

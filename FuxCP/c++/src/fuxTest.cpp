@@ -22,6 +22,8 @@ FuxTest::FuxTest(char* test){
         problem = test_1sp_H4_1();
     } else if(strcmp(test, "1H42")==0){
         problem = test_1sp_H4_2();
+    } else if(strcmp(test, "1H5")==0){
+        problem = test_1sp_H5();
     }
     BAB<CounterpointProblem> e(problem);
     int nb_sol = 0;
@@ -142,6 +144,15 @@ CounterpointProblem* FuxTest::test_1sp_H4_2(){
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
     rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-1], IRT_EQ, 67); //does not work since it is not a consonant
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_1sp_H5(){
+    spList = {FIRST_SPECIES};
+    v_type = {0};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 62); //does not work since it is not a consonant
     return problem;
 }
 

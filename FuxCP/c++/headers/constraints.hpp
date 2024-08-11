@@ -35,6 +35,8 @@ void H4_1_keyToneIsTuned(Home home, Part* part);
 
 void H5_1_cpAndCfDifferentNotes(Home home, Part* part, Part* cf);
 
+void H5_1_differentNotes(Home home, vector<Part*> part);
+
 void H6_1_preferImperfectConsonances(Home home, Part* part);
 
 void H7_1_2v_penultimateSixthOrThird(Home home, Part* part);
