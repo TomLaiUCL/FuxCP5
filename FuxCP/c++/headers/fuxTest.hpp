@@ -3,6 +3,9 @@
 
 #include "Utilities.hpp"
 #include "Parts/Part.hpp"
+#include "CounterpointUtils.hpp"
+#include "CounterpointProblems/CounterpointProblem.hpp"
+#include "Parts/CantusFirmus.hpp"
 
 using namespace Gecode;
 using namespace std;
@@ -16,8 +19,15 @@ protected:
     int borrowMode;
     vector<int> cp;
     int idx;
+    int size;
+    vector<int> melodic_params;
+    vector<int> general_params;
+    vector<int> specific_params;
+    vector<int> importance;
 
 public:
+
+    FuxTest(char* test);
 
     FuxTest(int testNumber);
 
@@ -29,6 +39,9 @@ public:
     int getBMode();
     vector<int> getCp();
     int getIdx();
+
+    CounterpointProblem* test_1sp_H1();
+    CounterpointProblem* test_1sp_H2();
 
     void test_2v_1sp_fig22_setter(int i);
     void test_2v_1sp_fig23_setter(int i);

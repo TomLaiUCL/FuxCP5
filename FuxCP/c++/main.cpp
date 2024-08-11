@@ -133,8 +133,8 @@ int main(int argc, char* argv[]) {
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            // if (nb_sol >= 1)
-            //     break;
+            if (nb_sol >= 1)
+                break;
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==3){
@@ -206,74 +206,78 @@ int main(int argc, char* argv[]) {
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==2){
-        FuxTest* test = new FuxTest(atoi(argv[1]));
-        vector<Species> species = test->getSpList();
-        //la do si re do mi fa mi re do si la
-        //57 60 59 62 60 64 65 64 62 60 59 57
-        vector<int> cantusFirmus = test->getCf();
-        
-        int size = cantusFirmus.size();
-        vector<int> v_type = test->getVType();
-
-        vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
-        //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
-        vector<int> general_params = {4, 1, 1, 2, 2, 2, 8, 1};
-
-        //penult sixth, non-ciambata, con m after skip, h triad 3rd species, m2 eq zero, no syncopation, pref species slider
-        vector<int> specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
-
-        vector<int> importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
-
-        int borrowMode = test->getBMode();
-
-        // create a new problem
-        // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
-        auto* problem = create_problem(cantusFirmus, species, v_type, melodic_params, general_params, specific_params,
-            importance, borrowMode);
-        //cout << problem->to_string() << endl;
-        // create a new search engine
-        if(atoi(argv[1])==125){
-            cout << "HERE" << endl;
-            for(int j = 0; j < problem->getSize(); j++){
-                if(j!=10){
-                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
-                }
-            }
-        }
-        else{
-            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
-                for(int j = 0; j < problem->getSize(); j++){
-                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
-                }
-            } else if(species[0]==SECOND_SPECIES || species[0]==FOURTH_SPECIES){
-                for(int j = 1; j < problem->getSize(); j++){
-                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
-                }
-            }
-        }
-
-        BAB<CounterpointProblem> e(problem);
-
-        int nb_sol = 0;
-        while(CounterpointProblem* pb = e.next()){
-            nb_sol++;
+        char* str = argv[1];
+        if(!notInt(str)){
+            FuxTest* test = new FuxTest(atoi(argv[1]));
+            vector<Species> species = test->getSpList();
+            //la do si re do mi fa mi re do si la
+            //57 60 59 62 60 64 65 64 62 60 59 57
+            vector<int> cantusFirmus = test->getCf();
             
-            // cout << int_vector_to_string(cantusFirmus) << endl;
-            cout << "Solution " << nb_sol << ": " << endl;
-            cout << pb->to_string() << endl;
-            delete pb;
-            if (nb_sol >= 1)
-                break;
-        }
-        if(nb_sol!=1){
-            cout << "This test did not pass. An error was found!" << endl;
+            int size = cantusFirmus.size();
+            vector<int> v_type = test->getVType();
+
+            vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
+            //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
+            vector<int> general_params = {4, 1, 1, 2, 2, 2, 8, 1};
+
+            //penult sixth, non-ciambata, con m after skip, h triad 3rd species, m2 eq zero, no syncopation, pref species slider
+            vector<int> specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
+
+            vector<int> importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+
+            int borrowMode = test->getBMode();
+
+            // create a new problem
+            // auto* problem = new TwoVoiceCounterpoint(cantusFirmus, species[0], C, lower_bound_domain, upper_bound_domain);
+            auto* problem = create_problem(cantusFirmus, species, v_type, melodic_params, general_params, specific_params,
+                importance, borrowMode);
+            //cout << problem->to_string() << endl;
+            // create a new search engine
+            if(atoi(argv[1])==125){
+                cout << "HERE" << endl;
+                for(int j = 0; j < problem->getSize(); j++){
+                    if(j!=10){
+                        rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                    }
+                }
+            }
+            else{
+                if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES){
+                    for(int j = 0; j < problem->getSize(); j++){
+                        rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                    }
+                } else if(species[0]==SECOND_SPECIES || species[0]==FOURTH_SPECIES){
+                    for(int j = 1; j < problem->getSize(); j++){
+                        rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                    }
+                }
+            }
+
+            BAB<CounterpointProblem> e(problem);
+
+            int nb_sol = 0;
+            while(CounterpointProblem* pb = e.next()){
+                nb_sol++;
+                
+                // cout << int_vector_to_string(cantusFirmus) << endl;
+                cout << "Solution " << nb_sol << ": " << endl;
+                cout << pb->to_string() << endl;
+                delete pb;
+                if (nb_sol >= 1)
+                    break;
+            }
+            if(nb_sol!=1){
+                cout << "This test did not pass. An error was found!" << endl;
+            } else {
+                cout << "This test passed successfully!" << endl;
+            }
         } else {
-            cout << "This test passed successfully!" << endl;
+            FuxTest* test = new FuxTest(argv[1]);
         }
     } else {
         throw std::invalid_argument("Wrong amount of arguments!");
     }
-
+    
     return 0;
 }
-

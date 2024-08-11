@@ -34,6 +34,8 @@ CounterpointProblem* create_problem(vector<int> cf, vector<Species> sp, vector<i
  */
 void create_lowest(Home home, Stratum* lowest, CantusFirmus* cf, Part* cp1, Part* cp2=nullptr);
 
+bool notInt(char* argv);
+
 ///////////////////////////////////////////////////////////////////
 //////////////     CONTSTRAINTS             ///////////////////////
 ///////////////////////////////////////////////////////////////////

@@ -455,7 +455,9 @@ int CounterpointProblem::get_ext_cp_domain_size(int ctp_index){
     return cpDomSize;
 }
 
-
+Stratum* CounterpointProblem::getLowest(){
+    return lowest;
+}
 
 /*************************
  * Search engine methods *

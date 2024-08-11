@@ -115,6 +115,16 @@ CounterpointProblem* create_problem(vector<int> cf, vector<Species> spList, vect
     }
 }
 
+bool notInt(char* argv){
+    bool noInt = false;
+    for(int i = 0; i < strlen(argv); i++){
+        if(!isdigit(argv[i])){
+            noInt = true;
+            break;
+        }
+    }
+    return noInt;
+}
 ///////////////////////////////////////////////////////////////////
 //////////////     CONTSTRAINTS             ///////////////////////
 ///////////////////////////////////////////////////////////////////

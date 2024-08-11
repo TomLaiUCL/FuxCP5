@@ -1,5 +1,36 @@
 #include "../headers/fuxTest.hpp"
 
+FuxTest::FuxTest(char* test){
+    
+    cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
+    size = cantusFirmus.size();
+    melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
+    general_params = {4, 1, 1, 2, 2, 2, 8, 1};
+    specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
+    importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+    borrowMode = 1;
+    CounterpointProblem* problem;
+    if(strcmp(test, "1H1")==0){
+        problem = test_1sp_H1();
+    } else if(strcmp(test, "1H2")==0){
+        problem = test_1sp_H2();
+    }
+    BAB<CounterpointProblem> e(problem);
+    int nb_sol = 0;
+    while(CounterpointProblem* pb = e.next()){
+        nb_sol++;
+        delete pb;
+        if (nb_sol >= 1)
+            break;
+    }
+    if(nb_sol==0){
+        cout << "This contraint works. It prohibits a forbidden configuration." << endl;
+    } else {
+        cout << "This contraint does NOT work. It allows a forbidden configuration." << endl;
+    }
+
+}
+
 FuxTest::FuxTest(int testNumber): FuxTest(testNumber, 0){
     idx = cp.size();
 }
@@ -49,6 +80,24 @@ FuxTest::FuxTest(int testNumber, int i){
     else {
         throw std::invalid_argument("This test number has not been implemented (yet)");
     }
+}
+
+CounterpointProblem* FuxTest::test_1sp_H1(){
+    spList = {FIRST_SPECIES};
+    v_type = {2};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 72); //does not work since it is not a consonant
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_1sp_H2(){
+    spList = {FIRST_SPECIES};
+    v_type = {2};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 64); //does not work since it is not a consonant
+    return problem;
 }
 
 vector<Species> FuxTest::getSpList(){

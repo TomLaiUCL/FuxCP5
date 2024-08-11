@@ -91,6 +91,8 @@ public:
 
     IntVarArray getSolutionArray();
 
+    Stratum* getLowest();
+
     int* get_species_array_5sp(int ctp_index);
     int* get_extended_cp_domain(int ctp_index);
     int  get_ext_cp_domain_size(int ctp_index);
