@@ -24,11 +24,18 @@ FuxTest::FuxTest(char* test){
         problem = test_1sp_H4_2();
     } else if(strcmp(test, "1H5")==0){
         problem = test_1sp_H5();
+    } else if(strcmp(test, "1H7")==0){
+        problem = test_1sp_H7();
+    } else if(strcmp(test, "1H72")==0){
+        problem = test_1sp_H7_2();
+    } else if(strcmp(test, "2H2")==0){
+        problem = test_2sp_H2();
     }
     BAB<CounterpointProblem> e(problem);
     int nb_sol = 0;
     while(CounterpointProblem* pb = e.next()){
         nb_sol++;
+        cout << pb->to_string() << endl;
         delete pb;
         if (nb_sol >= 1)
             break;
@@ -153,6 +160,40 @@ CounterpointProblem* FuxTest::test_1sp_H5(){
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
     rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 62); //does not work since it is not a consonant
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_1sp_H7(){
+    spList = {FIRST_SPECIES};
+    v_type = {0};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-2], IRT_EQ, 69); //does not work since it is not a consonant
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_1sp_H7_2(){
+    spList = {FIRST_SPECIES};
+    v_type = {-1};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-2], IRT_EQ, 55); //does not work since it is not a consonant
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_2sp_H2(){
+    spList = {SECOND_SPECIES};
+    v_type = {2};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    //these three lines are an example of the constraint working as intended
+    //rel(problem->getHome(), problem->getSolutionArray()[2], IRT_EQ, 78); 
+    //rel(problem->getHome(), problem->getSolutionArray()[3], IRT_EQ, 79); 
+    //rel(problem->getHome(), problem->getSolutionArray()[4], IRT_EQ, 81); 
+    //these three lines are an example of the constraint blocking a dissonance
+    rel(problem->getHome(), problem->getSolutionArray()[2], IRT_EQ, 74); 
+    rel(problem->getHome(), problem->getSolutionArray()[3], IRT_EQ, 79); 
+    rel(problem->getHome(), problem->getSolutionArray()[4], IRT_EQ, 81); 
     return problem;
 }
 

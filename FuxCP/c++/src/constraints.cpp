@@ -68,7 +68,7 @@ void H2_1_startWithPerfectConsonance(Home home, Part* part){
 
 void H2_2_arsisHarmoniesCannotBeDisonnant(Home home, Part* part){
     for(int i = 0; i < part->getNMeasures()-1; i++){
-        rel(home, part->getConsonance()[(i*2)+1], IRT_EQ, 0, Reify(part->getIsDiminution()[i]));
+        rel(home, part->getConsonance()[(i*4)+2], IRT_EQ, 0, Reify(part->getIsDiminution()[i]));
     }
 }
 

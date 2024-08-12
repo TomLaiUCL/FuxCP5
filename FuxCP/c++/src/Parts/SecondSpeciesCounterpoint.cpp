@@ -228,6 +228,8 @@ string SecondSpeciesCounterpoint::to_string() const {
     text += "Second species isLowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
     text += "Second species h intervals : " + intVarArray_to_string(secondSpeciesHarmonicIntervals) + "\n";
     text += "Second species arsis intervals : " + intVarArray_to_string(secondSpeciesArsisArray) + "\n";
+    text += "Second species is Consonance : " + boolVarArray_to_string(isConsonance) + "\n";
+    text += "Second species notes : " + intVarArray_to_string(notes) + "\n";
     text += "First species : " + FirstSpeciesCounterpoint::to_string() + "\n";
     return text;
 }
