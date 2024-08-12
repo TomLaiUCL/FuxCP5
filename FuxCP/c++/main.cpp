@@ -15,14 +15,14 @@ int main(int argc, char* argv[]) {
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
-        vector<Species> species = {THIRD_SPECIES};
+        vector<Species> species = {THIRD_SPECIES, THIRD_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
         vector<int> cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
         
         int size = cantusFirmus.size();
-        vector<int> v_type = {-1};
+        vector<int> v_type = {-1, 2};
 
         vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
         //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
@@ -133,8 +133,8 @@ int main(int argc, char* argv[]) {
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            if (nb_sol >= 1)
-                break;
+            //if (nb_sol >= 1)
+            //    break;
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==3){

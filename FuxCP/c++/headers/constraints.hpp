@@ -103,13 +103,24 @@ void H8_4v_preferHarmonicTriad(Home home, IntVarArray triadCostArray, Stratum* u
  */
 
 
-void M2_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
+/**
+ * 1.M1 : melodic intervals cannot exceed a minor sixth
+ */
+void M1_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
+
+/**
+ * 1.M1 : melodic intervals cannot exceed a minor sixth but may include an octave
+ */
+void M1_1_3v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
 
 void M2_2_2v_twoConsecutiveNotesAreNotTheSame(Home home, Part* part);
 
 void M2_2_3v_melodicIntervalsNotExceedMinorSixth(Home home, vector<Part*> parts, bool containsThirdSpecies);
 
-void M4_varietyCost(Home home, vector<Part*> parts);
+/**
+ * 1.M2 : The notes of each part should be as diverse as possible
+ */
+void M2_1_varietyCost(Home home, vector<Part*> parts);
 
 void P1_1_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
@@ -132,8 +143,6 @@ void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray s
 void P6_noMoveInSameDirection(Home home, vector<Part*> parts);
 
 void P7_noSuccessiveAscendingSixths(Home home, vector<Part*> parts);
-
-void M2_1_3v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
 
 void P1_1_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 

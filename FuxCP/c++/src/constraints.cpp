@@ -165,20 +165,22 @@ void H8_3v_preferHarmonicTriad(Home home, Part* part, IntVarArray triadCostArray
         BoolVar triad = BoolVar(home, 0, 1);        //check if it is a triad
         BoolVar not_triad = BoolVar(home, 0, 1);    //check if it is not a triad
 
+        //check for the first possibility
         rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 3, Reify(h1_3));
         rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 4, Reify(h1_4));
         rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 7, Reify(h2_7));
         rel(home, h1_3, BOT_OR, h1_4, h1_third);
         rel(home, h1_third, BOT_AND, h2_7, h_firstPoss);
 
+        //check for the second possibility
         rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 3, Reify(h2_3));
         rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 4, Reify(h2_4));
         rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 7, Reify(h1_7));
         rel(home, h2_3, BOT_OR, h2_4, h2_third);
         rel(home, h2_third, BOT_AND, h1_7, h_secondPoss);
 
-        rel(home, h_firstPoss, BOT_OR, h_secondPoss, triad);
-        rel(home, triad, BOT_XOR, not_triad, 1);
+        rel(home, h_firstPoss, BOT_OR, h_secondPoss, triad);   //is a triad if it is either the first or the second possibility
+        rel(home, triad, BOT_XOR, not_triad, 1);               //set not triad
         rel(home, triadCostArray[i], IRT_EQ, 0, Reify(triad, RM_IMP));
         rel(home, triadCostArray[i], IRT_EQ, part->getTriadCost(), Reify(not_triad, RM_IMP));
     }
@@ -234,13 +236,19 @@ void H8_4v_preferHarmonicTriad(Home home, IntVarArray triadCostArray, Stratum* u
     }
 }
 
-void M2_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
+void M1_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
     rel(home, part->getFirstSpeciesMIntervals(), IRT_LQ, MINOR_SIXTH);
     rel(home, part->getFirstSpeciesMIntervals(), IRT_GQ, -MINOR_SIXTH);
 }
 
+void M1_1_3v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
+    dom(home, part->getMelodicIntervals(), IntSet({-UNISSON, -MINOR_SECOND, -MAJOR_SECOND, -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FOURTH, -TRITONE,
+            -PERFECT_FIFTH, -MINOR_SIXTH, -PERFECT_OCTAVE, UNISSON, MINOR_SECOND, MAJOR_SECOND, MINOR_THIRD, MAJOR_THIRD, PERFECT_FOURTH, TRITONE,
+            PERFECT_FIFTH, MINOR_SIXTH, PERFECT_OCTAVE}));
+}
+
 void M2_2_2v_twoConsecutiveNotesAreNotTheSame(Home home, Part* part){
-    rel(home, part->getSecondSpeciesMIntervals(), IRT_NQ, 0); /// plus efficace que de faire cp[i] /= cp[i+1]
+    rel(home, part->getSecondSpeciesMIntervals(), IRT_NQ, 0);
 }
 
 void M2_2_3v_melodicIntervalsNotExceedMinorSixth(Home home, vector<Part*> parts, bool containsThirdSpecies){
@@ -271,7 +279,7 @@ void M2_2_3v_melodicIntervalsNotExceedMinorSixth(Home home, vector<Part*> parts,
     }
 }
 
-void M4_varietyCost(Home home, vector<Part*> parts){
+void M2_1_varietyCost(Home home, vector<Part*> parts){
     for(int i = 1; i < parts.size(); i++){
         Part* p = parts[i];
         cout << "Branching notes size : " << endl;
@@ -546,12 +554,6 @@ void P7_noSuccessiveAscendingSixths(Home home, vector<Part*> parts){
             }
         }
     }
-}
-
-void M2_1_3v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part){
-    dom(home, part->getMelodicIntervals(), IntSet({-UNISSON, -MINOR_SECOND, -MAJOR_SECOND, -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FOURTH, -TRITONE,
-            -PERFECT_FIFTH, -MINOR_SIXTH, -PERFECT_OCTAVE, UNISSON, MINOR_SECOND, MAJOR_SECOND, MINOR_THIRD, MAJOR_THIRD, PERFECT_FOURTH, TRITONE,
-            PERFECT_FIFTH, MINOR_SIXTH, PERFECT_OCTAVE}));
 }
 
 void P1_1_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part){

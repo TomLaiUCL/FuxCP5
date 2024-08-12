@@ -59,7 +59,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     }
 
     //M4 variety cost (notes should be as diverse as possible)
-    M4_varietyCost(*this, parts);
+    M2_1_varietyCost(*this, parts);
 
     //two fifth species counterpoints should be as different as possible
     if(counterpoint_1->getSpecies()==FIFTH_SPECIES && counterpoint_2->getSpecies()==FIFTH_SPECIES){

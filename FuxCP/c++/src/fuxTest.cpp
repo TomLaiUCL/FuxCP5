@@ -45,9 +45,9 @@ FuxTest::FuxTest(char* test){
             break;
     }
     if(nb_sol==0){
-        cout << "This contraint works. It prohibits a forbidden configuration." << endl;
+        cout << "This constraint works. It prohibits a forbidden configuration." << endl;
     } else {
-        cout << "This contraint does NOT work. It allows a forbidden configuration." << endl;
+        cout << "This constraint does NOT work. It allows a forbidden configuration." << endl;
     }
 
 }

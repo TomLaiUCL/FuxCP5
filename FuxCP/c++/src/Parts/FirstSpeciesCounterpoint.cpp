@@ -144,7 +144,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     H7_1_2v_penultimateSixthOrThird(home, this);
 
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth
-    M2_1_2v_melodicIntervalsNotExceedMinorSixth(home, this);
+    M1_1_2v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     /// Motion rules
     //P1 from Thibault : Perfect consonances cannot be reached by direct motion
@@ -188,7 +188,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     //dom(home, firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2], IntSet({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH, PERFECT_OCTAVE}));
 
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
-    M2_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
+    M1_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     //1.P1
     P1_1_3v_noDirectMotionFromPerfectConsonance(home, this);
@@ -231,7 +231,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     H7_1_4v_penultimateSixthOrThird(home, this);
     
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
-    M2_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
+    M1_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     //P1 4 voices version
     P1_1_4v_noDirectMotionFromPerfectConsonance(home, this);
