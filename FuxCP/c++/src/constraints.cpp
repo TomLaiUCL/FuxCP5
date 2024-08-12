@@ -58,7 +58,7 @@ void H1_1_harmonicIntrvalsAreConsonances(Home home, Part* part){
 
 void H1_3_fiveConsecutiveNotesByJointDegree(Home home, Part* part){
     for(int i = 0; i < part->getIs5QNArray().size(); i++){
-        rel(home, (part->getIs5QNArray()[i]) >> (part->getConsonance()[(i*4)+2]));
+        rel(home, (part->getIs5QNArray()[i]==1) >> (part->getConsonance()[(i*4)+2]==1));
     }
 }
 
@@ -86,7 +86,7 @@ void H3_1_endWithPerfectConsonance(Home home, Part* part){
 }
 
 void H3_2_penultimateNoteDomain(Home home, Part* part){
-    //dom(home, part->getHInterval()[part->getHInterval().size()-3], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
+    dom(home, part->getHInterval()[part->getHInterval().size()-3], IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
 
     rel(home, (part->getHInterval()[part->getHInterval().size()-3]!=PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==part->getPenultCost()));
     rel(home, (part->getHInterval()[part->getHInterval().size()-3]==PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==0));

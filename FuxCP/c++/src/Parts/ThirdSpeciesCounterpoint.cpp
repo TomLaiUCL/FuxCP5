@@ -334,10 +334,10 @@ string ThirdSpeciesCounterpoint::to_string() const {
     text += boolVarArray_to_string(isNotLowest) += "\n";
     text += "Third species motions : \n";
     text += intVarArray_to_string(thirdSpeciesMotions) += "\n";
-    text += "Third species h intervals : \n";
-    text += intVarArray_to_string(thirdSpeciesHarmonicIntervals) += "\n";
-    text += "Third species isDiminution array : \n";
-    text += boolVarArray_to_string(isDiminution) += "\n";
+    text += "Third species m intervals : \n";
+    text += intVarArray_to_string(thirdSpeciesMelodicIntervals) += "\n";
+    text += "Third species is5QN array : \n";
+    text += boolVarArray_to_string(is5QNArray) += "\n";
     return text;
 }
 

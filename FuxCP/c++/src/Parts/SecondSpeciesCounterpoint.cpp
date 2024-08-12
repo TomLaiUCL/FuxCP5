@@ -115,16 +115,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     // 2.H2 : Arsis harmonies cannot be dissonant except if there is a diminution.
     H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
     
-    // 2.H3 : penult cost
-    H3_2_penultimateNoteDomain(home, this);
-    
     // 2.M1 : If the two voices are getting so close that there is no contrary motion possible without crossing each other, then the melodic interval of the counterpoint can be an octave leap.
     //TODO : check if the expression makes sense when I have internet connection
     for(int j = 0; j < firstSpeciesMelodicIntervals.size(); j++){
         rel(home, firstSpeciesMelodicIntervals[j], IRT_EQ, 12, Reify(expr(home,(abs(firstSpeciesHarmonicIntervals[j])>=4)&&
             (expr(home, expr(home, abs(low->getMelodicIntervals()[j])>0) == isNotLowest[j]))), RM_PMI));
     }
-    
 
     //2.P2 : battuta adapted
     P3_2_noBattuta(home, this);
@@ -138,7 +134,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     costs = IntVarArray(home, 6, 0, 1000000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult"};
 
-    /// 2.M2: Two consecutive notes cannot be the same
+    // 2.H3 : penult cost
+    H3_2_penultimateNoteDomain(home, this);
     //can do better than this?
     M2_2_2v_twoConsecutiveNotesAreNotTheSame(home, this);
 
