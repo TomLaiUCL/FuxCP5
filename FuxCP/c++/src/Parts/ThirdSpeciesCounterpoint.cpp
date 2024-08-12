@@ -189,7 +189,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
 {
     //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
-    rel(home, (c->getIsNotLowest()[c->getNotes().size()-2]) >> (firstSpeciesHarmonicIntervals[firstSpeciesHarmonicIntervals.size()-2]==MINOR_THIRD));
+    //rel(home, (getIsNotLowest()[getIsNotLowest().size()-2]==0) >> (thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-5]==MINOR_THIRD));
 
     //3.P1 adapted
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
@@ -336,6 +336,8 @@ string ThirdSpeciesCounterpoint::to_string() const {
     text += intVarArray_to_string(thirdSpeciesMotions) += "\n";
     text += "Third species m intervals : \n";
     text += intVarArray_to_string(thirdSpeciesMelodicIntervals) += "\n";
+    text += "m intervals : \n";
+    text += intVarArray_to_string(m_intervals_brut) += "\n";
     text += "Third species is5QN array : \n";
     text += boolVarArray_to_string(is5QNArray) += "\n";
     return text;

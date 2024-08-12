@@ -1,31 +1,34 @@
 #include "../headers/constraints.hpp"
 
 void initializeIsOffArray(Home home, Part* part){
-    for(int i = 0; i < part->getIsOffArray().size(); i++){
+    for(int i = 0; i < part->getIsOffArray().size(); i++){                              //loop goes through every note of the counterpoint
         IntVarArray res = IntVarArray(home, part->getOffDomain().size(), 0, 1);
         IntVar sm = IntVar(home, 0, part->getOffDomain().size());
-        for(int l = 0; l < part->getOffDomain().size(); l++){      // TODO il y a d'office une meilleure manière de faire que double boucle for
+        for(int l = 0; l < part->getOffDomain().size(); l++){                           //loop goes through the domain of borrowed notes
             BoolVar b1 = BoolVar(home, 0, 1);
-            rel(home, part->getNotes()[i], IRT_EQ, part->getOffDomain()[l], Reify(b1));   // REIFY RM_PMI?
-            ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);
+            rel(home, part->getNotes()[i], IRT_EQ, part->getOffDomain()[l], Reify(b1)); //checks if a note is borrowed
+            ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);              //if it is borrowed, set res[l] to one
         }
         IntVarArgs x(res.size());
         for(int t = 0; t < part->getOffDomain().size(); t++){
-            x[t] = res[t];
+            x[t] = res[t];                                                              //create an IntVarArgs array of the contents of res[l] (for sum)
         }
-        rel(home, sm, IRT_EQ, expr(home, sum(x)));
-        rel(home, sm, IRT_GR, 0, Reify(part->getIsOffArray()[i]));  // REIFY RM_PMI?*/
+        rel(home, sm, IRT_EQ, expr(home, sum(x)));                                      //set the sm variable to be the sum of the IntVarArgs
+        rel(home, sm, IRT_GR, 0, Reify(part->getIsOffArray()[i]));                      //if the sum is greater than 0, then the note is borrowed (off key)
     }
 }
 
 void G4_counterpointMustBeInTheSameKey(Home home, Part* part){
     for(int i = 0; i < part->getIsOffArray().size(); i++){
-        rel(home, (part->getIsOffArray()[i]==0) >> (part->getOffCostArray()[i]==0));
-        rel(home, (part->getIsOffArray()[i]==1) >> (part->getOffCostArray()[i]==part->getBorrowCost()));
+        rel(home, (part->getIsOffArray()[i]==0) >> (part->getOffCostArray()[i]==0));                     //sets no cost if not borrowed
+        rel(home, (part->getIsOffArray()[i]==1) >> (part->getOffCostArray()[i]==part->getBorrowCost())); //sets a cost if borrowed
     }
 }
 
 void G6_noChromaticMelodies(Home home, Part* part, int mSpec){
+
+    //forbids that three notes one after the other increase by a step, making the melody chromatic
+
     for(int i = 0; i < part->getMelodicIntervals().size()-1; i+=4/notesPerMeasure.at(mSpec)){
         rel(home, expr(home, part->getMelodicIntervals()[i]==1), BOT_AND, expr(home, part->getMelodicIntervals()[i+1]==1), 0);
         rel(home, expr(home, part->getMelodicIntervals()[i]==-1), BOT_AND, expr(home, part->getMelodicIntervals()[i+1]==-1), 0);
@@ -33,7 +36,9 @@ void G6_noChromaticMelodies(Home home, Part* part, int mSpec){
 }
 
 void G7_melodicIntervalsShouldBeSmall(Home home, Part* part, int mSpec){
-    int idx = 0;
+
+    //loop goes through every note of the melodic interval and sets the cost
+
     for(int i = 0; i < part->getMelodicIntervals().size(); i+=4/notesPerMeasure.at(mSpec)){
         rel(home, (abs(part->getMelodicIntervals()[i])<MINOR_THIRD) >> (part->getMelodicDegreeCost()[i]==part->getSecondCost()));
         rel(home, (abs(part->getMelodicIntervals()[i])==MINOR_THIRD || abs(part->getMelodicIntervals()[i])==MAJOR_THIRD) >> (part->getMelodicDegreeCost()[i]==part->getThirdCost()));
@@ -43,15 +48,21 @@ void G7_melodicIntervalsShouldBeSmall(Home home, Part* part, int mSpec){
         rel(home, (abs(part->getMelodicIntervals()[i])==MINOR_SIXTH || abs(part->getMelodicIntervals()[i])==MAJOR_SIXTH) >> (part->getMelodicDegreeCost()[i]==part->getSixthCost()));
         rel(home, (abs(part->getMelodicIntervals()[i])==MINOR_SEVENTH || abs(part->getMelodicIntervals()[i])==MAJOR_SEVENTH) >> (part->getMelodicDegreeCost()[i]==part->getSeventhCost()));
         rel(home, (abs(part->getMelodicIntervals()[i])==PERFECT_OCTAVE) >> (part->getMelodicDegreeCost()[i]==part->getOctaveCost()));
-        idx++;
     }
 }
 
 void G9_lastChordSameAsFundamental(Home home, Stratum* lowest, Part* cantusFirmus){
+
+    //we check the last note of the cantusFirmus to set the last note of the counterpoint to be in the same key
+
     rel(home, expr(home, lowest->getNotes()[lowest->getNotes().size()-1]%12), IRT_EQ, expr(home, cantusFirmus->getNotes()[cantusFirmus->getNotes().size()-1]%12));
 }   
 
-void H1_1_harmonicIntrvalsAreConsonances(Home home, Part* part){
+void H1_1_harmonicIntervalsAreConsonances(Home home, Part* part){
+
+    //we also include negative values, since the fourth species could render the harmonic intervals to be negative because of its deplacement
+    //mostly the harmonic intervals are going to be positive
+
     dom(home, part->getFirstSpeciesHIntervals(), IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
         -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
 }
@@ -101,11 +112,6 @@ void H3_3_cambiataCost(Home home, Part* part){
     }
 }
 
-void H4_1_keyToneIsTuned(Home home, Part* part){
-    rel(home, (part->getIsNotLowest()[0]==1) >> (part->getFirstHInterval()[0]==0));
-    rel(home, (part->getIsNotLowest()[part->getIsNotLowest().size()-1]==1) >> (part->getFirstHInterval()[part->getFirstHInterval().size()-1]==0));
-}
-
 void H5_1_cpAndCfDifferentNotes(Home home, Part* part, Part* cf){
     for(int i = 1; i < part->getFirstSpeciesNotes().size()-1; i++){
         rel(home, part->getFirstSpeciesNotes()[i], IRT_NQ, cf->getNotes()[i]);
@@ -124,36 +130,40 @@ void H5_1_differentNotes(Home home, vector<Part*> parts){
 
 void H6_1_preferImperfectConsonances(Home home, Part* part){
     for(int i = 0; i < part->getHInterval().size(); i++){
+        //set the octave cost
         rel(home, part->getOctaveCostArray()[i], IRT_EQ, part->getHOctaveCost(), Reify(expr(home, part->getHInterval()[i]==UNISSON), RM_PMI));
         rel(home, part->getOctaveCostArray()[i], IRT_EQ, 0, Reify(expr(home, part->getHInterval()[i]!=UNISSON), RM_PMI));
 
+        //set the fifth cost
         rel(home, part->getFifthCostArray()[i], IRT_EQ, part->getHFifthCost(), Reify(expr(home, part->getHInterval()[i]==PERFECT_FIFTH), RM_PMI));
         rel(home, part->getFifthCostArray()[i], IRT_EQ, 0, Reify(expr(home, part->getHInterval()[i]!=PERFECT_FIFTH), RM_PMI));
     }
 }
 
 void H7_1_2v_penultimateSixthOrThird(Home home, Part* part){
-    int p = part->getFirstSpeciesNotes().size()-2;
+    int p = part->getFirstSpeciesNotes().size()-2; //index of the penultimate note
+
+    //if it is the lowest, then it is a major sixth (cf version in the cantusFirmus class)
     rel(home, part->getFirstSpeciesHIntervals()[part->getFirstSpeciesHIntervals().size()-2], IRT_EQ, MAJOR_SIXTH, 
         Reify(part->getIsNotLowest()[part->getIsNotLowest().size()-2], RM_IMP));
 }
 
 void H8_3v_preferHarmonicTriad(Home home, Part* part, IntVarArray triadCostArray, Stratum* upper1, Stratum* upper2){
     for(int i = 0; i < triadCostArray.size(); i++){
-        BoolVar h1_3 = BoolVar(home, 0 ,1);
-        BoolVar h1_4 = BoolVar(home, 0 ,1);
-        BoolVar h1_third = BoolVar(home, 0 ,1);
-        BoolVar h1_7 = BoolVar(home, 0 ,1);
+        BoolVar h1_3 = BoolVar(home, 0 ,1);         //check if the first interval is a minor third
+        BoolVar h1_4 = BoolVar(home, 0 ,1);         //check if the first interval is a major third
+        BoolVar h1_third = BoolVar(home, 0 ,1);     //check is the first interval is a third
+        BoolVar h1_7 = BoolVar(home, 0 ,1);         //check if the first interval is a perfect fifth
 
-        BoolVar h2_3 = BoolVar(home, 0 ,1);
-        BoolVar h2_4 = BoolVar(home, 0 ,1);
-        BoolVar h2_third = BoolVar(home, 0 ,1);
-        BoolVar h2_7 = BoolVar(home, 0 ,1);
+        BoolVar h2_3 = BoolVar(home, 0 ,1);         //check if the second interval is a minor third
+        BoolVar h2_4 = BoolVar(home, 0 ,1);         //check if the second interval is a major third
+        BoolVar h2_third = BoolVar(home, 0 ,1);     //check if the second interval is a third
+        BoolVar h2_7 = BoolVar(home, 0 ,1);         //check if the second interval is a perfect fifth
 
-        BoolVar h_firstPoss = BoolVar(home, 0, 1);
-        BoolVar h_secondPoss = BoolVar(home, 0, 1);
-        BoolVar triad = BoolVar(home, 0, 1);
-        BoolVar not_triad = BoolVar(home, 0, 1);
+        BoolVar h_firstPoss = BoolVar(home, 0, 1);  //check if the first interval is a third and the second a perfect fifth
+        BoolVar h_secondPoss = BoolVar(home, 0, 1); //check if the second interval is a third and the first a perfect fifth
+        BoolVar triad = BoolVar(home, 0, 1);        //check if it is a triad
+        BoolVar not_triad = BoolVar(home, 0, 1);    //check if it is not a triad
 
         rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 3, Reify(h1_3));
         rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 4, Reify(h1_4));

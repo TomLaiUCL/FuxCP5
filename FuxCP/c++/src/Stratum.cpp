@@ -17,7 +17,7 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes) :
 //this constructor applies 3rd voice specific constraints which apply to the upper strata
 Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, int nV) : Stratum(home, nMes, lb, ub, lowestNotes){
 
-    //G8 Last chord can only consist of notes of the harmonic triad
+    //1.H3 (formerly G8) Last chord can only consist of notes of the harmonic triad
     dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
 
     //H10 No tenths in last chord

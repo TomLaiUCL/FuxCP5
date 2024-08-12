@@ -32,6 +32,8 @@ FuxTest::FuxTest(char* test){
         problem = test_2sp_H2();
     } else if(strcmp(test, "3H1")==0){
         problem = test_3sp_H1();
+    } else if(strcmp(test, "4H2")==0){
+        problem = test_4sp_H2();
     }
     BAB<CounterpointProblem> e(problem);
     int nb_sol = 0;
@@ -209,6 +211,16 @@ CounterpointProblem* FuxTest::test_3sp_H1(){
     rel(problem->getHome(), problem->getSolutionArray()[6], IRT_EQ, 67);
     rel(problem->getHome(), problem->getSolutionArray()[7], IRT_EQ, 69);
     rel(problem->getHome(), problem->getSolutionArray()[8], IRT_EQ, 69);
+    return problem;
+}
+
+CounterpointProblem* FuxTest::test_4sp_H2(){
+    spList = {FOURTH_SPECIES};
+    v_type = {-1};
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
+            importance, borrowMode);
+    rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 52);
+    rel(problem->getHome(), problem->getSolutionArray()[2], IRT_EQ, 52);
     return problem;
 }
 

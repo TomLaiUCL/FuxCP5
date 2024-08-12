@@ -18,7 +18,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     }
     /*
     if borrowMode is enabled, the extended domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
-    that he does like to borrow notes, so the borrow cost should just do the job and still allow borrowed notes, not outright forbid them
+    that he does like to borrow notes, so the borrow cost should just do the job and we should still allow borrowed notes, not outright forbid them
     */
     if(borrowMode==1){
         extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
@@ -59,6 +59,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     //create off_cost array
     offCostArray = IntVarArray(home, is_off.size(), IntSet({0, borrowCost}));
     
+    //create the melodic degree cost array
     melodicDegreeCost = IntVarArray(home, m_intervals_brut.size(), IntSet({secondCost, thirdCost, fourthCost, tritoneCost, fifthCost, 
         sixthCost, seventhCost, octaveCost}));
 
@@ -69,8 +70,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     //create motions
 
     for(int i = 0; i < firstSpeciesMotions.size(); i++){
+
         //direct motions help creation
-        
         BoolVar both_up = expr(home, (firstSpeciesMelodicIntervals[i]>0)&&(low->getMelodicIntervals()[i]>0)); //if both parts are going in the same direction
         BoolVar both_stay = expr(home, (firstSpeciesMelodicIntervals[i]==0)&&(low->getMelodicIntervals()[i]==0)); //if both parts are staying
         BoolVar both_down = expr(home, (firstSpeciesMelodicIntervals[i]<0)&&(low->getMelodicIntervals()[i]<0)); //if both parts are going down
@@ -103,6 +104,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     octaveCostArray = IntVarArray(home, h_intervals.size(), IntSet({0, h_octaveCost}));
 
     isConsonance = BoolVarArray(home, h_intervals.size(), 0, 1);
+    //this loop checks that every harmonic interval is a consonance or not
     for(int i = 0; i < isConsonance.size(); i++){
         rel(home, expr(home, (h_intervals[i]==UNISSON)||(h_intervals[i]==MINOR_THIRD)||(h_intervals[i]==MAJOR_THIRD)||(h_intervals[i]==PERFECT_FIFTH)||
             (h_intervals[i]==MINOR_SIXTH)||(h_intervals[i]==MAJOR_SIXTH)||(h_intervals[i]==PERFECT_OCTAVE)), IRT_EQ, isConsonance[i]);
@@ -117,12 +119,12 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     
     /// Harmonic rules
     /// H1 from Thibault: All harmonic intervals must be consonances
-    H1_1_harmonicIntrvalsAreConsonances(home, this);
+    H1_1_harmonicIntervalsAreConsonances(home, this);
     
     //H2 and H3 are found in the TwoVoiceCounterpoint class, since these rules are 2 voice specific
 
     // H4 from Thibault : The key tone is tuned to the first note of the lowest strata
-    H4_1_keyToneIsTuned(home, this);
+    // applied as rule G9 in the Two, Three and FourVoice Counterpointproblem
 
     // H6 from Thibault : Imperfect consonances are preferred
     H6_1_preferImperfectConsonances(home, this);

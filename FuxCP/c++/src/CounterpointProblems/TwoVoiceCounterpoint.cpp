@@ -25,8 +25,12 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
     G6_noChromaticMelodies(*this, counterpoint_1, species);
 
+    //G9
+    G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
     if(species!=FIFTH_SPECIES){
+        //we check for fifth species since it always starts with a break, so it doesn't make sense to apply the constraint in this case
         H2_1_startWithPerfectConsonance(*this, counterpoint_1);
     }
 
