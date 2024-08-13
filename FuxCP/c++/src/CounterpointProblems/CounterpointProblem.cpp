@@ -463,7 +463,7 @@ Stratum* CounterpointProblem::getLowest(){
  * Search engine methods *
  *************************/
 
-Gecode::Search::TimeStop global_timeout(500000);
+Gecode::Search::TimeStop global_timeout(5000);
 
 /**
  * Creates a search engine for the given problem
@@ -480,7 +480,7 @@ Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type
     Gecode::Search::Options opts;   
     /**@todo add here any options you want*/
     opts.stop = &global_timeout;
-    opts.threads = 32;
+    opts.threads = 1;
 
     if (type == bab_solver)
         return new BAB<CounterpointProblem>(pb, opts);

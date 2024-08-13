@@ -17,7 +17,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
     counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 6) + cf[0], (6 * v_type[2] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[2], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
-
+    
     setLowest(counterpoint_2, counterpoint_3, upper_1, upper_2, upper_3);
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2, counterpoint_3};
@@ -91,14 +91,14 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     unitedCostNames = {};
     
     //TEST
-
+    
     uniteCounterpoints();
     uniteCosts();
 
     orderCosts();
     
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
-
+    
     if(species[0]==FIFTH_SPECIES){
         branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
     }
@@ -141,7 +141,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     }
     
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
-
+    cout << "HERE" << endl;
 }
 
 // COPY CONSTRUCTOR

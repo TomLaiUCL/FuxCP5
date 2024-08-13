@@ -193,6 +193,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3) :
     SecondSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
 {
+    
     costs = IntVarArray(home, 8, 0, 1000000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "variety", "direct", "penult"};
 
