@@ -166,6 +166,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
 
+    // 2.H3 : penult cost
+    H3_2_penultimateNoteDomain(home, this);
     //P1 3 voices version
     P1_2_3v_noDirectMotionFromPerfectConsonance(home, this);
 
@@ -200,6 +202,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, 2, directMoveCost}));
 
+    // 2.H3 : penult cost
+    H3_2_penultimateNoteDomain(home, this);
     //P1 4 voices version
     P1_2_4v_noDirectMotionFromPerfectConsonance(home, this);
 
