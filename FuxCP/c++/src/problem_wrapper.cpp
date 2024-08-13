@@ -108,7 +108,7 @@ void* create_solver(void* sp, int type){
  */
 void* return_next_solution_space(void* solver){
     writeToLogFile("return_next_solution_space function called");
-    return (void*) get_next_solution_space(static_cast<DFS<CounterpointProblem>*>(solver));
+    return (void*) get_next_solution_space(static_cast<BAB<CounterpointProblem>*>(solver));
 }
 
 
