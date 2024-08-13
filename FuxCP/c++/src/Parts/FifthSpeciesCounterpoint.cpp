@@ -44,10 +44,10 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
 
     firstSpeciesHarmonicIntervals = IntVarArray(home, fifthSpeciesHIntervals.slice(0, 4, fifthSpeciesHIntervals.size()));
 
-    for(int i = 1; i < fifthSpeciesHIntervals.size(); i++){
+    for(int i = 0; i < fifthSpeciesHIntervals.size(); i++){
         rel(home, (fifthSpeciesHIntervals[i])==((fifthSpeciesNotesCp[i]-low->getNotes()[floor(i/4)*4])%12));
     }
-    rel(home, (fifthSpeciesHIntervals[0])==((fifthSpeciesNotesCp[2]-low->getNotes()[0])%12));
+    //rel(home, (fifthSpeciesHIntervals[0])==((fifthSpeciesNotesCp[2]-low->getNotes()[0])%12));
 
     fifthSpeciesSuccMIntervals = IntVarArray(home, m_intervals_brut.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
 
@@ -249,8 +249,20 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     
     //is penult cons to cf
     BoolVar isPenultConsToCf = BoolVar(home, 0, 1);
-    rel(home, (isConsonance[isConsonance.size()-5]==1) >> (isPenultConsToCf==1));
-    rel(home, (isConsonance[isConsonance.size()-5]==0) >> (isPenultConsToCf==0));
+    vector<int> consonances = {0,3,4,7,8,9,-3,-4,-7,-8,-9};
+    IntVarArray res = IntVarArray(home, consonances.size(), 0, 1);
+    IntVar sm = IntVar(home, 0, consonances.size());
+    for(int l = 0; l < consonances.size(); l++){                          
+        BoolVar b1 = BoolVar(home, 0, 1);
+        rel(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-5], IRT_EQ, consonances[l], Reify(b1)); 
+        ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);           
+    }
+    IntVarArgs x(res.size());
+    for(int t = 0; t < consonances.size(); t++){
+        x[t] = res[t];                                                          
+    }
+    rel(home, sm, IRT_EQ, expr(home, sum(x)));                                     
+    rel(home, sm, IRT_GR, 0, Reify(isPenultConsToCf));                     
 
     rel(home, isFourthSpeciesArray[isFourthSpeciesArray.size()-5], BOT_AND, isPenultConsToCf, 0);
     
