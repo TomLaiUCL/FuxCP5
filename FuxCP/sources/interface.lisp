@@ -674,7 +674,7 @@
             )
             )
 
-            (om::om-make-dialog-item
+             (om::om-make-dialog-item
             'om::om-button
             (om::om-make-point 262 100) ; position
             (om::om-make-point 160 20) ; size
@@ -695,6 +695,7 @@
                             (loop while check do
                                 (setf result (search-next-fux-cp (current-csp (om::object editor))))
                                 (if result (setf (result-voice (om::object editor)) result) (setf check nil))
+                                (if *is-stopped (setf check nil))
                             )
                         )
                         (om::openeditorframe ; open a voice window displaying the solution
@@ -711,7 +712,8 @@
             (om::om-make-point 160 20) ; size (horizontal, vertical)
             "Stop"
             :di-action #'(lambda (b)
-                (setq *is-stopped t)
+                ;; (setq *is-stopped t)
+                (setf *is-stopped t)
                 (print "search stopped. *is-stopped parameter :" )
                 (print *is-stopped)
             )
@@ -735,13 +737,16 @@
 
         (time (om::while check :do
             (print "search next loop")
+            ;; (print *is-stopped)
+            ;; (print (getparam 'is-stopped))
             ;; ; reset the tstop timer before launching the search
             ;; (gil::time-stop-reset tstop)                             ; Done on Gecode side
             ; try to find a solution
             (time (setq sol (try-find-solution se)))    ; "sol" will contain a void* cast of a Problem* pointer (the solution space)
             (if (null sol)
                 ; then check if there are solutions left and if the user wishes to continue searching
-                (stopped-or-ended (search-stopped se) (getparam 'is-stopped))   ; TODO check git damien
+                ;; (stopped-or-ended (search-stopped se) (getparam 'is-stopped))   ; TODO check git damien
+                (stopped-or-ended (search-stopped se) *is-stopped)   ; TODO check git damien
                 ; else we have found a solution so break fthe loop
                 (setf check nil)
             )
