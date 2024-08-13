@@ -17,7 +17,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     that he does like to borrow notes, so the borrow cost should just do the job and still allow borrowed notes, not outright forbid them
     */
     if(borrowMode==1){
-        extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
+        extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
     } else {
         extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
     }
