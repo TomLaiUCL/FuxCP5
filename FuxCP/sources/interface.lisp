@@ -697,9 +697,9 @@
                                 (if result (setf (result-voice (om::object editor)) result) (setf check nil))
                             )
                         )
-                        ;(om::openeditorframe ; open a voice window displaying the solution
-                        ;    (om::omNG-make-new-instance (result-voice (om::object editor)) "Current solution")
-                        ;)
+                        (om::openeditorframe ; open a voice window displaying the solution
+                            (om::omNG-make-new-instance (result-voice (om::object editor)) "Current solution")
+                        )
                     )
                 )
             )
