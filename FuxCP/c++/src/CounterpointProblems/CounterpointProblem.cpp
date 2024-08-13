@@ -463,7 +463,7 @@ Stratum* CounterpointProblem::getLowest(){
  * Search engine methods *
  *************************/
 
-Gecode::Search::TimeStop global_timeout(5000);
+Gecode::Search::TimeStop global_timeout(50000);
 
 /**
  * Creates a search engine for the given problem
