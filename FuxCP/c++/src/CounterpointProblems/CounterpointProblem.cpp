@@ -481,7 +481,7 @@ Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type
     Gecode::Search::Options opts;   
     /**@todo add here any options you want*/
     //opts.stop = &global_timeout;
-    opts.threads = 4;
+    opts.threads = 1;
 
     if (type == bab_solver)
         return new BAB<CounterpointProblem>(pb, opts);
