@@ -381,6 +381,21 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, fifthSpeciesHIntervals[((i+1)*4)], IRT_NQ, 2, Reify(bAndCst, RM_IMP));
     }
 
+    //marcel's rule
+    for(int i = 0; i < fifthSpeciesSuccMIntervals.size()-1; i++){
+        BoolVar bSkip = BoolVar(home, 0, 1);
+        BoolVar bMbUp = BoolVar(home, 0, 1);
+        BoolVar bMbDown = BoolVar(home, 0, 1);
+        BoolVar bContrary = BoolVar(home, 0, 1);
+
+        rel(home, expr(home, abs(fifthSpeciesSuccMIntervals[i])), IRT_GR, 2, Reify(bSkip));
+        rel(home, fifthSpeciesSuccMIntervals[i], IRT_GR, 0, Reify(bMbUp));
+        rel(home, fifthSpeciesSuccMIntervals[i+1], IRT_LE, 1, Reify(bMbDown));
+        rel(home, bMbUp, BOT_EQV, bMbDown, bContrary);
+        rel(home, fifthSpeciesSuccMIntervals[i+1], IRT_LQ, 2, Reify(bSkip, RM_IMP));
+        rel(home, bSkip, BOT_IMP, bContrary, 1);
+    }
+
     //Imperfect consonances are preferred
     fifthCostArray = IntVarArray(home, notes.size(), IntSet({0, fifthCost}));
     octaveCostArray = IntVarArray(home, notes.size(), IntSet({0, octaveCost}));
