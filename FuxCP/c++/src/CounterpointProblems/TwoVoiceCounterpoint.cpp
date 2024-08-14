@@ -59,6 +59,9 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     if(species==FIFTH_SPECIES){
         branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
     }
+    if(species==FOURTH_SPECIES){
+        branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
     
     

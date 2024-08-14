@@ -313,7 +313,7 @@ string FourthSpeciesCounterpoint::to_string() const {
     text += "No Syncope array : " + boolVarArray_to_string(isNoSyncopeArray) + "\n";
     text += "H intervals array : " + intVarArray_to_string(fourthSpeciesHIntervals) + "\n";
     text += "M intervals array : " + intVarArray_to_string(fourthSpeciesMelodicIntervals) + "\n";
-    text += "Variety array : " + intVarArray_to_string(varietyCostArray) + "\n";
+    text += "Syncopation array : " + intVarArray_to_string(snycopeCostArray) + "\n";
     return text;
 }
 
