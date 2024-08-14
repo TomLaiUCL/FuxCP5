@@ -160,6 +160,7 @@ void CounterpointProblem::orderCosts(){
     finalCosts = IntVarArray(*this, n_unique_costs, 0, 1000000);
     for(int i = 0; i < n_unique_costs; i++){
         rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
+        //rel(*this, finalCosts[i], IRT_EQ, orderedFactors[(n_unique_costs-1)-i]);
     }
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
 }
@@ -463,7 +464,7 @@ Stratum* CounterpointProblem::getLowest(){
  * Search engine methods *
  *************************/
 
-Gecode::Search::TimeStop global_timeout(50000);
+//Gecode::Search::TimeStop global_timeout(50000);
 
 /**
  * Creates a search engine for the given problem
@@ -479,7 +480,7 @@ Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type
 
     Gecode::Search::Options opts;   
     /**@todo add here any options you want*/
-    opts.stop = &global_timeout;
+    //opts.stop = &global_timeout;
     opts.threads = 1;
 
     if (type == bab_solver)
@@ -497,7 +498,7 @@ Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type
 CounterpointProblem* get_next_solution_space(Search::Base<CounterpointProblem>* solver){
     string message = "get_next_solution_space function called.\n";
     // RESET TIMEOUT OBJECT HERE
-    global_timeout.reset();
+    //global_timeout.reset();
     CounterpointProblem* sol_space = solver->next();
     if (sol_space == nullptr){
         message += "solution_space was null. \n";
