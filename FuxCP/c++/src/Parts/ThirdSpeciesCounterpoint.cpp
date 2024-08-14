@@ -27,6 +27,10 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     
     rel(home, thirdSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(THIRD_SPECIES),m_intervals_brut.size()));
 
+    for(int i = 0; i < thirdSpeciesMelodicIntervals.size(); i++){
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i])), IRT_GR, 0);
+    }
+
     thirdSpeciesMotions = IntVarArray(home, notes.size()/4, IntSet({-1, CONTRARY_MOTION, OBLIQUE_MOTION, PARALLEL_MOTION}));
     thirdSpeciesMotionCosts = IntVarArray(home, notes.size()/4, IntSet{0, directCost, obliqueCost, contraryCost});
 
@@ -159,7 +163,20 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         rel(home, ((thirdSpeciesMelodicIntervals[i]+thirdSpeciesMelodicIntervals[i+1]+thirdSpeciesMelodicIntervals[i+2])!=0) >> (m2ZeroArray[i]==0));
     }
 
-    //no direct move for thirdmotions (for 2v and 3v)
+    //marcel's rule
+    for(int i = 0; i < thirdSpeciesMelodicIntervals.size()-1; i++){
+        BoolVar bSkip = BoolVar(home, 0, 1);
+        BoolVar bMbUp = BoolVar(home, 0, 1);
+        BoolVar bMbDown = BoolVar(home, 0, 1);
+        BoolVar bContrary = BoolVar(home, 0, 1);
+
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i])), IRT_GR, 2, Reify(bSkip));
+        rel(home, thirdSpeciesMelodicIntervals[i], IRT_GR, 0, Reify(bMbUp));
+        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_LE, 1, Reify(bMbDown));
+        rel(home, bMbUp, BOT_EQV, bMbDown, bContrary);
+        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_LQ, 2, Reify(bSkip, RM_IMP));
+        rel(home, bSkip, BOT_IMP, bContrary, 1);
+    }
     
     //no battuta adapted for third species
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
