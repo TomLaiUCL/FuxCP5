@@ -84,6 +84,22 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     //2.M2, have to write it here since it has a weird interaction with the third species
     M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
 
+    vector<int> consonances = {0,3,4,7,8,9,-3,-4,-7,-8,-9};
+    //consonances between upper
+    for(int v1 = 1; v1 < parts.size(); v1++){
+        for(int v2 = v1+1; v2 < parts.size(); v2++){
+            for(int i = 0; i < counterpoint_1->getNMeasures(); i++){
+                BoolVar noneLowest = BoolVar(*this, 0, 1);
+                rel(*this, parts[v1]->getIsNotLowest()[i], IRT_EQ, parts[v2]->getIsNotLowest()[i], Reify(noneLowest, RM_PMI));
+
+                IntVar interval = IntVar(*this, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+                rel(*this, interval == ((parts[v1]->getNotes()[i*4]-parts[v2]->getNotes()[i*4])%12));
+                rel(*this, (noneLowest==1) >> (expr(*this, abs(interval)==0 || abs(interval)==3 || abs(interval)==4 || abs(interval)==7 || abs(interval)==8 ||
+                    abs(interval)==9)));
+            }
+        }
+    }
+
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size() + 
         counterpoint_3->getBranchingNotes().size(), 0, 127);
     
