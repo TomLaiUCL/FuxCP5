@@ -133,10 +133,10 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     m2ZeroArray = IntVarArray(home, thirdSpeciesMelodicIntervals.size()-2, IntSet({0, m2ZeroCost}));
 
     //third note of the penultimate measure must be below the fourth one
-    //rel(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2], IRT_GR, 1);
+    rel(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2], IRT_GR, 1);
     //second one must also be more distant than a semi tone from the last note of the penultimate measure
-    //rel(home, expr(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-3]+thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2])
-    //    , IRT_NQ, 1);
+    rel(home, expr(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-3]+thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2])
+        , IRT_NQ, 1);
     
     //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
     H1_3_fiveConsecutiveNotesByJointDegree(home, this);
@@ -150,22 +150,6 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     //no melodic interval between 9 and 11
     for(int i = 0; i < nMeasures-1; i++){
         rel(home, abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SIXTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MINOR_SEVENTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SEVENTH);
-    }
-
-    //no chromatic motion between 3 consecutive notes
-    for(int i = 1; i < thirdSpeciesMelodicIntervals.size()-1; i++){
-        BoolVar b1 = BoolVar(home, 0, 1);
-        BoolVar b2 = BoolVar(home, 0, 1);
-        BoolVar b3 = BoolVar(home, 0, 1);
-        BoolVar b4 = BoolVar(home, 0, 1);
-
-        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_EQ, 1, Reify(b1));
-        rel(home, m2IntervalsArray[i], IRT_EQ, 2, Reify(b2));
-        rel(home, b1, BOT_AND, b2, 0);
-
-        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_EQ, -1, Reify(b3));
-        rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
-        rel(home, b3, BOT_AND, b4, 0);
     }
 
     //3.M1 : each note and its two beats further peer are preferred to be different
@@ -190,12 +174,6 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
 {
     //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
     //rel(home, (getIsNotLowest()[getIsNotLowest().size()-2]==0) >> (thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-5]==MINOR_THIRD));
-
-    //3.P1 adapted
-    for(int j = 0; j < thirdSpeciesMotions.size(); j++){
-        //rel(home, (firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH) >> 
-        //    (thirdSpeciesMotions[j]!=2));
-    }
 
     costs = IntVarArray(home, 7, 0, 10000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2"};
