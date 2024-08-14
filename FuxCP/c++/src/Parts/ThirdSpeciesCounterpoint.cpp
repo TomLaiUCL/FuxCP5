@@ -135,8 +135,8 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     //third note of the penultimate measure must be below the fourth one
     //rel(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2], IRT_GR, 1);
     //second one must also be more distant than a semi tone from the last note of the penultimate measure
-    rel(home, expr(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-3]+thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2])
-        , IRT_NQ, 1);
+    //rel(home, expr(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-3]+thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2])
+    //    , IRT_NQ, 1);
     
     //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
     H1_3_fiveConsecutiveNotesByJointDegree(home, this);
@@ -193,8 +193,8 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
 
     //3.P1 adapted
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
-        rel(home, (firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH) >> 
-            (thirdSpeciesMotions[j]!=2));
+        //rel(home, (firstSpeciesHarmonicIntervals[j+1]==UNISSON || firstSpeciesHarmonicIntervals[j+1]==PERFECT_FIFTH) >> 
+        //    (thirdSpeciesMotions[j]!=2));
     }
 
     costs = IntVarArray(home, 7, 0, 10000);
