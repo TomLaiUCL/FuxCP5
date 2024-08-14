@@ -93,9 +93,16 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
                 rel(*this, parts[v1]->getIsNotLowest()[i], IRT_EQ, parts[v2]->getIsNotLowest()[i], Reify(noneLowest, RM_PMI));
 
                 IntVar interval = IntVar(*this, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-                rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
-                rel(*this, (noneLowest==1) >> (expr(*this, abs(interval)==0 || abs(interval)==3 || abs(interval)==4 || abs(interval)==7 || abs(interval)==8 ||
-                    abs(interval)==9)));
+                if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
+                    rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
+                } else if(parts[v1]->getSpecies()==FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
+                    rel(*this, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getFirstNotes()[i])%12));
+                } else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()==FOURTH_SPECIES){
+                    rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getNotes()[(i*4)+2])%12));
+                } else {
+                    rel(*this, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getNotes()[(i*4)+2])%12));
+                }
+                rel(*this, (noneLowest==1) >> (expr(*this, abs(interval)!=1)));
             }
         }
     }
