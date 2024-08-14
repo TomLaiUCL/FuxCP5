@@ -93,7 +93,10 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
                 rel(*this, parts[v1]->getIsNotLowest()[i], IRT_EQ, parts[v2]->getIsNotLowest()[i], Reify(noneLowest, RM_PMI));
 
                 IntVar interval = IntVar(*this, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-                if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
+                if(i==counterpoint_1->getNMeasures()-1){
+                    rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
+                }
+                else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
                     rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
                 } else if(parts[v1]->getSpecies()==FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
                     rel(*this, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getFirstNotes()[i])%12));
