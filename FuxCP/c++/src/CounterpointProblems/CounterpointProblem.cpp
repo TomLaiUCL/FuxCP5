@@ -32,7 +32,6 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int>
     }
 
     globalCost = IntVar(*this, 0, 2000000);
-    maxCost = IntVar(*this, 0, 2000000);
 
     writeToLogFile("counterpointproblem constructor"); 
 
@@ -99,7 +98,6 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
         sorted_voices[i].update(*this, s.sorted_voices[i]);
     }
     globalCost.update(*this, s.globalCost);
-    maxCost.update(*this, s.maxCost);
 }
 
 IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?
@@ -190,7 +188,6 @@ void CounterpointProblem::orderCosts(){
         //rel(*this, finalCosts[i], IRT_EQ, orderedFactors[(n_unique_costs-1)-i]);
     }
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
-    max(*this, finalCosts, maxCost);
 }
 
 void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Stratum* upper2, Stratum* upper3){
