@@ -15,7 +15,8 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int>
     cantusFirmus = new CantusFirmus(*this, nMeasures, cf, lowest, v_type, m_costs, g_costs, s_costs, nV);
     importance = imp;
     n_unique_costs = 0;
-    importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "motion", "melodic", "direct", "penult", "syncopation" ,"cambiata", "m2", "triad3"};
+    //{8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+    importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "direct", "motion", "penult", "cambiata", "triad3" ,"m2", "syncope", "melodic"};
     //creating the map with the names of the costs and their importance
     
     prefs = {};
@@ -166,6 +167,7 @@ void CounterpointProblem::orderCosts(){
                 for(int t = 0; t < unitedCostNames.size(); t++){
                     if(unitedCostNames[t]==costLevels[i][k]){
                         //rel(*this, sm[idx], IRT_EQ, unitedCosts[t]);
+                        cout << unitedCostNames[t] << endl;
                         sm[idx] = unitedCosts[t];
                         //rel(*this, orderedFactors[n_unique_costs], IRT_EQ, unitedCosts[t]);
                         idx++;
