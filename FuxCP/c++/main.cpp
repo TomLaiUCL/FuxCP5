@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
-        vector<Species> species = {THIRD_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+        vector<Species> species = {FIFTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
@@ -41,10 +41,11 @@ int main(int argc, char* argv[]) {
         auto* problem = create_problem(cantusFirmus, species, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
         
-        vector<int> sol = {76,77,79,77,74,76,83,72,74,72,74,72,79,72,74,76,81,77,79,83,81,76,77,79,81,74,76,83,81,79,77,79,76,67,65,62,60,60,62,60,65,67,48,50,50,48,48,50,48,50,48};
-        for(int i = 0; i < problem->getSize(); i++){
-            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
-        }
+        //solution from illustration 8.3
+        //vector<int> sol = {76,77,79,77,74,76,83,72,74,72,74,72,79,72,74,76,81,77,79,83,81,76,77,79,81,74,76,83,81,79,77,79,76,67,65,62,60,60,62,60,65,67,48,50,50,48,48,50,48,50,48};
+        //for(int i = 0; i < problem->getSize(); i++){
+            //rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
+        //}
         Search::Base<CounterpointProblem>* e = make_solver(problem, bab_solver);
         int nb_sol = 0;
         while(CounterpointProblem* pb = get_next_solution_space(e)){

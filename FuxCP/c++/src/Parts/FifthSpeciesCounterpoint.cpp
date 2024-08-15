@@ -224,7 +224,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
 
     isNoSyncopeArray = BoolVarArray(home, nMeasures-1, 0, 1);
     for(int i = 0; i < isNoSyncopeArray.size(); i++){
-        rel(home, fifthSpeciesMIntervals[(i*2)+2], IRT_EQ, 0, Reify(isNoSyncopeArray[i]));
+        rel(home, fifthSpeciesMIntervals[(i*2)+2], IRT_NQ, 0, Reify(isNoSyncopeArray[i]));
     }
     rel(home, fifthSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIFTH_SPECIES),(notes.size())));
     rel(home, fifthSpeciesHIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(FIFTH_SPECIES),h_intervals.size()));
@@ -237,7 +237,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
 
     //Only one possible value for non constrained variables
     for(int i = 0; i < fifthSpeciesNotesCp.size()-1; i++){
-        rel(home, fifthSpeciesNotesCp[i], IRT_EQ, fifthSpeciesNotesCp[i+1], Reify(isNthSpeciesArray[(i*5)], RM_IMP));
+        //rel(home, fifthSpeciesNotesCp[i], IRT_EQ, fifthSpeciesNotesCp[i+1], Reify(isNthSpeciesArray[(i*5)], RM_IMP));
     }
     
     //Third note of penult measure must be below the fourth one
@@ -272,7 +272,10 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, isNthSpeciesArray[(i*5)+2], BOT_IMP, isConsonance[i], 1); //second species check
         rel(home, isThirdSpeciesArray[i], BOT_IMP, isConsonance[i], 1);     //third species check
         if(i!=isConsonance.size()-1){
-            rel(home, isFourthSpeciesArray[i+2], BOT_IMP, isConsonance[i+2], 1);  //fourth species check
+            //rel(home, isFourthSpeciesArray[i+2], BOT_IMP, isConsonance[i+2], 1);  //fourth species check
+        }
+        if(i!=0 && i!=isConsonance.size()-1){
+            //rel(home, expr(home, isFourthSpeciesArray[i]==1 && isNoSyncopeArray[i]==0), BOT_IMP, isConsonance[i],1);
         }
     }
     
@@ -395,6 +398,11 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, fifthSpeciesSuccMIntervals[i+1], IRT_LQ, 2, Reify(bSkip, RM_IMP));
         rel(home, bSkip, BOT_IMP, bContrary, 1);
     }
+
+    /** ===========================================================================
+     *                              COST CONSTRAINS
+     *  ===========================================================================
+     */
 
     //Imperfect consonances are preferred
     fifthCostArray = IntVarArray(home, notes.size(), IntSet({0, fifthCost}));

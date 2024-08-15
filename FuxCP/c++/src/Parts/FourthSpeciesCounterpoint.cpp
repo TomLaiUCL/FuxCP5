@@ -111,7 +111,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 
     isNoSyncopeArray = BoolVarArray(home, nMeasures-1, 0, 1);
     for(int i = 0; i < isNoSyncopeArray.size(); i++){
-        rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_EQ, 0, Reify(isNoSyncopeArray[i]));
+        rel(home, fourthSpeciesMelodicIntervals[(i*2)], IRT_NQ, 0, Reify(isNoSyncopeArray[i]));
     }
     
     // G6 : no chromatic melodies
@@ -179,8 +179,8 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     
     //4.M1 Arsis half notes should be the same as their next halves in thesis
     for(int i = 0; i < snycopeCostArray.size(); i++){
-        rel(home, (isNoSyncopeArray[i]==0) >> (snycopeCostArray[i]==syncopationCost));
-        rel(home, (isNoSyncopeArray[i]!=0) >> (snycopeCostArray[i]==0));
+        rel(home, (isNoSyncopeArray[i]==1) >> (snycopeCostArray[i]==syncopationCost));
+        rel(home, (isNoSyncopeArray[i]==0) >> (snycopeCostArray[i]==0));
     }
     
     //4.M2 notes and two beats further are preferred to be different

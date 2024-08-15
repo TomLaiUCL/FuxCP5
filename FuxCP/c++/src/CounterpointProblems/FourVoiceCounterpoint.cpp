@@ -84,7 +84,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     //2.M2, have to write it here since it has a weird interaction with the third species
     M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
 
-    vector<int> consonances = {0,3,4,7,8,9,-3,-4,-7,-8,-9};
+    /*vector<int> consonances = {0,3,4,7,8,9,-3,-4,-7,-8,-9};
     //consonances between upper
     for(int v1 = 0; v1 < parts.size(); v1++){
         for(int v2 = v1+1; v2 < parts.size(); v2++){
@@ -108,7 +108,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
                 rel(*this, (noneLowest==1) >> (expr(*this, abs(interval)!=1)));
             }
         }
-    }
+    }*/
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size() + 
         counterpoint_3->getBranchingNotes().size(), 0, 127);
@@ -136,23 +136,23 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     }
 
     if(species[0]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[1]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[2]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_3->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_3->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
 
     if(species[0]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[1]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_2->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_2->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[2]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_3->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_3->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     
 
