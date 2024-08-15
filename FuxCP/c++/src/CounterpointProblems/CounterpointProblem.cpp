@@ -108,10 +108,13 @@ IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in 
 
 void CounterpointProblem::constrain(const IntLexMinimizeSpace& _b){
 
-    const CounterpointProblem &b = static_cast<const CounterpointProblem &>(_b);
+    const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
     //IntVar current_sum = IntVar(*this, 0, 2000000);
     //max(*this, finalCosts, current_sum);
     //rel(*this, current_sum, IRT_LQ, b.maxCost);
+    //IntVar best_sum = IntVar(*this, 0, 2000000);
+    //rel(*this, best_sum, IRT_EQ, expr(*this, sum(b.cost())));
+    //linear(*this, cost(), IRT_LE, best_sum);
 }
 
 IntVarArgs CounterpointProblem::cost() const{
@@ -485,7 +488,7 @@ Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type
     Gecode::Search::Options opts;   
     /**@todo add here any options you want*/
     //opts.stop = &global_timeout;
-    opts.threads = 4;
+    opts.threads = 1;
 
     if (type == bab_solver)
         return new BAB<CounterpointProblem>(pb, opts);

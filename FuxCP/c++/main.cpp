@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
         vector<int> cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
         
         int size = cantusFirmus.size();
-        vector<int> v_type = {2 , 1, -1};
+        vector<int> v_type = {3 , 1, -1};
 
         vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
         //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
         vector<int> specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
 
 
-        vector<int> importance = {8,7,5,2,14,3,9,12,6,11,4,10,1,13};
+        vector<int> importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
 
         int borrowMode = 1;
 
