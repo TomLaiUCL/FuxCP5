@@ -315,17 +315,22 @@ void P1_1_2v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
 void P1_1_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
     for(int j = 0; j < part->getFirstSpeciesMotions().size()-1; j++){
 
+        //if the counterpoint is the lowest part -> the cost is 0
         rel(home, (!part->getIsNotLowest()[j]) >> (part->getDirectCostArray()[j]==0));
 
+        //if the counterpoint is neither the lowest nor the highest part, and the condition is true, then add a cost of 2
         rel(home, (part->getIsNotLowest()[j] && !part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||
-            part->getFirstSpeciesHIntervals()[j+1]==7))) >> (part->getDirectCostArray()[j]==2));
-        rel(home, (part->getIsNotLowest()[j] && !part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0 &&
-            part->getFirstSpeciesHIntervals()[j+1]!=7))) >> (part->getDirectCostArray()[j]==0));
+            expr(home, abs(part->getFirstSpeciesHIntervals()[j+1]))==7))) >> (part->getDirectCostArray()[j]==2));
+        //else the cost is 0
+        rel(home, (part->getIsNotLowest()[j] && !part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0 
+            && expr(home, abs(part->getFirstSpeciesHIntervals()[j+1]))!=7))) >> (part->getDirectCostArray()[j]==0));
 
+        //if the counterpoint is the highest part and the condition is true, then add a direct move cost (8 in this case)
         rel(home, (part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]==2&&(part->getFirstSpeciesHIntervals()[j+1]==0||
-            part->getFirstSpeciesHIntervals()[j+1]==7))) >> (part->getDirectCostArray()[j]==part->getDirectMoveCost()));
+            expr(home, abs(part->getFirstSpeciesHIntervals()[j+1]))==7))) >> (part->getDirectCostArray()[j]==part->getDirectMoveCost()));
+        //else the cost is 0
         rel(home, (part->getIsHighest()[j] && (part->getFirstSpeciesMotions()[j]!=2||(part->getFirstSpeciesHIntervals()[j+1]!=0 &&
-            part->getFirstSpeciesHIntervals()[j+1]!=7))) >> (part->getDirectCostArray()[j]==0));
+            expr(home, abs(part->getFirstSpeciesHIntervals()[j+1]))!=7))) >> (part->getDirectCostArray()[j]==0));
 
     }
 }
