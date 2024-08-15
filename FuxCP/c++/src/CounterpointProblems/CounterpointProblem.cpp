@@ -151,22 +151,43 @@ void CounterpointProblem::setPreferenceMap(vector<string> importance_names){
 void CounterpointProblem::orderCosts(){
     for(int i = 0; i < 14; i++){
         if(!costLevels[i].empty()){
-            for(int k = 0; k < costLevels[k].size(); k++){
+            int sm_size = 0;
+            for(int k = 0; k < costLevels[i].size(); k++){
+                //goes through every cost at the cost level
                 for(int t = 0; t < unitedCostNames.size(); t++){
                     if(unitedCostNames[t]==costLevels[i][k]){
-                        cout << unitedCostNames[t] << endl;
-                        rel(*this, orderedFactors[n_unique_costs], IRT_EQ, unitedCosts[t]);
-                        n_unique_costs++;
+                        sm_size++;
                     }
                 }
+            }
+            //now cst_sm_size contains the size of all the cost array on this level combined
+            IntVarArgs sm(sm_size); //sum of all the costs on this level
+            cout << sm.size() << endl;
+            int idx = 0;
+            for(int k = 0; k < costLevels[i].size(); k++){
+                //goes through every cost at the cost level
+                for(int t = 0; t < unitedCostNames.size(); t++){
+                    if(unitedCostNames[t]==costLevels[i][k]){
+                        cout << "HERERERERE" << endl;
+                        //rel(*this, sm[idx], IRT_EQ, unitedCosts[t]);
+                        sm[idx] = unitedCosts[t];
+                        //rel(*this, orderedFactors[n_unique_costs], IRT_EQ, unitedCosts[t]);
+                        idx++;
+                    }
+                }
+            }
+            cout << idx << endl;
+            if(idx>0){
+                rel(*this, orderedFactors[n_unique_costs], IRT_EQ, expr(*this, sum(sm)));
+                n_unique_costs++;
             }
         }
     }
     
     finalCosts = IntVarArray(*this, n_unique_costs, 0, 1000000);
     for(int i = 0; i < n_unique_costs; i++){
-        //rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
-        rel(*this, finalCosts[i], IRT_EQ, orderedFactors[(n_unique_costs-1)-i]);
+        rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
+        //rel(*this, finalCosts[i], IRT_EQ, orderedFactors[(n_unique_costs-1)-i]);
     }
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
     max(*this, finalCosts, maxCost);
