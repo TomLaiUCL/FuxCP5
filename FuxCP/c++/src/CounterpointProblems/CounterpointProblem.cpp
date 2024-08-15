@@ -32,6 +32,7 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int>
     }
 
     globalCost = IntVar(*this, 0, 2000000);
+    maxCost = IntVar(*this, 0, 2000000);
 
     writeToLogFile("counterpointproblem constructor"); 
 
@@ -98,6 +99,7 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
         sorted_voices[i].update(*this, s.sorted_voices[i]);
     }
     globalCost.update(*this, s.globalCost);
+    maxCost.update(*this, s.maxCost);
 }
 
 IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?
@@ -107,9 +109,9 @@ IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in 
 void CounterpointProblem::constrain(const IntLexMinimizeSpace& _b){
 
     const CounterpointProblem &b = static_cast<const CounterpointProblem &>(_b);
-    IntVar current_sum = IntVar(*this, 0, 2000000);
-    max(*this, finalCosts, current_sum);
-    //rel(*this, globalCost, IRT_LQ, b.globalCost);
+    //IntVar current_sum = IntVar(*this, 0, 2000000);
+    //max(*this, finalCosts, current_sum);
+    //rel(*this, current_sum, IRT_LQ, b.maxCost);
 }
 
 IntVarArgs CounterpointProblem::cost() const{
@@ -157,12 +159,14 @@ void CounterpointProblem::orderCosts(){
             }
         }
     }
+    
     finalCosts = IntVarArray(*this, n_unique_costs, 0, 1000000);
     for(int i = 0; i < n_unique_costs; i++){
-        rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
-        //rel(*this, finalCosts[i], IRT_EQ, orderedFactors[(n_unique_costs-1)-i]);
+        //rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
+        rel(*this, finalCosts[i], IRT_EQ, orderedFactors[(n_unique_costs-1)-i]);
     }
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
+    max(*this, finalCosts, maxCost);
 }
 
 void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Stratum* upper2, Stratum* upper3){
@@ -481,7 +485,7 @@ Search::Base<CounterpointProblem>* make_solver(CounterpointProblem* pb, int type
     Gecode::Search::Options opts;   
     /**@todo add here any options you want*/
     //opts.stop = &global_timeout;
-    opts.threads = 1;
+    opts.threads = 4;
 
     if (type == bab_solver)
         return new BAB<CounterpointProblem>(pb, opts);

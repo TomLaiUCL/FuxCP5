@@ -45,6 +45,7 @@ protected:
     vector<vector<string>> costLevels;
 
     IntVar globalCost;
+    IntVar maxCost;
     // vector<int> species;        /// the species of the counterpoint to generate
 
 public:
