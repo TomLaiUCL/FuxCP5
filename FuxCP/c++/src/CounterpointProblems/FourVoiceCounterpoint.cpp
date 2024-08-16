@@ -36,24 +36,11 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     for(int p = 1; p < parts.size(); p++){
         // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
         G6_noChromaticMelodies(*this, parts[p], sp[p-1]);
-
-        // H5 from Thibault : The cp and the cf cannot play the same note
-        H5_1_cpAndCfDifferentNotes(*this, parts[p], cantusFirmus);
     }
-
-    H5_1_differentNotes(*this, parts);
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
     H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
 
-    for(int v1 = 0; v1 < parts.size(); v1++){
-        for(int v2 = v1+1; v2 < parts.size(); v2++){
-            for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
-                rel(*this, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);
-            }
-        }
-    }
-    
     //M4 variety cost (notes should be as diverse as possible)
     M2_1_varietyCost(*this, parts);
 
@@ -84,8 +71,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     //2.M2, have to write it here since it has a weird interaction with the third species
     M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
 
-    /*vector<int> consonances = {0,3,4,7,8,9,-3,-4,-7,-8,-9};
-    //consonances between upper
+    //no minor second interval between upper
     for(int v1 = 0; v1 < parts.size(); v1++){
         for(int v2 = v1+1; v2 < parts.size(); v2++){
             for(int i = 0; i < counterpoint_1->getNMeasures(); i++){
@@ -108,7 +94,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
                 rel(*this, (noneLowest==1) >> (expr(*this, abs(interval)!=1)));
             }
         }
-    }*/
+    }
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size() + 
         counterpoint_3->getBranchingNotes().size(), 0, 127);

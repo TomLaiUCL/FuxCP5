@@ -15,11 +15,12 @@ int main(int argc, char* argv[]) {
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
-        vector<Species> species = {THIRD_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+        vector<Species> species = {SECOND_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
         vector<int> cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
+        //cantusFirmus = {62,   65,   64,   62,   67,   65,   69,   67,   65, 64, 62};
         
         int size = cantusFirmus.size();
         vector<int> v_type = {3 , 1, -1};
@@ -44,14 +45,40 @@ int main(int argc, char* argv[]) {
         //solution from illustration 8.4
         //vector<int> sol = {76,77,79,77,74,76,83,72,74,72,74,72,79,72,74,76,81,77,79,83,81,76,77,79,81,74,76,83,81,79,77,79,76,67,65,62,60,60,62,60,65,67,48,50,50,48,48,50,48,50,48};
         //for(int i = 0; i < problem->getSize(); i++){
-            //rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
+        //    rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
         //}
         //solution from illustration 8.2
         //costs : ...,...,octave,...,fifth,...,...,melodic,motion
-        /*vector<int> sol = {88,81,81,83,83,84,72,74,79,67,65,60,67,62,69,69,69,64,48,50,53,52,55,53,57,65,60};
-        for(int i = 0; i < problem->getSize(); i++){
-            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
-        }*/
+        //vector<int> sol = {88,81,81,83,83,84,72,74,79,67,65,60,67,62,69,69,69,64,48,50,53,52,55,53,57,65,60};
+        //for(int i = 0; i < problem->getSize(); i++){
+        //    rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
+        //}
+
+        //solution from illustration 8.3
+        //costs : ...,...,octave,...,fifth,...,...,melodic,motion
+        //vector<int> sol = {76,81,74,86,83,86,79,88,81,88,86,89,81,79,89,86,79,67,65,62,60,64,69,69,69,64,48,50,50,48,48,50,48,50,48};
+        //for(int i = 0; i < problem->getSize(); i++){
+        //    rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
+        //}
+
+        /*
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 57);
+        rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 57);
+        rel(problem->getHome(), problem->getSolutionArray()[2], IRT_EQ, 60);
+        rel(problem->getHome(), problem->getSolutionArray()[3], IRT_EQ, 59);
+        rel(problem->getHome(), problem->getSolutionArray()[4], IRT_EQ, 59);
+
+        rel(problem->getHome(), problem->getSolutionArray()[11], IRT_EQ, 53);
+        rel(problem->getHome(), problem->getSolutionArray()[12], IRT_EQ, 53);
+        rel(problem->getHome(), problem->getSolutionArray()[13], IRT_EQ, 55);
+        rel(problem->getHome(), problem->getSolutionArray()[14], IRT_EQ, 55);
+        rel(problem->getHome(), problem->getSolutionArray()[15], IRT_EQ, 55);
+
+        rel(problem->getHome(), problem->getSolutionArray()[22], IRT_EQ, 50);
+        rel(problem->getHome(), problem->getSolutionArray()[23], IRT_EQ, 50);
+        rel(problem->getHome(), problem->getSolutionArray()[24], IRT_EQ, 48);
+        rel(problem->getHome(), problem->getSolutionArray()[25], IRT_EQ, 55);
+        rel(problem->getHome(), problem->getSolutionArray()[16], IRT_EQ, 52);*/
         Search::Base<CounterpointProblem>* e = make_solver(problem, bab_solver);
         int nb_sol = 0;
         while(CounterpointProblem* pb = get_next_solution_space(e)){
