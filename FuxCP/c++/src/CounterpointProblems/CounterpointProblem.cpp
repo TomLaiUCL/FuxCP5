@@ -108,12 +108,7 @@ IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in 
 void CounterpointProblem::constrain(const IntLexMinimizeSpace& _b){
 
     const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
-    //IntVar current_sum = IntVar(*this, 0, 2000000);
-    //max(*this, finalCosts, current_sum);
-    //rel(*this, current_sum, IRT_LQ, b.maxCost);
-    //IntVar best_sum = IntVar(*this, 0, 2000000);
-    //rel(*this, best_sum, IRT_EQ, expr(*this, sum(b.cost())));
-    //linear(*this, cost(), IRT_LE, best_sum);
+    
 }
 
 IntVarArgs CounterpointProblem::cost() const{
@@ -461,8 +456,15 @@ int* CounterpointProblem::get_extended_cp_domain(int ctp_index){
         writeToLogFile("invalid value of ctp_index given as argument to get_extended_cp_domain");
         return nullptr;
     }
-    int* ext_cp_dom_array = ext_cp_dom.data();
-    return ext_cp_dom_array;
+    writeToLogFile(int_vector_to_string(ext_cp_dom).c_str());
+    
+    int* ext_cp_dom_int_ptr = new int[ext_cp_dom.size()];
+    for(int i = 0; i < ext_cp_dom.size(); i++){
+        ext_cp_dom_int_ptr[i] = ext_cp_dom[i];       
+        // message += std::to_string(solution[i]) + " ";
+    }
+
+    return ext_cp_dom_int_ptr;
 }
 
 int CounterpointProblem::get_ext_cp_domain_size(int ctp_index){
