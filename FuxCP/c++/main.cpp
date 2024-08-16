@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
-        vector<Species> species = {SECOND_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+        vector<Species> species = {FOURTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
         //cantusFirmus = {62,   65,   64,   62,   67,   65,   69,   67,   65, 64, 62};
         
         int size = cantusFirmus.size();
-        vector<int> v_type = {3 , 1, -1};
+        vector<int> v_type = {2 , 1, -1};
 
         vector<int> melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
         //borrow, h-5th, h-octave, succ, variety, triad, direct move, penult rule check
@@ -57,6 +57,13 @@ int main(int argc, char* argv[]) {
         //solution from illustration 8.3
         //costs : ...,...,octave,...,fifth,...,...,melodic,motion
         //vector<int> sol = {76,81,74,86,83,86,79,88,81,88,86,89,81,79,89,86,79,67,65,62,60,64,69,69,69,64,48,50,50,48,48,50,48,50,48};
+        //for(int i = 0; i < problem->getSize(); i++){
+        //    rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
+        //}
+
+        //solution from illustration 8.5
+        //costs : ...,...,octave,...,fifth,...,...,melodic,motion
+        //vector<int> sol = {72,72,76,76,81,81,74,74,76,76,83,83,79,79,77,72,60,65,62,60,64,62,69,69,64,48,50,50,48,48,50,48,50,48};
         //for(int i = 0; i < problem->getSize(); i++){
         //    rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);
         //}
@@ -133,6 +140,15 @@ int main(int argc, char* argv[]) {
             for(int j = 0; j < test->getIdx(); j++){
                 if(j!=0){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                }
+            }
+        }
+        else if(atoi(argv[1])==82){
+            vector<int> speciesArray = {-1,-1,3,-1,3,2,2,2,2,2,2,2,2,2,3,-1,3,2,2,2,2,2,3,-1,3,-1,3,-1,3,2,3,-1,3,2,3,-1,3,-1,3,-1,3};
+            for(int j = 0; j < test->getIdx(); j++){
+                if(j>1){
+                    rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
+                    //rel(problem->getHome(), problem->get_species_array_5sp(0)[j], IRT_EQ, test->getCp()[j]);
                 }
             }
         }

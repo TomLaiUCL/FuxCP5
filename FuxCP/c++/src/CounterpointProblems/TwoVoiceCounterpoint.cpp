@@ -40,7 +40,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     // H5 from Thibault : The cp and the cf cannot play the same note
     H5_1_cpAndCfDifferentNotes(*this, counterpoint_1, cantusFirmus);
 
-    setLowest(nullptr, nullptr, upper_1, nullptr, nullptr);
+    setStrata();
 
     unitedCosts = IntVarArray(*this, counterpoint_1->getCosts().size(), 0, 1000000);
 
@@ -59,7 +59,10 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     if(species==FIFTH_SPECIES){
         branch(*this, counterpoint_1->getSpeciesArray(), INT_VAR_DEGREE_MAX(), INT_VAL_RND(3U));
     }
-    if(species==FOURTH_SPECIES){
+    if(species==FIFTH_SPECIES){
+        branch(*this, counterpoint_1->getCambiataCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+    }
+    if(species==FOURTH_SPECIES || species==FIFTH_SPECIES){
         branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
@@ -92,33 +95,3 @@ string TwoVoiceCounterpoint::to_string() const {
     text += counterpoint_1->to_string();
     return text;
 }
-/*
-void TwoVoiceCounterpoint::uniteCosts(){
-    int cp1_idx = 0;
-    for(int i = 0; i < 14; i++){
-        string name = importanceNames[i];
-        //decides if the cost is present for any counterpoint
-        bool cp1_contains = 0;
-        int sz = 0;
-        for(int t = 0; t < counterpoint_1->getCostNames().size(); t++){
-            if(name==counterpoint_1->getCostNames()[t]){
-                cp1_contains=1;
-                sz++;
-            }
-        }
-        if(!cp1_contains){
-            unitedCostNames.push_back("NOT ADDED");
-        } else {
-            unitedCostNames.push_back(name);
-            //adds the cost to the IntVarArgs
-            IntVarArgs x(sz);
-            int idx=0;
-            if(cp1_contains){
-                x[idx] = counterpoint_1->getCosts()[cp1_idx];
-                idx++;
-                cp1_idx++;
-            }
-            rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
-        }
-    }
-}*/

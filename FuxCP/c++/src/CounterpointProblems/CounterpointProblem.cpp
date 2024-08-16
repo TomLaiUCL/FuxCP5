@@ -15,24 +15,26 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int>
     cantusFirmus = new CantusFirmus(*this, nMeasures, cf, lowest, v_type, m_costs, g_costs, s_costs, nV);
     importance = imp;
     n_unique_costs = 0;
-    //{8,7,5,2,9,3,14,12,6,11,4,10,1,13};
     importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "direct", "motion", "penult", "cambiata", "triad3" ,"m2", "syncope", "melodic"};
+    
     //creating the map with the names of the costs and their importance
     
     prefs = {};
+
     setPreferenceMap(importanceNames);
-    orderedFactors = IntVarArray(*this, 14, 0, 1000);
+
+    orderedFactors = IntVarArray(*this, 14, 0, 1000);   //orderedFactors will contain the costs in order of their importance
     for(int i = 0; i < 14; i++){
         vector<string> tmp = {};
-        costLevels.push_back(tmp);
+        costLevels.push_back(tmp);                      //costLevels will contain all the costs at a specific level of importance (1 to 14)
     }
 
     for(const auto& entry : prefs){ 
         int val = entry.second-1;
-        costLevels[val].push_back(entry.first);
+        costLevels[val].push_back(entry.first);         //initialize the costLevels
     }
 
-    globalCost = IntVar(*this, 0, 2000000);
+    globalCost = IntVar(*this, 0, 2000000);             //contains the global cost
 
     writeToLogFile("counterpointproblem constructor"); 
 
@@ -150,6 +152,7 @@ void CounterpointProblem::orderCosts(){
                 //goes through every cost at the cost level
                 for(int t = 0; t < unitedCostNames.size(); t++){
                     if(unitedCostNames[t]==costLevels[i][k]){
+                        //adjusts the amount of costs at this level
                         sm_size++;
                     }
                 }
@@ -161,16 +164,17 @@ void CounterpointProblem::orderCosts(){
                 //goes through every cost at the cost level
                 for(int t = 0; t < unitedCostNames.size(); t++){
                     if(unitedCostNames[t]==costLevels[i][k]){
-                        //rel(*this, sm[idx], IRT_EQ, unitedCosts[t]);
-                        cout << unitedCostNames[t] << endl;
+                        //add the cost to the intvarargs
                         sm[idx] = unitedCosts[t];
-                        //rel(*this, orderedFactors[n_unique_costs], IRT_EQ, unitedCosts[t]);
                         idx++;
                     }
                 }
             }
+            //if there is at least one cost at this level
             if(idx>0){
+                //then sum all the intvarargs of this level together and add them to the orderedFactors
                 rel(*this, orderedFactors[n_unique_costs], IRT_EQ, expr(*this, sum(sm)));
+                //increase the amount of unique costs
                 n_unique_costs++;
             }
         }
@@ -178,148 +182,135 @@ void CounterpointProblem::orderCosts(){
     
     finalCosts = IntVarArray(*this, n_unique_costs, 0, 1000000);
     for(int i = 0; i < n_unique_costs; i++){
+        //adds the cost/costs to the finalCosts list, which will be the one that will be minimized
+        //(this eliminates all the <not assigned> values of the intvararray for costs which are not set)
         rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
-        //rel(*this, finalCosts[i], IRT_EQ, orderedFactors[(n_unique_costs-1)-i]);
     }
+    //globalCost is the sum of all the finalCosts
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
 }
 
-void CounterpointProblem::setLowest(Part* cp2, Part* cp3, Stratum* upper1, Stratum* upper2, Stratum* upper3){
+void CounterpointProblem::setStrata(){
+    //decided how many voices we have
     int nVoices = 2;
-    if(upper2!=nullptr){
+    if(upper_2!=nullptr){
         nVoices ++;
     }
-    if(upper3!=nullptr){
+    if(upper_3!=nullptr){
         nVoices++;
     }
     
     int size = counterpoint_1->getNMeasures();
+    //sortedVoices : will contain in order at index 0 the lowest note and then the next highest at index 1 etc.
     sorted_voices = {};
     for(int i = 0; i < size; i++){
+        //initialize the voices array which will contain the current note of a part
         IntVarArray voices = IntVarArray(*this, nVoices, 0, 127);
+        //at index 0, we have the cantusFirmus
         rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
+        //adds the correct note to the voices array at the index. special rules for fourth and fifth species apply
         if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
-        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES) {
-            if(i==0){
-                rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
-            } else {
-                rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
-            }
+        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0) {
+            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]); 
         } else{
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
         }
+        //same for 3 voices
         if(nVoices>=3){
             if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES) {
-                if(i==0){
-                    rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-                } else {
-                    rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
-                }
+            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0) {
+                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
             }else{
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
             }
         }
+        //same for 4 voices
         if(nVoices>=4){
             if(counterpoint_3->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES) {
-                if(i==0){
-                    rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-                } else {
-                    rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
-                }
+            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i==0) {
+                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
             }else{
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
             }
         }
+
+        //sorting the voices. Order is necessary to get the correct index of the voices array to put into the sorted_voices array
         IntVarArray order = IntVarArray(*this, nVoices, 0, nVoices-1);
         sorted_voices.push_back(IntVarArray(*this, nVoices, 0, 127));
-
         sorted(*this, voices, sorted_voices[i], order);
 
+        //set lowest and upper strata notes
         lowest->setNote(*this, i*4, sorted_voices[i][0]);
 
-        upper1->setNote(*this, i*4, sorted_voices[i][1]);
+        upper_1->setNote(*this, i*4, sorted_voices[i][1]);
         if(nVoices>=3){
-            upper2->setNote(*this, i*4, sorted_voices[i][2]);
+            upper_2->setNote(*this, i*4, sorted_voices[i][2]);
         }
         if(nVoices>=4){
-            upper3->setNote(*this, i*4, sorted_voices[i][3]);
+            upper_3->setNote(*this, i*4, sorted_voices[i][3]);
         }
 
-        BoolVar cfLowest = BoolVar(*this, 0, 1);
-        BoolVar cp1Lowest = BoolVar(*this, 0, 1);
-        BoolVar cp1Bass = BoolVar(*this, 0, 1);
-
+        //if the lowest note is the same as the cantusFirmus note, then the cantusFirmus is the lowest stratum
         rel(*this, lowest->getFirstNotes()[i], IRT_NQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsNotLowest()[i]));
         
         if(nVoices>=2){
+            //sets the isNotLowest boolean for the first counterpoint
             if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
-            } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES){
-                if(i==0){
-                    rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i])); 
-                } else {
-                    rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
-                }
+            } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0){
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i])); 
             } else{
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
             }
 
         } 
         if(nVoices==3){
-
-            rel(*this, expr(*this, counterpoint_1->getIsNotLowest()[i]!=cantusFirmus->getIsNotLowest()[i]), IRT_EQ, counterpoint_2->getIsNotLowest()[i]); //else it is the cp2 (in 3 voices)
+            
+            //if we have 3 voices and both the counterpoint and the cantusFirmus are the same (both must be 1), then the counterpoint2 is the lowest
+            rel(*this, expr(*this, counterpoint_1->getIsNotLowest()[i]!=cantusFirmus->getIsNotLowest()[i]), IRT_EQ, counterpoint_2->getIsNotLowest()[i]);
             
         }  
         if(nVoices==4){
             
+            //set the counterpoint2 lowest boolean
             if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i])); 
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES){
-                if(i==0){
-                    rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i])); 
-                } else {
-                    rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i]));
-                }
+            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0){
+                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i])); 
             } else {
                 rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i]));
             }
+            //if we have 4 voices and the counterpoint1, counterpoint2 and the cantusFirmus are the same (all must be 1), then the counterpoint3 is the lowest
             rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1) && (counterpoint_1->getIsNotLowest()[i]==1) && (counterpoint_2->getIsNotLowest()[i]==1)), IRT_NQ, counterpoint_3->getIsNotLowest()[i]);
 
-            rel(*this, upper3->getFirstNotes()[i], IRT_EQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsHighest()[i]));
+            //the following are the same but for the isHighest array to define the highest stratum (needed for a 4 voice specific constraint)
+            rel(*this, upper_3->getFirstNotes()[i], IRT_EQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsHighest()[i]));
 
             if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));    
-            } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES){
-                if(i==0){
-                    rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i])); 
-                } else {
-                    rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
-                }
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));    
+            } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0){
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i])); 
             } else {
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
             }
 
             if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES){
-                if(i==0){
-                    rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
-                } else {
-                    rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
-                }
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
+            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0){
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
             } else {
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper3->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
+                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
             }
 
             rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0) && (counterpoint_1->getIsHighest()[i]==0) && (counterpoint_2->getIsHighest()[i]==0)), IRT_EQ, counterpoint_3->getIsHighest()[i]);
         }
 
         if(i > 0){
+
+            //the following lines define the melodic interval of the lowest stratum
 
             vector<IntVarArray> corresponding_m_intervals;
 

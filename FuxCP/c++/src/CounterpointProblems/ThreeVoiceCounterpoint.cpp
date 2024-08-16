@@ -14,24 +14,29 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
     species = sp;
     
+    //initialize upper strata
 
     upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
     upper_2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
+
+    //create counterpoints
 
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, THREE_VOICES);
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, THREE_VOICES);
 
-    setLowest(counterpoint_2, nullptr, upper_1, upper_2, nullptr);
+    //create strata
+
+    setStrata();
+
+    //creating variables
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2};
-
-    triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, counterpoint_1->getTriadCost()}));
-
     int scc_cz = ((cantusFirmus->getSize()/4)-1);
     bool containsThirdSpecies = 0;
 
+    triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, counterpoint_1->getTriadCost()}));
     successiveCostArray = IntVarArray(*this, scc_cz, IntSet({0, counterpoint_1->getSuccCost()}));
     
     //G9 last chord must have the same fundamental as the cf (used throughout the composition)
@@ -40,44 +45,25 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     for(int p = 1; p < parts.size(); p++){
         // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
         G6_noChromaticMelodies(*this, parts[p], sp[p-1]);
-
-        // H5 from Thibault : The cp and the cf cannot play the same note
-        H5_1_cpAndCfDifferentNotes(*this, parts[p], cantusFirmus);
     }
 
+    //H5 for three voices
     H5_1_differentNotes(*this, parts);
 
     //H8 : the triad should be used as much as possible
     H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper_1, upper_2);
 
-    for(int v1 = 0; v1 < parts.size(); v1++){
-        for(int v2 = v1+1; v2 < parts.size(); v2++){
-            for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
-                rel(*this, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);
-            }
-        }
-    }
-
     //M4 variety cost (notes should be as diverse as possible)
     M2_1_varietyCost(*this, parts);
 
     //two fifth species counterpoints should be as different as possible
-    if(counterpoint_1->getSpecies()==FIFTH_SPECIES && counterpoint_2->getSpecies()==FIFTH_SPECIES){
-        BoolVarArray isSameSpecies = BoolVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
-        IntVarArray isSameSpeciesInt = IntVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
-        IntVar percentageSame = IntVar(*this, 0, counterpoint_1->getNotes().size());
-        for(int i = 0; i < counterpoint_1->getNotes().size(); i++){
-            rel(*this, counterpoint_1->getSpeciesArray()[i], IRT_EQ, counterpoint_2->getSpeciesArray()[i], Reify(isSameSpecies[i]));
-            rel(*this, isSameSpeciesInt[i], IRT_EQ, 1, Reify(isSameSpecies[i]));
-        }
-        rel(*this, percentageSame, IRT_EQ, expr(*this, sum(isSameSpeciesInt)));
-        rel(*this, percentageSame, IRT_LE, floor(counterpoint_1->getNotes().size()/2));
-    }
+    twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_2);
 
     //P4 avoid successive perfect consonances
     P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
+
     //P6 : no move in same direction
-    if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES){
+    if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES){ //doesn't apply to 4th species
         P6_noMoveInSameDirection(*this, parts);
     }
     
@@ -91,8 +77,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
 
     unitedCosts = IntVarArray(*this, 14, 0, 10000000);
     unitedCostNames = {};
-    
-    //TEST
 
     uniteCounterpoints();
     uniteCosts();
@@ -102,6 +86,8 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     }
 
     orderCosts();
+
+    //Branching strategies
 
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
 
@@ -113,24 +99,16 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     }
 
     if(species[0]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_1->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     if(species[1]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
-    }
-
-    if(species[0]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
-    }
-    if(species[1]==FIFTH_SPECIES){
-        //branch(*this, counterpoint_2->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
+        branch(*this, counterpoint_2->getCambiataCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     }
     
-
-    if(species[0]==FOURTH_SPECIES){
+    if(species[0]==FOURTH_SPECIES || species[0]==FIFTH_SPECIES){
         branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
-    if(species[1]==FOURTH_SPECIES){
+    if(species[1]==FOURTH_SPECIES || species[1]==FIFTH_SPECIES){
         branch(*this, counterpoint_2->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
     
@@ -168,6 +146,7 @@ string ThreeVoiceCounterpoint::to_string() const {
 }
 
 void ThreeVoiceCounterpoint::uniteCounterpoints(){
+    //this function takes all the notes that are being branched on and adds them one after the other to the solution array
     int idx = 0;
     for(int i = 0; i < counterpoint_1->getBranchingNotes().size(); i++){
         rel(*this, solutionArray[idx], IRT_EQ, counterpoint_1->getBranchingNotes()[i]);
@@ -180,14 +159,17 @@ void ThreeVoiceCounterpoint::uniteCounterpoints(){
 }
 
 void ThreeVoiceCounterpoint::uniteCosts(){
+    //this function takes the costs that are present for each species and some 3v specific costs and adds them together
     int cp1_idx = 0;
     int cp2_idx = 0;
     for(int i = 0; i < 14; i++){
+        //goes through every possible cost
         string name = importanceNames[i];
+        //check seperately for the successive cost 
         if(name=="succ"){
             unitedCostNames.push_back(name);
             rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(IntVarArgs(successiveCostArray))));
-        } else if(name=="triad"){
+        } else if(name=="triad"){ //check seperately for the triad cost
             unitedCostNames.push_back(name);
             rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(IntVarArgs(triadCostArray))));
         } else {
@@ -209,9 +191,11 @@ void ThreeVoiceCounterpoint::uniteCosts(){
                     sz++;
                 }
             }
+            //if the cost is present in no counterpoint -> add a specific name to the array containing all present cost names
             if(!cp1_contains && !cp2_contains){
                 unitedCostNames.push_back("NOT ADDED");
             } else {
+                //if it is in either counterpoint -> add the cost
                 unitedCostNames.push_back(name);
                 //adds the cost to the IntVarArgs
                 IntVarArgs x(sz);
@@ -226,6 +210,7 @@ void ThreeVoiceCounterpoint::uniteCosts(){
                     idx++;
                     cp2_idx++;
                 }
+                //sum the cost together if it are present in both counterpoints
                 rel(*this, unitedCosts[i], IRT_EQ, expr(*this, sum(x)));
             }
         }

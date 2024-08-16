@@ -5,11 +5,6 @@ class Part;
 
 #include "Parts/Part.hpp"
 
-/**
- * This function creates the isOff array to be able to know if a note is borrowed or not
- */
-void initializeIsOffArray(Home home, Part* part);
-
 /* ================================================
  *              GENERAL CONSTRAINTS
  * ================================================
@@ -147,5 +142,25 @@ void P7_noSuccessiveAscendingSixths(Home home, vector<Part*> parts);
 void P1_1_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
 void H7_1_4v_penultimateSixthOrThird(Home home, Part* part);
+
+/* ================================================
+ *               OTHER CONSTRAINTS
+ * ================================================
+ */
+
+/**
+ * This function creates the isOff array to be able to know if a note is borrowed or not
+ */
+void initializeIsOffArray(Home home, Part* part);
+
+/**
+ * Two fifth species rhythms should be as diverse as possible
+ */
+void twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2);
+
+/**
+ * For the upper strata, there shouldn't be a minor second interval between the thesis notes
+ */
+void noMinorSecondBetweenUpper(Home home, vector<Part*> parts);
 
 #endif

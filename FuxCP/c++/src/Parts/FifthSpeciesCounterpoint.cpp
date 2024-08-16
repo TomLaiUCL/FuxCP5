@@ -11,13 +11,14 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
-    
+    cout << lowerBound << endl;
+    cout << upperBound << endl;
     /*
     if borrowMode is enabled, the extended domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
     that he does like to borrow notes, so the borrow cost should just do the job and still allow borrowed notes, not outright forbid them
     */
     if(borrowMode==1){
-        extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+        extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
     } else {
         extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
     }
@@ -683,6 +684,7 @@ string FifthSpeciesCounterpoint::to_string() const {
     text += "M Intervals array : " + intVarArray_to_string(fifthSpeciesSuccMIntervals) + "\n";
     text += "isMostlyThird : " + boolVarArray_to_string(isMostlyThirdArray) + "\n";
     text += "not Lowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
+    text += "Species array : " + intVarArray_to_string(speciesArray) + "\n";
     return text;
 }
 

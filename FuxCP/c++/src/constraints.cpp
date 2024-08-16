@@ -18,6 +18,46 @@ void initializeIsOffArray(Home home, Part* part){
     }
 }
 
+void twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2){
+    if(cp1->getSpecies()==FIFTH_SPECIES && cp2->getSpecies()==FIFTH_SPECIES){
+        BoolVarArray isSameSpecies = BoolVarArray(home, cp1->getNotes().size(), 0, 1);
+        IntVarArray isSameSpeciesInt = IntVarArray(home, cp1->getNotes().size(), 0, 1);
+        IntVar percentageSame = IntVar(home, 0, cp1->getNotes().size());
+        for(int i = 0; i < cp1->getNotes().size(); i++){
+            rel(home, cp1->getSpeciesArray()[i], IRT_EQ, cp2->getSpeciesArray()[i], Reify(isSameSpecies[i]));
+            rel(home, isSameSpeciesInt[i], IRT_EQ, 1, Reify(isSameSpecies[i]));
+        }
+        rel(home, percentageSame, IRT_EQ, expr(home, sum(isSameSpeciesInt)));
+        rel(home, percentageSame, IRT_LE, floor(cp1->getNotes().size()/2));
+    }
+}
+
+void noMinorSecondBetweenUpper(Home home, vector<Part*> parts){
+    for(int v1 = 0; v1 < parts.size(); v1++){
+        for(int v2 = v1+1; v2 < parts.size(); v2++){
+            for(int i = 0; i < parts[1]->getNMeasures(); i++){
+                BoolVar noneLowest = BoolVar(home, 0, 1);
+                rel(home, parts[v1]->getIsNotLowest()[i], IRT_EQ, parts[v2]->getIsNotLowest()[i], Reify(noneLowest, RM_PMI));
+
+                IntVar interval = IntVar(home, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+                if(i==parts[1]->getNMeasures()-1){
+                    rel(home, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
+                }
+                else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
+                    rel(home, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
+                } else if(parts[v1]->getSpecies()==FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
+                    rel(home, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getFirstNotes()[i])%12));
+                } else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()==FOURTH_SPECIES){
+                    rel(home, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getNotes()[(i*4)+2])%12));
+                } else {
+                    rel(home, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getNotes()[(i*4)+2])%12));
+                }
+                rel(home, (noneLowest==1) >> (expr(home, abs(interval)!=1)));
+            }
+        }
+    }
+}
+
 void G4_counterpointMustBeInTheSameKey(Home home, Part* part){
     for(int i = 0; i < part->getIsOffArray().size(); i++){
         rel(home, (part->getIsOffArray()[i]==0) >> (part->getOffCostArray()[i]==0));                     //sets no cost if not borrowed
@@ -119,7 +159,7 @@ void H5_1_cpAndCfDifferentNotes(Home home, Part* part, Part* cf){
 }
 
 void H5_1_differentNotes(Home home, vector<Part*> parts){
-    for(int v1 = 1; v1 < parts.size(); v1++){
+    for(int v1 = 0; v1 < parts.size(); v1++){
         for(int v2 = v1+1; v2 < parts.size(); v2++){
             for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
                 rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);

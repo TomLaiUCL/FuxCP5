@@ -7,9 +7,13 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 {
     species = sp;
 
+    //initialize upper strata
+
     upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
     upper_2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
     upper_3 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES, FOUR_VOICES);
+
+    //create counterpoints
 
     counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
@@ -18,19 +22,21 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 6) + cf[0], (6 * v_type[2] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[2], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
     
-    setLowest(counterpoint_2, counterpoint_3, upper_1, upper_2, upper_3);
+    //create strata
+
+    setStrata();
+
+    //creating variables
 
     vector<Part*> parts = {cantusFirmus, counterpoint_1, counterpoint_2, counterpoint_3};
+    int scc_cz = 3*((cantusFirmus->getSize()/4)-1);
+    bool containsThirdSpecies = 0;
 
     triadCostArray = IntVarArray(*this, counterpoint_1->getFirstHInterval().size(), IntSet({0, not_harmonic_triad_cost, double_fifths_cost, double_thirds_cost,
         triad_with_octave_cost}));
-
-    int scc_cz = 3*((cantusFirmus->getSize()/4)-1);
-
-    bool containsThirdSpecies = 0;
-
     successiveCostArray = IntVarArray(*this, scc_cz, IntSet({0, counterpoint_1->getSuccCost()}));
 
+    //G9 last chord must have the same fundamental as the cf (used throughout the composition)
     G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
 
     for(int p = 1; p < parts.size(); p++){
@@ -45,17 +51,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     M2_1_varietyCost(*this, parts);
 
     //two fifth species counterpoints should be as different as possible
-    if(counterpoint_1->getSpecies()==FIFTH_SPECIES && counterpoint_3->getSpecies()==FIFTH_SPECIES){
-        BoolVarArray isSameSpecies = BoolVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
-        IntVarArray isSameSpeciesInt = IntVarArray(*this, counterpoint_1->getNotes().size(), 0, 1);
-        IntVar percentageSame = IntVar(*this, 0, counterpoint_1->getNotes().size());
-        for(int i = 0; i < counterpoint_1->getNotes().size(); i++){
-            rel(*this, counterpoint_1->getSpeciesArray()[i], IRT_EQ, counterpoint_3->getSpeciesArray()[i], Reify(isSameSpecies[i]));
-            rel(*this, isSameSpeciesInt[i], IRT_EQ, 1, Reify(isSameSpecies[i]));
-        }
-        rel(*this, percentageSame, IRT_EQ, expr(*this, sum(isSameSpeciesInt)));
-        rel(*this, percentageSame, IRT_LE, floor(counterpoint_1->getNotes().size()/2));
-    }
+    twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_3);
     
     //P4 avoid successive perfect consonances
     P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
@@ -72,29 +68,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
 
     //no minor second interval between upper
-    for(int v1 = 0; v1 < parts.size(); v1++){
-        for(int v2 = v1+1; v2 < parts.size(); v2++){
-            for(int i = 0; i < counterpoint_1->getNMeasures(); i++){
-                BoolVar noneLowest = BoolVar(*this, 0, 1);
-                rel(*this, parts[v1]->getIsNotLowest()[i], IRT_EQ, parts[v2]->getIsNotLowest()[i], Reify(noneLowest, RM_PMI));
-
-                IntVar interval = IntVar(*this, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-                if(i==counterpoint_1->getNMeasures()-1){
-                    rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
-                }
-                else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
-                    rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
-                } else if(parts[v1]->getSpecies()==FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
-                    rel(*this, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getFirstNotes()[i])%12));
-                } else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()==FOURTH_SPECIES){
-                    rel(*this, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getNotes()[(i*4)+2])%12));
-                } else {
-                    rel(*this, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getNotes()[(i*4)+2])%12));
-                }
-                rel(*this, (noneLowest==1) >> (expr(*this, abs(interval)!=1)));
-            }
-        }
-    }
+    noMinorSecondBetweenUpper(*this, parts);
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size() + 
         counterpoint_3->getBranchingNotes().size(), 0, 127);
@@ -102,13 +76,13 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     unitedCosts = IntVarArray(*this, 14, 0, 10000000);
     unitedCostNames = {};
     
-    //TEST
-    
     uniteCounterpoints();
     uniteCosts();
 
     orderCosts();
     
+    //Branching strategies
+
     branch(*this, lowest->getNotes().slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), lowest->getNotes().size()), INT_VAR_DEGREE_MAX(), INT_VAL_SPLIT_MIN());
     
     if(species[0]==FIFTH_SPECIES){
@@ -218,6 +192,7 @@ void FourVoiceCounterpoint::uniteCosts(){
             bool cp2_contains = 0;
             bool cp3_contains = 0;
             int sz = 0;
+            //determining in how many counterpoints a cost appears
             for(int t = 0; t < counterpoint_1->getCostNames().size(); t++){
                 if(name==counterpoint_1->getCostNames()[t]){
                     cp1_contains=1;
@@ -236,9 +211,10 @@ void FourVoiceCounterpoint::uniteCosts(){
                     sz++;
                 }
             }
+            //if it is not present in any counterpoint -> leave it empty
             if(!cp1_contains && !cp2_contains && !cp3_contains){
                 unitedCostNames.push_back("NOT ADDED");
-            } else {
+            } else { //else -> add the costs together for that entry
                 unitedCostNames.push_back(name);
                 //adds the cost to the IntVarArgs
                 IntVarArgs x(sz);
