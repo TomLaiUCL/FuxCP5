@@ -15,7 +15,7 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int>
     cantusFirmus = new CantusFirmus(*this, nMeasures, cf, lowest, v_type, m_costs, g_costs, s_costs, nV);
     importance = imp;
     n_unique_costs = 0;
-    importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "direct", "motion", "penult", "cambiata", "triad3" ,"m2", "syncope", "melodic"};
+    importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "direct", "motion", "penult", "cambiata", "triad3" ,"m2", "syncopation", "melodic"};
     
     //creating the map with the names of the costs and their importance
     
@@ -125,8 +125,11 @@ string CounterpointProblem::to_string() const {
     text += "\n";
     text += "All costs : \n";
     text += intVarArray_to_string(unitedCosts); 
-    text += "Lowest : \n";
+    text += "\nLowest : \n";
     text += lowest->to_string();
+    text += "\n";
+    text += "Upper : \n";
+    text += upper_1->to_string();
     text += "\n";
     text += "Final Costs : \n";
     text += intVarArray_to_string(finalCosts);

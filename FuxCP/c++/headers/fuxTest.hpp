@@ -53,6 +53,7 @@ public:
     CounterpointProblem* test_3sp_H1();
     CounterpointProblem* test_4sp_H2();
     
+    CounterpointProblem* dispatcher(char* test);
 
     void test_2v_1sp_fig22_setter(int i);
     void test_2v_1sp_fig23_setter(int i);
@@ -60,8 +61,6 @@ public:
     void test_2v_2sp_fig38_setter(int i);
     void test_2v_2sp_fig39_setter(int i);
     void test_2v_2sp_fig40_setter(int i);
-    void test_2v_2sp_fig41_setter(int i);
-    void test_2v_2sp_fig42_setter(int i);
 
     void test_2v_3sp_fig55_setter(int i);
 

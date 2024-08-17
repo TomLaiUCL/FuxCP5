@@ -17,7 +17,6 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         secondSpeciesNotesCp[secondSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     }
     rel(home, secondSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(notes.size())));
-    cout << notes << endl;
     /// Harmonic intervals for the second species notes
     secondSpeciesHarmonicIntervals = IntVarArray(home, (nMeasures*notesPerMeasure.at(SECOND_SPECIES))-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
     rel(home, secondSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(h_intervals.size())));
@@ -99,10 +98,10 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         BoolVar bat2nd = BoolVar(home, 0, 1);
         BoolVar band = BoolVar(home, 0, 1);
 
-        rel(home, firstSpeciesMelodicIntervals[i], IRT_EQ, 3, Reify(btt3));
-        rel(home, firstSpeciesMelodicIntervals[i], IRT_EQ, 4, Reify(btt4));
-        rel(home, secondSpeciesMelodicIntervals[i*2], IRT_LQ, 2, Reify(bta2nd));
-        rel(home, secondSpeciesMelodicIntervals[i*2+1], IRT_LQ, 2, Reify(bat2nd));
+        rel(home, expr(home, abs(firstSpeciesMelodicIntervals[i])), IRT_EQ, 3, Reify(btt3));
+        rel(home, expr(home, abs(firstSpeciesMelodicIntervals[i])), IRT_EQ, 4, Reify(btt4));
+        rel(home, expr(home, abs(secondSpeciesMelodicIntervals[i*2])), IRT_LQ, 2, Reify(bta2nd));
+        rel(home, expr(home, abs(secondSpeciesMelodicIntervals[i*2+1])), IRT_LQ, 2, Reify(bat2nd));
         rel(home, btt3, BOT_OR, btt4, btt3rd);
         rel(home, bta2nd, BOT_AND, btt3rd, band);
         rel(home, band, BOT_AND, bat2nd, isDiminution[i]);
@@ -115,12 +114,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     // 2.H2 : Arsis harmonies cannot be dissonant except if there is a diminution.
     H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
     
-    // 2.M1 : If the two voices are getting so close that there is no contrary motion possible without crossing each other, then the melodic interval of the counterpoint can be an octave leap.
-    //TODO : check if the expression makes sense when I have internet connection
-    for(int j = 0; j < firstSpeciesMelodicIntervals.size(); j++){
-        rel(home, firstSpeciesMelodicIntervals[j], IRT_EQ, 12, Reify(expr(home,(abs(firstSpeciesHarmonicIntervals[j])>=4)&&
-            (expr(home, expr(home, abs(low->getMelodicIntervals()[j])>0) == isNotLowest[j]))), RM_PMI));
-    }
+    //2.M1
+    M1_2_octaveLeap(home, this, low);
 
     //2.P2 : battuta adapted
     P3_2_noBattuta(home, this);
@@ -228,8 +223,9 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 string SecondSpeciesCounterpoint::to_string() const {
     string text = "\nSecond species diminution array : " + boolVarArray_to_string(isDiminution) + "\n";
     text += "Second species isLowest array : " + boolVarArray_to_string(isNotLowest) + "\n";
+    text += "First species m intervals : " + intVarArray_to_string(firstSpeciesMelodicIntervals) + "\n";
+    text += "Second species m intervals : " + intVarArray_to_string(secondSpeciesMelodicIntervals) + "\n";
     text += "Second species h intervals : " + intVarArray_to_string(secondSpeciesHarmonicIntervals) + "\n";
-    text += "Second species arsis intervals : " + intVarArray_to_string(secondSpeciesArsisArray) + "\n";
     text += "Second species is Consonance : " + boolVarArray_to_string(isConsonance) + "\n";
     text += "Second species notes : " + intVarArray_to_string(notes) + "\n";
     text += "First species : " + FirstSpeciesCounterpoint::to_string() + "\n";

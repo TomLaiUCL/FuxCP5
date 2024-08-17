@@ -71,8 +71,8 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         }
     } else {
         //H7,H8 cf version, 3v adapted
-        //rel(home, h_intervals[h_intervals.size()-2]==UNISSON||h_intervals[h_intervals.size()-2]==MINOR_THIRD||h_intervals[h_intervals.size()-2]==PERFECT_FIFTH
-        //    ||h_intervals[h_intervals.size()-2]==MAJOR_SIXTH);
+        rel(home, expr(home, abs(h_intervals[h_intervals.size()-2]))==UNISSON||expr(home, abs(h_intervals[h_intervals.size()-2]))==MINOR_THIRD
+            ||expr(home, abs(h_intervals[h_intervals.size()-2]))==PERFECT_FIFTH||expr(home, abs(h_intervals[h_intervals.size()-2]))==MAJOR_SIXTH);
     }
 
     //No battuta

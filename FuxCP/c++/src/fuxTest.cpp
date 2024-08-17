@@ -10,31 +10,7 @@ FuxTest::FuxTest(char* test){
     importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
     borrowMode = 1;
     CounterpointProblem* problem;
-    if(strcmp(test, "1H1")==0){
-        problem = test_1sp_H1();
-    } else if(strcmp(test, "1H2")==0){
-        problem = test_1sp_H2();
-    } else if(strcmp(test, "1H32")==0){
-        problem = test_1sp_H3();
-    } else if(strcmp(test, "1H33")==0){
-        problem = test_1sp_H3_2();
-    } else if(strcmp(test, "1H41")==0){
-        problem = test_1sp_H4_1();
-    } else if(strcmp(test, "1H42")==0){
-        problem = test_1sp_H4_2();
-    } else if(strcmp(test, "1H5")==0){
-        problem = test_1sp_H5();
-    } else if(strcmp(test, "1H7")==0){
-        problem = test_1sp_H7();
-    } else if(strcmp(test, "1H72")==0){
-        problem = test_1sp_H7_2();
-    } else if(strcmp(test, "2H2")==0){
-        problem = test_2sp_H2();
-    } else if(strcmp(test, "3H1")==0){
-        problem = test_3sp_H1();
-    } else if(strcmp(test, "4H2")==0){
-        problem = test_4sp_H2();
-    }
+    problem = dispatcher(test);
     BAB<CounterpointProblem> e(problem);
     int nb_sol = 0;
     while(CounterpointProblem* pb = e.next()){
@@ -52,6 +28,36 @@ FuxTest::FuxTest(char* test){
 
 }
 
+CounterpointProblem* FuxTest::dispatcher(char* test){
+    if(strcmp(test, "1H1")==0){
+        return test_1sp_H1();
+    } else if(strcmp(test, "1H2")==0){
+        return test_1sp_H2();
+    } else if(strcmp(test, "1H32")==0){
+        return test_1sp_H3();
+    } else if(strcmp(test, "1H33")==0){
+        return test_1sp_H3_2();
+    } else if(strcmp(test, "1H41")==0){
+        return test_1sp_H4_1();
+    } else if(strcmp(test, "1H42")==0){
+        return test_1sp_H4_2();
+    } else if(strcmp(test, "1H5")==0){
+        return test_1sp_H5();
+    } else if(strcmp(test, "1H7")==0){
+        return test_1sp_H7();
+    } else if(strcmp(test, "1H72")==0){
+        return test_1sp_H7_2();
+    } else if(strcmp(test, "2H2")==0){
+        return test_2sp_H2();
+    } else if(strcmp(test, "3H1")==0){
+        return test_3sp_H1();
+    } else if(strcmp(test, "4H2")==0){
+        return test_4sp_H2();
+    } else {
+        std::invalid_argument("Test for constraint not found!");
+    }
+}
+
 FuxTest::FuxTest(int testNumber): FuxTest(testNumber, 0){
     idx = cp.size();
 }
@@ -67,10 +73,6 @@ FuxTest::FuxTest(int testNumber, int i){
         test_2v_2sp_fig39_setter(i);
     } else if(testNumber==40){
         test_2v_2sp_fig40_setter(i);
-    } else if(testNumber==41){
-        test_2v_2sp_fig41_setter(i);
-    } else if(testNumber==42){
-        test_2v_2sp_fig42_setter(i);
     } else if(testNumber==55){
         test_2v_3sp_fig55_setter(i);
     } else if(testNumber==74){
@@ -292,7 +294,7 @@ void FuxTest::test_2v_2sp_fig38_setter(int i){
 }
 
 void FuxTest::test_2v_2sp_fig39_setter(int i){
-    cout << "Fig. 39 (the voice types as defined previously don't woooooork here)" << endl;
+    cout << "Fig. 39 (the voice types as defined previously don't work here)" << endl;
     spList = {SECOND_SPECIES};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; //1sp 2v cf
     cp =           {0,53,52,48,53,52,50,48,46,58,55,60,57,53,52,48,53,41,45,50,48,52,53};
@@ -307,26 +309,6 @@ void FuxTest::test_2v_2sp_fig40_setter(int i){
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; //1sp 2v cf
     cp =           {0,67,64,65,67,69,71,69,67,72,71,72,74,72,71,69,67,65,64,72,71,69,67,62,64,66,67};
     v_type = {2};
-    idx = i;
-    borrowMode = 1;
-}
-
-void FuxTest::test_2v_2sp_fig41_setter(int i){
-    cout << "Fig. 41" << endl;
-    spList = {SECOND_SPECIES};
-    cantusFirmus = {55,   60,   59,   55,   60,   64,   62,   67,   64,   60,   62,   59,   57,   55}; //1sp 2v cf
-    cp =           {0 ,55,52,53,55,53,52,50,48,52,48,60,59,57,55,59,60,59,57,55,54,50,55,47,50,54,55};
-    v_type = {-1};
-    idx = i;
-    borrowMode = 1;
-}
-
-void FuxTest::test_2v_2sp_fig42_setter(int i){
-    cout << "Fig. 42 (voice types don't work here either)" << endl;
-    spList = {SECOND_SPECIES};
-    cantusFirmus = {57,60,59,60,64,65,64,62,60,59,57}; //1sp 2v cf
-    cp =           {0,69,64,65,67,62,64,76,72,71,69,65,67,71,74,69,72,64,66,68,69};
-    v_type = {1};
     idx = i;
     borrowMode = 1;
 }
@@ -357,7 +339,7 @@ void FuxTest::test_2v_4sp_fig74_setter(int i){
     cout << "Fig. 74" << endl;
     spList = {FOURTH_SPECIES};
     cantusFirmus = {62,   65,   64,   62,   67,   65,   69,   67,   65,   64,   62}; //1sp 2v cf
-    cp =           {0 ,50,50,62,62,60,60,59,59,64,64,62,62,65,65,64,64,62,62,61,62};
+    cp =           {   50,50,62,62,60,60,59,59,64,64,62,62,65,65,64,64,62,62,61,62};
     cout << cp.size() << endl;
     v_type = {-1};
     idx = i;
@@ -376,7 +358,6 @@ void FuxTest::test_2v_5sp_fig82_setter(int i){
 }
 
 void FuxTest::test_3v_1sp_fig108_setter(int i){
-    //??? Fux violates his own rules? Last note 1st cp is 66, with respect to the lowest stratum the h interval is 2. Impossible...
     cout << "Fig. 108" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64};
@@ -446,7 +427,7 @@ void FuxTest::test_3v_4sp_fig146_setter(int i){
     cout << "Fig. 146" << endl;
     spList = {FOURTH_SPECIES, FIRST_SPECIES};
     cantusFirmus = {64,   60,   62,   60,   57,   69,   67,   64,   65,   64};
-    cp =           {00,76,76,72,72,71,71,69,69,72,72,74,74,72,72,69,69,71,68,
+    cp =           {   76,76,72,72,71,71,69,69,72,72,74,74,72,72,69,69,71,68,
                     52,   57,   55,   57,   53,   53,   52,   48,   50,   52};
     v_type = {1 ,-2};
     idx = i;

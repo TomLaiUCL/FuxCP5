@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
-        vector<Species> species = {FOURTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+        vector<Species> species = {THIRD_SPECIES};
         //la do si re do mi fa mi re do si la
         //57 60 59 62 60 64 65 64 62 60 59 57
         // vector<int> cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
@@ -97,8 +97,8 @@ int main(int argc, char* argv[]) {
             // cout << int_vector_to_string(cantusFirmus) << endl;
 
             delete pb;
-            //if (nb_sol >= 10)
-            //    break;
+            if (nb_sol >= 1)
+                break;
         }
         cout << "No (more) solutions." << endl;
     } else if(argc==3){
@@ -153,11 +153,11 @@ int main(int argc, char* argv[]) {
             }
         }
         else{
-            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES ){
+            if(species[0]==FIRST_SPECIES || species[0]==THIRD_SPECIES || species[0]==FOURTH_SPECIES){
                 for(int j = 0; j < test->getIdx(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }
-            } else if(species[0]==SECOND_SPECIES || species[0]==FOURTH_SPECIES){
+            } else if(species[0]==SECOND_SPECIES){
                 for(int j = 1; j < test->getIdx(); j++){
                     rel(problem->getHome(), problem->getSolutionArray()[j], IRT_EQ, test->getCp()[j]);
                 }

@@ -124,8 +124,8 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         IntVar addition = expr(home, abs(m2IntervalsArray[i+1]));
         rel(home, addition, IRT_EQ, 3, Reify(btt3));
         rel(home, addition, IRT_EQ, 4, Reify(btt4));
-        rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_LQ, 2, Reify(bta2nd));
-        rel(home, thirdSpeciesMelodicIntervals[i+2], IRT_LQ, 2, Reify(bat2nd));
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i+1])), IRT_LQ, 2, Reify(bta2nd));
+        rel(home, expr(home, abs(thirdSpeciesMelodicIntervals[i+2])), IRT_LQ, 2, Reify(bat2nd));
         rel(home, btt3, BOT_OR, btt4, btt3rd);
         rel(home, bta2nd, BOT_AND, btt3rd, band);
         rel(home, band, BOT_AND, bat2nd, isDiminution[i/4]);
@@ -164,7 +164,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
 
     //marcel's rule
-    for(int i = 0; i < thirdSpeciesMelodicIntervals.size()-1; i++){
+    /*for(int i = 0; i < thirdSpeciesMelodicIntervals.size()-1; i++){
         BoolVar bSkip = BoolVar(home, 0, 1);
         BoolVar bMbUp = BoolVar(home, 0, 1);
         BoolVar bMbDown = BoolVar(home, 0, 1);
@@ -176,7 +176,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         rel(home, bMbUp, BOT_EQV, bMbDown, bContrary);
         rel(home, thirdSpeciesMelodicIntervals[i+1], IRT_LQ, 2, Reify(bSkip, RM_IMP));
         rel(home, bSkip, BOT_IMP, bContrary, 1);
-    }
+    }*/
     
     //no battuta adapted for third species
     for(int j = 0; j < thirdSpeciesMotions.size(); j++){
@@ -190,7 +190,8 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
 {
     //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
-    //rel(home, (getIsNotLowest()[getIsNotLowest().size()-2]==0) >> (thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-5]==MINOR_THIRD));
+    rel(home, (getIsNotLowest()[getIsNotLowest().size()-2]==0) >> 
+        (expr(home, abs(thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-5]))==MINOR_THIRD));
 
     costs = IntVarArray(home, 7, 0, 10000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2"};

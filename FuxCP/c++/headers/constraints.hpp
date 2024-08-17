@@ -108,6 +108,12 @@ void M1_1_2v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
  */
 void M1_1_3v_melodicIntervalsNotExceedMinorSixth(Home home, Part* part);
 
+/**
+ * 2.M1 : If the two voices are getting so close that there is no contrary motion possible without crossing each other, then the melodic interval of 
+ * the counterpoint can be an octave leap.
+ */
+void M1_2_octaveLeap(Home home, Part* part, Stratum* low);
+
 void M2_2_2v_twoConsecutiveNotesAreNotTheSame(Home home, Part* part);
 
 void M2_2_3v_melodicIntervalsNotExceedMinorSixth(Home home, vector<Part*> parts, bool containsThirdSpecies);
@@ -141,7 +147,7 @@ void P7_noSuccessiveAscendingSixths(Home home, vector<Part*> parts);
 
 void P1_1_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part);
 
-void H7_1_4v_penultimateSixthOrThird(Home home, Part* part);
+void H7_1_3v_penultimateSixthOrThird(Home home, Part* part);
 
 /* ================================================
  *               OTHER CONSTRAINTS
