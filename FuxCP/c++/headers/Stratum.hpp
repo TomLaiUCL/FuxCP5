@@ -32,17 +32,7 @@ class Stratum : public Voice{
 
         Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, int nV1, int nV2);
 
-        // /**
-        //  * These functions are the real constructors of Stratum. The base constructor should not be used. 
-        //  * They will create
-        // */
-        // Stratum* CreateTwoVoiceStratum(Home home, int nMes , int lb, int ub, int index);
-        // Stratum* CreateThreeVoiceStratum(Home home, int nMes , int lb, int ub, int index);
-        // Stratum* CreateFourVoiceStratum(Home home, int nMes , int lb, int ub, int index);
-
         Stratum(Home home, Stratum& s);  // clone constructor
-
-        // IntVarArray getBranchingNotes() override;
 
         Stratum* clone(Home home) override;
 

@@ -12,9 +12,7 @@
 
 ///This class extends the first species class because most rules of the first species are also valid for the second species
 /**
- * This class represents a counterpoint of the first species. It inherits from the FirstSpeciesCounterpoint class.
- * todo modify it so it also works for 3 and 4 voices. Add the appropriate constraints by making a constructor that takes the number of voices as a parameter
- * todo maybe it should take a Stratum (object or just IntVarArray) for the lowest voice or something like that depending on the formalization
+ * This class represents a counterpoint of the second species. It inherits from the FirstSpeciesCounterpoint class.
  */
 class SecondSpeciesCounterpoint : public FirstSpeciesCounterpoint {
 protected:

@@ -36,12 +36,9 @@ public:
 
     string to_string() const override; 
 
-    /// Getters
     
-    //todo add here other getters if necessary
 
-    ///destructor
-    //todo release the allocated memory (each object created must be deleted) WILL THE COUNTERPOINTPROBLEM DESTRUCTOR BE AUTOMATICALLY CALLED?
+    ///destructor : mother class destructor is sufficient, nothing to add
 
 };
 

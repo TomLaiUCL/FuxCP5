@@ -23,7 +23,6 @@ enum {
 class CounterpointProblem : public IntLexMinimizeSpace{
 protected:
     CantusFirmus* cantusFirmus;
-    // put one counterpoint? or group counterpoints together in a vector<Part*> ? or just leave it like this...
 
     int nMeasures;      /// the number of measures in the score to generate
     int n_unique_costs;
@@ -76,10 +75,8 @@ public:
     IntVarArgs cost() const;
 
     /// Getters
-    //todo add here getters if necessary
     //Part* getCounterpoint(){ return counterpoint_1; }
     ///destructor
-    //todo release the allocated memory (each object created must be deleted)
     virtual ~CounterpointProblem(){ delete cantusFirmus; delete lowest; delete counterpoint_1; delete counterpoint_2; delete counterpoint_3; delete upper_1;
         delete upper_2, delete upper_3;}
 

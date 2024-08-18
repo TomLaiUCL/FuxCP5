@@ -518,10 +518,10 @@
                     (setq melodic-params-list (append melodic-params-list (list (getf subcost :param))))
                     (setq melodic-values-list (append melodic-values-list (list (convert-to-cost-integer (getf subcost :value))))))
 
-                (print "melodic lists params then values: ")
-                (print melodic-params-list)
-                (print melodic-values-list)
-                (print (length melodic-values-list))
+                ;; (print "melodic lists params then values: ")
+                ;; (print melodic-params-list)
+                ;; (print melodic-values-list)
+                ;; (print (length melodic-values-list))
 
 
                 (defvar general-params-list nil)
@@ -540,10 +540,10 @@
                                 (setq general-params-list (append general-params-list (list (getf cost :param))))
                                 (setq general-values-list (append general-values-list (list (convert-to-cost-integer (getf cost :value))))))))) ; else
 
-                (print "general lists params then values: ")
-                (print general-params-list)
-                (print general-values-list)
-                (print (length general-values-list))
+                ;; (print "general lists params then values: ")
+                ;; (print general-params-list)
+                ;; (print general-values-list)
+                ;; (print (length general-values-list))
 
 
                 (defvar motion-params-list nil)
@@ -555,10 +555,10 @@
                     (setq motion-params-list (append motion-params-list (list (getf subcost :param))))
                     (setq motion-values-list (append motion-values-list (list (convert-to-cost-integer (getf subcost :value))))))
 
-                (print "motion lists params then values: ")
-                (print motion-params-list)
-                (print motion-values-list)
-                (print (length motion-values-list))
+                ;; (print "motion lists params then values: ")
+                ;; (print motion-params-list)
+                ;; (print motion-values-list)
+                ;; (print (length motion-values-list))
 
 
                 (defvar specific-params-list nil)
@@ -579,10 +579,10 @@
                                 (setq specific-params-list (append specific-params-list (list (getf cost :param))))
                                 (setq specific-values-list (append specific-values-list (list (convert-to-cost-integer (getf cost :value))))))))) ; else
 
-                (print "specific lists params then values: ")
-                (print specific-params-list)
-                (print specific-values-list)
-                (print (length specific-values-list))
+                ;; (print "specific lists params then values: ")
+                ;; (print specific-params-list)
+                ;; (print specific-values-list)
+                ;; (print (length specific-values-list))
 
 
 
@@ -603,37 +603,37 @@
                     )
                 )
 
-                (print "cost name then values: ")
-                (print cost-params-list)
-                (print cost-values-list)
-                (print (length cost-values-list))
+                ;; (print "cost name then values: ")
+                ;; (print cost-params-list)
+                ;; (print cost-values-list)
+                ;; (print (length cost-values-list))
 
 
                 (setf borrow-mode-int (map-mode-to-int (borrow-mode-param (om::object editor))))
                 (setf min-skips-slider (min-skips-slider-param (om::object editor)))
 
-                (print (borrow-mode-param (om::object editor)))
-                (print (map-mode-to-int (borrow-mode-param (om::object editor))))
-                (print borrow-mode-int)
-                (print min-skips-slider)
+                ;; (print (borrow-mode-param (om::object editor)))
+                ;; (print (map-mode-to-int (borrow-mode-param (om::object editor))))
+                ;; (print borrow-mode-int)
+                ;; (print min-skips-slider)
 
                 (setf species-integer-list (convert-to-species-integer-list (species-param (om::object editor))))
                 (setf *voices-types (convert-to-voice-integer-list (voice-type-param (om::object editor))))
                 
-                (print species-integer-list)
-                (print *voices-types)
+                ;; (print species-integer-list)
+                ;; (print *voices-types)
 
                 (defparameter *species-list species-integer-list)
 
-                (print *scale)
+                ;; (print *scale)
 
                 (print "calling new problem")
 
                 (defparameter problem-pointer (new-ctp-problem *cf species-integer-list *voices-types borrow-mode-int min-skips-slider general-values-list motion-values-list melodic-values-list specific-values-list cost-values-list *tonalite-offset *scale *chromatic-scale *borrowed-scale))
-                (print problem-pointer)
+                ;; (print problem-pointer)
 
                 (setf (current-csp (om::object editor)) (create-solver problem-pointer BAB))
-                (print (current-csp (om::object editor)))
+                ;; (print (current-csp (om::object editor)))
                 
                 (print "Base<Problem>* (search engine) stored in current-csp object variable")
 
@@ -758,8 +758,8 @@
         (print "The solution can now be retrieved by evaluating the third output of cp-params.")
         ;; (setq sol-pitches (gil::g-values sol the-cp)) ; store the values of the solution
         (setq sol-pitches (solution-to-int-array sol)) ; store the values of the solution
-        (print "sol-pitches :")
-        (print sol-pitches)
+        ;; (print "sol-pitches :")
+        ;; (print sol-pitches)
         (let (
             (basic-rythmics (get-basic-rythmics *species-list *cf-len sol-pitches sol))
             (sol-voices (make-list *N-COUNTERPOINTS :initial-element nil))
@@ -784,7 +784,7 @@
     (handler-case
         (return-next-solution-space se) ; search the next solution, sol is the space of the solution
         (error (c)
-            (error "Error on Gecode side when calling return-next-solution-space")
+            (error "Error on Gecode side when calling return-next-solution-space. Wait a few seconds, then press stop, then next solution again. If that doesn't work, press save config and restart the search.")
             ;(try-find-solution se)
         )
     )
@@ -817,7 +817,7 @@
 ; ((4) 5) -> ~((-1/2 1 1 1 1/2 1/2 1 (pitches)) depending on the counterpoint
 
 (defun get-basic-rythmics (species-list len sol-pitches sol)
-    (print "get-basic-rythmics function entered")
+    ;; (print "get-basic-rythmics function entered")
     (setq len-1 (- len 1))
     (setq len-2 (- len 2))
     (let (
@@ -946,38 +946,6 @@
     (mapcar #'(lambda (x) (format nil "~A" x)) (loop for i from 1 to 14 collect i))
 )
 
-;; ; set the value @v in the hash table @h with key @k
-;; (defun seth (h k v)
-;;     (setf (gethash k h) v)
-;; )
-
-;; ; set the value @v in the parameters with key @k
-;; (defun setparam (k v)
-;;     (seth *params* k v)
-;; )
-
-;; (defun setparam-yes-no (k v)
-;;     (let ((converted (if (string= "Yes" v)
-;;                     t
-;;                     nil)))
-;;         (setparam k converted)
-;;     )
-;; )
-
-;; ; set the cost-converted value @of v in the parameters with key @k
-;; (defun setparam-cost (k v)
-;;     (setparam k (convert-to-cost-integer v))
-;; )
-
-;; ; set the species-converted value @of v in the parameters with key @k
-;; (defun setparam-species (k v)
-;;     (setparam k (convert-to-species-integer v))
-;; )
-
-;; ; set the slider-converted value @of v in the parameters with key @k
-;; (defun setparam-slider (k v)
-;;     (setparam k (convert-to-percent v))
-;; )
 
 ; convert a cost to an integer
 (defun convert-to-cost-integer (param)

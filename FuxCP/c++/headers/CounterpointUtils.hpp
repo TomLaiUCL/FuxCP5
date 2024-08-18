@@ -34,16 +34,7 @@ Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> can
 CounterpointProblem* create_problem(vector<int> cf, vector<Species> sp, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
     vector<int> s_costs, vector<int> imp, int bm);
 
-/**
- * Creates the lowest strata deciding which notes currently are the lowest
- */
-void create_lowest(Home home, Stratum* lowest, CantusFirmus* cf, Part* cp1, Part* cp2=nullptr);
-
 bool notInt(char* argv);
-
-///////////////////////////////////////////////////////////////////
-//////////////     CONTSTRAINTS             ///////////////////////
-///////////////////////////////////////////////////////////////////
 
 
 

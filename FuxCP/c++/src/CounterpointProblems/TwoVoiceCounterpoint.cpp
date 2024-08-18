@@ -72,11 +72,10 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
 }
 // COPY CONSTRUCTOR
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : CounterpointProblem(s){
-    //counterpoint = s.counterpoint;
     species = s.species;
 }
 
-IntLexMinimizeSpace* TwoVoiceCounterpoint::copy(){   // todo use 'bool share' in copy constructor?
+IntLexMinimizeSpace* TwoVoiceCounterpoint::copy(){   
     return new TwoVoiceCounterpoint(*this);
 }
 

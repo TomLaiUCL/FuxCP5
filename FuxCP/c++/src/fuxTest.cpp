@@ -127,7 +127,7 @@ CounterpointProblem* FuxTest::test_1sp_H2(){
     v_type = {2};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 64); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 64); 
     return problem;
 }
 
@@ -136,7 +136,7 @@ CounterpointProblem* FuxTest::test_1sp_H3(){
     v_type = {2};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-1], IRT_EQ, 64); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-1], IRT_EQ, 64); 
     return problem;
 }
 
@@ -145,8 +145,8 @@ CounterpointProblem* FuxTest::test_1sp_H3_2(){
     v_type = {2, 1};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[(problem->getSize()/2)-1], IRT_EQ, 67); //does not work since it is not a consonant
-    rel(problem->getHome(), problem->getSolutionArray()[(problem->getSize())-1], IRT_EQ, 65); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[(problem->getSize()/2)-1], IRT_EQ, 67); 
+    rel(problem->getHome(), problem->getSolutionArray()[(problem->getSize())-1], IRT_EQ, 65); 
     return problem;
 }
 
@@ -155,7 +155,7 @@ CounterpointProblem* FuxTest::test_1sp_H4_1(){
     v_type = {1};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 67); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 67); 
     return problem;
 }
 
@@ -164,7 +164,7 @@ CounterpointProblem* FuxTest::test_1sp_H4_2(){
     v_type = {1};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-1], IRT_EQ, 67); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-1], IRT_EQ, 67); 
     return problem;
 }
 
@@ -173,7 +173,7 @@ CounterpointProblem* FuxTest::test_1sp_H5(){
     v_type = {0};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 62); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 62); 
     return problem;
 }
 
@@ -182,7 +182,7 @@ CounterpointProblem* FuxTest::test_1sp_H7(){
     v_type = {0};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-2], IRT_EQ, 69); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-2], IRT_EQ, 69); 
     return problem;
 }
 
@@ -191,7 +191,7 @@ CounterpointProblem* FuxTest::test_1sp_H7_2(){
     v_type = {-1};
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params,
             importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-2], IRT_EQ, 55); //does not work since it is not a consonant
+    rel(problem->getHome(), problem->getSolutionArray()[problem->getSize()-2], IRT_EQ, 55); 
     return problem;
 }
 
@@ -356,7 +356,7 @@ void FuxTest::test_2v_5sp_fig82_setter(int i){
     cout << "Fig. 82" << endl;
     spList = {FIFTH_SPECIES};
     cantusFirmus = {62,   65,   64,   62,   67,   65,   69,   67,   65,   64,   62}; //1sp 2v cf
-    cp =           {0,0,69,69,69,62,64,65,67,65,64,67,65,62,74,74,74,72,70,67,69,71,72,72,72,72,77,77,77,76,76,76,76,69,74,74,74,74,73,73,74};
+    cp =           {0,0,69,69,69,62,64,65,67,65,64,67,65,62, 74,74,74,72,70,67,69,71,72,72,72,72, 77,77,77,76,76,76,76,69, 74,74,74,74,73,73,74};
     cout << cp.size() << endl;
     v_type = {1};
     idx = i;
@@ -421,9 +421,9 @@ void FuxTest::test_3v_2sp_fig125_setter(int i){
 void FuxTest::test_3v_3sp_fig133_setter(int i){
     cout << "Fig. 133" << endl;
     spList = {THIRD_SPECIES, FIRST_SPECIES};
-    cantusFirmus = {62,         65,         64,         62,         67,         65,         69,         67,         65,         64,         62};
-    cp =           {53,50,53,55,57,53,57,59,60,52,55,57,59,62,59,57,55,57,59,61,62,64,65,62,60,57,60,62,64,62,60,59,57,62,57,59,61,57,59,60,62,
-                    50,         50,         48,         55,         52,         50,         53,         48,         50,         57,         50};
+    cantusFirmus = {62,          65,          64,          62,          67,          65,          69,          67,          65,          64,          62};
+    cp =           {53,50,53,55, 57,53,57,59, 60,52,55,57, 59,62,59,57, 55,57,59,61, 62,64,65,62, 60,57,60,62, 64,62,60,59, 57,62,57,59, 61,57,59,60, 62,
+                    50,          50,          48,          55,          52,          50,          53,          48,          50,          57,          50};
     v_type = {-1 ,-2};
     idx = i;
     borrowMode = 1;
@@ -479,10 +479,10 @@ void FuxTest::test_4v_2sp_fig176_setter(int i){
 void FuxTest::test_4v_3sp_fig183_setter(int i){
     cout << "Fig. 183" << endl;
     spList = {THIRD_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
-    cantusFirmus = {64,         60,         62,         60,         57,         69,         67,         64,         65,         64};
-    cp =           {71,64,71,72,69,72,69,67,65,62,64,65,67,64,65,67,69,65,69,71,72,69,72,74,76,71,76,74,72,76,72,71,69,74,69,71,68,
-                    56,         57,         57,         55,         60,         57,         59,         60,         62,         59,
-                    52,         53,         50,         52,         53,         53,         52,         57,         50,         52};
+    cantusFirmus = {64,          60,          62,          60,          57,          69,          67,          64,          65,          64};
+    cp =           {71,64,71,72, 69,72,69,67, 65,62,64,65, 67,64,65,67, 69,65,69,71, 72,69,72,74, 76,71,76,74, 72,76,72,71, 69,74,69,71, 68,
+                    56,          57,          57,          55,          60,          57,          59,          60,          62,          59,
+                    52,          53,          50,          52,          53,          53,          52,          57,          50,          52};
     v_type = {0 ,-1, -2};
     idx = i;
     borrowMode = 1;

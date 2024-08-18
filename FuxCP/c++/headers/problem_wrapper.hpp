@@ -30,8 +30,6 @@ void* create_new_problem(int* cantusFirmus, int size, int n_cp, int* splist, int
  */
 int get_size(void* sp);
 
-int test_cffi(int n);
-
 void delete_pointer(void* p);
 
 void delete_solver_pointer(void* p);

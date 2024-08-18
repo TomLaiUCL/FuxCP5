@@ -52,24 +52,6 @@ Part::Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int 
     obliqueCost = 1;
     contraryCost = 2;
 
-//    mIntervalsCp        = IntVarArray(home, nMeasures-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-
-    // /// link harmonic intervals
-    // for (int i = 0; i < hIntervalsCpCf.size(); i++){
-    //     /// i // 4 because the ctp has 4 notes per measure and the Cf 1
-    //     rel(home, expr(home, abs(cp[i] - cf_vector[floor(i / 4)])), IRT_EQ, hIntervalsCpCf[i]); /// absolute value is rule G1 from Thibault
-    // }
-    /// link melodic intervals
-    
-    //todo link motions using the enum in headers/Utilities.hpp
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///                                                General Constraints                                           ///
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /// rule G4 from Thibault: The counterpoint has to be in the key of the Cantus Firmus todo move this to the parent class in a function
-    //dom(home, notes, IntSet(IntArgs(get_all_notes_from_scale(key, MAJOR_SCALE)))); //@todo do it correctly, this is just an example
-
 }
 
 string Part::to_string() const{
@@ -164,8 +146,6 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
 
     speciesArray.update(home, s.speciesArray);
 
-//    mIntervalsCp.update(home, s.mIntervalsCp);
-//    motionsCfCp.update(home, s.motionsCfCp);
 }
 
 // Virtual clone function

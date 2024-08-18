@@ -233,16 +233,6 @@ string SecondSpeciesCounterpoint::to_string() const {
     return text;
 }
 
-// SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(SecondSpeciesCounterpoint &s): FirstSpeciesCounterpoint(s){     COPY CONSTRUCTOR NO LONGER NEEDED, THIS IS NO LONGER A SPACE
-//     secondSpeciesNotesCp.update(*this, s.secondSpeciesNotesCp);
-//     secondSpeciesHarmonicIntervals.update(*this, s.secondSpeciesHarmonicIntervals);
-//     secondSpeciesMelodicIntervals.update(*this, s.secondSpeciesMelodicIntervals);
-
-// }
-
-// Space* SecondSpeciesCounterpoint::copy() {
-//     return new SecondSpeciesCounterpoint(*this);
-// }
 
 SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, SecondSpeciesCounterpoint &s): FirstSpeciesCounterpoint(home, s){  
     secondSpeciesNotesCp.update(home, s.secondSpeciesNotesCp);

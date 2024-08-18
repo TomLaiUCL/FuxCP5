@@ -39,9 +39,8 @@ public:
 
     /// Getters
     // Part* getCounterpoint(){ return counterpoint; }
-    //todo add here other getters if necessary
 
-    ///destructor 
+    ///destructor : mother class destructor is sufficient, nothing to add
 
     void uniteCounterpoints();
 

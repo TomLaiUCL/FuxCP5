@@ -107,7 +107,7 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
     globalCost.update(*this, s.globalCost);
 }
 
-IntLexMinimizeSpace* CounterpointProblem::copy(){   // todo use 'bool share' in copy constructor?
+IntLexMinimizeSpace* CounterpointProblem::copy(){   
     return new CounterpointProblem(*this);
 }
 

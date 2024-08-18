@@ -37,7 +37,6 @@
         (chr (cffi::foreign-alloc :int :initial-contents chromscale))
         (bor (cffi::foreign-alloc :int :initial-contents borscale))
     )
-    (test-cffi 4)
     (new-problem cfi (length cf) (length splist) spl vt borrowmode minskips gen mot mel spe cst toffset sca (length scale) chr (length chromscale) bor (length borscale))
     )
 )
@@ -70,11 +69,6 @@
 (cffi::defcfun ("get_size" get-size) :int
     "Returns the size of the space."
     (sp :pointer) ; a void* cast of a Problem*
-)
-
-(cffi::defcfun ("test_cffi" test-cffi) :int
-    "Returns n+1."
-    (n :int) ; an integer
 )
 
 

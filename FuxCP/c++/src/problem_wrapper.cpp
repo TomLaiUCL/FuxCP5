@@ -13,10 +13,6 @@ std::vector<Species> convertToSpeciesVector(const std::vector<int>& intVec);
 
 /**
  * Wraps the Problem constructor.
- * @todo modify this to include any parameters your Problem constructor requires
- * @param size an integer representing the size of the problem
- * @param lower_bound_domain an integer representing the lower bound of the domain of the variables
- * @param upper_bound_domain an integer representing the upper bound of the domain of the variables
  * @return A pointer to a Problem object casted as a void*
  */
 void* create_new_problem(int* cantusFirmus, int size, int n_cp, int* splist, int* v_types, int b_mode, int min_skips, int* general_params, 
@@ -36,7 +32,6 @@ void* create_new_problem(int* cantusFirmus, int size, int n_cp, int* splist, int
     vector<int> gen(int_pointer_to_vector(general_params, 8));
     vector<int> spec(int_pointer_to_vector(specific, 7));
     vector<int> imp(int_pointer_to_vector(importance, 14));
-    // return (void*) new Problem(cf, size, n_cp, sp, vt, b_mode, min_skips, gen, mot, mel, spec, imp, t_off, sc, scale_size, chr, chrom_size, brw, borrow_size);
 
     vector<Species> speciesList = convertToSpeciesVector(sp);
     return create_problem(cf, speciesList, vt, mel, gen, spec, imp, b_mode);
@@ -49,11 +44,6 @@ void* create_new_problem(int* cantusFirmus, int size, int n_cp, int* splist, int
  */
 int get_size(void* sp){
     return static_cast<CounterpointProblem*>(sp)->getSize();
-}
-
-int test_cffi(int n){
-    writeToLogFile(to_string(n).c_str());
-    return n+1;
 }
 
 

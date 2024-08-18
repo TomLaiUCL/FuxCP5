@@ -6,11 +6,6 @@
 #include "../headers/CounterpointUtils.hpp"
 
 
-///////////////////////////////////////////////////////////////////
-//////////////      GENERAL UTILS           ///////////////////////
-///////////////////////////////////////////////////////////////////
-
-
 Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> cantusFirmus, int lowerBound, int upperBound, Stratum* low,
     CantusFirmus* c, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV){
     switch(nV) {
@@ -96,13 +91,6 @@ Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> can
 CounterpointProblem* create_problem(vector<int> cf, vector<Species> spList, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
     vector<int> s_costs, vector<int> imp, int bm){
 
-    // cout << "create_problem" << endl;
-    // string message = "create_problem called with arguments : \n";
-    // message += int_vector_to_string(cf) + "\n";
-    // message += int_vector_to_string(spList) + "\n";
-    // message += int_vector_to_string(v_type) + "\n";
-    // writeToLogFile(message.c_str());
-
     switch (spList.size())
     {
     case 1:
@@ -130,6 +118,3 @@ bool notInt(char* argv){
     }
     return noInt;
 }
-///////////////////////////////////////////////////////////////////
-//////////////     CONTSTRAINTS             ///////////////////////
-///////////////////////////////////////////////////////////////////

@@ -5,7 +5,6 @@
 #include "../headers/Stratum.hpp"
 
 Stratum::Stratum(Home home, int nMes, int lb, int ub) : Voice(home, nMes, lb, ub){
-    // add here any variable initialization that can't be done in Voice constructor and that is independent of the number of voices
     //notes = IntVarArray(home, nMes*4-3, 0, 127);
     //h_intervals = IntVarArray(home, notes.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
     //m_intervals_brut = IntVarArray(home, notes.size()-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
