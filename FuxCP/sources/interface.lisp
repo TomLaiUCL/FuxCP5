@@ -1,6 +1,6 @@
 (in-package :fuxcp)
 
-; Author: Thibault Wafflard and Anton Lamotte
+; Author: Thibault Wafflard and Anton Lamotte. Adapted for the migration of FuxCP to C++ by Luc Cleenewerk and Diego de Patoul in August 2024.
 ; Date: June 3, 2023 and January 2024
 ; This file contains all the cp-params interface.
 ; That is to say the interface blocks, as well as the global variables updated via the interface.

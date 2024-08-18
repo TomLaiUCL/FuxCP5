@@ -1,3 +1,7 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+//
+
 #include "../headers/Stratum.hpp"
 
 Stratum::Stratum(Home home, int nMes, int lb, int ub) : Voice(home, nMes, lb, ub){

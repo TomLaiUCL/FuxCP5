@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file is the header file of the testing framework implementation.  
+// 
+
 #ifndef FUX_TESTS_HPP
 #define FUX_TEST_HPP
 

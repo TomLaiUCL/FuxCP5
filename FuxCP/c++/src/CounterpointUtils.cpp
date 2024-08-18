@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file contains the implementations of the main functions to create problems and counterpoints.  
+//
+
 #include "../headers/CounterpointUtils.hpp"
 
 

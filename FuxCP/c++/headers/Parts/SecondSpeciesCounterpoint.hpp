@@ -1,5 +1,6 @@
 //
 // Created by Damien Sprockeels on 12/06/2024.
+// Extended and developed by Luc Cleenewerk and Diego de Patoul up to August 2024. 
 //
 
 #ifndef MYPROJECT_SECONDSPECIESCOUNTERPOINT_HPP

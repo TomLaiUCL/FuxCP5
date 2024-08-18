@@ -1,3 +1,7 @@
+// 
+// This file contains the declarations of the C++ interface functions. 
+//
+
 #ifndef gecode_wrapper_hpp
 #define gecode_wrapper_hpp
 

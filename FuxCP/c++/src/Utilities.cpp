@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file contains the implementations of general utility functions. 
+//
+
 #include "../headers/Utilities.hpp"
 
 /**

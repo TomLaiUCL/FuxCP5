@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file contains the testing framework implementation.  
+//
+
 #include "../headers/fuxTest.hpp"
 
 FuxTest::FuxTest(char* test){
@@ -55,6 +60,7 @@ CounterpointProblem* FuxTest::dispatcher(char* test){
         return test_4sp_H2();
     } else {
         std::invalid_argument("Test for constraint not found!");
+        return nullptr;
     }
 }
 

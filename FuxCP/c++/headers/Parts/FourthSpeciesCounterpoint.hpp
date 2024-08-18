@@ -1,3 +1,7 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// 
+
 #ifndef FUXCP_BASE_FOURTHSPECIESCOUNTERPOINT_HPP
 #define FUXCP_BASE_FOURTHSPECIESCOUNTERPOINT_HPP
 

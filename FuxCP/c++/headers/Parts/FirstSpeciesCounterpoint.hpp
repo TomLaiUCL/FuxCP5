@@ -1,5 +1,6 @@
 //
 // Created by Damien Sprockeels on 11/06/2024.
+// Extended and developed by Luc Cleenewerk and Diego de Patoul up to August 2024. 
 //
 
 #ifndef FUXCP_BASE_FIRSTSPECIESCOUNTERPOINT_HPP

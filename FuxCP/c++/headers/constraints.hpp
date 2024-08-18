@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file contains the declarations of the functions that post the constraints.  
+// 
+
 #ifndef CONSTRAINTS_HPP
 #define CONSTRAINTS_HPP
 

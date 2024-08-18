@@ -1,3 +1,7 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// 
+
 #include "../../headers/Parts/FifthSpeciesCounterpoint.hpp"
 
 /**

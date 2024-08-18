@@ -1,3 +1,7 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// 
+
 #ifndef MYPROJECT_THIRDSPECIESCOUNTERPOINT_HPP
 #define MYPROJECT_THIRDSPECIESCOUNTERPOINT_HPP
 

@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file contains the declarations of the main functions to create problems and counterpoints.  
+// 
+
 #ifndef COUNTERPOINTUTILS_HPP
 #define COUNTERPOINTUTILS_HPP
 

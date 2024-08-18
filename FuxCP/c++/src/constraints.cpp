@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file contains the implementations of the functions that post the constraints.  
+//
+
 #include "../headers/constraints.hpp"
 
 void initializeIsOffArray(Home home, Part* part){

@@ -1,3 +1,7 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// 
+
 #ifndef FUXCP_BASE_VOICE_HPP
 #define FUXCP_BASE_VOICE_HPP
 
@@ -27,11 +31,6 @@ class Voice{
         IntVarArray h_intervals;  // with respect to lowest stratum. TODO set to 0 if isLowest
         IntVarArray m_intervals_brut;
         IntVarArray motions;
-
-        
-        // motions ? (w/r to lowest)
-
-        // Stratum lowestStratum;
 
 
     public:

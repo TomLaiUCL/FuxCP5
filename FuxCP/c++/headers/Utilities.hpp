@@ -1,3 +1,8 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// This file contains the declarations of general utility functions. 
+// 
+
 #ifndef UTILITIES
 #define UTILITIES
 

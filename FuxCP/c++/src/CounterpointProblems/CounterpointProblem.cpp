@@ -1,3 +1,7 @@
+// 
+// Created by Luc Cleenewerk and Diego de Patoul. 
+// 
+
 #include "../../headers/CounterpointProblems/CounterpointProblem.hpp"
 #include "../../headers/CounterpointUtils.hpp"
 

@@ -1,3 +1,7 @@
+// 
+// This file contains the implementations of the C++ interface functions. 
+//
+
 #include "../headers/problem_wrapper.hpp"
 #include "../headers/CounterpointProblems/CounterpointProblem.hpp"
 
