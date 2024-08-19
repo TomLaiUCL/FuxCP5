@@ -95,8 +95,6 @@ FuxTest::FuxTest(int testNumber, int i){
         test_3v_1sp_fig111_setter(i);
     } else if(testNumber==125){
         test_3v_2sp_fig125_setter(i);
-    } else if(testNumber==133){
-        test_3v_3sp_fig133_setter(i);
     } else if(testNumber==146){
         test_3v_4sp_fig146_setter(i);
     } else if(testNumber==166){
@@ -105,8 +103,6 @@ FuxTest::FuxTest(int testNumber, int i){
         test_4v_1sp_fig167_setter(i);
     } else if(testNumber==176){
         test_4v_2sp_fig176_setter(i);
-    } else if(testNumber==183){
-        test_4v_3sp_fig183_setter(i);
     }
     else {
         throw std::invalid_argument("This test number has not been implemented (yet)");
@@ -418,17 +414,6 @@ void FuxTest::test_3v_2sp_fig125_setter(int i){
     borrowMode = 1;
 }
 
-void FuxTest::test_3v_3sp_fig133_setter(int i){
-    cout << "Fig. 133" << endl;
-    spList = {THIRD_SPECIES, FIRST_SPECIES};
-    cantusFirmus = {62,          65,          64,          62,          67,          65,          69,          67,          65,          64,          62};
-    cp =           {53,50,53,55, 57,53,57,59, 60,52,55,57, 59,62,59,57, 55,57,59,61, 62,64,65,62, 60,57,60,62, 64,62,60,59, 57,62,57,59, 61,57,59,60, 62,
-                    50,          50,          48,          55,          52,          50,          53,          48,          50,          57,          50};
-    v_type = {-1 ,-2};
-    idx = i;
-    borrowMode = 1;
-}
-
 void FuxTest::test_3v_4sp_fig146_setter(int i){
     cout << "Fig. 146" << endl;
     spList = {FOURTH_SPECIES, FIRST_SPECIES};
@@ -472,18 +457,6 @@ void FuxTest::test_4v_2sp_fig176_setter(int i){
                     65,   69,   72,   74,   70,   69,   69,   71,   74,   73,   74,
                     57,   57,   55,   57,   58,   60,   60,   62,   57,   64,   57};
     v_type = {2, 3, 1};
-    idx = i;
-    borrowMode = 1;
-}
-
-void FuxTest::test_4v_3sp_fig183_setter(int i){
-    cout << "Fig. 183" << endl;
-    spList = {THIRD_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
-    cantusFirmus = {64,          60,          62,          60,          57,          69,          67,          64,          65,          64};
-    cp =           {71,64,71,72, 69,72,69,67, 65,62,64,65, 67,64,65,67, 69,65,69,71, 72,69,72,74, 76,71,76,74, 72,76,72,71, 69,74,69,71, 68,
-                    56,          57,          57,          55,          60,          57,          59,          60,          62,          59,
-                    52,          53,          50,          52,          53,          53,          52,          57,          50,          52};
-    v_type = {0 ,-1, -2};
     idx = i;
     borrowMode = 1;
 }

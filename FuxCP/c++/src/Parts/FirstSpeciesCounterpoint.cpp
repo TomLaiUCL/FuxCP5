@@ -183,8 +183,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
 
-    //1.H7
-    H7_1_3v_penultimateSixthOrThird(home, this);
+    //1.H7 -- after careful testing, this constraint does not work Fux's examples
+    //H7_1_3v_penultimateSixthOrThird(home, this);
    
     //1.M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
     M1_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
