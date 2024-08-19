@@ -641,7 +641,7 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
             (thirdHTriadArray[i]==0));
     }
 
-    //1.P1 3 voices version
+    //1.P1 4 voices version
     for(int j = 0; j < fifthSpeciesMotions.size()-1; j++){
         //set a cost when it is reached through direct motion, it is 0 when not
         rel(home, (fifthSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>

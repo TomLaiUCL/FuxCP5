@@ -272,11 +272,12 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 {
     varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
 
-    //4.P5
-    for(int j = 0; j < nMeasures-1; j++){
-        rel(home, (low->getMelodicIntervals()[j]==0)==(isConsonance[(j*4)+2]==0));
-        rel(home, (low->getMelodicIntervals()[j]!=0)==(isConsonance[(j*4)+2]==1));
-    }
+    //4.P5 -- after careful testing, Fux does not seem to follow this rule in many of his examples. Suspended for now, but implementation left in case the decision is taken to reactivate it. 
+    // for(int j = 1; j < nMeasures-1; j++){
+        //rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
+        //    || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||
+        //    expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SEVENTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SEVENTH));
+    // }
 
     costs = IntVarArray(home, 7, 0, 1000000);
     cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation", "variety"};
