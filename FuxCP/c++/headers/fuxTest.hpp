@@ -4,7 +4,7 @@
 // 
 
 #ifndef FUX_TESTS_HPP
-#define FUX_TEST_HPP
+#define FUX_TESTS_HPP
 
 #include "Utilities.hpp"
 #include "Parts/Part.hpp"

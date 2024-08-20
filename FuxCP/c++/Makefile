@@ -12,8 +12,9 @@ dylib:
 
 # #run the main.cpp file on macOS
 run_mac_os:
-	g++ -std=c++11 -F/Library/Frameworks -c main.cpp src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
-		src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp src/CounterpointProblems/ThreeVoiceCounterpoint.cpp src/CounterpointProblems/FourVoiceCounterpoint.cpp src/fuxTest.cpp src/constraints.cpp
+	g++ -std=c++11 -F/Library/Frameworks main.cpp src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
+		src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp src/CounterpointProblems/ThreeVoiceCounterpoint.cpp src/CounterpointProblems/FourVoiceCounterpoint.cpp src/fuxTest.cpp src/constraints.cpp -o fuxCpFour -framework gecode && ./fuxCpFour
+
 # 	g++ -std=c++11 -F/Library/Frameworks -framework gecode -o Main src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
 # 		src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp src/CounterpointProblems/ThreeVoiceCounterpoint.cpp src/CounterpointProblems/FourVoiceCounterpoint.cpp src/fuxTest.cpp src/constraints.cpp main.cpp
 # 	./Main

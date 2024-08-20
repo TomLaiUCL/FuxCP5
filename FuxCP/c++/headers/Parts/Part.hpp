@@ -119,7 +119,7 @@ class Part : public Voice {
 
         virtual Part* clone(Home home) override;
 
-        virtual string to_string() const;
+        virtual string to_string() const override;
 
         virtual IntVarArray getBranchingNotes();
 
