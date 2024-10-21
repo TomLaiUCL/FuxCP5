@@ -1,12 +1,15 @@
 // 
 // Created by Luc Cleenewerk and Diego de Patoul. 
+// Modified by Tom Lai.
 // This file contains the testing framework implementation.  
 //
 
+#include <cmath>
 #include "../headers/fuxTest.hpp"
 
-FuxTest::FuxTest(char* test){
-    
+// ========== Modified by Tom ====================
+
+FuxTest::FuxTest() {
     cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
     size = cantusFirmus.size();
     melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
@@ -14,21 +17,88 @@ FuxTest::FuxTest(char* test){
     specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
     importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
     borrowMode = 1;
-    CounterpointProblem* problem;
-    problem = dispatcher(test);
-    BAB<CounterpointProblem> e(problem);
-    int nb_sol = 0;
-    while(CounterpointProblem* pb = e.next()){
-        nb_sol++;
-        cout << pb->to_string() << endl;
-        delete pb;
-        if (nb_sol >= 1)
-            break;
+    test_1H1();
+    cout << "end" << endl;
+}
+
+void FuxTest::test_1H1() {
+    int dis[] = {1, 2, 5, 6, 10, 11}; // dissonant intervals
+    int cons[] = {0, 3, 4, 7, 8, 9}; // conssonant intervals
+    spList = {FIRST_SPECIES};
+    v_type = {3};
+    // Test that dissonant notes are forbidden
+    for (int interval : dis) {
+        for (size_t i = 0; i < size; i++) {
+            CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            int note = 12 + cantusFirmus[i] + interval; // note is dissonant
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note); // fix the note i
+            if (has_solution(problem)) {
+                std::cerr   << "Error test 1H1: It exists a dissonant harmonic solution at the mesure " << i << ":\n" 
+                            << "the lowest note is " << cantusFirmus[i] << " and the solution note is " << problem->getSolutionArray()[i] 
+                << std::endl;
+            }
+            delete problem;
+        }  
     }
-    if(nb_sol==0){
-        cout << "This constraint works. It prohibits a forbidden configuration." << endl;
+    // Test that conssonant notes are allowed
+    for (int interval : cons) {
+        for (size_t i = 1; i < size-1; i++) { // skip the first and last note -> 1.H3: In two voice composition, the last harmonic in-terval must be a perfect consonance
+            CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            int note = 12 + cantusFirmus[i] + interval; // note is consonnant
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note); // fix the note i
+            if (std::abs(cantusFirmus[i] - problem->getSolutionArray()[i].med()) % 12 != 0) // skip same notes: 1.H5: THe voices cannot play the same note at the same time
+            {
+                if (!has_solution(problem)) {
+                    std::cerr   << "- Error test 1H1: It doesn't exist solution but it should with the following configuration: at the mesure " << i 
+                                << " the lowest note is " << cantusFirmus[i] << " and the solution note is " << problem->getSolutionArray()[i]
+                    << std::endl;
+            }
+            }
+            delete problem;
+        } 
+         
+    }
+}
+
+bool FuxTest::has_solution(CounterpointProblem* problem) {
+    BAB<CounterpointProblem> e(problem);
+    if (CounterpointProblem* pb = e.next()){
+        delete pb;
+        return true;
+    }
+    return false;
+}
+
+// ===============================================
+
+FuxTest::FuxTest(char* test){
+    if(strcmp(test, "all")==0){
+        cout << "Running all tests:" << endl;
+        FuxTest();
     } else {
-        cout << "This constraint does NOT work. It allows a forbidden configuration." << endl;
+        cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
+        size = cantusFirmus.size();
+        melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
+        general_params = {4, 1, 1, 2, 2, 2, 8, 1};
+        specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
+        importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+        borrowMode = 1;
+        CounterpointProblem* problem;
+        problem = dispatcher(test);
+        BAB<CounterpointProblem> e(problem);
+        int nb_sol = 0;
+        while(CounterpointProblem* pb = e.next()){
+            nb_sol++;
+            cout << pb->to_string() << endl;
+            delete pb;
+            if (nb_sol >= 1)
+                break;
+        }
+        if(nb_sol==0){
+            cout << "This constraint works. It prohibits a forbidden configuration." << endl;
+        } else {
+            cout << "This constraint does NOT work. It allows a forbidden configuration." << endl;
+        }
     }
 
 }

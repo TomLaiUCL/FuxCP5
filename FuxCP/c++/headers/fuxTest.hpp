@@ -32,6 +32,16 @@ protected:
 
 public:
 
+// ========== Modified by Tom ====================
+
+    FuxTest();
+
+    void test_1H1();
+
+    bool has_solution(CounterpointProblem* problem);
+
+// ===============================================
+
     FuxTest(char* test);
 
     FuxTest(int testNumber);

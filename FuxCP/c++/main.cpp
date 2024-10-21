@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
                 break;
         }
         cout << "No (more) solutions." << endl;
-    } else if(argc==3){
+    } else if(argc==3){ // Run test targetting a figure example by fixing the fisrt n measures
         FuxTest* test = new FuxTest(atoi(argv[1]), atoi(argv[2]));
         vector<Species> species = test->getSpList();
         //la do si re do mi fa mi re do si la
@@ -182,9 +182,9 @@ int main(int argc, char* argv[]) {
                 break;
         }
         cout << "No (more) solutions." << endl;
-    } else if(argc==2){
+    } else if(argc==2){ // TESTS
         char* str = argv[1];
-        if(!notInt(str)){
+        if(!notInt(str)){ // Run test targetting a figure example
             FuxTest* test = new FuxTest(atoi(argv[1]));
             vector<Species> species = test->getSpList();
             //la do si re do mi fa mi re do si la
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
             } else {
                 cout << "This test passed successfully!" << endl;
             }
-        } else {
+        } else { // Run test targetting a specific constraint
             FuxTest* test = new FuxTest(argv[1]);
         }
     } else {
