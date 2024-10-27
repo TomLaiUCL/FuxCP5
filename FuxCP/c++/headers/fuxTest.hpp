@@ -38,6 +38,13 @@ public:
 
     void test_1H1();
 
+    void test_1H2();
+    void test_1H2_2v_1sp();
+
+    void test_1H3();
+
+    void test_1H3_2v_1sp();
+
     bool has_solution(CounterpointProblem* problem);
 
 // ===============================================

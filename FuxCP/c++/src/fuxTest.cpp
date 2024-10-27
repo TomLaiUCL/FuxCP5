@@ -18,14 +18,19 @@ FuxTest::FuxTest() {
     importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
     borrowMode = 1;
     test_1H1();
+    test_1H2();
+    test_1H3();
     cout << "end" << endl;
 }
 
+/*
+All notes on the downbeat are consonant with the notes (on the downbeat) of the lowest stratum. 
+*/
 void FuxTest::test_1H1() {
     int dis[] = {1, 2, 5, 6, 10, 11}; // dissonant intervals
     int cons[] = {0, 3, 4, 7, 8, 9}; // conssonant intervals
     spList = {FIRST_SPECIES};
-    v_type = {3};
+    v_type = {3}; // {(6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0]}
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
         for (size_t i = 0; i < size; i++) {
@@ -42,11 +47,11 @@ void FuxTest::test_1H1() {
     }
     // Test that conssonant notes are allowed
     for (int interval : cons) {
-        for (size_t i = 1; i < size-1; i++) { // skip the first and last note -> 1.H3: In two voice composition, the last harmonic in-terval must be a perfect consonance
+        for (size_t i = 1; i < size-1; i++) { // skip the first and last note -> 1.H2 and 1.H3
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
             int note = 12 + cantusFirmus[i] + interval; // note is consonnant
             rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note); // fix the note i
-            if (std::abs(cantusFirmus[i] - problem->getSolutionArray()[i].med()) % 12 != 0) // skip same notes: 1.H5: THe voices cannot play the same note at the same time
+            if (std::abs(cantusFirmus[i] - problem->getSolutionArray()[i].med()) % 12 != 0) // skip same notes: 1.H5: The voices cannot play the same note at the same time
             {
                 if (!has_solution(problem)) {
                     std::cerr   << "- Error test 1H1: It doesn't exist solution but it should with the following configuration: at the mesure " << i 
@@ -59,6 +64,78 @@ void FuxTest::test_1H1() {
          
     }
 }
+
+/*
+In two voice composition, the first harmonic interval must be a perfect consonance.
+*/
+void FuxTest::test_1H2() {
+    test_1H2_2v_1sp();
+}
+
+void FuxTest::test_1H2_2v_1sp() {
+    int p_cons[] = {0, 7}; // perfect conssonant intervals
+    int non_p_cons[] = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11}; // non-perfect conssonant intervals
+    spList = {FIRST_SPECIES};
+    v_type = {3};
+    for (int interval : p_cons) {
+        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, cantusFirmus[0]+12+interval); // fix the first solution note as perfect consonant with cf
+        if (!has_solution(problem)) {
+            std::cerr   << "- Error test 1H2_2v_1sp: It doesn't exist solution but it should with the following configuration: at the last mesure:\n"
+                        << " the lowest note is " << cantusFirmus[0] << " and the solution note is " << problem->getSolutionArray()[0]
+            << std::endl;
+        }
+        delete problem;
+    }
+    for (int interval : non_p_cons) {
+        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, cantusFirmus[0]+12+interval); // fix the first solution note as non-perfect consonant with cf
+        if (has_solution(problem)) {
+            std::cerr   << "- Error test 1H2_2v_1sp: It exists solution but it shouldn't with a non perfect consonnace at the last mesure:\n" 
+                        << "the lowest note is " << cantusFirmus[0] << " and the solution note is " << problem->getSolutionArray()[0] 
+            << std::endl;
+        }
+        delete problem;
+    }
+}
+
+
+/*
+In two voice composition, the last harmonic in-terval must be a perfect consonance. 
+When composing for three or four voices, the last chord should be composed only of notes of the harmonic triad.
+*/
+void FuxTest::test_1H3() {
+    test_1H3_2v_1sp();
+}
+
+void FuxTest::test_1H3_2v_1sp() {
+    int p_cons[] = {0, 7}; // perfect conssonant intervals
+    int non_p_cons[] = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11}; // non-perfect conssonant intervals
+    spList = {FIRST_SPECIES};
+    v_type = {0};
+    for (int interval : p_cons) {
+        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        rel(problem->getHome(), problem->getSolutionArray()[size-1], IRT_EQ, cantusFirmus[size-1]+interval); // fix the last note with a perfect consonance
+        if (!has_solution(problem)) {
+            std::cerr   << "- Error test 1H3_2v_1sp: It doesn't exist solution but it should with the following configuration: at the last mesure:\n"
+                        << " the lowest note is " << cantusFirmus[size-1] << " and the solution note is " << problem->getSolutionArray()[size-1]
+            << std::endl;
+        }
+        delete problem;
+    }
+    for (int interval : non_p_cons) {
+        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        rel(problem->getHome(), problem->getSolutionArray()[size-1], IRT_EQ, cantusFirmus[size-1]+12+interval); // fix the last note with a not perfect consonance
+        if (has_solution(problem)) {
+            std::cerr   << "- Error test 1H3_2v_1sp: It exists solution but it shouldn't with a non perfect consonnace at the last mesure:\n" 
+                        << "the lowest note is " << cantusFirmus[size-1] << " and the solution note is " << problem->getSolutionArray()[size-1] 
+            << std::endl;
+        }
+        delete problem;
+    }
+}
+
+
 
 bool FuxTest::has_solution(CounterpointProblem* problem) {
     BAB<CounterpointProblem> e(problem);
