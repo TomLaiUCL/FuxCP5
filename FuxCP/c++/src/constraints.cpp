@@ -101,6 +101,7 @@ void G9_lastChordSameAsFundamental(Home home, Stratum* lowest, Part* cantusFirmu
     //we check the last note of the cantusFirmus to set the last note of the counterpoint to be in the same key
 
     rel(home, expr(home, lowest->getNotes()[lowest->getNotes().size()-1]%12), IRT_EQ, expr(home, cantusFirmus->getNotes()[cantusFirmus->getNotes().size()-1]%12));
+    rel(home, expr(home, lowest->getNotes()[0]%12), IRT_EQ, expr(home, cantusFirmus->getNotes()[0]%12)); // Modified by Tom Lai
 }   
 
 void H1_1_harmonicIntervalsAreConsonances(Home home, Part* part){

@@ -37,15 +37,28 @@ public:
     FuxTest();
 
     void test_1H1();
+    void test_1H1_2v_1sp();
 
     void test_1H2();
     void test_1H2_2v_1sp();
 
     void test_1H3();
-
     void test_1H3_2v_1sp();
 
-    bool has_solution(CounterpointProblem* problem);
+    void test_1H4();
+    void test_1H4_2v_1sp();
+
+    void test_1H5();
+    void test_1H5_2v_1sp();
+
+    void test_1H6();
+    void test_1H6_2v_1sp();
+
+    void test_1H7();
+    void test_1H7_2v_1sp();
+
+    void test_1M2();
+    void test_1M2_2v_1sp();
 
 // ===============================================
 
@@ -105,5 +118,13 @@ public:
     void test_4v_2sp_fig176_setter(int i);
 
 };
+
+void printVector(const std::vector<int>& array);
+
+void printIntVarArray(const IntVarArray& array);
+
+std::vector<CounterpointProblem*> get_all_solutions(CounterpointProblem* problem);
+
+bool has_solution(CounterpointProblem* problem);
 
 #endif

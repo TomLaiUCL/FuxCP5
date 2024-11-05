@@ -100,3 +100,7 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	find $(SRC_DIR) -name '*.o' -delete
 	rm -f $(TARGET)
+
+# Target to compile and run ./Main all
+test: compile_for_debug
+	./Main all
