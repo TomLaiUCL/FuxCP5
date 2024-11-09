@@ -34,16 +34,19 @@ public:
 
 // ========== Modified by Tom ====================
 
-    FuxTest();
+    void test_G6();
+    void test_G6_2v_1sp();
 
     void test_1H1();
     void test_1H1_2v_1sp();
+    // void test_1H1_3v_1sp();
 
     void test_1H2();
     void test_1H2_2v_1sp();
 
     void test_1H3();
     void test_1H3_2v_1sp();
+    void test_1H3_4v_1sp();
 
     void test_1H4();
     void test_1H4_2v_1sp();

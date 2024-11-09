@@ -348,12 +348,12 @@ void M2_2_3v_melodicIntervalsNotExceedMinorSixth(Home home, vector<Part*> parts,
 void M2_1_varietyCost(Home home, vector<Part*> parts){
     for(int i = 1; i < parts.size(); i++){
         Part* p = parts[i];
-        cout << "Branching notes size : " << endl;
-        cout << p->getBranchingNotes().size() << endl;
+        // cout << "Branching notes size : " << endl;
+        // cout << p->getBranchingNotes().size() << endl;
         int temp = 0;
         IntVarArray notes = p->getBranchingNotes();
         for(int j = 0; j < p->getHIntervalSize()-1; j++){
-            cout << j << endl;
+            // cout << j << endl;
             int upbnd = 0;
             if(j+3<p->getHIntervalSize()){
                 upbnd = j+4;

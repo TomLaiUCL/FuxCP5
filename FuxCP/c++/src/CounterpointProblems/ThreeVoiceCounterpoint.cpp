@@ -19,9 +19,9 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     species = sp;
     
     //initialize upper strata
-
     upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
     upper_2 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes(), THREE_VOICES);
+    upper_3 = nullptr;
 
     //create counterpoints
 
@@ -31,7 +31,6 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, THREE_VOICES);
 
     //create strata
-
     setStrata();
 
     //creating variables
@@ -85,9 +84,9 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     uniteCounterpoints();
     uniteCosts();
 
-    for(int i = 0; i < unitedCostNames.size(); i++){
-        cout << unitedCostNames[i] << endl;
-    }
+    // for(int i = 0; i < unitedCostNames.size(); i++){
+    //     cout << unitedCostNames[i] << endl;
+    // }
 
     orderCosts();
 

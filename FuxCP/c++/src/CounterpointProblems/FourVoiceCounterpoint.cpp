@@ -131,7 +131,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     }
     
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
-    cout << "HERE" << endl;
+    // cout << "HERE" << endl;
 }
 
 // COPY CONSTRUCTOR
