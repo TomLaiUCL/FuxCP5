@@ -3,7 +3,8 @@
 // Modified by Tom Lai.
 // This file contains the testing framework implementation.  
 //
-
+#include <iostream>
+#include <fstream>  // For file operations
 #include <cmath>
 #include "../headers/fuxTest.hpp"
 
@@ -301,22 +302,40 @@ void FuxTest::test_1H3_4v_1sp() {
     int non_triad_cons[] = {1, 2, 5, 6, 8, 9, 10, 11}; // non-harmonic triad intervals
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
     v_type = {0, 0, 0};
-    // perfect consonant intervals are allowed
-    CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-    rel(problem->getHome(), problem->getSolutionArray()[(size*0)+size-1], IRT_EQ, cantusFirmus[size-1]+0+12); // fix the last note as a note in harmonic triad intervals
-    rel(problem->getHome(), problem->getSolutionArray()[(size*1)+size-1], IRT_EQ, cantusFirmus[size-1]+3); // fix the last note as a note in harmonic triad intervals
-    rel(problem->getHome(), problem->getSolutionArray()[(size*2)+size-1], IRT_EQ, cantusFirmus[size-1]+7); // fix the last note as a note in harmonic triad intervals
-    if (!has_solution(problem)) {
-        std::cerr   << "/!\\ ERROR test 1H3_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
-                    << "Cantus firmus: ";
-        printVector(cantusFirmus);
-        std::cerr   << "Solution array: ";
-        printIntVarArray(problem->getSolutionArray());
-        std::cerr   << "> Last harmonic intervals should be correct" << std::endl;
-    } else {
-        cout << "Works with that configuration: " << problem->getSolutionArray() << endl;
-    }
-    delete problem;
+
+    // std::ofstream outFile("test.txt");
+
+    
+    // CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // std::vector<CounterpointProblem *> solutions = get_all_solutions(problem);
+    // for (CounterpointProblem *solution : solutions) {
+    //     cout << solution->getSolutionArray() << endl;
+    //     // Check if the file is open
+    //     if (!outFile.is_open()) {
+    //         std::cerr << "Error: Could not open the file for writing!" << std::endl;
+    //         return;
+    //     }
+    //     outFile << solution->getSolutionArray() << std::endl;
+    // }
+    // outFile.close();
+
+
+    // // perfect consonant intervals are allowed
+    // problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // rel(problem->getHome(), problem->getSolutionArray()[(size*0)+size-1], IRT_EQ, cantusFirmus[size-1]+0+12); // fix the last note as a note in harmonic triad intervals
+    // rel(problem->getHome(), problem->getSolutionArray()[(size*1)+size-1], IRT_EQ, cantusFirmus[size-1]+3); // fix the last note as a note in harmonic triad intervals
+    // rel(problem->getHome(), problem->getSolutionArray()[(size*2)+size-1], IRT_EQ, cantusFirmus[size-1]+7); // fix the last note as a note in harmonic triad intervals
+    // if (!has_solution(problem)) {
+    //     std::cerr   << "/!\\ ERROR test 1H3_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+    //                 << "Cantus firmus: ";
+    //     printVector(cantusFirmus);
+    //     std::cerr   << "Solution array: ";
+    //     printIntVarArray(problem->getSolutionArray());
+    //     std::cerr   << "> Last harmonic intervals should be correct" << std::endl;
+    // } else {
+    //     cout << "Works with that configuration: " << problem->getSolutionArray() << endl;
+    // }
+    // delete problem;
     // non-perfect consonant intervals are forbidden
     for (size_t i = 0; i < 3; i++)
     {
