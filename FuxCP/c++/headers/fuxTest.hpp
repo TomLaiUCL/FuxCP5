@@ -39,29 +39,43 @@ public:
 
     void test_1H1();
     void test_1H1_2v_1sp();
-    // void test_1H1_3v_1sp();
+    void test_1H1_3v_1sp();
+    void test_1H1_4v_1sp();
 
     void test_1H2();
     void test_1H2_2v_1sp();
 
     void test_1H3();
     void test_1H3_2v_1sp();
+    void test_1H3_3v_1sp();
     void test_1H3_4v_1sp();
 
     void test_1H4();
     void test_1H4_2v_1sp();
+    void test_1H4_3v_1sp();
+    void test_1H4_4v_1sp();
 
     void test_1H5();
     void test_1H5_2v_1sp();
+    void test_1H5_3v_1sp();
 
     void test_1H6();
     void test_1H6_2v_1sp();
 
     void test_1H7();
     void test_1H7_2v_1sp();
+    void test_1H7_3v_1sp();
 
     void test_1M2();
     void test_1M2_2v_1sp();
+    void test_1M2_3v_1sp();
+    void test_1M2_4v_1sp();
+
+    void test_2H2();
+    void test_2H2_2v_2sp();
+
+
+    void another_test();
 
 // ===============================================
 
