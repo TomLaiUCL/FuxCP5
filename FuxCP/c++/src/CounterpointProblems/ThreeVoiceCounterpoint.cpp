@@ -51,6 +51,8 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     }
 
     //H5 for three voices
+    H5_1_cpAndCfDifferentNotes(*this, counterpoint_1, cantusFirmus);
+    H5_1_cpAndCfDifferentNotes(*this, counterpoint_2, cantusFirmus);
     H5_1_differentNotes(*this, parts);
 
     //H8 : the triad should be used as much as possible
