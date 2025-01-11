@@ -29,6 +29,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, THREE_VOICES);
     counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, THREE_VOICES);
+    counterpoint_3 = nullptr;
 
     //create strata
     setStrata();

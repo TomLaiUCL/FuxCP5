@@ -73,6 +73,13 @@ public:
 
     void test_2H2();
     void test_2H2_2v_2sp();
+    void test_2H2_3v_2sp();
+    void test_2H2_4v_2sp();
+
+    void test_2v_1sp_fig23();
+    void test_2v_2sp_fig40();
+    void test_3v_2sp_fig129();
+    void test_3v_2sp_fig125();
 
 
     void another_test();
