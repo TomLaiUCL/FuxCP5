@@ -41,6 +41,9 @@ public:
     void test_1H1_2v_1sp();
     void test_1H1_3v_1sp();
     void test_1H1_4v_1sp();
+    void test_1H1_2v_2sp();
+    void test_1H1_3v_2sp();
+    void test_1H1_4v_2sp();
 
     void test_1H2();
     void test_1H2_2v_1sp();
