@@ -24,7 +24,7 @@ protected:
     int borrowMode;
     vector<int> cp;
     int idx;
-    int size;
+    int cfSize;
     vector<int> melodic_params;
     vector<int> general_params;
     vector<int> specific_params;
@@ -47,20 +47,29 @@ public:
 
     void test_1H2();
     void test_1H2_2v_1sp();
+    void test_1H2_2v_2sp();
 
     void test_1H3();
     void test_1H3_2v_1sp();
     void test_1H3_3v_1sp();
     void test_1H3_4v_1sp();
+    void test_1H3_2v_2sp();
+    void test_1H3_3v_2sp();
+    void test_1H3_4v_2sp();
 
     void test_1H4();
     void test_1H4_2v_1sp();
     void test_1H4_3v_1sp();
     void test_1H4_4v_1sp();
+    void test_1H4_2v_2sp();
+    void test_1H4_3v_2sp();
+    void test_1H4_4v_2sp();
 
     void test_1H5();
     void test_1H5_2v_1sp();
     void test_1H5_3v_1sp();
+    void test_1H5_2v_2sp();
+    void test_1H5_3v_2sp();
 
     void test_1H6();
     void test_1H6_2v_1sp();
@@ -68,6 +77,7 @@ public:
     void test_1H7();
     void test_1H7_2v_1sp();
     void test_1H7_3v_1sp();
+    void test_1H7_2v_2sp();
 
     void test_1M2();
     void test_1M2_2v_1sp();
@@ -81,8 +91,10 @@ public:
 
     void test_2v_1sp_fig23();
     void test_2v_2sp_fig40();
-    void test_3v_2sp_fig129();
+    void test_3v_1sp_fig119();
     void test_3v_2sp_fig125();
+    void test_3v_2sp_fig129();
+    void test_4v_2sp_fig176();
 
 
     void another_test();

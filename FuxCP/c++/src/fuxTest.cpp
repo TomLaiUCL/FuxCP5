@@ -12,7 +12,7 @@
 
 FuxTest::FuxTest(char* test){
     cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
-    size = cantusFirmus.size();
+    cfSize = cantusFirmus.size();
     melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
     general_params = {4, 1, 1, 2, 2, 2, 8, 1};
     specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
@@ -48,6 +48,13 @@ FuxTest::FuxTest(char* test){
         test_1M2();
     } else if(strcmp(test, "2H2")==0){
         test_2H2();
+    } else if(strcmp(test, "figs")==0){
+        test_2v_1sp_fig23();
+        test_2v_2sp_fig40();
+        test_3v_1sp_fig119();
+        test_3v_2sp_fig129();
+        test_3v_2sp_fig125();
+        test_4v_2sp_fig176();
     } else {
         std::invalid_argument("Test for constraint not found!");
     }
@@ -75,9 +82,9 @@ FuxTest::FuxTest(char* test){
 Chromatic melodies are forbidden for two and three voice composition, and to be avoided for four voice composition.
 */
 void FuxTest::test_G6() {
-    cout << "Start test G6..." << endl;
+    cout << "Start tests G6..." << endl;
     test_G6_2v_1sp();
-    cout << "End test G6." << endl;
+    cout << "End tests G6." << endl;
 }
 
 void FuxTest::test_G6_2v_1sp() {
@@ -95,7 +102,7 @@ void FuxTest::test_G6_2v_1sp() {
     //         printIntVarArray(problem->getSolutionArray());
     //         std::cerr   << "> First note of lowest stratum is not the tonic" << std::endl;
     //     }
-    //     if (solution->getSolutionArray()[size-1].val() % 12 != cantusFirmus[0] % 12) { 
+    //     if (solution->getSolutionArray()[cfSize-1].val() % 12 != cantusFirmus[0] % 12) { 
     //         std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
     //                     << "cantus firmus: ";
     //         printVector(cantusFirmus);
@@ -111,14 +118,14 @@ void FuxTest::test_G6_2v_1sp() {
 All notes on the downbeat are consonant with the notes (on the downbeat) of the lowest stratum. 
 */
 void FuxTest::test_1H1() {
-    cout << "Start test 1H1..." << endl;
+    cout << "Start tests 1H1..." << endl;
     test_1H1_2v_1sp();
     test_1H1_3v_1sp();
     test_1H1_4v_1sp();
     test_1H1_2v_2sp();
     test_1H1_3v_2sp();
     test_1H1_4v_2sp();
-    cout << "End test 1H1." << endl;
+    cout << "End tests 1H1." << endl;
 }
 
 void FuxTest::test_1H1_2v_1sp() {
@@ -129,7 +136,7 @@ void FuxTest::test_1H1_2v_1sp() {
     v_type = {3}; // {(6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0]}
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
-        for (size_t i = 0; i < size; i++) {
+        for (size_t i = 0; i < cfSize; i++) {
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
             int note = cantusFirmus[i] + 12 + interval; // note is dissonant
             rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note); // fix the note i
@@ -156,10 +163,10 @@ void FuxTest::test_1H1_3v_1sp() {
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
         for (size_t j = 0; j < 2; j++) { // iterate over each solution line
-            for (size_t i = 0; i < size; i++) {
+            for (size_t i = 0; i < cfSize; i++) {
                 CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
                 int note = cantusFirmus[i] + 12 + interval; // note is dissonant
-                rel(problem->getHome(), problem->getSolutionArray()[j*size+i], IRT_EQ, note); // fix the note i
+                rel(problem->getHome(), problem->getSolutionArray()[j*cfSize+i], IRT_EQ, note); // fix the note i
                 if (has_solution(problem)) {
                     std::cerr   << "/!\\ ERROR test 1H1_3v_1sp: It exists a solution but it shouldn't with the following configuration:\n"
                                 << "Cantus firmus: ";
@@ -184,10 +191,10 @@ void FuxTest::test_1H1_4v_1sp() {
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
         for (size_t j = 0; j < 2; j++) { // iterate over each solution line
-            for (size_t i = 0; i < size; i++) {
+            for (size_t i = 0; i < cfSize; i++) {
                 CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
                 int note = cantusFirmus[i] + 12 + interval; // note is dissonant
-                rel(problem->getHome(), problem->getSolutionArray()[j*size+i], IRT_EQ, note); // fix the note i
+                rel(problem->getHome(), problem->getSolutionArray()[j*cfSize+i], IRT_EQ, note); // fix the note i
                 if (has_solution(problem)) {
                     std::cerr   << "/!\\ ERROR test 1H1_4v_1sp: It exists a solution but it shouldn't with the following configuration:\n"
                                 << "Cantus firmus: ";
@@ -211,7 +218,7 @@ void FuxTest::test_1H1_2v_2sp() {
     v_type = {3}; // {(6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0]}
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
-        for (size_t i = 1; i < size; i++) {
+        for (size_t i = 1; i < cfSize; i++) {
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
             int note = cantusFirmus[i] + 12 + interval; // note is dissonant
             rel(problem->getHome(), problem->getSolutionArray()[i*2], IRT_EQ, note); // fix the note i (downbeat)
@@ -231,6 +238,7 @@ void FuxTest::test_1H1_2v_2sp() {
 
 void FuxTest::test_1H1_3v_2sp() {
     cout << "Start test 1H1_3v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
     int dis[] = {1, 2, 5, 6, 10, 11}; // dissonant intervals
     int cons[] = {3, 4, 7, 8, 9}; // conssonant intervals without 0 because 1H5
     spList = {SECOND_SPECIES, SECOND_SPECIES};
@@ -238,12 +246,10 @@ void FuxTest::test_1H1_3v_2sp() {
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
         for (size_t j = 0; j < 2; j++) { // iterate over each solution line
-            for (size_t i = 1; i < size; i++) {
-                cout << "i: " << i << endl;
-                cout << "solution array index: " << (j*(size*2-1))+(i*2) << endl;
+            for (size_t i = 1; i < cfSize; i++) {
                 CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
                 int note = cantusFirmus[i] + 12 + interval; // note is dissonant
-                rel(problem->getHome(), problem->getSolutionArray()[(j*(size*2-1))+(i*2)], IRT_EQ, note); // fix the note i
+                rel(problem->getHome(), problem->getSolutionArray()[(j*cpSize)+(i*2)], IRT_EQ, note); // fix the note i
                 if (has_solution(problem)) {
                     std::cerr   << "/!\\ ERROR test 1H1_3v_2sp: It exists a solution but it shouldn't with the following configuration:\n"
                                 << "Cantus firmus: ";
@@ -261,6 +267,7 @@ void FuxTest::test_1H1_3v_2sp() {
 
 void FuxTest::test_1H1_4v_2sp() {
     cout << "Start test 1H1_4v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
     int dis[] = {1, 2, 5, 6, 10, 11}; // dissonant intervals
     int cons[] = {3, 4, 7, 8, 9}; // conssonant intervals without 0 because 1H5
     spList = {SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES};
@@ -268,12 +275,10 @@ void FuxTest::test_1H1_4v_2sp() {
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
         for (size_t j = 0; j < 3; j++) { // iterate over each solution line
-            for (size_t i = 1; i < size; i++) {
-                cout << "i: " << i << endl;
-                cout << "solution array index: " << (j*(size*2-1))+(i*2) << endl;
+            for (size_t i = 1; i < cfSize; i++) {
                 CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
                 int note = cantusFirmus[i] + 12 + interval; // note is dissonant
-                rel(problem->getHome(), problem->getSolutionArray()[(j*(size*2-1))+(i*2)], IRT_EQ, note); // fix the note i
+                rel(problem->getHome(), problem->getSolutionArray()[(j*cpSize)+(i*2)], IRT_EQ, note); // fix the note i
                 if (has_solution(problem)) {
                     std::cerr   << "/!\\ ERROR test 1H1_4v_2sp: It exists a solution but it shouldn't with the following configuration:\n"
                                 << "Cantus firmus: ";
@@ -294,9 +299,10 @@ void FuxTest::test_1H1_4v_2sp() {
 In two voice composition, the first harmonic interval must be a perfect consonance.
 */
 void FuxTest::test_1H2() {
-    cout << "Start test 1H2..." << endl;
+    cout << "Start tests 1H2..." << endl;
     test_1H2_2v_1sp();
-    cout << "End test 1H2." << endl;
+    test_1H2_2v_2sp();
+    cout << "End tests 1H2." << endl;
 }
 
 void FuxTest::test_1H2_2v_1sp() {
@@ -334,17 +340,55 @@ void FuxTest::test_1H2_2v_1sp() {
     cout << "End test 1H2_2v_1sp..." << endl;
 }
 
+void FuxTest::test_1H2_2v_2sp() {
+    cout << "Start test 1H2_2v_2sp..." << endl;
+    int p_cons[] = {0, 7}; // perfect conssonant intervals
+    int non_p_cons[] = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11}; // non-perfect conssonant intervals
+    spList = {SECOND_SPECIES};
+    v_type = {3};
+    for (int interval : p_cons) {
+        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, cantusFirmus[0]+12+interval); // fix the first solution note as perfect consonant with cf
+        if (!has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H2_2v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> First harmonic interval should be correct" << std::endl;
+        }
+        delete problem;
+    }
+    for (int interval : non_p_cons) {
+        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, cantusFirmus[0]+12+interval); // fix the first solution note as non-perfect consonant with cf
+        if (has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H2_2v_2sp: It exists a solution but it shouldn't with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Non perfect consonance at the first mesure" << std::endl;
+        }
+        delete problem;
+    }
+    cout << "End test 1H2_2v_2sp..." << endl;
+}
+
 
 /*
 In two voice composition, the last harmonic in-terval must be a perfect consonance. 
 When composing for three or four voices, the last chord should be composed only of notes of the harmonic triad.
 */
 void FuxTest::test_1H3() {
-    cout << "Start test 1H3..." << endl;
-    // test_1H3_2v_1sp();
+    cout << "Start tests 1H3..." << endl;
+    test_1H3_2v_1sp();
     test_1H3_3v_1sp();
     test_1H3_4v_1sp();
-    cout << "End test 1H3." << endl;
+    test_1H3_2v_2sp();
+    test_1H3_3v_2sp();
+    test_1H3_4v_2sp();
+    cout << "End tests 1H3." << endl;
 }
 
 void FuxTest::test_1H3_2v_1sp() {
@@ -353,24 +397,10 @@ void FuxTest::test_1H3_2v_1sp() {
     int non_p_cons[] = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11}; // non-perfect conssonant intervals
     spList = {FIRST_SPECIES};
     v_type = {0};
-    // perfect consonant intervals are allowed
-    for (int interval : p_cons) {
-        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        rel(problem->getHome(), problem->getSolutionArray()[size-1], IRT_EQ, cantusFirmus[size-1]+interval); // fix the last note with a perfect consonance
-        if (!has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H3_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
-                        << "Cantus firmus: ";
-            printVector(cantusFirmus);
-            std::cerr   << "Solution array: ";
-            printIntVarArray(problem->getSolutionArray());
-            std::cerr   << "> Last harmonic interval should be correct" << std::endl;
-        }
-        delete problem;
-    }
     // non-perfect consonant intervals are forbidden
     for (int interval : non_p_cons) {
         CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        rel(problem->getHome(), problem->getSolutionArray()[size-1], IRT_EQ, cantusFirmus[size-1]+interval); // fix the last note with a not perfect consonance
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize-1], IRT_EQ, cantusFirmus[cfSize-1]+interval); // fix the last note with a not perfect consonance
         if (has_solution(problem)) {
             std::cerr   << "/!\\ ERROR test 1H3_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                         << "cantus firmus: ";
@@ -381,7 +411,7 @@ void FuxTest::test_1H3_2v_1sp() {
         }
         delete problem;
     }
-    cout << "Start test 1H1_4v_1sp..." << endl;
+    cout << "End test 1H3_2v_1sp..." << endl;
 }
 
 void FuxTest::test_1H3_3v_1sp() {
@@ -390,27 +420,11 @@ void FuxTest::test_1H3_3v_1sp() {
     int non_triad_cons[] = {1, 2, 5, 6, 8, 9, 10, 11}; // non-harmonic triad intervals
     spList = {FIRST_SPECIES, FIRST_SPECIES};
     v_type = {0, 0};
-    // harmonic triad intervals are allowed
-    for (size_t i = 0; i < 2; i++) { // iterate over each solution line
-        for (int interval : triad_cons) {
-            CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-            rel(problem->getHome(), problem->getSolutionArray()[size*i + size-1], IRT_EQ, cantusFirmus[size-1] + interval); // fix the last note with a harmonic triad interval
-            if (!has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H3_3v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
-                            << "Cantus firmus: ";
-                printVector(cantusFirmus);
-                std::cerr   << "Solution array: ";
-                printIntVarArray(problem->getSolutionArray());
-                std::cerr   << "> Last harmonic interval should be correct" << std::endl;
-            }
-            delete problem;
-        }
-    }
     // non-perfect consonant intervals are forbidden
     for (size_t i = 0; i < 2; i++) { // iterate over each solution line
         for (int interval : non_triad_cons) {
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-            rel(problem->getHome(), problem->getSolutionArray()[(size*i)+size-1], IRT_EQ, cantusFirmus[size-1] + interval); // fix the last note as a note not in harmonic triad intervals
+            rel(problem->getHome(), problem->getSolutionArray()[(cfSize*i)+cfSize-1], IRT_EQ, cantusFirmus[cfSize-1] + interval); // fix the last note as a note not in harmonic triad intervals
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H3_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
@@ -431,33 +445,11 @@ void FuxTest::test_1H3_4v_1sp() {
     int non_triad_cons[] = {1, 2, 5, 6, 8, 9, 10, 11}; // non-harmonic triad intervals
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
     v_type = {3, 3, 3};
-    // harmonic triad intervals are allowed
-    for (size_t i = 0; i < 3; i++) { // iterate over each solution line
-        cout << "line: " << i << endl;
-        for (int interval : triad_cons) {
-            cout << "interval: " << interval << endl;
-            CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-            rel(problem->getHome(), problem->getSolutionArray()[size*i + size-1], IRT_EQ, cantusFirmus[size-1] +12+ interval); // fix the last note with a harmonic triad interval
-            cout << "has solution ?" << endl;
-            if (!has_solution(problem)) {
-                cout << "no" << endl;
-                std::cerr   << "/!\\ ERROR test 1H3_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
-                            << "Cantus firmus: ";
-                printVector(cantusFirmus);
-                std::cerr   << "Solution array: ";
-                printIntVarArray(problem->getSolutionArray());
-                std::cerr   << "> Last harmonic interval should be correct" << std::endl;
-            }
-            cout << "out" << endl;
-            delete problem;
-        }
-    }
     // non-perfect consonant intervals are forbidden
-    cout << "non_triad_cons: " << endl;
     for (size_t i = 0; i < 3; i++) { // iterate over each solution line
         for (int interval : non_triad_cons) {
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-            rel(problem->getHome(), problem->getSolutionArray()[(size*i)+size-1], IRT_EQ, cantusFirmus[size-1]+12+interval); // fix the last note as a note not in harmonic triad intervals
+            rel(problem->getHome(), problem->getSolutionArray()[(cfSize*i)+cfSize-1], IRT_EQ, cantusFirmus[cfSize-1]+12+interval); // fix the last note as a note not in harmonic triad intervals
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H3_4v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
@@ -472,14 +464,97 @@ void FuxTest::test_1H3_4v_1sp() {
     cout << "End test 1H3_4v_1sp..." << endl;
 }
 
+void FuxTest::test_1H3_2v_2sp() {
+    cout << "Start test 1H3_2v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    int p_cons[] = {0, 7}; // perfect conssonant intervals
+    int non_p_cons[] = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11}; // non-perfect conssonant intervals
+    spList = {SECOND_SPECIES};
+    v_type = {0};
+    // non-perfect consonant intervals are forbidden
+    for (int interval : non_p_cons) {
+        CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        int note = cantusFirmus[cfSize-1] + interval;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize-1], IRT_EQ, note); // fix the last note with a not perfect consonance
+        if (has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H3_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                        << "cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Last harmonic interval must be a perfect consonance" << std::endl;
+        }
+        delete problem;
+    }
+    cout << "End test 1H3_2v_1sp..." << endl;
+}
+
+void FuxTest::test_1H3_3v_2sp() {
+    cout << "Start test 1H3_3v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    int triad_cons[] = {0, 3, 4, 7}; // harmonic triad intervals
+    int non_triad_cons[] = {1, 2, 5, 6, 8, 9, 10, 11}; // non-harmonic triad intervals
+    spList = {SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {0, 0};
+    // non-perfect consonant intervals are forbidden
+    for (size_t i = 0; i < 2; i++) { // iterate over each solution line
+        for (int interval : non_triad_cons) {
+            CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            int note = cantusFirmus[cfSize-1] + interval;
+            rel(problem->getHome(), problem->getSolutionArray()[(cpSize*i)+cpSize-1], IRT_EQ, note); // fix the last note as a note not in harmonic triad intervals
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H3_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last harmonic intervals must be in harmonic triad" << std::endl;
+            }
+            delete problem;
+        }
+    }
+    cout << "End test 1H3_3v_2sp..." << endl;
+}
+
+void FuxTest::test_1H3_4v_2sp() {
+    cout << "Start test 1H3_4v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    int triad_cons[] = {0, 3, 4, 7}; // harmonic triad intervals
+    int non_triad_cons[] = {1, 2, 5, 6, 8, 9, 10, 11}; // non-harmonic triad intervals
+    spList = {SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {0, 0};
+    // non-perfect consonant intervals are forbidden
+    for (size_t i = 0; i < 3; i++) { // iterate over each solution line
+        for (int interval : non_triad_cons) {
+            CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            int note = cantusFirmus[cfSize-1] + interval;
+            rel(problem->getHome(), problem->getSolutionArray()[(cpSize*i)+cpSize-1], IRT_EQ, note); // fix the last note as a note not in harmonic triad intervals
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H3_4v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last harmonic intervals must be in harmonic triad" << std::endl;
+            }
+            delete problem;
+        }
+    }
+    cout << "End test 1H3_4v_2sp..." << endl;
+}
+
+
 /*The key tone is tuned according to the first note of the cantus firmus. 
 In other words, the lowest stratum at the first and last notes must be the tonic.*/
 void FuxTest::test_1H4() {
-    cout << "Start test 1H4..." << endl;
-    // test_1H4_2v_1sp();
+    cout << "Start tests 1H4..." << endl;
+    test_1H4_2v_1sp();
     test_1H4_3v_1sp();
     test_1H4_4v_1sp();
-    cout << "End test 1H4." << endl;
+    test_1H4_2v_2sp();
+    test_1H4_3v_2sp();
+    test_1H4_4v_2sp();
+    cout << "End tests 1H4." << endl;
 }
 
 void FuxTest::test_1H4_2v_1sp() {
@@ -509,16 +584,16 @@ void FuxTest::test_1H4_2v_1sp() {
         delete problem;
         // fix the last note of the lowest stratum 
         problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        note = cantusFirmus[size-1] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[size-1], IRT_EQ, note); // fix the last note of the lowest stratum
-        if (note % 12 == cantusFirmus[size-1] % 12 && !has_solution(problem)) {
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize-1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
             std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
-        } else if (note % 12 != cantusFirmus[size-1] % 12 && has_solution(problem)) {
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
@@ -528,7 +603,7 @@ void FuxTest::test_1H4_2v_1sp() {
         }
         delete problem;
     }
-    cout << "End test 1H1_4v_1sp..." << endl;
+    cout << "End test 1H4_2v_1sp..." << endl;
 }
 
 void FuxTest::test_1H4_3v_1sp() {
@@ -542,14 +617,14 @@ void FuxTest::test_1H4_3v_1sp() {
         int note = cantusFirmus[0] + i;
         rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, note); // fix the first note of the lowest stratum
         if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+            std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
         } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+                std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -559,17 +634,17 @@ void FuxTest::test_1H4_3v_1sp() {
         delete problem;
         // fix the last note of the lowest stratum 
         problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        note = cantusFirmus[size-1] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[size-1], IRT_EQ, note); // fix the last note of the lowest stratum
-        if (note % 12 == cantusFirmus[size-1] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize-1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
-        } else if (note % 12 != cantusFirmus[size-1] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -585,16 +660,16 @@ void FuxTest::test_1H4_3v_1sp() {
         // fix the first note of the lowest stratum 
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         int note = cantusFirmus[0] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[size], IRT_EQ, note); // fix the first note of the lowest stratum
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize], IRT_EQ, note); // fix the first note of the lowest stratum
         if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+            std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
         } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+                std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -604,17 +679,17 @@ void FuxTest::test_1H4_3v_1sp() {
         delete problem;
         // fix the last note of the lowest stratum 
         problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        note = cantusFirmus[size-1] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[(size*2) -1], IRT_EQ, note); // fix the last note of the lowest stratum
-        if (note % 12 == cantusFirmus[size-1] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[(cfSize*2) -1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
-        } else if (note % 12 != cantusFirmus[size-1] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -637,14 +712,14 @@ void FuxTest::test_1H4_4v_1sp() {
         int note = cantusFirmus[0] + i;
         rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, note); // fix the first note of the lowest stratum
         if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+            std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
         } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+                std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -654,17 +729,17 @@ void FuxTest::test_1H4_4v_1sp() {
         delete problem;
         // fix the last note of the lowest stratum 
         problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        note = cantusFirmus[size-1] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[size-1], IRT_EQ, note); // fix the last note of the lowest stratum
-        if (note % 12 == cantusFirmus[size-1] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize-1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
-        } else if (note % 12 != cantusFirmus[size-1] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -680,16 +755,16 @@ void FuxTest::test_1H4_4v_1sp() {
         // fix the first note of the lowest stratum 
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         int note = cantusFirmus[0] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[size], IRT_EQ, note); // fix the first note of the lowest stratum
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize], IRT_EQ, note); // fix the first note of the lowest stratum
         if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+            std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
         } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+                std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -699,17 +774,17 @@ void FuxTest::test_1H4_4v_1sp() {
         delete problem;
         // fix the last note of the lowest stratum 
         problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        note = cantusFirmus[size-1] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[(size*2) -1], IRT_EQ, note); // fix the last note of the lowest stratum
-        if (note % 12 == cantusFirmus[size-1] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[(cfSize*2) -1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
-        } else if (note % 12 != cantusFirmus[size-1] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -725,16 +800,16 @@ void FuxTest::test_1H4_4v_1sp() {
         // fix the first note of the lowest stratum 
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         int note = cantusFirmus[0] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[size*2], IRT_EQ, note); // fix the first note of the lowest stratum
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize*2], IRT_EQ, note); // fix the first note of the lowest stratum
         if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+            std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
         } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+                std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -744,17 +819,17 @@ void FuxTest::test_1H4_4v_1sp() {
         delete problem;
         // fix the last note of the lowest stratum 
         problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        note = cantusFirmus[size-1] + i;
-        rel(problem->getHome(), problem->getSolutionArray()[(size*3) -1], IRT_EQ, note); // fix the last note of the lowest stratum
-        if (note % 12 == cantusFirmus[size-1] % 12 && !has_solution(problem)) {
-            std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[(cfSize*3) -1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
             printVector(cantusFirmus);
             std::cerr   << "Solution array: ";
             printIntVarArray(problem->getSolutionArray());
             std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
-        } else if (note % 12 != cantusFirmus[size-1] % 12 && has_solution(problem)) {
-                std::cerr   << "/!\\ ERROR test 1H4_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
                 printVector(cantusFirmus);
                 std::cerr   << "solution array: ";
@@ -763,24 +838,313 @@ void FuxTest::test_1H4_4v_1sp() {
         }
         delete problem;
     }
-    cout << "End test 1H1_4v_1sp." << endl;
+    cout << "End test 1H4_4v_1sp." << endl;
+}
+
+void FuxTest::test_1H4_2v_2sp() {
+    cout << "Start test 1H4_2v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    spList = {SECOND_SPECIES};
+    v_type = {-2};
+    for (int i = -18; i < 1; i++) { //iterate over every note that can take solution array
+        // fix the first note of the lowest stratum 
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        int note = cantusFirmus[0] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, note); // fix the first note of the lowest stratum
+        if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_2v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> First note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+        // fix the last note of the lowest stratum 
+        problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize-1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_2v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+    }
+    cout << "End test 1H4_2v_2sp..." << endl;
+}
+
+void FuxTest::test_1H4_3v_2sp() {
+    cout << "Start test 1H4_3v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    // Lowest stratum is the first solution array
+    spList = {SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {-2, 3};
+    for (int i = -18; i < 1; i++) { //iterate over every note that can take solution array
+        // fix the first note of the lowest stratum 
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        int note = cantusFirmus[0] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, note); // fix the first note of the lowest stratum
+        if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> First note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+        // fix the last note of the lowest stratum 
+        problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize-1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+    }
+    // Lowest stratum is the second solution array
+    spList = {SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {3, -2};
+    for (int i = -18; i < 1; i++) { //iterate over every note that can take solution array
+        // fix the first note of the lowest stratum 
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        int note = cantusFirmus[0] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize], IRT_EQ, note); // fix the first note of the lowest stratum
+        if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> First note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+        // fix the last note of the lowest stratum 
+        problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize*2-1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+    }
+    cout << "End test 1H4_3v_2sp." << endl;
+}
+
+void FuxTest::test_1H4_4v_2sp() {
+    cout << "Start test 1H4_4v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    // Lowest stratum is the first solution array
+    spList = {SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {-2, 3, 3};
+    for (int i = -18; i < 1; i++) { //iterate over every note that can take solution array
+        // fix the first note of the lowest stratum 
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        int note = cantusFirmus[0] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, note); // fix the first note of the lowest stratum
+        if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> First note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+        // fix the last note of the lowest stratum 
+        problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize-1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+    }
+    // Lowest stratum is the second solution array
+    spList = {SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {3, -2, 3};
+    for (int i = -18; i < 1; i++) { //iterate over every note that can take solution array
+        // fix the first note of the lowest stratum 
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        int note = cantusFirmus[0] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize], IRT_EQ, note); // fix the first note of the lowest stratum
+        if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> First note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+        // fix the last note of the lowest stratum 
+        problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize*2 -1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+    }
+    // Lowest stratum is the third solution array
+    spList = {SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {3, 3, -2};
+    for (int i = -18; i < 1; i++) { //iterate over every note that can take solution array
+        // fix the first note of the lowest stratum 
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        int note = cantusFirmus[0] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[cpSize*2], IRT_EQ, note); // fix the first note of the lowest stratum
+        if (note % 12 == cantusFirmus[0] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> First note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[0] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> First note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+        // fix the last note of the lowest stratum 
+        problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        note = cantusFirmus[cfSize-1] + i;
+        rel(problem->getHome(), problem->getSolutionArray()[(cpSize*3) -1], IRT_EQ, note); // fix the last note of the lowest stratum
+        if (note % 12 == cantusFirmus[cfSize-1] % 12 && !has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "Solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Last note of lowest stratum is the tonic and must be" << std::endl;
+        } else if (note % 12 != cantusFirmus[cfSize-1] % 12 && has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H4_4v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Last note of lowest stratum is not the tonic" << std::endl;
+        }
+        delete problem;
+    }
+    cout << "End test 1H4_4v_2sp." << endl;
 }
 
 /*
 The voices cannot play the same note at the same time except in the first and last measure.
 */
 void FuxTest::test_1H5() {
-    cout << "Start test 1H5..." << endl;
-    // test_1H5_2v_1sp();
+    cout << "Start tests 1H5..." << endl;
+    test_1H5_2v_1sp();
     test_1H5_3v_1sp();
-    cout << "End test 1H5." << endl;
+    test_1H5_2v_2sp();
+    test_1H5_3v_2sp();
+    cout << "End tests 1H5." << endl;
 }
 
 void FuxTest::test_1H5_2v_1sp() {
     cout << "Start test_1H5_2v_1sp ..." << endl;
     spList = {FIRST_SPECIES};
     v_type = {0};
-    for (size_t i = 1; i < size-1; i++) {
+    for (size_t i = 1; i < cfSize-1; i++) {
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, cantusFirmus[i]); // fix the solution note as the same note as the cf
         if (has_solution(problem)) {
@@ -801,11 +1165,10 @@ void FuxTest::test_1H5_3v_1sp() {
     spList = {FIRST_SPECIES, FIRST_SPECIES};
     v_type = {0, 0};
     // // test solution lines != cf
-    cout << "test solution lines != cf" << endl;
     for (size_t j = 0; j < 2; j++) { // iterate over each solution line
-        for (size_t i = 1; i < size-1; i++) {
+        for (size_t i = 1; i < cfSize-1; i++) {
             auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-            rel(problem->getHome(), problem->getSolutionArray()[(j*size) + i], IRT_EQ, cantusFirmus[i]); // fix the solution note as the same note as the cf
+            rel(problem->getHome(), problem->getSolutionArray()[(j*cfSize) + i], IRT_EQ, cantusFirmus[i]); // fix the solution note as the same note as the cf
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H5_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
@@ -818,12 +1181,12 @@ void FuxTest::test_1H5_3v_1sp() {
         }
     }
     // test notes of solutions lines are different
-    for (size_t i = 1; i < size-1; i++) {
+    for (size_t i = 1; i < cfSize-1; i++) {
         for (int j = -6; j < 13; j++) {
             auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
             int note = cantusFirmus[0] + j;
             rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note); // fix the note of the first solution line as the same note as the note of the second solution line 
-            rel(problem->getHome(), problem->getSolutionArray()[size+i], IRT_EQ, note); // fix the note of the first solution line as the same note as the note of the second solution line 
+            rel(problem->getHome(), problem->getSolutionArray()[cfSize+i], IRT_EQ, note); // fix the note of the first solution line as the same note as the note of the second solution line 
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H5_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                             << "cantus firmus: ";
@@ -838,6 +1201,67 @@ void FuxTest::test_1H5_3v_1sp() {
     cout << "End test 1H5_3v_1sp." << endl;
 }
 
+void FuxTest::test_1H5_2v_2sp() {
+    cout << "Start test 1H5_2v_2sp ..." << endl;
+    spList = {SECOND_SPECIES};
+    v_type = {0};
+    for (size_t i = 1; i < cfSize-1; i++) {
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        rel(problem->getHome(), problem->getSolutionArray()[i*2], IRT_EQ, cantusFirmus[i]); // fix the solution note as the same note as the cf
+        if (has_solution(problem)) {
+            std::cerr   << "/!\\ ERROR test 1H5_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                        << "cantus firmus: ";
+            printVector(cantusFirmus);
+            std::cerr   << "solution array: ";
+            printIntVarArray(problem->getSolutionArray());
+            std::cerr   << "> Same note played at the mesure: " << i << std::endl;
+        }
+        delete problem;
+    }
+    cout << "End test 1H5_2v_2sp" << endl;
+}
+
+void FuxTest::test_1H5_3v_2sp() {
+    cout << "Start test 1H5_3v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    spList = {SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {0, 0};
+    // // test solution lines != cf
+    for (size_t j = 0; j < 2; j++) { // iterate over each solution line
+        for (size_t i = 1; i < cfSize-1; i++) { // iterate over each note of the cantus firmus
+            auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            rel(problem->getHome(), problem->getSolutionArray()[(j*cpSize) + i*2], IRT_EQ, cantusFirmus[i]); // fix the solution note as the same note as the cf
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H5_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Same note played at the mesure: " << i << std::endl;
+            }
+            delete problem;
+        }
+    }
+    // test notes of solutions lines are different
+    for (size_t i = 1; i < cfSize-1; i++) {
+        for (int j = -6; j < 13; j++) { // iterate over each possible note of solution lines
+            auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            int note = cantusFirmus[0] + j;
+            rel(problem->getHome(), problem->getSolutionArray()[i*2], IRT_EQ, note); // fix the note of the first solution line as the same note as the note of the second solution line 
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize+i*2], IRT_EQ, note); // fix the note of the first solution line as the same note as the note of the second solution line 
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H5_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> Same note played at the mesure: " << i << std::endl;
+            }
+            delete problem;
+        }
+    }
+    cout << "End test 1H5_3v_2sp." << endl;
+}
 
 
 // /*
@@ -872,11 +1296,9 @@ In three voice composition, that harmonic interval must be either a minor third,
 */
 void FuxTest::test_1H7() {
     cout << "Start test 1H7..." << endl;
-    // test_2v_2sp_fig40();
-    test_3v_2sp_fig125();
-    test_3v_2sp_fig129();
-    // test_1H7_2v_1sp();
-    // test_1H7_3v_1sp();
+    test_1H7_2v_1sp();
+    test_1H7_3v_1sp();
+    test_1H7_2v_2sp();
     cout << "End test 1H7." << endl;
 }
 
@@ -888,7 +1310,7 @@ void FuxTest::test_1H7_2v_1sp() {
     for (size_t interval = 0; interval < 12; interval++) {
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         if (interval == 9) { // correct interval
-            rel(problem->getHome(), problem->getSolutionArray()[size-2], IRT_EQ, cantusFirmus[size-2]+12+interval); // fix the penultimate solution note as the major sixth with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cfSize-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as the major sixth with the cf
             if (!has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
@@ -898,7 +1320,7 @@ void FuxTest::test_1H7_2v_1sp() {
                 std::cerr   << "> The penultimate note should be correct" << std::endl;
             }
         } else {
-            rel(problem->getHome(), problem->getSolutionArray()[size-2], IRT_EQ, cantusFirmus[size-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cfSize-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                         << "cantus firmus: ";
@@ -915,7 +1337,7 @@ void FuxTest::test_1H7_2v_1sp() {
     for (size_t interval = 0; interval < 12; interval++) {
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         if (interval == 3) { // correct interval
-            rel(problem->getHome(), problem->getSolutionArray()[size-2], IRT_EQ, cantusFirmus[size-2]-interval); // fix the penultimate solution note as the major sixth with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cfSize-2], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as the major sixth with the cf
             if (!has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_1sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
@@ -925,7 +1347,7 @@ void FuxTest::test_1H7_2v_1sp() {
                 std::cerr   << "> The penultimate note should be correct" << std::endl;
             }
         } else {
-            rel(problem->getHome(), problem->getSolutionArray()[size-2], IRT_EQ, cantusFirmus[size-2]-interval); // fix the penultimate solution note as a wrong interval with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cfSize-2], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as a wrong interval with the cf
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                         << "cantus firmus: ";
@@ -937,7 +1359,6 @@ void FuxTest::test_1H7_2v_1sp() {
         }
         delete problem;
     }
-    test_2v_1sp_fig23();
     cout << "End test 1H7_2v_1sp." << endl;
 }
 
@@ -948,7 +1369,7 @@ void FuxTest::test_1H7_3v_1sp() {
     vector<int> intervals = {1, 2, 4, 5, 6, 8, 10, 11}; // forbidden intervals
     for (int interval : intervals) {
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        rel(problem->getHome(), problem->getSolutionArray()[size-2], IRT_EQ, cantusFirmus[size-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
         if (has_solution(problem)) {
             std::cerr   << "/!\\ ERROR test 1H7_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                     << "cantus firmus: ";
@@ -959,8 +1380,68 @@ void FuxTest::test_1H7_3v_1sp() {
         }
         delete problem;
     }
-    test_3v_2sp_fig129();
     cout << "End test 1H7_3v_1sp." << endl;
+}
+
+void FuxTest::test_1H7_2v_2sp() {
+    cout << "Start test 1H7_2v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    // Test with cf as the lowest stratum
+    spList = {SECOND_SPECIES};
+    v_type = {3};
+    for (size_t interval = 0; interval < 12; interval++) {
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        if (interval == 9) { // correct interval
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as the major sixth with the cf
+            if (!has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "Solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> The penultimate note should be correct" << std::endl;
+            }
+        } else {
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                        << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> The harmonic interval of the penultimate note must be a major sixth" << std::endl;
+            }
+        }
+        delete problem;
+    }
+    // Test with cf as the highest stratum
+    v_type = {-2};
+    for (size_t interval = 0; interval < 12; interval++) {
+        auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+        if (interval == 3) { // correct interval
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as the major sixth with the cf
+            if (!has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
+                        << "Cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "Solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> The penultimate note should be correct" << std::endl;
+            }
+        } else {
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as a wrong interval with the cf
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                        << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> The harmonic interval of the penultimate note must be a minor third" << std::endl;
+            }
+        }
+        delete problem;
+    }
+    cout << "End test 1H7_2v_2sp." << endl;
 }
 
 void FuxTest::test_1M2() {
@@ -977,7 +1458,7 @@ void FuxTest::test_1M2_2v_1sp() {
     std::vector<CounterpointProblem*> solutions = get_all_solutions(problem);
     for (CounterpointProblem* solution : solutions) {
         int previous_note = solution->getSolutionArray()[0].val();
-        for (size_t i = 1; i < size; i++) {
+        for (size_t i = 1; i < cfSize; i++) {
             int current_note = solution->getSolutionArray()[i].val();
             if (abs(current_note - previous_note) > 8) {
                 std::cerr   << "/!\\ ERROR test 1M2_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
@@ -1005,7 +1486,7 @@ void FuxTest::test_1M2_3v_1sp() {
     for (CounterpointProblem* solution : solutions) {
         cout << "solution: " << solution->getSolutionArray() << endl;
         int previous_note = solution->getSolutionArray()[0].val();
-        for (size_t i = 1; i < size; i++) {
+        for (size_t i = 1; i < cfSize; i++) {
             int current_note = solution->getSolutionArray()[i].val();
             if (abs(current_note - previous_note) > 8 && abs(current_note - previous_note) != 12) {
                 std::cerr   << "/!\\ ERROR test 1M2_2v_1sp: It exists solution but it shouldn't with the following configuration:\n"
@@ -1052,7 +1533,7 @@ void FuxTest::test_2H2_2v_2sp() {
             }
             delete problem;      
         // test next notes
-        for (size_t i = 1; i < size; i++) {
+        for (size_t i = 1; i < cfSize; i++) {
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
             int note = cantusFirmus[i] + 12 + interval; // note is dissonant
             rel(problem->getHome(), problem->getSolutionArray()[i*2], IRT_EQ, note); // fix the note i
@@ -1081,7 +1562,7 @@ void FuxTest::test_2H2_3v_2sp() {
             //test first note
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
             int note = cantusFirmus[0] + 12 + interval; // note is dissonant
-            rel(problem->getHome(), problem->getSolutionArray()[j*((size*2)-1)], IRT_EQ, note); // fix the first note
+            rel(problem->getHome(), problem->getSolutionArray()[j*((cfSize*2)-1)], IRT_EQ, note); // fix the first note
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 2H2_3v_2sp: It exists a solution but it shouldn't with the following configuration:\n"
                             << "Cantus firmus: ";
@@ -1092,10 +1573,10 @@ void FuxTest::test_2H2_3v_2sp() {
             }
             delete problem;      
             // test next notes
-            for (size_t i = 0; i < size; i++) {
+            for (size_t i = 0; i < cfSize; i++) {
                 CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
                 int note = cantusFirmus[i] + 12 + interval; // note is dissonant
-                rel(problem->getHome(), problem->getSolutionArray()[j*size+i], IRT_EQ, note); // fix the note i
+                rel(problem->getHome(), problem->getSolutionArray()[j*cfSize+i], IRT_EQ, note); // fix the note i
                 if (has_solution(problem)) {
                     std::cerr   << "/!\\ ERROR test 2H2_3v_2sp: It exists a solution but it shouldn't with the following configuration:\n"
                                 << "Cantus firmus: ";
@@ -1123,7 +1604,7 @@ void FuxTest::test_2H2_4v_2sp() {
             //test first note
             CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
             int note = cantusFirmus[0] + 12 + interval; // note is dissonant
-            rel(problem->getHome(), problem->getSolutionArray()[j*((size*2)-1)], IRT_EQ, note); // fix the first note
+            rel(problem->getHome(), problem->getSolutionArray()[j*((cfSize*2)-1)], IRT_EQ, note); // fix the first note
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 2H2_4v_2sp: It exists a solution but it shouldn't with the following configuration:\n"
                             << "Cantus firmus: ";
@@ -1134,10 +1615,10 @@ void FuxTest::test_2H2_4v_2sp() {
             }
             delete problem;      
             // test next notes
-            for (size_t i = 0; i < size; i++) {
+            for (size_t i = 0; i < cfSize; i++) {
                 CounterpointProblem* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
                 int note = cantusFirmus[i] + 12 + interval; // note is dissonant
-                rel(problem->getHome(), problem->getSolutionArray()[j*size+i], IRT_EQ, note); // fix the note i
+                rel(problem->getHome(), problem->getSolutionArray()[j*cfSize+i], IRT_EQ, note); // fix the note i
                 if (has_solution(problem)) {
                     std::cerr   << "/!\\ ERROR test 2H2_4v_2sp: It exists a solution but it shouldn't with the following configuration:\n"
                                 << "Cantus firmus: ";
@@ -1155,7 +1636,7 @@ void FuxTest::test_2H2_4v_2sp() {
 // ----- Figures tests -----
 
 void FuxTest::test_2v_1sp_fig23(){
-    cout << "Test Fig. 23" << endl;
+    cout << "Start test_2v_1sp_fig23" << endl;
     spList = {FIRST_SPECIES};
     cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
     cp =           {57,57,55,53,52,52,50,48,55,57,56,57};
@@ -1174,17 +1655,17 @@ void FuxTest::test_2v_1sp_fig23(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
+    cout << "End test 2v_1sp_fig23." << endl;
 }
 
 void FuxTest::test_2v_2sp_fig40(){
-    cout << "Test Fig. 40" << endl;
+    cout << "Start test_2v_2sp_fig40" << endl;
     spList = {SECOND_SPECIES};
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; //1sp 2v cf
     cp =           {67,64,65,67,69,71,69,67,72,71,72,74,72,71,69,67,65,64,72,71,69,67,62,64,66,67};
     v_type = {2};
     borrowMode = 1;
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-    cout << problem->getSolutionArray() << endl;
     for (size_t i = 0; i < cp.size(); i++)
     {
         int note = cp[i];
@@ -1197,12 +1678,36 @@ void FuxTest::test_2v_2sp_fig40(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
-    cout << problem->getSolutionArray() << endl;
+    cout << "End test 2v_2sp_fig40." << endl;
+}
+
+void FuxTest::test_3v_1sp_fig119(){
+    cout << "Start test 3v_1sp_fig119" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {60, 64, 65, 67, 64, 69, 67, 64, 65, 64, 62, 60};
+    cp =           {64, 67, 69, 71, 72, 72, 76, 72, 69, 72, 71, 72,
+                    72, 72, 69, 67, 69, 65, 72, 72, 74, 72, 67, 72};
+    v_type = {1, 1};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test 3v_1sp_fig119: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    cout << "End test 3v_1sp_fig119." << endl;
 }
 
 
 void FuxTest::test_3v_2sp_fig125(){
-    cout << "Test Fig. 125" << endl;
+    cout << "Start test_3v_2sp_fig125" << endl;
     spList = {FIRST_SPECIES, SECOND_SPECIES};
     cantusFirmus = {52,   48,   50,   48,   45,   57,   55,   52,   53,   52};
     cp =           {64,   64,   65,   64,   65,   64,   67,   67,   69,   68,
@@ -1229,7 +1734,7 @@ void FuxTest::test_3v_2sp_fig125(){
 }
 
 void FuxTest::test_3v_2sp_fig129(){
-    cout << "Test Fig. 129" << endl;
+    cout << "Start test_3v_2sp_fig129" << endl;
     spList = {FIRST_SPECIES, SECOND_SPECIES};
     cantusFirmus =  {65,   67,   69,    65,   62,   64,   65,   72,   69,   65,   67,   65}; //1sp 2v cf
     cp =            {60,   60,   60,    62,   65,   67,   69,   67,   60,   62,   64,   65,
@@ -1253,6 +1758,33 @@ void FuxTest::test_3v_2sp_fig129(){
         printIntVarArray(problem->getSolutionArray());
     }
     cout << "End test 3v_2sp_fig129." << endl;
+}
+
+void FuxTest::test_4v_2sp_fig176(){
+    cout << "Start test_4v_2sp_fig176" << endl;
+    spList = {FIRST_SPECIES, SECOND_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {50,   53,   52,   50,   55,   53,   57,   55,   53,   52,   50}; 
+    cp =            {65,   69,   72,   74,   70,   69,   69,   71,   74,   73,   74,
+                     -1,62,60,62,64,67,65,64,62,64,65,69,64,65,67,62,65,69,67,64,66,
+                     69,   69,   67,   69,   70,   72,   72,   74,   69,   76,   69};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test 2v_1sp_fig176: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    cout << "End test test_4v_2sp_fig176." << endl;
 }
 
 void printVector(const std::vector<int>& array) {
