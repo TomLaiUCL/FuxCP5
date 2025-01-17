@@ -78,6 +78,11 @@ public:
     void test_1H7_2v_1sp();
     void test_1H7_3v_1sp();
     void test_1H7_2v_2sp();
+    void test_1H7_3v_2sp();
+
+    void test_1H10();
+    void test_1H10_3v_1sp();
+    void test_1H10_3v_2sp();
 
     void test_1M2();
     void test_1M2_2v_1sp();

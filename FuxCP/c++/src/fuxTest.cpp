@@ -27,6 +27,7 @@ FuxTest::FuxTest(char* test){
         test_1H5();
         // test_1H6();
         test_1H7();
+        test_1H10();
 
         test_1M2();
         cout << "Tests ended." << endl;
@@ -44,6 +45,8 @@ FuxTest::FuxTest(char* test){
     //     test_1H6();
     } else if(strcmp(test, "1H7")==0){
         test_1H7();
+    } else if(strcmp(test, "1H10")==0){
+        test_1H10();
     } else if(strcmp(test, "1M2")==0){
         test_1M2();
     } else if(strcmp(test, "2H2")==0){
@@ -1299,6 +1302,7 @@ void FuxTest::test_1H7() {
     test_1H7_2v_1sp();
     test_1H7_3v_1sp();
     test_1H7_2v_2sp();
+    test_1H7_3v_2sp();
     cout << "End test 1H7." << endl;
 }
 
@@ -1367,9 +1371,10 @@ void FuxTest::test_1H7_3v_1sp() {
     spList = {FIRST_SPECIES, FIRST_SPECIES};
     v_type = {3, 3};
     vector<int> intervals = {1, 2, 4, 5, 6, 8, 10, 11}; // forbidden intervals
-    for (int interval : intervals) {
+    for (size_t i = 1; i < 3; i++) {
+        for (int interval : intervals) {
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        rel(problem->getHome(), problem->getSolutionArray()[cfSize-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
+        rel(problem->getHome(), problem->getSolutionArray()[cfSize*i-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
         if (has_solution(problem)) {
             std::cerr   << "/!\\ ERROR test 1H7_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
                     << "cantus firmus: ";
@@ -1379,6 +1384,7 @@ void FuxTest::test_1H7_3v_1sp() {
             std::cerr   << "> The harmonic interval of the penultimate note must be either a minor third, a perfect fifth, a major sixth or an octave. " << std::endl;
         }
         delete problem;
+        }
     }
     cout << "End test 1H7_3v_1sp." << endl;
 }
@@ -1392,7 +1398,7 @@ void FuxTest::test_1H7_2v_2sp() {
     for (size_t interval = 0; interval < 12; interval++) {
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         if (interval == 9) { // correct interval
-            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as the major sixth with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as the major sixth with the cf
             if (!has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
@@ -1402,7 +1408,7 @@ void FuxTest::test_1H7_2v_2sp() {
                 std::cerr   << "> The penultimate note should be correct" << std::endl;
             }
         } else {
-            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
                         << "cantus firmus: ";
@@ -1419,7 +1425,7 @@ void FuxTest::test_1H7_2v_2sp() {
     for (size_t interval = 0; interval < 12; interval++) {
         auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
         if (interval == 3) { // correct interval
-            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as the major sixth with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-2], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as the major sixth with the cf
             if (!has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It doesn't exist a solution but it should with the following configuration:\n"
                         << "Cantus firmus: ";
@@ -1429,7 +1435,7 @@ void FuxTest::test_1H7_2v_2sp() {
                 std::cerr   << "> The penultimate note should be correct" << std::endl;
             }
         } else {
-            rel(problem->getHome(), problem->getSolutionArray()[cpSize-3], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as a wrong interval with the cf
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize-2], IRT_EQ, cantusFirmus[cfSize-2]-interval); // fix the penultimate solution note as a wrong interval with the cf
             if (has_solution(problem)) {
                 std::cerr   << "/!\\ ERROR test 1H7_2v_2sp: It exists solution but it shouldn't with the following configuration:\n"
                         << "cantus firmus: ";
@@ -1444,9 +1450,90 @@ void FuxTest::test_1H7_2v_2sp() {
     cout << "End test 1H7_2v_2sp." << endl;
 }
 
+void FuxTest::test_1H7_3v_2sp() {
+    cout << "Start test 1H7_3v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    spList = {SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {3, 3};
+    vector<int> intervals = {1, 2, 4, 5, 6, 8, 10, 11}; // forbidden intervals
+    for (size_t i = 1; i < 3; i++) {
+        for (int interval : intervals) {
+            auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            rel(problem->getHome(), problem->getSolutionArray()[cpSize*i-2], IRT_EQ, cantusFirmus[cfSize-2]+12+interval); // fix the penultimate solution note as a wrong interval with the cf
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H7_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                        << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> The harmonic interval of the penultimate note must be either a minor third, a perfect fifth, a major sixth or an octave. " << std::endl;
+            }
+            delete problem;
+        }
+    }
+    cout << "End test 1H7_3v_2sp." << endl;
+}
+
+// In three voice composition, tenths are prohibited in the last chord.
+void FuxTest::test_1H10(){
+    cout << "Start test 1H10..." << endl;
+    // test_1H10_3v_1sp();
+    test_1H10_3v_2sp();
+    cout << "End test 1H10." << endl;
+}
+
+void FuxTest::test_1H10_3v_1sp(){
+    cout << "Start test_1H10_3v_1sp..." << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES};
+    v_type = {4, 4};
+    int intervals[] = {3, 4}; // forbidden intervals
+    for (size_t i = 1; i < 3; i++) { // iterate over each counter point
+        for (int interval: intervals) { // interval tested
+            auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            int note = cantusFirmus[cfSize-1] + 24 + interval;
+            rel(problem->getHome(), problem->getSolutionArray()[(i*cfSize)-1], IRT_EQ, note); // fix the last note as a thens
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H10_3v_1sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> A thenth is played in the last chord" << std::endl;
+            }
+            delete problem;
+
+        }
+    }
+    cout << "End test 1H10_3v_1sp" << endl;
+}
+
+void FuxTest::test_1H10_3v_2sp() {
+    cout << "Start test_1H10_3v_2sp..." << endl;
+    int cpSize = cfSize*2-1; // size of a counterpoint
+    spList = {SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {2, 2};
+    int intervals[] = {3, 4}; // forbidden intervals
+    for (size_t i = 1; i < 3; i++) { // iterate over each counter point
+        for (int interval: intervals) { // interval tested
+            auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            int note = cantusFirmus[cfSize-1] + 12 + interval;
+            rel(problem->getHome(), problem->getSolutionArray()[(i*cpSize)-1], IRT_EQ, note); // fix the last note as a thens
+            if (has_solution(problem)) {
+                std::cerr   << "/!\\ ERROR test 1H10_3v_2sp: It exists solution but it shouldn't with the following configuration:\n"
+                            << "cantus firmus: ";
+                printVector(cantusFirmus);
+                std::cerr   << "solution array: ";
+                printIntVarArray(problem->getSolutionArray());
+                std::cerr   << "> A thenth is played in the last chord" << std::endl;
+            }
+            delete problem;
+        }
+    }
+}
+
 void FuxTest::test_1M2() {
     cout << "Start test 1M2..." << endl;
-    // test_1M2_2v_1sp();
+    test_1M2_2v_1sp();
     test_1M2_3v_1sp();
     cout << "End test 1M2." << endl;
 }
@@ -1474,7 +1561,6 @@ void FuxTest::test_1M2_2v_1sp() {
         delete solution;
     }
     delete problem;
-    
 }
 
 void FuxTest::test_1M2_3v_1sp() {

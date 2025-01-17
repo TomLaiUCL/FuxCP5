@@ -24,6 +24,9 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, i
     dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
 
     //H10 No tenths in last chord
+    // cout << "Lowest notes size : " << lowestNotes.size() << endl;
+    // cout << "Notes size : " << notes.size() << endl;
+    // cout << "absolute interval: " << h_intervals[h_intervals.size()-1] << endl;
     rel(home, ((notes[notes.size()-4]-lowestNotes[lowestNotes.size()-1])>12) >> (expr(home, abs(h_intervals[h_intervals.size()-1]))!=MINOR_THIRD && 
         expr(home, abs(h_intervals[h_intervals.size()-4]))!=MAJOR_THIRD));
 
