@@ -59,3 +59,7 @@ IntVarArray Voice::getHInterval(){
 IntVarArgs Voice::getSecondHInterval(){
     return h_intervals.slice(2,4,h_intervals.size());
 }
+
+IntVarArray Voice::getMotions(){
+    return motions;
+}

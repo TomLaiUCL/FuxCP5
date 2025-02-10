@@ -59,6 +59,8 @@ class Voice{
         IntVarArray getHInterval();
 
         IntVarArgs getSecondHInterval();
+
+        IntVarArray getMotions();
 };
 
 

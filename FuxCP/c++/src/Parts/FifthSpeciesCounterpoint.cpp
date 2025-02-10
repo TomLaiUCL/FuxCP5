@@ -15,8 +15,8 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
-    cout << lowerBound << endl;
-    cout << upperBound << endl;
+    // cout << lowerBound << endl;
+    // cout << upperBound << endl;
     /*
     if borrowMode is enabled, the extended domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
     that he does like to borrow notes, so the borrow cost should just do the job and still allow borrowed notes, not outright forbid them
@@ -827,8 +827,8 @@ void FifthSpeciesCounterpoint::createSpeciesArrays(Home home){
     /**
      * CREATE NTH SPECIES ARRAY
      */
-    cout << speciesArray.size() << endl;
-    cout << isNthSpeciesArray.size() << endl;
+    // cout << speciesArray.size() << endl;
+    // cout << isNthSpeciesArray.size() << endl;
     for(int i = 0; i < isNthSpeciesArray.size(); i+=5){
         rel(home, speciesArray[floor(i/5)], IRT_EQ, -1, Reify(isNthSpeciesArray[i]));
         rel(home, speciesArray[floor(i/5)], IRT_EQ, FIRST_SPECIES, Reify(isNthSpeciesArray[i+1]));

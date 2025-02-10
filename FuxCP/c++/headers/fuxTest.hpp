@@ -44,10 +44,21 @@ public:
     void test_1H1_2v_2sp();
     void test_1H1_3v_2sp();
     void test_1H1_4v_2sp();
+    void test_1H1_2v_3sp();
+    void test_1H1_3v_3sp();
+    void test_1H1_4v_3sp();
+    void test_1H1_2v_4sp();
+    void test_1H1_3v_4sp();
+    void test_1H1_4v_4sp();
+    void test_1H1_2v_5sp();
+    void test_1H1_3v_5sp();
+    void test_1H1_4v_5sp();
 
     void test_1H2();
     void test_1H2_2v_1sp();
     void test_1H2_2v_2sp();
+    void test_1H2_2v_3sp();
+    void test_1H2_2v_4sp();
 
     void test_1H3();
     void test_1H3_2v_1sp();
@@ -56,6 +67,12 @@ public:
     void test_1H3_2v_2sp();
     void test_1H3_3v_2sp();
     void test_1H3_4v_2sp();
+    void test_1H3_2v_3sp();
+    void test_1H3_3v_3sp();
+    void test_1H3_4v_3sp();
+    void test_1H3_2v_4sp();
+    void test_1H3_3v_4sp();
+    void test_1H3_4v_4sp();
 
     void test_1H4();
     void test_1H4_2v_1sp();
@@ -64,12 +81,22 @@ public:
     void test_1H4_2v_2sp();
     void test_1H4_3v_2sp();
     void test_1H4_4v_2sp();
+    void test_1H4_2v_3sp();
+    void test_1H4_3v_3sp();
+    void test_1H4_4v_3sp();
+    void test_1H4_2v_4sp();
+    void test_1H4_3v_4sp();
+    void test_1H4_4v_4sp();
 
     void test_1H5();
     void test_1H5_2v_1sp();
     void test_1H5_3v_1sp();
     void test_1H5_2v_2sp();
     void test_1H5_3v_2sp();
+    void test_1H5_2v_3sp();
+    void test_1H5_3v_3sp();
+    void test_1H5_2v_4sp();
+    void test_1H5_3v_4sp();
 
     void test_1H6();
     void test_1H6_2v_1sp();
@@ -79,20 +106,31 @@ public:
     void test_1H7_3v_1sp();
     void test_1H7_2v_2sp();
     void test_1H7_3v_2sp();
+    void test_1H7_2v_3sp();
+    void test_1H7_3v_3sp();
+    void test_1H7_2v_4sp();
+    void test_1H7_3v_4sp();
 
     void test_1H10();
     void test_1H10_3v_1sp();
     void test_1H10_3v_2sp();
+    void test_1H10_3v_3sp();
+    void test_1H10_3v_4sp();
 
     void test_1M2();
     void test_1M2_2v_1sp();
     void test_1M2_3v_1sp();
     void test_1M2_4v_1sp();
 
+    void test_1P1_2v_1sp();
+
     void test_2H2();
     void test_2H2_2v_2sp();
     void test_2H2_3v_2sp();
     void test_2H2_4v_2sp();
+
+    void test_2M2();
+    void test_2M2_2v_2sp();
 
     void test_2v_1sp_fig23();
     void test_2v_2sp_fig40();
@@ -102,7 +140,7 @@ public:
     void test_4v_2sp_fig176();
 
 
-    void another_test();
+    int get_motions(CounterpointProblem* problem, int i);
 
 // ===============================================
 
