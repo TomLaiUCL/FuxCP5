@@ -164,6 +164,7 @@ void H3_3_cambiataCost(Home home, Part* part){
 }
 
 void H5_1_cpAndCfDifferentNotes(Home home, Part* part, Part* cf){
+    // cout << part->getFirstSpeciesNotes() << endl;
     for(int i = 1; i < part->getFirstSpeciesNotes().size()-1; i++){
         rel(home, part->getFirstSpeciesNotes()[i], IRT_NQ, cf->getNotes()[i]);
     }
