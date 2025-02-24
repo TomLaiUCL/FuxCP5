@@ -57,11 +57,21 @@ FuxTest::FuxTest(char* test){
     } else if(strcmp(test, "2M2")==0){
         test_2M2();
     } else if(strcmp(test, "figs")==0){
+        test_2v_1sp_fig22();
         test_2v_1sp_fig23();
         test_2v_2sp_fig40();
+        test_2v_2sp_fig45();
+        test_2v_3sp_fig59();
+        test_2v_3sp_fig60();
+        test_2v_4sp_fig77();
+        test_2v_4sp_fig78();
+        test_3v_1sp_fig118();
         test_3v_1sp_fig119();
-        test_3v_2sp_fig129();
         test_3v_2sp_fig125();
+        test_3v_2sp_fig128();
+        test_3v_2sp_fig129();
+        test_3v_3sp_fig132();
+        test_3v_3sp_fig133();
         test_4v_2sp_fig176();
     } else {
         std::invalid_argument("Test for constraint not found!");
@@ -3207,12 +3217,36 @@ void FuxTest::test_2M2_2v_2sp() {
 
 // ----- Figures tests -----
 
+void FuxTest::test_2v_1sp_fig22() {
+    cout << "Start test_2v_1sp_fig22" << endl;
+    spList = {FIRST_SPECIES};
+    cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
+    cp =           {69,64,67,65,64,72,69,71,71,69,68,69};
+    v_type = {1};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test 2v_1sp_fig22: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test 2v_1sp_fig22." << endl;
+}
+
 void FuxTest::test_2v_1sp_fig23(){
     cout << "Start test_2v_1sp_fig23" << endl;
     spList = {FIRST_SPECIES};
     cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; //1sp 2v cf
-    cp =           {57,57,55,53,52,52,50,48,55,57,56,57};
-    v_type = {-1};
+    cp =           {69,69,67,65,64,64,62,60,67,69,68,69};
+    v_type = {1};
     borrowMode = 1;
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
     for (size_t i = 0; i < cp.size(); i++)
@@ -3227,6 +3261,11 @@ void FuxTest::test_2v_1sp_fig23(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
+    cout << problem->getLowest()->to_string() << endl;
+    cout << problem->getCounterpoint_1()->getHInterval() << endl;
+    cout << problem->getCounterpoint_1()->getFirstHInterval() << endl;
+    cout << problem->getCounterpoint_1()->getFirstSpeciesHIntervals() << endl;
+    delete problem;
     cout << "End test 2v_1sp_fig23." << endl;
 }
 
@@ -3234,14 +3273,14 @@ void FuxTest::test_2v_2sp_fig40(){
     cout << "Start test_2v_2sp_fig40" << endl;
     spList = {SECOND_SPECIES};
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; //1sp 2v cf
-    cp =           {67,64,65,67,69,71,69,67,72,71,72,74,72,71,69,67,65,64,72,71,69,67,62,64,66,67};
+    cp =           {-1, 67,64,65,67,69,71,69,67,72,71,72,74,72,71,69,67,65,64,72,71,69,67,62,64,66,67};
     v_type = {2};
     borrowMode = 1;
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-    for (size_t i = 0; i < cp.size(); i++)
+    for (size_t i = 1; i < cp.size(); i++)
     {
         int note = cp[i];
-        rel(problem->getHome(), problem->getSolutionArray()[i+1], IRT_EQ, note);
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
     }
     if (!has_solution(problem)) {
         std::cerr   << "/!\\ ERROR test 2v_1sp_fig40: It doesn't exist a solution but it should with the following configuration:\n"
@@ -3250,7 +3289,154 @@ void FuxTest::test_2v_2sp_fig40(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
+    delete problem;
     cout << "End test 2v_2sp_fig40." << endl;
+}
+
+void FuxTest::test_2v_2sp_fig45(){
+    cout << "Start test_2v_2sp_fig45" << endl;
+    spList = {SECOND_SPECIES};
+    cantusFirmus = {60,64,65,67,64,69,67,64,65,64,62,60}; //1sp 2v cf
+    cp =           {-1,60,72,71,69,74,71,67,72,71,69,72,76,74,72,69,74,69,72,60,67,71,72};
+    v_type = {1};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 1; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test 2v_2sp_fig45: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test 2v_2sp_fig45." << endl;
+}
+
+void FuxTest::test_2v_3sp_fig59() {
+    cout << "Start test_2v_3sp_fig59" << endl;
+    spList = {THIRD_SPECIES};
+    cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 2v cf
+    cp =           {65,64,62,60,59,62,68,65,64,62,60,58,57,60,62,64,65,62,64,65,67,64,65,67,69,67,65,69,67,65,64,62,60,64,60,64,65,64,62,60,58,60,62,64,65};
+    v_type = {-1};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_2v_3sp_fig59: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_2v_3sp_fig59." << endl;
+}
+
+
+void FuxTest::test_2v_3sp_fig60() {
+    cout << "Start test_2v_3sp_fig60" << endl;
+    spList = {THIRD_SPECIES};
+    cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 2v cf
+    cp =           {62,74,72,71,72,69,71,72,74,72,71,69,71,69,66,65,66,74,78,77,76,69,81,78,77,76,74,71,72,69,71,72,74,72,71,69,71,72,74,71,72,69,71,72,74};
+    v_type = {1};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_2v_3sp_fig60: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_2v_3sp_fig60." << endl;
+}
+
+void FuxTest::test_2v_4sp_fig77() {
+    cout << "Start test_2v_4sp_fig77" << endl;
+    spList = {FOURTH_SPECIES};
+    cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 2v cf
+    cp =           {65,65,64,64,60,60,65,65,69,69,67,67,65,65,64,64,69,69,65,65,64,65};
+    v_type = {0};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_2v_4sp_fig77: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_2v_4sp_fig77." << endl;
+}
+
+void FuxTest::test_2v_4sp_fig78() {
+    cout << "Start test_2v_4sp_fig78" << endl;
+    spList = {FOURTH_SPECIES};
+    cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 2v cf
+    cp =           {74,74,72,72,71,71,66,66,64,64,76,76,74,74,72,72,71,71,74,74,72,74};
+    v_type = {0};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_2v_4sp_fig78: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_2v_4sp_fig78." << endl;
+}
+
+void FuxTest::test_3v_1sp_fig118(){
+    cout << "Start test test_3v_1sp_fig118" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {60, 64, 65, 67, 64, 69, 67, 64, 65, 64, 62, 60};
+    cp =           {67, 72, 69, 67, 72, 72, 76, 72, 71, 72, 71, 72,
+                    69, 69, 71, 72, 69, 74, 72, 77, 71, 69, 76, 69};
+    v_type = {1, 1};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++)
+    {
+        int note = cp[i];
+        rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test_3v_1sp_fig118: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test_3v_1sp_fig118." << endl;
 }
 
 void FuxTest::test_3v_1sp_fig119(){
@@ -3274,6 +3460,7 @@ void FuxTest::test_3v_1sp_fig119(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
+    delete problem;
     cout << "End test 3v_1sp_fig119." << endl;
 }
 
@@ -3287,11 +3474,9 @@ void FuxTest::test_3v_2sp_fig125(){
     v_type = {2 ,1};
     borrowMode = 1;
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-    for (size_t i = 0; i < cp.size(); i++)
-    {
+    for (size_t i = 0; i < cp.size(); i++) {
         int note = cp[i];
-        if (note > 0)
-        {
+        if (note > 0) {
             rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
         }
     }
@@ -3302,23 +3487,48 @@ void FuxTest::test_3v_2sp_fig125(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
+    delete problem;
     cout << "End test 3v_2sp_fig125." << endl;
+}
+
+void FuxTest::test_3v_2sp_fig128(){
+    cout << "Start test_3v_2sp_fig128" << endl;
+    spList = {SECOND_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {65,   67,   69,   65,   62,   64,   65,   72,   69,   65,   67,   65};
+    cp =           {-1,77,76,74,72,71,69,72,70,69,67,72,69,81,79,76,72,69,74,77,77,76,77,
+                    65,   60,   65,   65,   67,   72,   74,   76,   77,   74,   72,   65};
+    v_type = {1 ,0};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++) {
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test_3v_2sp_fig128: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test_3v_2sp_fig128." << endl;
 }
 
 void FuxTest::test_3v_2sp_fig129(){
     cout << "Start test_3v_2sp_fig129" << endl;
     spList = {FIRST_SPECIES, SECOND_SPECIES};
-    cantusFirmus =  {65,   67,   69,    65,   62,   64,   65,   72,   69,   65,   67,   65}; //1sp 2v cf
-    cp =            {60,   60,   60,    62,   65,   67,   69,   67,   60,   62,   64,   65,
-                     -1,53,52,48,53, 52,50,48,46,45,43,48,41,53,52,48,53,52,50,46,43,48,41};
+    cantusFirmus =  {65,   67,   69,   65,   62,   64,   65,   72,   69,   65,   67,   65}; //1sp 2v cf
+    cp =            {60,   60,   60,   62,   65,   67,   69,   67,   60,   62,   64,   65,
+                     -1,53,52,48,53,52,50,48,46,45,43,48,41,53,52,48,53,52,50,46,43,48,41};
     v_type = {-1, -3};
     borrowMode = 1;
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-    for (size_t i = 0; i < cp.size(); i++)
-    {
+    for (size_t i = 0; i < cp.size(); i++) {
         int note = cp[i];
-        if (note > 0)
-        {
+        if (note > 0) {
             rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
         }
     }
@@ -3329,8 +3539,198 @@ void FuxTest::test_3v_2sp_fig129(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
+    delete problem;
     cout << "End test 3v_2sp_fig129." << endl;
 }
+
+void FuxTest::test_3v_3sp_fig132(){
+    cout << "Start test_3v_3sp_fig132" << endl;
+    spList = {FIRST_SPECIES, THIRD_SPECIES};
+    cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; //1sp 2v cf
+    cp =            {69,69,72,71,71,74,72,76,74,73,74,
+                     -1,62,65,64,62,64,65,67,69,67,64,65,67,62,67,65,64,67,65,64,62,74,62,64,65,67,69,71,72,76,74,72,74,62,65,67,69,67,69,57,62};
+    v_type = {1, 0};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++) {
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test_3v_3sp_fig132: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test_3v_3sp_fig132." << endl;
+}
+
+void FuxTest::test_3v_3sp_fig133(){
+    cout << "Start test_3v_3sp_fig133" << endl;
+    spList = {THIRD_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; //1sp 2v cf
+    cp =            {65,62,65,67,69,65,69,71,72,64,67,69,71,74,71,69,67,69,71,73,74,76,77,74,72,69,72,74,76,74,72,71,69,74,69,71,73,69,71,72,74,
+                     50,50,48,55,52,50,53,48,50,57,50};
+    v_type = {0, -3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++) {
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test_3v_3sp_fig133: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test_3v_3sp_fig133." << endl;
+}
+
+void FuxTest::test_3v_4sp_fig150(){
+    cout << "Start test_3v_4sp_fig150" << endl;
+    spList = {FOURTH_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 2v cf
+    cp =            {69,71,72,69,65,67,69,67,72,69,70,69,
+                    65,65,64,64,60,60,57,57,62,62,60,60,65,65,64,64,60,60,65,65,64,65};
+    v_type = {0, -3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++) {
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test_3v_4sp_fig150: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test_3v_4sp_fig150." << endl;
+}
+
+void FuxTest::test_3v_4sp_fig151(){
+    cout << "Start test_3v_4sp_fig151" << endl;
+    spList = {FIRST_SPECIES, FOURTH_SPECIES};
+    cantusFirmus =  {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 2v cf
+    cp =            {53,60,65,62,58,55,62,64,65,62,58,57,
+                    53,53,52,52,50,50,46,46,43,-1,48,48,46,46,45,45,50,50,53,53,52,53};
+    v_type = {0, -3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    for (size_t i = 0; i < cp.size(); i++) {
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test_3v_4sp_fig151: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test_3v_4sp_fig151." << endl;
+}
+
+void FuxTest::test_4v_1sp_fig171(){
+    cout << "Start test_4v_1sp_fig171" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {65,67,69,65,62,64,65,72,69,65,67,65}; 
+    cp =            {69,67,65,65,65,67,65,64,65,65,64,65,
+                     60,60,60,62,62,58,57,57,53,57,60,57,
+                     53,52,53,50,46,43,50,45,50,50,48,41};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_4v_1sp_fig171: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_4v_1sp_fig171." << endl;
+}
+
+void FuxTest::test_4v_1sp_fig172(){
+    cout << "Start test_4v_1sp_fig172" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {65,67,69,65,62,64,65,72,69,65,67,65}; 
+    cp =            {72,71,72,69,69,72,72,72,72,69,70,65,
+                     69,67,64,65,65,67,69,67,65,65,64,65,
+                     65,62,60,60,62,60,60,64,60,62,58,60};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_4v_1sp_fig172: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_4v_1sp_fig172." << endl;
+}
+
+void FuxTest::test_4v_2sp_fig175(){
+    cout << "Start test_4v_2sp_fig175" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES, SECOND_SPECIES};
+    cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =            {74,74,72,74,76,77,77,76,74,73,74,
+                     69,69,69,71,71,74,72,72,69,69,69,
+                     -1,74,62,65,69,72,67,65,64,67,62,64,65,69,72,60,62,65,69,57,62};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test 2v_1sp_fig176: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_4v_2sp_fig175." << endl;
+}
+
 
 void FuxTest::test_4v_2sp_fig176(){
     cout << "Start test_4v_2sp_fig176" << endl;
@@ -3356,8 +3756,123 @@ void FuxTest::test_4v_2sp_fig176(){
         std::cerr   << "Solution array: ";
         printIntVarArray(problem->getSolutionArray());
     }
+    delete problem;
     cout << "End test test_4v_2sp_fig176." << endl;
 }
+
+void FuxTest::test_4v_3sp_fig184(){
+    cout << "Start test_4v_3sp_fig184" << endl;
+    spList = {FIRST_SPECIES, THIRD_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {76,72,74,72,69,81,79,76,77,76}; 
+    cp =            {68,71,64,67,69,72,69,67,65,62,64,65,67,65,64,62,60,72,69,67,65,67,69,71,72,74,76,71,72,69,71,72,69,74,69,71,68,
+                     59,57,57,55,57,60,64,60,62,59,
+                     64,65,62,64,65,65,64,69,62,64};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_4v_3sp_fig184: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_4v_3sp_fig184." << endl;
+}
+
+void FuxTest::test_4v_3sp_fig186(){
+    cout << "Start test_4v_3sp_fig186" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES, THIRD_SPECIES};
+    cantusFirmus =  {64,60,62,60,57,69,67,64,65,64}; 
+    cp =            {71,76,77,76,77,77,76,76,69,68,
+                     68,69,69,72,72,72,72,72,74,71,
+                     76,74,72,71,69,67,65,64,62,64,65,62,69,72,69,67,65,67,69,67,65,67,69,71,72,64,65,67,69,67,65,64,62,65,64,62,64};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_4v_3sp_fig186: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_4v_3sp_fig186." << endl;
+}
+
+void FuxTest::test_4v_4sp_fig193(){
+    cout << "Start test_4v_4sp_fig193" << endl;
+    spList = {FOURTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =            {69,69,74,74,72,72,71,71,74,74,69,69,77,77,76,76,74,74,73,74,
+                     69,69,69,62,74,74,72,72,69,69,69,
+                     50,50,45,47,43,50,53,48,50,45,50};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_4v_4sp_fig193: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_4v_4sp_fig193." << endl;
+}
+
+void FuxTest::test_4v_4sp_fig196(){
+    cout << "Start test_4v_4sp_fig196" << endl;
+    spList = {FOURTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =            {57,57,62,62,60,60,59,59,62,62,57,57,65,65,64,64,62,62,61,62,
+                     65,69,69,62,74,74,72,72,69,69,69,
+                     50,50,45,47,43,50,53,48,50,45,50};
+    v_type = {3, 2, 3};
+    borrowMode = 1;
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // Fix notes
+    for (size_t i = 0; i < cp.size(); i++) { 
+        int note = cp[i];
+        if (note > 0) {
+            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
+        }
+    }
+    if (!has_solution(problem)) {
+        std::cerr   << "/!\\ ERROR test test_4v_4sp_fig196: It doesn't exist a solution but it should with the following configuration:\n"
+                    << "Cantus firmus: ";
+        printVector(cantusFirmus);
+        std::cerr   << "Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
+    }
+    delete problem;
+    cout << "End test test_4v_4sp_fig196." << endl;
+}
+
+
 
 // ----- Util functions -----
 

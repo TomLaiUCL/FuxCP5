@@ -132,12 +132,31 @@ public:
     void test_2M2();
     void test_2M2_2v_2sp();
 
+    void test_2v_1sp_fig22();
     void test_2v_1sp_fig23();
     void test_2v_2sp_fig40();
+    void test_2v_2sp_fig45();
+    void test_2v_3sp_fig59();
+    void test_2v_3sp_fig60();
+    void test_2v_4sp_fig77();
+    void test_2v_4sp_fig78();
+    void test_3v_1sp_fig118();
     void test_3v_1sp_fig119();
     void test_3v_2sp_fig125();
+    void test_3v_2sp_fig128();
     void test_3v_2sp_fig129();
+    void test_3v_3sp_fig132();
+    void test_3v_3sp_fig133();
+    void test_3v_4sp_fig150();
+    void test_3v_4sp_fig151();
+    void test_4v_1sp_fig171();
+    void test_4v_1sp_fig172();
+    void test_4v_2sp_fig175();
     void test_4v_2sp_fig176();
+    void test_4v_3sp_fig184();
+    void test_4v_3sp_fig186();
+    void test_4v_4sp_fig193();
+    void test_4v_4sp_fig196();
 
 
     int get_motions(CounterpointProblem* problem, int i);
