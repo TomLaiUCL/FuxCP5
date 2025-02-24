@@ -93,6 +93,12 @@ public:
     IntVarArray getSolutionArray();
 
     Stratum* getLowest();
+    
+    // --- Added getters for counterpoint_2 and counterpoint_3 (Modified by Tom Lai)
+    Part* getCounterpoint_1(); 
+    Part* getCounterpoint_2();
+    Part* getCounterpoint_3();
+    // ---
 
     int* get_species_array_5sp(int ctp_index);
     int* get_extended_cp_domain(int ctp_index);

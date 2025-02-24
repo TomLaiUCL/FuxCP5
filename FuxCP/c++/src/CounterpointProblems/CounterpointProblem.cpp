@@ -484,6 +484,19 @@ Stratum* CounterpointProblem::getLowest(){
     return lowest;
 }
 
+Part* CounterpointProblem::getCounterpoint_1(){
+    return counterpoint_1;
+}
+
+Part* CounterpointProblem::getCounterpoint_2(){
+    return counterpoint_2;
+}
+
+Part* CounterpointProblem::getCounterpoint_3(){
+    return counterpoint_3;
+}
+
+
 /*************************
  * Search engine methods *
  *************************/
