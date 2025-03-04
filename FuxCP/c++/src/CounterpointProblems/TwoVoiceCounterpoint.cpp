@@ -22,7 +22,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     upper_2 = nullptr;
     upper_3 = nullptr;
     
-    counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, (6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0], lowest, cantusFirmus, 
+    counterpoint_1 = create_counterpoint(*this, species, nMeasures, cf, (6 * v_type - 12) + cf[0], (6 * v_type + 12) + cf[0], lowest, cantusFirmus, 
         v_type, m_costs, g_costs, s_costs, bm, TWO_VOICES);
     counterpoint_2 = nullptr;
     counterpoint_3 = nullptr;
@@ -30,7 +30,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
     G6_noChromaticMelodies(*this, counterpoint_1, species);
 
-    //G9
+    // 1.H4 (G9)
     G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
 
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
