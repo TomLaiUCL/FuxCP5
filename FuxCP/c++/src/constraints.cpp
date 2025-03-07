@@ -170,13 +170,26 @@ void H5_1_cpAndCfDifferentNotes(Home home, Part* part, Part* cf){
     }
 }
 
+/**
+ * Modified by Tom Lai
+ * Check that voices do not play the same notes (except for the first and last measure)
+ * @param home
+ * @param parts vector of parts with parts[0] being the cantusFirmus
+ */
 void H5_1_differentNotes(Home home, vector<Part*> parts){
+    // iterate over all pairs of parts
     for(int v1 = 0; v1 < parts.size(); v1++){
         for(int v2 = v1+1; v2 < parts.size(); v2++){
-            for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
-                if(parts[v1]->getSpecies()==CANTUS_FIRMUS){
-                    rel(home, parts[v1]->getNotes()[floor(i/4)], IRT_NQ, parts[v2]->getNotes()[i]);
-                } else {
+            if(parts[v1]->getSpecies()==CANTUS_FIRMUS){
+                // check voice v2 doesn't play same note as cantusFirmus
+                for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
+                    for (int j = i*4; j < (i*4)+4; j++) {
+                        rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[j]);
+                    }
+                }
+            } else {
+                // check voice v1 doesn't play same note as voice v2 with v1 and v2 are counterpoints
+                for(int i = 4; i < parts[v1]->getNotes().size()-1; i++){
                     rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);
                 }
             }
