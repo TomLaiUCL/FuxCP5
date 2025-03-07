@@ -95,6 +95,7 @@ public:
     Stratum* getLowest();
     
     // --- Added getters for counterpoint_2 and counterpoint_3 (Modified by Tom Lai)
+    Part* getCantusFirmus();
     Part* getCounterpoint_1(); 
     Part* getCounterpoint_2();
     Part* getCounterpoint_3();

@@ -484,6 +484,10 @@ Stratum* CounterpointProblem::getLowest(){
     return lowest;
 }
 
+Part* CounterpointProblem::getCantusFirmus(){
+    return cantusFirmus;
+}
+
 Part* CounterpointProblem::getCounterpoint_1(){
     return counterpoint_1;
 }
