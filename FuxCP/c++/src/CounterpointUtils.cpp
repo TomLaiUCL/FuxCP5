@@ -118,3 +118,11 @@ bool notInt(char* argv){
     }
     return noInt;
 }
+
+bool has_solution(CounterpointProblem* problem) {
+    BAB<CounterpointProblem> e(problem);
+    if (e.next()) {
+        return true;
+    }
+    return false;
+}

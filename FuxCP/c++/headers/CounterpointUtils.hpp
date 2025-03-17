@@ -36,6 +36,8 @@ CounterpointProblem* create_problem(vector<int> cf, vector<Species> sp, vector<i
 
 bool notInt(char* argv);
 
+bool has_solution(CounterpointProblem* problem);
+
 
 
 #endif

@@ -134,12 +134,35 @@ public:
 
     void test_2v_1sp_fig22();
     void test_2v_1sp_fig23();
+    void test_2v_2sp_fig38();
+    void test_2v_2sp_fig39();
     void test_2v_2sp_fig40();
+    void test_2v_2sp_fig41();
+    void test_2v_2sp_fig42();
+    void test_2v_2sp_fig43();
+    void test_2v_2sp_fig44();
     void test_2v_2sp_fig45();
+    void test_2v_3sp_fig55();
+    void test_2v_3sp_fig56();
+    void test_2v_3sp_fig57();
+    void test_2v_3sp_fig58();
     void test_2v_3sp_fig59();
     void test_2v_3sp_fig60();
+    void test_2v_4sp_fig74();
+    void test_2v_4sp_fig75();
+    void test_2v_4sp_fig76();
     void test_2v_4sp_fig77();
     void test_2v_4sp_fig78();
+    void test_3v_1sp_fig108();
+    void test_3v_1sp_fig109();
+    void test_3v_1sp_fig110();
+    void test_3v_1sp_fig111();
+    void test_3v_1sp_fig112();
+    void test_3v_1sp_fig113();
+    void test_3v_1sp_fig114();
+    void test_3v_1sp_fig115();
+    void test_3v_1sp_fig116();
+    void test_3v_1sp_fig117();
     void test_3v_1sp_fig118();
     void test_3v_1sp_fig119();
     void test_3v_2sp_fig125();
@@ -218,6 +241,7 @@ public:
 
     void test_4v_2sp_fig176_setter(int i);
 
+    void test_configuration();
 };
 
 void printVector(const std::vector<int>& array);
@@ -226,6 +250,5 @@ void printIntVarArray(const IntVarArray& array);
 
 std::vector<CounterpointProblem*> get_all_solutions(CounterpointProblem* problem);
 
-bool has_solution(CounterpointProblem* problem);
 
 #endif

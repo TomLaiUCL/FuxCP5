@@ -11,11 +11,24 @@
 #include "headers/CounterpointProblems/TwoVoiceCounterpoint.hpp"
 #include "headers/CounterpointProblems/CounterpointProblem.hpp"
 #include "headers/fuxTest.hpp"
+#include "headers/figureTests.hpp"
 
 using namespace Gecode;
 using namespace std;
 
 int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cout << "Please provide a test number or 'figs' as argument" << std::endl;
+        return 1;
+    }
+
+    string arg = argv[1];
+    if (arg == "figs") {
+        FigureTests figureTests;
+        figureTests.run_all_tests();
+        return 0;
+    }
+
     if(argc==1){
         cout << argv[0] << endl;
         cout << "-------------" << endl;
