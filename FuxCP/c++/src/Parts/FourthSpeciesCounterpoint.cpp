@@ -116,21 +116,23 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     // G6 : no chromatic melodies
     
     for(int i = 0; i < m_intervals_brut.size()-1; i+=4/notesPerMeasure.at(FOURTH_SPECIES)){
-        rel(home, expr(home, m_intervals_brut[i]==1), BOT_AND, expr(home, m_intervals_brut[i+1]==1), 0);
-        rel(home, expr(home, m_intervals_brut[i]==-1), BOT_AND, expr(home, m_intervals_brut[i+1]==-1), 0);
+        // Fux Constraint
+        // rel(home, expr(home, m_intervals_brut[i]==1), BOT_AND, expr(home, m_intervals_brut[i+1]==1), 0);
+        // rel(home, expr(home, m_intervals_brut[i]==-1), BOT_AND, expr(home, m_intervals_brut[i+1]==-1), 0);
     }
     
     // G7 : melodic intervals should be small (works for 1st, 2nd and 3rd species)
     int idx = 0;
     for(int i = 0; i < m_intervals_brut.size(); i+=4/notesPerMeasure.at(FOURTH_SPECIES)){
-        rel(home, (abs(m_intervals_brut[i])<MINOR_THIRD) >> (melodicDegreeCost[i]==secondCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_THIRD || abs(m_intervals_brut[i])==MAJOR_THIRD) >> (melodicDegreeCost[i]==thirdCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_FOURTH) >> (melodicDegreeCost[i]==fourthCost));
-        rel(home, (abs(m_intervals_brut[i])==TRITONE) >> (melodicDegreeCost[i]==tritoneCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_FIFTH) >> (melodicDegreeCost[i]==fifthCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_SIXTH || abs(m_intervals_brut[i])==MAJOR_SIXTH) >> (melodicDegreeCost[i]==sixthCost));
-        rel(home, (abs(m_intervals_brut[i])==MINOR_SEVENTH || abs(m_intervals_brut[i])==MAJOR_SEVENTH) >> (melodicDegreeCost[i]==seventhCost));
-        rel(home, (abs(m_intervals_brut[i])==PERFECT_OCTAVE) >> (melodicDegreeCost[i]==octaveCost));
+        // Fux Constraint
+        // rel(home, (abs(m_intervals_brut[i])<MINOR_THIRD) >> (melodicDegreeCost[i]==secondCost));
+        // rel(home, (abs(m_intervals_brut[i])==MINOR_THIRD || abs(m_intervals_brut[i])==MAJOR_THIRD) >> (melodicDegreeCost[i]==thirdCost));
+        // rel(home, (abs(m_intervals_brut[i])==PERFECT_FOURTH) >> (melodicDegreeCost[i]==fourthCost));
+        // rel(home, (abs(m_intervals_brut[i])==TRITONE) >> (melodicDegreeCost[i]==tritoneCost));
+        // rel(home, (abs(m_intervals_brut[i])==PERFECT_FIFTH) >> (melodicDegreeCost[i]==fifthCost));
+        // rel(home, (abs(m_intervals_brut[i])==MINOR_SIXTH || abs(m_intervals_brut[i])==MAJOR_SIXTH) >> (melodicDegreeCost[i]==sixthCost));
+        // rel(home, (abs(m_intervals_brut[i])==MINOR_SEVENTH || abs(m_intervals_brut[i])==MAJOR_SEVENTH) >> (melodicDegreeCost[i]==seventhCost));
+        // rel(home, (abs(m_intervals_brut[i])==PERFECT_OCTAVE) >> (melodicDegreeCost[i]==octaveCost));
         idx++;
     }
 
@@ -144,76 +146,88 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 
     //4.H1 : arsis harmonies must be consonant (could be the reason for 3 / 4 voice bugs)
     for(int i = 0; i < fourthSpeciesHIntervals.size(); i+=2){
-        dom(home, expr(home, abs(fourthSpeciesHIntervals[i])), IntSet(CONSONANCES));
+        // dom(home, expr(home, abs(fourthSpeciesHIntervals[i])), IntSet(CONSONANCES));
     }
     
     //Melodic intervals cannot be greater than Minor Sixth (except octave)
-    dom(home, fourthSpeciesMelodicIntervals, IntSet({UNISSON, -PERFECT_OCTAVE, -MINOR_SIXTH, -PERFECT_FIFTH, -AUGMENTED_FOURTH, -PERFECT_FOURTH, 
-        -MAJOR_THIRD, -MINOR_THIRD, -MAJOR_SECOND, -MINOR_SECOND, PERFECT_OCTAVE, MINOR_SIXTH, PERFECT_FIFTH, AUGMENTED_FOURTH, PERFECT_FOURTH, 
-        MAJOR_THIRD, MINOR_THIRD, MAJOR_SECOND, MINOR_SECOND}));
+    // Fux Constraint
+    // dom(home, fourthSpeciesMelodicIntervals, IntSet({UNISSON, -PERFECT_OCTAVE, -MINOR_SIXTH, -PERFECT_FIFTH, -AUGMENTED_FOURTH, -PERFECT_FOURTH, 
+    //     -MAJOR_THIRD, -MINOR_THIRD, -MAJOR_SECOND, -MINOR_SECOND, PERFECT_OCTAVE, MINOR_SIXTH, PERFECT_FIFTH, AUGMENTED_FOURTH, PERFECT_FOURTH, 
+    //     MAJOR_THIRD, MINOR_THIRD, MAJOR_SECOND, MINOR_SECOND}));
     
     //no chromatic motion between 3 consecutive notes
     for(int i = 1; i < fourthSpeciesMelodicIntervals.size()-1; i++){
-        BoolVar b1 = BoolVar(home, 0, 1);
-        BoolVar b2 = BoolVar(home, 0, 1);
-        BoolVar b3 = BoolVar(home, 0, 1);
-        BoolVar b4 = BoolVar(home, 0, 1);
+        // Fux Constraint
+        // BoolVar b1 = BoolVar(home, 0, 1);
+        // BoolVar b2 = BoolVar(home, 0, 1);
+        // BoolVar b3 = BoolVar(home, 0, 1);
+        // BoolVar b4 = BoolVar(home, 0, 1);
 
-        rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, 1, Reify(b1));
-        rel(home, m2IntervalsArray[i], IRT_EQ, 2, Reify(b2));
-        rel(home, b1, BOT_AND, b2, 0);
+        // rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, 1, Reify(b1));
+        // rel(home, m2IntervalsArray[i], IRT_EQ, 2, Reify(b2));
+        // rel(home, b1, BOT_AND, b2, 0);
 
-        rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, -1, Reify(b3));
-        rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
-        rel(home, b3, BOT_AND, b4, 0);
+        // rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, -1, Reify(b3));
+        // rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
+        // rel(home, b3, BOT_AND, b4, 0);
     }
     
     //4.M1 Arsis half notes should be the same as their next halves in thesis
+    // Fux Constraint
     for(int i = 0; i < snycopeCostArray.size(); i++){
-        rel(home, (isNoSyncopeArray[i]==1) >> (snycopeCostArray[i]==syncopationCost));
-        rel(home, (isNoSyncopeArray[i]==0) >> (snycopeCostArray[i]==0));
+        // rel(home, (isNoSyncopeArray[i]==1) >> (snycopeCostArray[i]==syncopationCost));
+        // rel(home, (isNoSyncopeArray[i]==0) >> (snycopeCostArray[i]==0));
     }
     
     //4.M2 notes and two beats further are preferred to be different
+    // Fux Constraint
     for(int i = 0; i < m2ZeroArray.size(); i++){
-        rel(home, (fourthSpeciesNotesCp[(i*2)]==fourthSpeciesNotesCp[(i*2)+4]) >> (m2ZeroArray[i]==m2ZeroCost));
-        rel(home, (fourthSpeciesNotesCp[(i*2)]!=fourthSpeciesNotesCp[(i*2)+4]) >> (m2ZeroArray[i]==0));
+        // rel(home, (fourthSpeciesNotesCp[(i*2)]==fourthSpeciesNotesCp[(i*2)+4]) >> (m2ZeroArray[i]==m2ZeroCost));
+        // rel(home, (fourthSpeciesNotesCp[(i*2)]!=fourthSpeciesNotesCp[(i*2)+4]) >> (m2ZeroArray[i]==0));
     }
     
     //4.P1
-    for(int i = 1; i < nMeasures-1; i++){
-        //rel(home, (isConsonance[(i*4)]==0) >> ((fourthSpeciesMelodicIntervals[(i*2)+1]==-MINOR_SECOND) || 
+    // Fux Constraint
+    for(int i = 1; i < nMeasures-2; i++){
+        // rel(home, (isConsonance[(i*4)]==0) >> ((fourthSpeciesMelodicIntervals[(i*2)+1]==-MINOR_SECOND) || 
         //    (fourthSpeciesMelodicIntervals[(i*2)+1]==-MAJOR_SECOND)));
     }
 
     //4.P2
+    // Fux Constraint
     for(int i = 0; i < nMeasures-1; i++){
-        BoolVar buni = BoolVar(home, 0, 1);
-        BoolVar band = BoolVar(home, 0, 1);
-        rel(home, fourthSpeciesHIntervals[(i*2)], IRT_EQ, UNISSON, buni);
-        rel(home, expr(home, !c->getIsNotLowest()[i]), BOT_AND, buni, band);
-        rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 1, Reify(band, RM_IMP));
-        rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 2, Reify(band, RM_IMP));
+        // BoolVar buni = BoolVar(home, 0, 1);
+        // BoolVar band = BoolVar(home, 0, 1);
+        // rel(home, fourthSpeciesHIntervals[(i*2)], IRT_EQ, UNISSON, buni);
+        // rel(home, expr(home, !c->getIsNotLowest()[i]), BOT_AND, buni, band);
+        // rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 1, Reify(band, RM_IMP));
+        // rel(home, fourthSpeciesHIntervals[i*2], IRT_NQ, 2, Reify(band, RM_IMP));
     }
     
 }   
 
+/**
+ * 2 VOICES CONSTRUCTOR
+ */
 FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
     
     //4.H2 : If the 4th species is the lowest stratum, then no hamonic seventh
+    // Fux Constraint
     for(int j = 1; j < getIsNotLowest().size(); j++){
-        rel(home, (getIsNotLowest()[j]==0) >> (fourthSpeciesHIntervals[(j*2)-1]!=MINOR_SEVENTH && fourthSpeciesHIntervals[(j*2)-1]!=-MINOR_SEVENTH));
-        rel(home, (getIsNotLowest()[j]==0) >> (fourthSpeciesHIntervals[(j*2)-1]!=MAJOR_SEVENTH && fourthSpeciesHIntervals[(j*2)-1]!=-MAJOR_SEVENTH));
+        // rel(home, (getIsNotLowest()[j]==0) >> (fourthSpeciesHIntervals[(j*2)-1]!=MINOR_SEVENTH && fourthSpeciesHIntervals[(j*2)-1]!=-MINOR_SEVENTH));
+        // rel(home, (getIsNotLowest()[j]==0) >> (fourthSpeciesHIntervals[(j*2)-1]!=MAJOR_SEVENTH && fourthSpeciesHIntervals[(j*2)-1]!=-MAJOR_SEVENTH));
     }
 
     //4.H3 Penult note condition
-    rel(home,(isNotLowest[isNotLowest.size()-2]==1) >> (expr(home, abs(fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-3]))==MINOR_SEVENTH ||
-        expr(home, abs(fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-3]))==MAJOR_SEVENTH));
+    // Fux Constraint
+    // rel(home,(isNotLowest[isNotLowest.size()-2]==1) >> (expr(home, abs(fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-3]))==MINOR_SEVENTH ||
+    //     expr(home, abs(fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-3]))==MAJOR_SEVENTH));
     
     //Must start with a perfect consonance (since 1.H2 applies to the first note, which is most likely a rest in 4th species)
+    // Fux Constraint
     dom(home, fourthSpeciesHIntervals[0], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));
 
     costs = IntVarArray(home, 6, 0, 1000000);
@@ -233,6 +247,9 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     add_cost(home, 5, snycopeCostArray, costs);
 }
 
+/**
+ * 3 VOICES CONSTRUCTOR
+ */
 FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2):
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
@@ -240,10 +257,11 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
 
     //4.P5 -- after careful testing, Fux does not seem to follow this rule in many of his examples. Suspended for now, but implementation left in case the decision is taken to reactivate it. 
+    // Fux Constraint
     // for(int j = 1; j < nMeasures-1; j++){
-        //rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
-        //    || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||
-        //    expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SEVENTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SEVENTH));
+    //     rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
+    //        || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||
+    //        expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SEVENTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SEVENTH));
     // }
 
     costs = IntVarArray(home, 7, 0, 1000000);
@@ -266,6 +284,9 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     
 }
 
+/**
+ * 4 VOICES CONSTRUCTOR
+ */
 FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
     FourthSpeciesCounterpoint(home, nMes, cf, lb, ub, FOURTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
@@ -273,10 +294,11 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
 
     //4.P5 -- after careful testing, Fux does not seem to follow this rule in many of his examples. Suspended for now, but implementation left in case the decision is taken to reactivate it. 
+    // Fux Constraint
     // for(int j = 1; j < nMeasures-1; j++){
-        //rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
-        //    || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||
-        //    expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SEVENTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SEVENTH));
+    //     rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
+    //        || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||
+    //        expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SEVENTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SEVENTH));
     // }
 
     costs = IntVarArray(home, 7, 0, 1000000);
@@ -298,7 +320,11 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     add_cost(home, 6, varietyCostArray, costs);
 }
 
-/**
+/** j < nMeasures-1; j++){
+    //     rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
+    //        || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||
+    //        expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SEVENTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SEVENTH));
+    // }
  * This function returns a string with the characteristics of the counterpoint. It calls the to_string() method from
  * the Part class and adds 1st species specific characteristics.
  * @return a string representation of the current instance of the FirstSpeciesCounterpoint class.

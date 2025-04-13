@@ -33,10 +33,9 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         rel(home, secondSpeciesMelodicIntervals[i], IRT_EQ, expr(home, secondSpeciesNotesCp[i+1] - secondSpeciesNotesCp[i]));
     rel(home, secondSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),m_intervals_brut.size()));
 
-    secondSpeciesArsisArray = IntVarArray(home, firstSpeciesMelodicIntervals.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
-
+    secondSpeciesArsisArray = IntVarArray(home, firstSpeciesMelodicIntervals.size(), -MAX_STEP, MAX_STEP);
     for(int i = 0; i < secondSpeciesArsisArray.size()-1; i++){
-        rel(home, secondSpeciesArsisArray[i], IRT_EQ, expr(home, secondSpeciesNotesCp[(i*2)+3]-secondSpeciesNotesCp[(i*2)+1]));
+        rel(home, secondSpeciesArsisArray[i], IRT_EQ, expr(home, (secondSpeciesNotesCp[(i*2)+3]-secondSpeciesNotesCp[(i*2)+1]))); // modified by Tom Lai
     }
     rel(home, secondSpeciesArsisArray[secondSpeciesArsisArray.size()-1], IRT_EQ, expr(home, secondSpeciesNotesCp[secondSpeciesNotesCp.size()-2]-
         secondSpeciesNotesCp[secondSpeciesNotesCp.size()-1]));
@@ -113,13 +112,16 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     /// Constraints
 
     // 2.H2 : Arsis harmonies cannot be dissonant except if there is a diminution.
-    H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
+    // Fux Constraint
+    // H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
     
     //2.M1
-    M1_2_octaveLeap(home, this, low);
+    // Fux Constraint
+    // M1_2_octaveLeap(home, this, low);
 
     //2.P2 : battuta adapted
-    P3_2_noBattuta(home, this);
+    // Fux Constraint   
+    // P3_2_noBattuta(home, this);
 
 }
 
@@ -134,12 +136,15 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult"};
 
     // 2.H3 : penult cost
-    H3_2_penultimateNoteDomain(home, this);
+    // Fux Constraint
+    // H3_2_penultimateNoteDomain(home, this);
     //can do better than this?
-    M2_2_2v_twoConsecutiveNotesAreNotTheSame(home, this);
+    // Fux Constraint
+    // M2_2_2v_twoConsecutiveNotesAreNotTheSame(home, this);
 
     //2.P1 : adapted no direct motion rule from first species to real motions
-    P1_2_2v_noDirectMotionFromPerfectConsonance(home, this);
+    // Fux Constraint
+    // P1_2_2v_noDirectMotionFromPerfectConsonance(home, this);
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);
@@ -169,9 +174,11 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
 
     // 2.H3 : penult cost
-    H3_2_penultimateNoteDomain(home, this);
+    // Fux Constraint
+    // H3_2_penultimateNoteDomain(home, this);
     //P1 3 voices version
-    P1_2_3v_noDirectMotionFromPerfectConsonance(home, this);
+    // Fux Constraint
+    // P1_2_3v_noDirectMotionFromPerfectConsonance(home, this);
 
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "penult"};
     //need to set cost[0] to be off cost
@@ -208,9 +215,11 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, 2, directMoveCost}));
 
     // 2.H3 : penult cost
-    H3_2_penultimateNoteDomain(home, this);
+    // Fux Constraint
+    // H3_2_penultimateNoteDomain(home, this);
     //P1 4 voices version
-    P1_2_4v_noDirectMotionFromPerfectConsonance(home, this);
+    // Fux Constraint
+    // P1_2_4v_noDirectMotionFromPerfectConsonance(home, this);
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), fifthCostArray.size())), costs);

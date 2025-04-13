@@ -22,10 +22,27 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string arg = argv[1];
-    if (arg == "figs") {
+    string arg1 = argv[1];
+    if (arg1 == "figs") {
         FigureTests figureTests;
-        figureTests.run_all_tests();
+        if (argc > 2) {
+            string arg2 = argv[2];
+            if (arg2 == "2v") {
+                figureTests.run_twoVoice_tests();
+            } else if (arg2 == "3v") {
+                figureTests.run_threeVoice_tests();
+            } else if (arg2 == "4v") {
+                figureTests.run_fourVoice_tests();
+            } else if (arg2 == "4sp") {
+                figureTests.run_fourthSpecies_tests();
+            }
+            else {
+                std::cout << "Invalid argument: " << arg2 << std::endl;
+                return 1;
+            }
+        } else {
+            figureTests.run_all_tests();
+        }
         return 0;
     }
 

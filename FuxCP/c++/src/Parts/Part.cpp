@@ -124,7 +124,7 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     isNotLowest.update(home, s.isNotLowest);
     isHighest.update(home, s.isHighest);
 
-    firstSpeciesHarmonicIntervals.update(home, s.firstSpeciesHarmonicIntervals);
+    firstSpeciesHarmonicIntervals.update(home, s.firstSpeciesHarmonicIntervals); // Interval for the first note of each measure
     firstSpeciesNotesCp.update(home, s.firstSpeciesNotesCp);
     firstSpeciesMelodicIntervals.update(home, s.firstSpeciesMelodicIntervals);
     firstSpeciesMotions.update(home, s.firstSpeciesMotions);
@@ -137,7 +137,7 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     secondSpeciesRealMotions.update(home, s.secondSpeciesRealMotions);
 
     is5QNArray.update(home, s.is5QNArray);
-    thirdSpeciesHarmonicIntervals.update(home, s.thirdSpeciesHarmonicIntervals);
+    thirdSpeciesHarmonicIntervals.update(home, s.thirdSpeciesHarmonicIntervals); // Interval for the each measure
     thirdSpeciesMelodicIntervals.update(home, s.thirdSpeciesMelodicIntervals);
     cambiataCostArray.update(home, s.cambiataCostArray);
 

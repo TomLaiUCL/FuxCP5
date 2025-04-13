@@ -3332,7 +3332,7 @@ void FuxTest::test_2v_2sp_fig44(){
     cout << "Start test_2v_2sp_fig44" << endl;
     spList = {SECOND_SPECIES};
     cantusFirmus = {60,64,65,67,64,69,67,64,65,64,62,60}; 
-    cp =           {-1,60,72,71,69,74,71,67,72,71,69,72,76,74,72,69,74,69,72,60,67,71,72};
+    cp =           {-1,67,72,71,69,74,71,69,67,71,72,74,76,74,72,71,69,71,72,67,69,71,72};
     v_type = {1};
     borrowMode = 1;
     test_configuration();
@@ -3680,7 +3680,7 @@ void FuxTest::test_3v_3sp_fig133(){
 void FuxTest::test_3v_4sp_fig150(){
     cout << "Start test_3v_4sp_fig150" << endl;
     spList = {FOURTH_SPECIES, FIRST_SPECIES};
-    cantusFirmus =  {65,67,69,65,62,64,65,72,69,65,67,65}; //1sp 2v cf
+    cantusFirmus =  {65,67,69,65,62,64,65,72,69,65,67,65};
     cp =            {69,71,72,69,65,67,69,67,72,69,70,69,
                     65,65,64,64,60,60,57,57,62,62,60,60,65,65,64,64,60,60,65,65,64,65};
     v_type = {0, -3};

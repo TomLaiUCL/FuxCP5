@@ -12,7 +12,7 @@
 FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Species mSpecies, Stratum* low, CantusFirmus* c,
      int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
         Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm) { /// super constructor
-
+    
     motherSpecies =         mSpecies;
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
@@ -113,21 +113,25 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// General rules
 
     //G4 : 
-    G4_counterpointMustBeInTheSameKey(home, this);
+    // Fux Constraint
+    // G4_counterpointMustBeInTheSameKey(home, this);
 
     // G7 : melodic intervals should be small (works for 1st, 2nd and 3rd species)
-    G7_melodicIntervalsShouldBeSmall(home, this, motherSpecies);
+    // Fux Constraint
+    // G7_melodicIntervalsShouldBeSmall(home, this, motherSpecies);
     
     /// Harmonic rules
     /// H1 from Thibault: All harmonic intervals must be consonances
-    H1_1_harmonicIntervalsAreConsonances(home, this);
+    // Fux Constraint
+    // H1_1_harmonicIntervalsAreConsonances(home, this);
     
     //H2 and H3 are found in the TwoVoiceCounterpoint class, since these rules are 2 voice specific
 
     // H4 : applied as rule G9 in the Two, Three and FourVoice Counterpointproblem
 
     // H6 from Thibault : Imperfect consonances are preferred
-    H6_1_preferImperfectConsonances(home, this);
+    // Fux Constraint
+    // H6_1_preferImperfectConsonances(home, this);
 }
 
 /**
@@ -141,19 +145,23 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
 
     //H7,H8 from Thibault : penultimate note major sixth or minor third
-    H7_1_2v_penultimateSixthOrThird(home, this);
+    // Fux Constraint
+    // H7_1_2v_penultimateSixthOrThird(home, this);
 
     //1.M2 from Thibault: Melodic intervals cannot exceed a minor sixth
-    M1_1_2v_melodicIntervalsNotExceedMinorSixth(home, this);
+    // Fux Constraint
+    // M1_1_2v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     // Motion rules
     //1.P1 from Thibault : Perfect consonances cannot be reached by direct motion
-    P1_1_2v_noDirectMotionFromPerfectConsonance(home, this);
+    // Fux Constraint
+    // P1_1_2v_noDirectMotionFromPerfectConsonance(home, this);
 
     //P2 from Thibault : already done when creating motions array
     
     //P3 from Thibault : no battuta
-    P3_1_noBattuta(home, this);
+    // Fux Constraint
+    // P3_1_noBattuta(home, this);
 
     costs = IntVarArray(home, 5, 0, 1000000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow"};
@@ -184,16 +192,20 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, directMoveCost}));
 
     //1.H7 -- after careful testing, this constraint does not work Fux's examples
-    //H7_1_3v_penultimateSixthOrThird(home, this);
+    // Fux Constraint
+    // H7_1_3v_penultimateSixthOrThird(home, this);
    
     //1.M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
-    M1_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
+    // Fux Constraint
+    // M1_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     //1.P1
-    P1_1_3v_noDirectMotionFromPerfectConsonance(home, this);
+    // Fux Constraint
+    // P1_1_3v_noDirectMotionFromPerfectConsonance(home, this);
 
     //1.P3 from Thibault : no battuta
-    P3_1_noBattuta(home, this);
+    // Fux Constraint
+    // P3_1_noBattuta(home, this);
 
     costs = IntVarArray(home, 7, 0, 1000000);
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct"};
@@ -227,13 +239,16 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     directCostArray = IntVarArray(home, firstSpeciesMotions.size()-1,IntSet({0, 2, directMoveCost}));
     
     /// M2 from Thibault: Melodic intervals cannot exceed a minor sixth (also include octave?)
-    M1_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
+    // Fux Constraint
+    // M1_1_3v_melodicIntervalsNotExceedMinorSixth(home, this);
 
     //P1 4 voices version
-    P1_1_4v_noDirectMotionFromPerfectConsonance(home, this);
+    // Fux Constraint
+    // P1_1_4v_noDirectMotionFromPerfectConsonance(home, this);
 
     //P3 from Thibault : no battuta
-    P3_1_noBattuta(home, this);
+    // Fux Constraint
+    // P3_1_noBattuta(home, this);
 
     costs = IntVarArray(home, 7, 0, 1000000);
     cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct"};
