@@ -35,6 +35,8 @@ int main(int argc, char* argv[]) {
                 figureTests.run_fourVoice_tests();
             } else if (arg2 == "4sp") {
                 figureTests.run_fourthSpecies_tests();
+            } else if (arg2 == "MUS") {
+                figureTests.MUSTest();
             }
             else {
                 std::cout << "Invalid argument: " << arg2 << std::endl;

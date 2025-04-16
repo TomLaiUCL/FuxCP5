@@ -28,27 +28,32 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     counterpoint_3 = nullptr;
     
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
-    // Fux Constraint
-    // G6_noChromaticMelodies(*this, counterpoint_1, species);
+    if (activeConstraints[V2_G6]) {
+        G6_noChromaticMelodies(*this, counterpoint_1, species);
+    }
 
     // 1.H4 (G9)
-    // Fux Constraint
-    // G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+    if (activeConstraints[V2_G9]) {
+        G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+    }
 
     /// H2 from Thibault: The first harmonic interval must be a perfect consonance
-    if(species!=FIFTH_SPECIES){
+    if (activeConstraints[V2_1H2]) {
         //we check for fifth species since it always starts with a break, so it doesn't make sense to apply the constraint in this case
-        // Fux Constraint
-        // H2_1_startWithPerfectConsonance(*this, counterpoint_1);
+        if(species!=FIFTH_SPECIES){
+            H2_1_startWithPerfectConsonance(*this, counterpoint_1);
+        } 
     }
 
     /// H3 from Thibault: The last harmonic interval must be a perfect consonance
-    // Fux Constraint
-    // H3_1_endWithPerfectConsonance(*this, counterpoint_1);
+    if (activeConstraints[V2_1H3]) {
+        H3_1_endWithPerfectConsonance(*this, counterpoint_1);
+    }
 
     // H5 from Thibault : The cp and the cf cannot play the same note
-    // Fux Constraint
-    // H5_1_cpAndCfDifferentNotes(*this, counterpoint_1, cantusFirmus);
+    if (activeConstraints[V2_1H5]) {
+        H5_1_cpAndCfDifferentNotes(*this, counterpoint_1, cantusFirmus);
+    }
 
     setStrata();
 

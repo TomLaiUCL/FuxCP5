@@ -16,6 +16,9 @@ private:
     int borrowMode;
     void test_configuration();
     std::vector<CounterpointProblem*> get_all_solutions();
+    bool is_unsat(const set<int>& cons_set);
+    set<int> minimize (const std::set<int>& activeCons);
+    void findAllMUSes();
 
 public:
     FigureTests();
@@ -118,6 +121,8 @@ public:
     void run_threeVoice_tests();
     void run_fourVoice_tests();
     void run_fourthSpecies_tests();
+
+    void MUSTest();
 };
 
 #endif // FIGURE_TESTS_HPP 

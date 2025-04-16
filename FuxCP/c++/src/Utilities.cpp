@@ -5,6 +5,15 @@
 
 #include "../headers/Utilities.hpp"
 
+vector<bool> activeConstraints = std::vector<bool>(constraintNames.size(), false);
+
+string get_constraint_name(int constraint) {
+    if (constraint < 0 || constraint >= constraintNames.size()) {
+        return "Unknown constraint";
+    }
+    return constraintNames[constraint];
+}
+
 /**
  * For a given set of intervals between notes that loops and a starting note, returns all the possible notes
  * @param note the starting note

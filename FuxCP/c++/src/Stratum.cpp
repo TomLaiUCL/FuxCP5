@@ -21,31 +21,32 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes) :
 Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, int nV) : Stratum(home, nMes, lb, ub, lowestNotes){
 
     //1.H3 (formerly G8) Last chord can only consist of notes of the harmonic triad
-    // Fux Constraint
-    // dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
+    if (activeConstraints[STRATUM_UPPER_1H3]) {
+        dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
+    }
 
     //H10 No tenths in last chord
-    // cout << "Lowest notes size : " << lowestNotes.size() << endl;
-    // cout << "Notes size : " << notes.size() << endl;
-    // cout << "absolute interval: " << h_intervals[h_intervals.size()-1] << endl;
-    // Fux Constraint
-    // rel(home, ((notes[notes.size()-1]-lowestNotes[lowestNotes.size()-1])>12) >> (expr(home, abs(h_intervals[h_intervals.size()-1]))!=MINOR_THIRD && 
-    //     expr(home, abs(h_intervals[h_intervals.size()-1]))!=MAJOR_THIRD));
-
+    if (activeConstraints[STRATUM_UPPER_1H10]) {
+        rel(home, ((notes[notes.size()-1]-lowestNotes[lowestNotes.size()-1])>12) >> (expr(home, abs(h_intervals[h_intervals.size()-1]))!=MINOR_THIRD && 
+            expr(home, abs(h_intervals[h_intervals.size()-1]))!=MAJOR_THIRD));
+    }
+    
     //H12 Last chord cannot include a minor third
-    // Fux Constraint
-    // rel(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IRT_NQ, 3);
-
+    if (activeConstraints[STRATUM_UPPER_1H12]) {
+        rel(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IRT_NQ, 3);
+    }
 }
 
 Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, int nV1, int nV2) : Stratum(home, nMes, lb, ub, lowestNotes){
     //1.H3 (formerly G8) Last chord can only consist of notes of the harmonic triad
-    // Fux Constraint
-    // dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
+    if (activeConstraints[STRATUM_1H3]) {
+        dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
+    }
 
     //H12 Last chord cannot include a minor third
-    // Fux Constraint
-    // rel(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IRT_NQ, 3);
+    if (activeConstraints[STRATUM_1H12]) {
+        rel(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IRT_NQ, 3);
+    } 
 }
 
 

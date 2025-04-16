@@ -40,49 +40,60 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
         triad_with_octave_cost}));
     successiveCostArray = IntVarArray(*this, scc_cz, IntSet({0, counterpoint_1->getSuccCost()}));
 
-    // 1.H4 (G9) last chord must have the same fundamental as the cf (used throughout the composition)
-    // Fux Constraint
-    // G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+    // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
+    if (activeConstraints[V4_G6]) {
+        for(int p = 1; p < parts.size(); p++){
+            G6_noChromaticMelodies(*this, parts[p], sp[p-1]);
+        }
+    }
 
-    for(int p = 1; p < parts.size(); p++){
-        // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
-        // Fux Constraint
-        // G6_noChromaticMelodies(*this, parts[p], sp[p-1]);
+    // 1.H4 (G9) last chord must have the same fundamental as the cf (used throughout the composition)
+    if (activeConstraints[V4_1H4]) {
+        G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
     }
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
-    // Fux Constraint
-    // H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
-
+    if (activeConstraints[V4_1H8]) {
+        H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
+    }
+    
     //M4 variety cost (notes should be as diverse as possible)
-    // Fux Constraint
-    // M2_1_varietyCost(*this, parts);
-
-    //two fifth species counterpoints should be as different as possible
-    // Fux Constraint
-    // twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_3);
+    if (activeConstraints[V4_1M4]) {
+        M2_1_varietyCost(*this, parts);
+    }
     
     //P4 avoid successive perfect consonances
-    // Fux Constraint
-    // P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
+    if (activeConstraints[V4_1P4]) {
+        P4_successiveCost(*this, parts, scc_cz, successiveCostArray, species);
+    }
+    
     
     //P6 : no move in same direction
-    if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES&&counterpoint_3->getSpecies()!=FOURTH_SPECIES){
-        // Fux Constraint
-        // P6_noMoveInSameDirection(*this, parts);
+    if (activeConstraints[V4_1P6]) {
+        if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES&&counterpoint_3->getSpecies()!=FOURTH_SPECIES){
+            P6_noMoveInSameDirection(*this, parts);
+        }
     }
     
     //P7 : no suxxessive ascending sixths
-    // Fux Constraint
-    // P7_noSuccessiveAscendingSixths(*this, parts);
+    if (activeConstraints[V4_1P7]) {
+        P7_noSuccessiveAscendingSixths(*this, parts);
+    }
 
     //2.M2, have to write it here since it has a weird interaction with the third species
-    // Fux Constraint
-    // M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
+    if (activeConstraints[V4_2M2]) {
+        M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
+    }
 
+    //two fifth species counterpoints should be as different as possible
+    if (activeConstraints[V4_U1]) {
+        twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_3);
+    }
+    
     //no minor second interval between upper
-    // Fux Constraint
-    // noMinorSecondBetweenUpper(*this, parts);
+    if (activeConstraints[V4_U2]) {
+        noMinorSecondBetweenUpper(*this, parts);
+    }
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size() + 
         counterpoint_3->getBranchingNotes().size(), 0, 127);

@@ -51,40 +51,48 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
     }
 
     // 1.H1 cf version (commented by Tom Lai)
-    // Fux Constraint
-    // dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
-    //     -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
-
+    if (activeConstraints[CF_1H1]) {
+        dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
+    }
+    
     if(nV==TWO_VOICES){
-        /// H2 from Thibault: The first harmonic interval must be a perfect consonance
-        // Fux Constraint
-        // dom(home, h_intervals[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
+        /// 1.H2 from Thibault: The first harmonic interval must be a perfect consonance
+        if (activeConstraints[CF_1H2_2V]) {
+            dom(home, h_intervals[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
+        }
 
-        /// H3 from Thibault: The last harmonic interval must be a perfect consonance
-        // Fux Constraint
-        // dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
+        /// 1.H3 from Thibault: The last harmonic interval must be a perfect consonance
+        if (activeConstraints[CF_1H3_2V]) {
+            dom(home, h_intervals[h_intervals.size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
+        }
         
         //H7,H8 cf version
-        // Fux Constraint
-        // rel(home, h_intervals[h_intervals.size()-2], IRT_EQ, MINOR_THIRD, Reify(isNotLowest[isNotLowest.size()-2], RM_IMP));
+        if (activeConstraints[CF_1H7_2V]) {
+            rel(home, h_intervals[h_intervals.size()-2], IRT_EQ, MINOR_THIRD, Reify(isNotLowest[isNotLowest.size()-2], RM_IMP));
+        } 
+        
 
         //P1 from Thibault : Perfect consonances cannot be reached by direct motion
-        for(int j = 0; j < motions.size(); j++){
-            // Fux Constraint
-            // rel(home, ((h_intervals[j+1]==UNISSON || h_intervals[j+1]==PERFECT_FIFTH)&&isNotLowest[j+1]==1) >>
-            //     (motions[j]!=PARALLEL_MOTION));
-
+        if (activeConstraints[CF_1P1]) {
+            for(int j = 0; j < motions.size(); j++){
+                rel(home, ((h_intervals[j+1]==UNISSON || h_intervals[j+1]==PERFECT_FIFTH)&&isNotLowest[j+1]==1) >>
+                    (motions[j]!=PARALLEL_MOTION));
+            }
         }
+
     } else {
         //H7,H8 cf version, 3v adapted
-        // Fux Constraint
-        // rel(home, expr(home, abs(h_intervals[h_intervals.size()-2]))==UNISSON||expr(home, abs(h_intervals[h_intervals.size()-2]))==MINOR_THIRD
-        //     ||expr(home, abs(h_intervals[h_intervals.size()-2]))==PERFECT_FIFTH||expr(home, abs(h_intervals[h_intervals.size()-2]))==MAJOR_SIXTH);
+        if (activeConstraints[CF_1H7_3V]) {
+            rel(home, expr(home, abs(h_intervals[h_intervals.size()-2]))==UNISSON||expr(home, abs(h_intervals[h_intervals.size()-2]))==MINOR_THIRD
+                ||expr(home, abs(h_intervals[h_intervals.size()-2]))==PERFECT_FIFTH||expr(home, abs(h_intervals[h_intervals.size()-2]))==MAJOR_SIXTH);
+        }
     }
 
     //No battuta
-    // Fux Constraint
-    // P3_0_noBattuta(home, this);
+    if (activeConstraints[CF_1P3]) {
+        P3_0_noBattuta(home, this);
+    }
 }
 
 string CantusFirmus::to_string() const {
