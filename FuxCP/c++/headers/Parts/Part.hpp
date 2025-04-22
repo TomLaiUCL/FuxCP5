@@ -84,6 +84,8 @@ class Part : public Voice {
         int obliqueCost;
         int contraryCost;
 
+        int H1_1_cost;
+
         //First Species specific variables
         IntVarArray firstSpeciesNotesCp;
         IntVarArray firstSpeciesHarmonicIntervals;

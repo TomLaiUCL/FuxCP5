@@ -50,10 +50,29 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         rel(home, (isNotLowest[i]==0) >> (motions[i]==-1));
     }
 
+    disCostArray = IntVarArray(home, notes.size(), IntSet{0, H1_1_cost});
+
     // 1.H1 cf version (commented by Tom Lai)
     if (activeConstraints[CF_1H1]) {
-        dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
-            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
+        // dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+        //     -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
+
+        // Define the set of consonant intervals
+        IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
+
+        // Loop through each harmonic interval
+        for (size_t i = 0; i < h_intervals.size(); i++) {
+            // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
+            BoolVar isConsonant(home, 0, 1);
+            dom(home, h_intervals[i], consonantIntervals, isConsonant);
+
+            // If the interval is consonant, set disCostArray[i] to 0
+            rel(home, isConsonant >> (disCostArray[i] == 0));
+
+            // Otherwise, set disCostArray[i] to H1_1_cost
+            rel(home, !isConsonant >> (disCostArray[i] == H1_1_cost));
+        }
     }
     
     if(nV==TWO_VOICES){
@@ -93,6 +112,12 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
     if (activeConstraints[CF_1P3]) {
         P3_0_noBattuta(home, this);
     }
+
+    costs = IntVarArray(home, 1, 0, 10000);
+    cost_names = {"1H1"};
+    //set cost[0] to be 1H1 cost
+    add_cost(home, 0, disCostArray, costs);
+
 }
 
 string CantusFirmus::to_string() const {

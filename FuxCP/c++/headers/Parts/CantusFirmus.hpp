@@ -11,6 +11,7 @@
 class CantusFirmus : public Part {
     protected:
         vector<int> cf_vector;
+        IntVarArray disCostArray;
     public:
         CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
             int nV);

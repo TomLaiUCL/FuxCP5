@@ -52,6 +52,7 @@ Part::Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int 
     obliqueCost = 1;
     contraryCost = 2;
 
+    H1_1_cost = 10;
 }
 
 string Part::to_string() const{
