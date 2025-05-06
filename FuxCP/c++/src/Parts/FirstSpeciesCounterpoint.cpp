@@ -125,7 +125,25 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     /// Harmonic rules
     /// H1 from Thibault: All harmonic intervals must be consonances
     if (activeConstraints[SP1_1H1]) {
-        H1_1_harmonicIntervalsAreConsonances(home, this);
+        // H1_1_harmonicIntervalsAreConsonances(home, this);
+        disCostArray = IntVarArray(home, notes.size(), IntSet{0, H1_1_cost});
+        // Define the set of consonant intervals
+        IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
+
+        // Loop through each harmonic interval
+        for (size_t i = 0; i < h_intervals.size(); i++) {
+            // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
+            BoolVar isConsonant(home, 0, 1);
+            dom(home, h_intervals[i], consonantIntervals, isConsonant);
+
+            // If the interval is consonant, set disCostArray[i] to 0
+            rel(home, isConsonant >> (disCostArray[i] == 0));
+
+            // Otherwise, set disCostArray[i] to H1_1_cost
+            rel(home, !isConsonant >> (disCostArray[i] == H1_1_cost));
+        }
+
     }
     
     //H2 and H3 are found in the TwoVoiceCounterpoint class, since these rules are 2 voice specific

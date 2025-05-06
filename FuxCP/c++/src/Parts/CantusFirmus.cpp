@@ -50,13 +50,13 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         rel(home, (isNotLowest[i]==0) >> (motions[i]==-1));
     }
 
-    disCostArray = IntVarArray(home, notes.size(), IntSet{0, H1_1_cost});
+    
 
     // 1.H1 cf version (commented by Tom Lai)
     if (activeConstraints[CF_1H1]) {
         // dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
         //     -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
-
+        disCostArray = IntVarArray(home, notes.size(), IntSet{0, H1_1_cost});
         // Define the set of consonant intervals
         IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
             -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});

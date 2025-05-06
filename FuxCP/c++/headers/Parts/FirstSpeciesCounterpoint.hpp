@@ -19,6 +19,7 @@ class FirstSpeciesCounterpoint : public Part{
 protected:
     Species motherSpecies;                          /// The species from which this is called.
     CantusFirmus* cantus;
+    IntVarArray disCostArray;
 public:
     /**
      * General constructor. It takes the mother species as an argument and calls the super constructor from the part class.
