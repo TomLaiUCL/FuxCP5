@@ -24,7 +24,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     }
     
     
-    thirdSpeciesMelodicIntervals = IntVarArray(home, m_intervals_brut.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    thirdSpeciesMelodicIntervals = IntVarArray(home, m_intervals_brut.size(), -MAX_STEP, MAX_STEP);
     
     for(int i = 0; i < thirdSpeciesMelodicIntervals.size(); i++)
         rel(home, thirdSpeciesMelodicIntervals[i], IRT_EQ, expr(home, thirdSpeciesNotesCp[i+1] - thirdSpeciesNotesCp[i]));

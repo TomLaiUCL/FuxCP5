@@ -13,8 +13,10 @@ private:
     std::vector<int> general_params;
     std::vector<int> specific_params;
     std::vector<int> importance;
+    std::vector<int> notesSpeciesFor5sp; // species for each notes in the 5th species
     int borrowMode;
     void test_configuration();
+    CounterpointProblem* set_configuration();
     std::vector<CounterpointProblem*> get_all_solutions();
     bool is_unsat(const set<int>& cons_set);
     set<int> minimize (const std::set<int>& activeCons);
@@ -53,7 +55,9 @@ public:
     void test_2v_4sp_fig78();
 
     // Two voice fifth species figures
-    void test_2v_5sp_fig86_1();
+    void test_2v_5sp_fig82();
+    void test_2v_5sp_fig83();
+    void test_2v_5sp_fig87_1();
     
     // Three voice first species figures
     void test_3v_1sp_fig108();
@@ -89,6 +93,12 @@ public:
     void test_3v_4sp_fig149();
     void test_3v_4sp_fig150();
     void test_3v_4sp_fig151();
+
+    // Three voice fifth species figures
+    void test_3v_5sp_fig154();
+    void test_3v_5sp_fig155();
+    void test_3v_5sp_fig156();
+    void test_3v_5sp_fig157();
     
     // Four voice first species figures
     void test_4v_1sp_fig166();
@@ -114,13 +124,22 @@ public:
     // Four voice fourth species figures
     void test_4v_4sp_fig196();
 
+    // Four voice fifth species figures
+    void test_4v_5sp_fig200();
+    void test_4v_5sp_fig201();
+
+    // Multispecies figures
+    void test_4v_Xsp_fig204();
+
     // Run all figure tests
     void run_all_tests();
 
     void run_twoVoice_tests();
     void run_threeVoice_tests();
     void run_fourVoice_tests();
+
     void run_fourthSpecies_tests();
+    void run_fifthSpecies_tests();
 
     void MUSTest();
 };

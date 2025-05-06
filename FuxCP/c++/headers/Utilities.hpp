@@ -400,9 +400,32 @@ enum constraints{
     SP4_4H3_2V,
     SP4_1H2_2V,
     SP4_4P5_3V,
-    SP4_4P5_4V
+    SP4_4P5_4V,
+    SP5_H1,
+    SP5_H2,
+    SP5_H3,
+    SP5_H4,
+    SP5_H5,
+    SP5_H6,
+    SP5_M1,
+    SP5_M2,
+    SP5_M3,
+    SP5_M4,
+    SP5_P1,
+    SP5_P2,
+    SP5_P3,
+    SP5_P4,
+    SP5_2V_1,
+    SP5_2V_2,
+    SP5_2V_3,
+    SP5_2V_4,
+    SP5_3V_1,
+    SP5_3V_2,
+    SP5_4V_1,
+    SP5_4V_2
 };
 
+const int consSize = static_cast<int>(SP5_4V_2+1); // Number of constraints
 extern vector<bool> activeConstraints;
                                 
 const vector<string> constraintNames = {
@@ -414,8 +437,9 @@ const vector<string> constraintNames = {
     "SP1_G4", "SP1_G7", "SP1_1H1", "SP1_1H6", "SP1_1H7_2V", "SP1_1M2_2V", "SP1_1P1_2V", "SP1_1P3_2V", "SP1_1H7_3V", "SP1_1M2_3V", "SP1_1P1_3V", "SP1_1P3_3V", "SP1_1M2_4V", "SP1_1P1_4V", "SP1_1P3_4V",
     "SP2_2H2", "SP2_2M1", "SP2_2P3", "SP2_2H3_2V", "SP2_2M2_2V", "SP2_2P1_2V", "SP2_2H3_3V", "SP2_1P1_3V", "SP2_2H3_4V", "SP2_1P1_4V",
     "SP3_3H1", "SP3_3H2", "SP3_3H3", "SP3_3M1", "SP3_1P3", "SP3_U1", "SP3_U2", "SP3_U3", "SP3_3H4_2V", "SP3_1H7_3V", "SP3_3H6_3V", "SP3_1P1_3V", "SP3_1H7_4V", "SP3_3H6_4V", "SP3_1P1_4V",
-    "SP4_G6", "SP4_G7", "SP4_1H6", "SP4_4H1", "SP4_4M1", "SP4_4M2", "SP4_4P1", "SP4_4P2", "SP4_U1", "SP4_U2", "SP4_4H2_2V", "SP4_4H3_2V", "SP4_1H2_2V", "SP4_4P5_3V", "SP4_4P5_4V"
-                                        };
+    "SP4_G6", "SP4_G7", "SP4_1H6", "SP4_4H1", "SP4_4M1", "SP4_4M2", "SP4_4P1", "SP4_4P2", "SP4_U1", "SP4_U2", "SP4_4H2_2V", "SP4_4H3_2V", "SP4_1H2_2V", "SP4_4P5_3V", "SP4_4P5_4V",
+    "SP5_H1", "SP5_H2", "SP5_H3", "SP5_H4", "SP5_H5", "SP5_H6", "SP5_M1", "SP5_M2", "SP5_M3", "SP5_M4", "SP5_P1", "SP5_P2", "SP5_P3", "SP5_P4", "SP5_2V_1", "SP5_2V_2", "SP5_2V_3", "SP5_2V_4", "SP5_3V_1", "SP5_3V_2", "SP5_4V_1", "SP5_4V_2"
+};
 
 /**********************************************
  *                                            *

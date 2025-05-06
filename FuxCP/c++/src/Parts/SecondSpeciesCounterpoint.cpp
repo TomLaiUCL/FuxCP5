@@ -26,7 +26,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     }
 
     /// Melodic intervals for the second species notes
-    secondSpeciesMelodicIntervals = IntVarArray(home, secondSpeciesNotesCp.size()-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    secondSpeciesMelodicIntervals = IntVarArray(home, secondSpeciesNotesCp.size()-1, -MAX_STEP, MAX_STEP);
     
     /// link melodic intervals
     for(int i = 0; i < secondSpeciesMelodicIntervals.size(); i++)

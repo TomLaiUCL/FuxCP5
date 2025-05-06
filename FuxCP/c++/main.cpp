@@ -21,6 +21,12 @@ int main(int argc, char* argv[]) {
         std::cout << "Please provide a test number or 'figs' as argument" << std::endl;
         return 1;
     }
+    if (consSize != constraintNames.size()) {
+        cout << "Error: constraintNames size does not match the number of constraints." << endl;
+        cout << "consSize = " << consSize << endl;
+        cout << "constraintNames.size() = " << constraintNames.size() << endl;
+        return 1;
+    }
 
     string arg1 = argv[1];
     if (arg1 == "figs") {
@@ -35,6 +41,8 @@ int main(int argc, char* argv[]) {
                 figureTests.run_fourVoice_tests();
             } else if (arg2 == "4sp") {
                 figureTests.run_fourthSpecies_tests();
+            } else if (arg2 == "5sp") {
+                figureTests.run_fifthSpecies_tests();
             } else if (arg2 == "MUS") {
                 figureTests.MUSTest();
             }

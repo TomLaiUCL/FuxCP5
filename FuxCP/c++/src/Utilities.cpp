@@ -5,7 +5,7 @@
 
 #include "../headers/Utilities.hpp"
 
-vector<bool> activeConstraints = std::vector<bool>(constraintNames.size(), false);
+vector<bool> activeConstraints = std::vector<bool>(consSize, false);
 
 string get_constraint_name(int constraint) {
     if (constraint < 0 || constraint >= constraintNames.size()) {

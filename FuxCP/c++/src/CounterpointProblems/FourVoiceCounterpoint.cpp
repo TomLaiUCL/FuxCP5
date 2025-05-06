@@ -19,11 +19,11 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 
     //create counterpoints
 
-    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 6) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
+    counterpoint_1 = create_counterpoint(*this, species[0], nMeasures, cf, (6 * v_type[0] - 12) + cf[0], (6 * v_type[0] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[0], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
-    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 6) + cf[0], (6 * v_type[1] + 12) + cf[0], lowest, 
+    counterpoint_2 = create_counterpoint(*this, species[1], nMeasures, cf, (6 * v_type[1] - 12) + cf[0], (6 * v_type[1] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[1], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
-    counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 6) + cf[0], (6 * v_type[2] + 12) + cf[0], lowest, 
+    counterpoint_3 = create_counterpoint(*this, species[2], nMeasures, cf, (6 * v_type[2] - 12) + cf[0], (6 * v_type[2] + 12) + cf[0], lowest, 
         cantusFirmus, v_type[2], m_costs, g_costs, s_costs, bm, FOUR_VOICES);
     
     //create strata

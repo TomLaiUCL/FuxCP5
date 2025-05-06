@@ -10,22 +10,60 @@ FigureTests::FigureTests() {
     general_params = {4, 1, 1, 2, 2, 2, 8, 1};
     specific_params = {8, 4, 0, 2, 1, 8, 50};
     importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+    notesSpeciesFor5sp = {};
 }
 
-std::vector<CounterpointProblem*> FigureTests::get_all_solutions() {
+CounterpointProblem* FigureTests::set_configuration() {
+    // create a new problem
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    // set the solution array
     for (size_t i = 0; i < cp.size(); i++) { 
         int note = cp[i];
         if (note >  0) {
             rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
         }
     }
+    // set the species array for the 5th sepcies counterpoint
+    if (spList[0] == FIFTH_SPECIES) {
+        auto* part = problem->getCounterpoint_1();
+        for (int i = 0; i < notesSpeciesFor5sp.size(); i++) {
+            int sp = notesSpeciesFor5sp[i];
+            if (sp > -1) {
+                rel(problem->getHome(), part->getSpeciesArray()[i], IRT_EQ, sp);
+            }
+            
+        }
+    }
+    if (spList.size() > 1 && spList[1] == FIFTH_SPECIES) {
+        auto* part = problem->getCounterpoint_2();
+        for (int i = 0; i < notesSpeciesFor5sp.size(); i++) {
+            int sp = notesSpeciesFor5sp[i];
+            if (sp > -1) {
+                rel(problem->getHome(), part->getSpeciesArray()[i], IRT_EQ, sp);
+            }
+        }
+    }
+    if (spList.size() > 2 && spList[2] == FIFTH_SPECIES) {
+        auto* part = problem->getCounterpoint_3();
+        for (int i = 0; i < notesSpeciesFor5sp.size(); i++) {
+            int sp = notesSpeciesFor5sp[i];
+            if (sp > -1) {
+                rel(problem->getHome(), part->getSpeciesArray()[i], IRT_EQ, sp);
+            }
+        }
+    }
+    return problem;
+}
+
+std::vector<CounterpointProblem*> FigureTests::get_all_solutions() {
+    CounterpointProblem* problem = set_configuration();
     std::vector<CounterpointProblem*> solutions;
-    DFS<CounterpointProblem> e(problem);
+    BAB<CounterpointProblem> e(problem);
     while (CounterpointProblem* pb = e.next()) {
         cout << "Solution found" << endl;
         solutions.push_back(pb);
         cout << pb->getSolutionArray() << endl;
+        cout << pb->getCounterpoint_1()-> getSpeciesArray() << endl;
         cout << "Solution added" << endl;
     }
     return solutions;
@@ -33,23 +71,14 @@ std::vector<CounterpointProblem*> FigureTests::get_all_solutions() {
 
 void FigureTests::test_configuration() {
     activeConstraints = std::vector<bool>(activeConstraints.size(), false);
-    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-    for (size_t i = 0; i < cp.size(); i++) { 
-        int note = cp[i];
-        if (note >  0) {
-            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
-        }
-    }
+    CounterpointProblem* problem = set_configuration();
     if (!has_solution(problem)) {
         std::cerr   << "\t /!\\ ERROR: It doesn't exist a solution but it should with the following configuration:" << endl;
-    } else {
-        cout << "\t Test passed with the following configuration:" << endl;
+        cout << "\t Cantus firmus: ";
+        printVector(cantusFirmus);
+        cout << "\t Solution array: ";
+        printIntVarArray(problem->getSolutionArray());
     }
-    cout << "\t Cantus firmus: ";
-    printVector(cantusFirmus);
-    cout << "\t Solution array: ";
-    printIntVarArray(problem->getSolutionArray());
-    // cout << problem->getCounterpoint_1()->getBranchingNotes() << endl;
     delete problem;
 }
 
@@ -64,13 +93,7 @@ bool FigureTests::is_unsat(const set<int>& cons_set) {
         activeConstraints[cons] = true;
     }
     // create a new problem and set the solution array
-    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-    for (size_t i = 0; i < cp.size(); i++) { 
-        int note = cp[i];
-        if (note >  0) {
-            rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, note);
-        }
-    }
+    CounterpointProblem* problem = set_configuration();
     // check if the problem is unsatisfiable
     bool unsat = !has_solution(problem);
     delete problem;
@@ -103,7 +126,10 @@ std::set<int> FigureTests::minimize(const std::set<int>& cons_set) {
  * using a breadth-first search algorithm.
  */
 void FigureTests::findAllMUSes() {
-    set<int> cons_set;
+    // Test that the configuration has solutions without constraints desactivated
+    test_configuration();
+    // Initialization
+    set<int> cons_set; // all constraint indices
     for (int i = 0; i < activeConstraints.size(); i++) {
         cons_set.insert(i);
     }
@@ -360,20 +386,92 @@ void FigureTests::test_2v_4sp_fig78() {
     findAllMUSes();
 }
 
-void FigureTests::test_2v_5sp_fig86_1() {
-    cout << "Start test_2v_5sp_fig86_1" << endl;
+void FigureTests::test_2v_5sp_fig82() {
+    cout << "Start test_2v_5sp_fig82" << endl;
     spList = {FIFTH_SPECIES};
-    cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
-    cp =           {64,62,60,58,57,55,53,52,50,48,46,45};
-    v_type = {0};
+    cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =           {-1,-1,69,-1,
+                    69,-1, 64,65,
+                    67,65,64,67,
+                    65,62,74,-1,
+                    74,-1,70,67,
+                    69,71,72,-1,
+                    72,-1,77,-1,
+                    77,-1,76,-1,
+                    76,-1,74,-1,
+                    74,-1,73,-1,
+                    74};
+    notesSpeciesFor5sp = {
+                    -1, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES
+                };
+    v_type = {2};
     borrowMode = 1;
-    std::vector<CounterpointProblem*> solution = get_all_solutions();
-    for (auto& s : solution) {
-        cout << "Solution found" << endl;
-        cout << s->getSolutionArray() << endl;
-        cout << "Solution added" << endl;
-    }
+    findAllMUSes();
+}
 
+void FigureTests::test_2v_5sp_fig83() {
+    cout << "Start test_2v_5sp_fig83" << endl;
+    spList = {FIFTH_SPECIES};
+    cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =           {-1,-1,74,-1,
+                    74,-1,69,71,
+                    72,67,72,-1,
+                    72,-1,71,63,
+                    67,69,71,72,
+                    74,69,74,-1,
+                    74,-1,77,-1,
+                    77,-1,76,-1,
+                    76,-1,74,-1,
+                    74,-1,73,-1,
+                    74};
+    v_type = {2};
+    borrowMode = 1;
+    findAllMUSes();
+}
+
+void FigureTests::test_2v_5sp_fig87_1() {
+    cout << "Start test_2v_5sp_fig87_1" << endl;
+    spList = {FIFTH_SPECIES};
+    cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; 
+    cp =           {-1,-1,69,-1,
+                    69,-1,67,69,
+                    71,67,71,-1,
+                    71,-1,69,71,
+                    72,67,72,-1,
+                    72,-1,71,72,
+                    74,69,74,-1,
+                    74,-1,72,-1,
+                    72,-1,71,-1,
+                    71,-1,69,-1,
+                    69,-1,68,-1,
+                    69};
+    notesSpeciesFor5sp = {
+                    -1, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES
+                };
+    v_type = {2};
+    borrowMode = 1;
+    findAllMUSes();
 }
 
 void FigureTests::test_3v_1sp_fig108(){
@@ -675,6 +773,144 @@ void FigureTests::test_3v_4sp_fig151(){
     findAllMUSes();
 }
 
+void FigureTests::test_3v_5sp_fig154() {
+    cout << "Start test_3v_5sp_fig154" << endl;
+    spList = {FIFTH_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =           {-1,-1,69,-1,
+                    69,-1,69,71,
+                    72,67,72,-1,
+                    72,-1,71,-1,
+                    71,-1,71,73,
+                    74,77,76,74,
+                    72,65,77,-1,
+                    77,-1,76,-1,
+                    76,-1,74,-1,
+                    74,-1,73,-1,
+                    74,
+
+                    62,74,72,67,64,62,65,72,74,69,62};
+    notesSpeciesFor5sp = {
+                        -1, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,
+    };
+    v_type = {2, 2};
+    borrowMode = 1;
+    findAllMUSes();
+}
+
+void FigureTests::test_3v_5sp_fig155() {
+    cout << "Start_test_3v_5sp_fig155" << endl;
+    spList = {FIFTH_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62};
+    cp =           {-1,-1,69,-1,
+                    69,-1,69,71,
+                    72,67,72,-1,
+                    72,-1,71,-1,
+                    71,-1,71,73,
+                    74,69,74,-1,
+                    74,-1,77,-1,
+                    77,-1,76,-1,
+                    76,-1,74,-1,
+                    74,-1,73,-1,
+                    74,
+
+                    50,50,48,55,52,50,53,48,50,57,50};
+    notesSpeciesFor5sp = {
+                        -1, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,
+    };
+    v_type = {2, -2};
+    borrowMode = 1;
+    findAllMUSes();
+}
+
+void FigureTests::test_3v_5sp_fig156() {
+    cout << "Start test_3v_5sp_fig156" << endl;
+    spList = {FIRST_SPECIES, FIFTH_SPECIES};
+    cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =           {69,69,72,71,71,74,72,72,69,67,66,
+                    
+                    -1,-1,50,-1,
+                    50,-1,53,55,
+                    57,52,57,-1,
+                    57,-1,55,53,
+                    52,55,53,52,
+                    50,52,53,-1,
+                    53,-1,53,-1,
+                    53,-1,52,-1,
+                    52,-1,50,-1,
+                    50,-1,49,-1,
+                    50};
+    notesSpeciesFor5sp = {
+                        -1, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES
+    };
+    v_type = {2,-2};
+    borrowMode = 1;
+    findAllMUSes();
+}
+
+void FigureTests::test_3v_5sp_fig157() {
+    cout << "Start test_3v_5sp_fig157" << endl;
+    spList = {FIFTH_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
+    cp =           {-1,-1,76,-1,
+                    76,-1,72,71,
+                    -1,-1,67,65,
+                    -1,-1,69,-1,
+                    69,-1,72,-1,
+                    72,-1,77,-1,
+                    77,-1,76,74,
+                    72,67,72,-1,
+                    72,-1,71,69,
+                    68,
+
+                    64,69,65,69,65,65,72,72,74,76};
+    notesSpeciesFor5sp = {
+                        -1, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                        -1,  -1, THIRD_SPECIES, THIRD_SPECIES,
+                        -1, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                        FOURTH_SPECIES
+    };
+    v_type = {2,2};
+    borrowMode = 1;
+    findAllMUSes();
+}
+
 void FigureTests::test_4v_1sp_fig166() {
     cout << "Start test_4v_1sp_fig166" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
@@ -867,6 +1103,92 @@ void FigureTests::test_4v_4sp_fig196(){
     findAllMUSes();
 }
 
+void FigureTests::test_4v_5sp_fig200(){
+    cout << "Start test_4v_5sp_fig200" << endl;
+    spList = {FIFTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =            {
+                    -1,-1,69,-1,
+                    69,-1,69,71,
+                    72,67,72,-1,
+                    72,-1,71,-1,
+                    71,-1,71,73,
+                    74,69,74,-1,
+                    74,-1,77,-1,
+                    77,-1,76,-1,
+                    76,-1,74,-1,
+                    74,-1,73,-1,
+                    74,
+
+                    69,65,67,67,67,69,69,72,69,69,69,
+                    50,50,48,55,52,50,53,48,50,45,50};
+    notesSpeciesFor5sp = {
+                        -1, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,
+    };
+    v_type = {1, 1, -2};
+    borrowMode = 1;
+    findAllMUSes();
+}
+
+void FigureTests::test_4v_5sp_fig201() {
+    cout << "Start test_4v_5sp_fig201" << endl;
+    spList = {FIFTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; 
+    cp =            {
+                    -1,-1,69,-1,
+                    69,-1,69,71,
+                    72,67,72,-1,
+                    72,-1,71,-1,
+                    71,-1,71,73,
+                    74,62,74,-1,
+                    74,-1,77,-1,
+                    77,-1,76,-1,
+                    76,-1,74,-1,
+                    74,-1,73,-1,
+                    74,           
+
+                    69,65,67,67,67,69,69,72,69,69,69,
+                    50,50,48,55,52,50,53,48,50,45,50};
+    notesSpeciesFor5sp = {
+                        -1, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                        THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES,
+    };
+    v_type = {1, 1, -2};
+    borrowMode = 1;
+    findAllMUSes();
+}
+
+void FigureTests::test_4v_Xsp_fig204() {
+    cout << "Start test_4v_Xsp_fig204" << endl;
+    spList = {SECOND_SPECIES, THIRD_SPECIES, FOURTH_SPECIES};
+    cantusFirmus =  {50,53,52,50,55,53,57,55,53,52,50}; 
+    cp = {  69,74,72,69,71,72,74,62,70,67,69,65,72,69,70,67,69,65,67,64,66,
+            62,64,65,67,69,67,65,69,67,65,64,67,65,62,65,64,62,60,58,62,65,67,69,65,64,62,60,57,62,60,58,55,60,59,57,62,64,52,53,55,57,
+            69,69,74,74,72,72,70,70,74,74,72,72,77,77,76,76,74,74,73,74,};
+    v_type = {2,2,3};
+    borrowMode = 0;
+    findAllMUSes();
+}
+
 void FigureTests::run_twoVoice_tests() {
     cout << "Running two voice tests..." << endl;
     // Two voice first species figures
@@ -895,7 +1217,6 @@ void FigureTests::run_twoVoice_tests() {
     test_2v_4sp_fig77();
     test_2v_4sp_fig78();
     // Two voice fifth species figures
-    test_2v_5sp_fig86_1();
 }
 
 void FigureTests::run_threeVoice_tests() {
@@ -974,6 +1295,20 @@ void FigureTests::run_fourthSpecies_tests() {
     test_3v_4sp_fig151();
     // Four voice fourth species figures
     test_4v_4sp_fig196();
+}
+
+void FigureTests::run_fifthSpecies_tests() {
+    cout << "Running fifth species tests..." << endl;
+    test_2v_5sp_fig82();
+    test_2v_5sp_fig83();
+    test_2v_5sp_fig87_1();
+    test_3v_5sp_fig154();
+    test_3v_5sp_fig155();
+    test_3v_5sp_fig156();
+    test_3v_5sp_fig157();
+    test_4v_5sp_fig200();
+    test_4v_5sp_fig201();
+    test_4v_Xsp_fig204();
 }
 
 void FigureTests::run_all_tests() {

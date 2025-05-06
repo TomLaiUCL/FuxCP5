@@ -45,7 +45,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     }
     
 
-    fifthSpeciesHIntervals = IntVarArray(home, h_intervals.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    fifthSpeciesHIntervals = IntVarArray(home, h_intervals.size(), -MAX_STEP, MAX_STEP);
 
     firstSpeciesHarmonicIntervals = IntVarArray(home, fifthSpeciesHIntervals.slice(0, 4, fifthSpeciesHIntervals.size()));
 
@@ -241,64 +241,77 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */ 
 
     //Only one possible value for non constrained variables
-    for(int i = 0; i < fifthSpeciesNotesCp.size()-1; i++){
-        //rel(home, fifthSpeciesNotesCp[i], IRT_EQ, fifthSpeciesNotesCp[i+1], Reify(isNthSpeciesArray[(i*5)], RM_IMP));
-    }
+    // for(int i = 0; i < fifthSpeciesNotesCp.size()-1; i++){
+    //     //rel(home, fifthSpeciesNotesCp[i], IRT_EQ, fifthSpeciesNotesCp[i+1], Reify(isNthSpeciesArray[(i*5)], RM_IMP));
+    // }
     
     //Third note of penult measure must be below the fourth one
-    rel(home, fifthSpeciesSuccMIntervals[fifthSpeciesSuccMIntervals.size()-3], IRT_GR, MINOR_SECOND, 
+    if (activeConstraints[SP5_H1]) {
+        rel(home, fifthSpeciesSuccMIntervals[fifthSpeciesSuccMIntervals.size()-3], IRT_GR, MINOR_SECOND, 
         Reify(isThirdSpeciesArray[isThirdSpeciesArray.size()-2], RM_IMP));
+    }
     //Second and third note distant by more than one semi tone from fourth note
-    rel(home, expr(home, abs(fifthSpeciesM2Intervals[fifthSpeciesM2Intervals.size()-2])), IRT_NQ, 1, 
-        Reify(isThirdSpeciesArray[isThirdSpeciesArray.size()-2], RM_IMP));
+    if (activeConstraints[SP5_H2]) {
+        rel(home, expr(home, abs(fifthSpeciesM2Intervals[fifthSpeciesM2Intervals.size()-2])), IRT_NQ, 1, 
+            Reify(isThirdSpeciesArray[isThirdSpeciesArray.size()-2], RM_IMP));
+    }
     
     //is penult cons to cf
-    BoolVar isPenultConsToCf = BoolVar(home, 0, 1);
-    vector<int> consonances = {0,3,4,7,8,9,-3,-4,-7,-8,-9};
-    IntVarArray res = IntVarArray(home, consonances.size(), 0, 1);
-    IntVar sm = IntVar(home, 0, consonances.size());
-    for(int l = 0; l < consonances.size(); l++){                          
-        BoolVar b1 = BoolVar(home, 0, 1);
-        rel(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-5], IRT_EQ, consonances[l], Reify(b1)); 
-        ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);           
-    }
-    IntVarArgs x(res.size());
-    for(int t = 0; t < consonances.size(); t++){
-        x[t] = res[t];                                                          
-    }
-    rel(home, sm, IRT_EQ, expr(home, sum(x)));                                     
-    rel(home, sm, IRT_GR, 0, Reify(isPenultConsToCf));                     
+    if (activeConstraints[SP5_H3]) {
+        BoolVar isPenultConsToCf = BoolVar(home, 0, 1);
+        vector<int> consonances = {0,3,4,7,8,9,-3,-4,-7,-8,-9};
+        IntVarArray res = IntVarArray(home, consonances.size(), 0, 1);
+        IntVar sm = IntVar(home, 0, consonances.size());
+        for(int l = 0; l < consonances.size(); l++){                          
+            BoolVar b1 = BoolVar(home, 0, 1);
+            rel(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-5], IRT_EQ, consonances[l], Reify(b1)); 
+            ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);           
+        }
+        IntVarArgs x(res.size());
+        for(int t = 0; t < consonances.size(); t++){
+            x[t] = res[t];                                                          
+        }
+        rel(home, sm, IRT_EQ, expr(home, sum(x)));                                     
+        rel(home, sm, IRT_GR, 0, Reify(isPenultConsToCf));                     
 
-    rel(home, isFourthSpeciesArray[isFourthSpeciesArray.size()-5], BOT_AND, isPenultConsToCf, 0);
+        rel(home, isFourthSpeciesArray[isFourthSpeciesArray.size()-5], BOT_AND, isPenultConsToCf, 0);
+    }
+    
     
     //every thesis note should be consonant
-    for(int i = 0; i < isConsonance.size(); i+=4){ //checks every thesis note
-        rel(home, isNthSpeciesArray[(i*5)+1], BOT_IMP, isConsonance[i], 1); //first species check
-        rel(home, isNthSpeciesArray[(i*5)+2], BOT_IMP, isConsonance[i], 1); //second species check
-        rel(home, isThirdSpeciesArray[i], BOT_IMP, isConsonance[i], 1);     //third species check
-        if(i!=isConsonance.size()-1){
-            //rel(home, isFourthSpeciesArray[i+2], BOT_IMP, isConsonance[i+2], 1);  //fourth species check
+    if (activeConstraints[SP5_H4]) {
+        for(int i = 0; i < isConsonance.size(); i+=4){ //checks every thesis note
+            rel(home, isNthSpeciesArray[(i*5)+1], BOT_IMP, isConsonance[i], 1); //first species check
+            rel(home, isNthSpeciesArray[(i*5)+2], BOT_IMP, isConsonance[i], 1); //second species check
+            rel(home, isThirdSpeciesArray[i], BOT_IMP, isConsonance[i], 1);     //third species check
+            if(i!=isConsonance.size()-1){
+                //rel(home, isFourthSpeciesArray[i+2], BOT_IMP, isConsonance[i+2], 1);  //fourth species check
+            }
+            if(i!=0 && i!=isConsonance.size()-1){
+                //rel(home, expr(home, isFourthSpeciesArray[i]==1 && isNoSyncopeArray[i]==0), BOT_IMP, isConsonance[i],1);
+            }
         }
-        if(i!=0 && i!=isConsonance.size()-1){
-            //rel(home, expr(home, isFourthSpeciesArray[i]==1 && isNoSyncopeArray[i]==0), BOT_IMP, isConsonance[i],1);
+        
+        for(int i = 4; i < isConsonance.size()-1; i+=4){ //start at the first note of the second measure
+            rel(home, expr(home, isFourthSpeciesArray[i]==1 && isNoSyncopeArray[i/4]==1), BOT_IMP, isConsonance[i], 1);
         }
-    }
-    
-    for(int i = 4; i < isConsonance.size()-1; i+=4){ //start at the first note of the second measure
-        rel(home, expr(home, isFourthSpeciesArray[i]==1 && isNoSyncopeArray[i/4]==1), BOT_IMP, isConsonance[i], 1);
     }
     
     //five consecutive notes by joint degree (3rd species)
-    for(int i = 0; i < is5QNArray.size(); i++){
-        BoolVar b = BoolVar(home, 0, 1);
-        rel(home, is5QNArray[i], BOT_AND, isMostlyThirdArray[i], b);
-        rel(home, b, BOT_IMP, isConsonance[i*4+2], 1);
+    if (activeConstraints[SP5_H5]) {
+        for(int i = 0; i < is5QNArray.size(); i++){
+            BoolVar b = BoolVar(home, 0, 1);
+            rel(home, is5QNArray[i], BOT_AND, isMostlyThirdArray[i], b);
+            rel(home, b, BOT_IMP, isConsonance[i*4+2], 1);
+        }
     }
     
     //any dissonant note implies it is surrounded by consonant notes (3rd species)
-    for(int i = 0; i < isDiminution.size(); i++){
-        BoolVar band1 = BoolVar(home, 0, 1);
-        rel(home, expr(home, isConsonance[(i*4)+2] || isThirdSpeciesArray[(i*4)+2]), BOT_OR, isDiminution[i], 1);
+    if (activeConstraints[SP5_H6]) {
+        for(int i = 0; i < isDiminution.size(); i++){
+            BoolVar band1 = BoolVar(home, 0, 1);
+            rel(home, expr(home, isConsonance[(i*4)+2] || isThirdSpeciesArray[(i*4)+2]), BOT_OR, isDiminution[i], 1);
+        }
     }
 
     /** ===========================================================================
@@ -307,32 +320,42 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */ 
 
     //no melodic interval between MAJOR_SIXTH and MAJOR_SEVENTH
-    for(int i = 0; i < fifthSpeciesMAllIntervals.size(); i++){
-        rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MAJOR_SIXTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
-        rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MINOR_SEVENTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
-        rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MAJOR_SEVENTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
+    if (activeConstraints[SP5_M1]) {
+        for(int i = 0; i < fifthSpeciesMAllIntervals.size(); i++){
+            rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MAJOR_SIXTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
+            rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MINOR_SEVENTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
+            rel(home, expr(home, abs(fifthSpeciesMAllIntervals[i])), IRT_NQ, MAJOR_SEVENTH, Reify(expr(home, isConstrainedArray[i]==1 && isConstrainedArray[i+1]==1), RM_IMP));
+        }
     }
     
     //no unisson between two consecutive notes
-    for(int i = 0; i < nMeasures-1; i++){
-        rel(home, fifthSpeciesNotesCp[(i*4)], IRT_NQ, fifthSpeciesNotesCp[(i*4)+1], Reify(expr(home, (isConstrainedArray[(i*4)]==1) && (isConstrainedArray[(i*4)+1]==1)), RM_IMP));
-        rel(home, fifthSpeciesNotesCp[(i*4)+2], IRT_NQ, fifthSpeciesNotesCp[(i*4)+3], Reify(expr(home, (isConstrainedArray[(i*4)+2]==1) && (isConstrainedArray[(i*4)+3]==1)), RM_IMP));
+    if (activeConstraints[SP5_M2]) {
+        for(int i = 0; i < nMeasures-1; i++){
+            rel(home, fifthSpeciesNotesCp[(i*4)], IRT_NQ, fifthSpeciesNotesCp[(i*4)+1], Reify(expr(home, (isConstrainedArray[(i*4)]==1) && (isConstrainedArray[(i*4)+1]==1)), RM_IMP));
+            rel(home, fifthSpeciesNotesCp[(i*4)+2], IRT_NQ, fifthSpeciesNotesCp[(i*4)+3], Reify(expr(home, (isConstrainedArray[(i*4)+2]==1) && (isConstrainedArray[(i*4)+3]==1)), RM_IMP));
+        }
     }
     
     //no more than minor sixth interval between arsis and thesis notes
-    for(int i = 0; i < nMeasures-1; i++){
-        rel(home, expr(home, abs(fifthSpeciesMTAIntervals[i])), IRT_NQ, MAJOR_SIXTH, Reify(expr(home, isConstrainedArray[i+1]==1), RM_IMP));
-        rel(home, expr(home, abs(fifthSpeciesMTAIntervals[i])), IRT_NQ, MINOR_SEVENTH, Reify(expr(home, isConstrainedArray[i+1]==1), RM_IMP));
-        rel(home, expr(home, abs(fifthSpeciesMTAIntervals[i])), IRT_NQ, MAJOR_SEVENTH, Reify(expr(home, isConstrainedArray[i+1]==1), RM_IMP));
+    if (activeConstraints[SP5_M3]) {
+        for(int i = 0; i < nMeasures-1; i++){
+            rel(home, expr(home, abs(fifthSpeciesMTAIntervals[i])), IRT_NQ, MAJOR_SIXTH, Reify(expr(home, isConstrainedArray[i+1]==1), RM_IMP));
+            rel(home, expr(home, abs(fifthSpeciesMTAIntervals[i])), IRT_NQ, MINOR_SEVENTH, Reify(expr(home, isConstrainedArray[i+1]==1), RM_IMP));
+            rel(home, expr(home, abs(fifthSpeciesMTAIntervals[i])), IRT_NQ, MAJOR_SEVENTH, Reify(expr(home, isConstrainedArray[i+1]==1), RM_IMP));
+        }
     }
     
+    
     //no same syncopation
-    for(int i = 1; i < nMeasures-1; i++){
-        rel(home, fifthSpeciesNotesCp[(i*4)], IRT_NQ, fifthSpeciesNotesCp[(i*4)+2], 
-            Reify(expr(home, isFourthSpeciesArray[(i*4)]==1 && isConstrainedArray[(i*4)+2]), RM_IMP));
-
-        rel(home, (isFourthSpeciesArray[(i*4)]==1 && isConstrainedArray[(i*4)+2]==1) >> (fifthSpeciesNotesCp[(i*4)]!=fifthSpeciesNotesCp[(i*4)+2]));
+    if (activeConstraints[SP5_M4]) {
+        for(int i = 1; i < nMeasures-1; i++){
+            rel(home, fifthSpeciesNotesCp[(i*4)], IRT_NQ, fifthSpeciesNotesCp[(i*4)+2], 
+                Reify(expr(home, isFourthSpeciesArray[(i*4)]==1 && isConstrainedArray[(i*4)+2]), RM_IMP));
+    
+            rel(home, (isFourthSpeciesArray[(i*4)]==1 && isConstrainedArray[(i*4)+2]==1) >> (fifthSpeciesNotesCp[(i*4)]!=fifthSpeciesNotesCp[(i*4)+2]));
+        }
     }
+    
 
     /** ===========================================================================
      *                             MOTION CONSTRAINS
@@ -340,70 +363,78 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */ 
 
     //no battuta kind of motion
-    for(int i = 0; i < fifthSpeciesMotions.size(); i++){
-        BoolVar isCM = BoolVar(home, 0, 1);
-        BoolVar isOct = BoolVar(home, 0, 1);
-        BoolVar isCPDown = BoolVar(home, 0, 1);
-        BoolVar band1 = BoolVar(home, 0, 1);
-        BoolVar band2 = BoolVar(home, 0, 1);
-        BoolVar band3 = BoolVar(home, 0, 1);
-
-        rel(home, fifthSpeciesMotions[i], IRT_EQ, CONTRARY_MOTION, Reify(isCM));
-        rel(home, expr(home, (fifthSpeciesHIntervals[((i+1)*4)]==UNISSON || fifthSpeciesHIntervals[((i+1)*4)]==PERFECT_OCTAVE || 
-            fifthSpeciesHIntervals[((i+1)*4)]==-PERFECT_OCTAVE)) >> isOct);
-        rel(home, fifthSpeciesMIntervals[(i*4)+3], IRT_LE, -4, Reify(isCPDown));
-
-        rel(home, isCM, BOT_AND, isOct, band1);
-        rel(home, band1, BOT_AND, isCPDown, band2);
-        rel(home, band2, BOT_AND, expr(home, c->getNotes()[i] <= fifthSpeciesNotesCp[(i*4)+3]), band3);
-        rel(home, isThirdSpeciesArray[(i*4)+3], BOT_AND, band3, 0);
-    }
+    if (activeConstraints[SP5_P1]) {
+        for(int i = 0; i < fifthSpeciesMotions.size(); i++){
+            BoolVar isCM = BoolVar(home, 0, 1);
+            BoolVar isOct = BoolVar(home, 0, 1);
+            BoolVar isCPDown = BoolVar(home, 0, 1);
+            BoolVar band1 = BoolVar(home, 0, 1);
+            BoolVar band2 = BoolVar(home, 0, 1);
+            BoolVar band3 = BoolVar(home, 0, 1);
     
+            rel(home, fifthSpeciesMotions[i], IRT_EQ, CONTRARY_MOTION, Reify(isCM));
+            rel(home, expr(home, (fifthSpeciesHIntervals[((i+1)*4)]==UNISSON || fifthSpeciesHIntervals[((i+1)*4)]==PERFECT_OCTAVE || 
+                fifthSpeciesHIntervals[((i+1)*4)]==-PERFECT_OCTAVE)) >> isOct);
+            rel(home, fifthSpeciesMIntervals[(i*4)+3], IRT_LE, -4, Reify(isCPDown));
+    
+            rel(home, isCM, BOT_AND, isOct, band1);
+            rel(home, band1, BOT_AND, isCPDown, band2);
+            rel(home, band2, BOT_AND, expr(home, c->getNotes()[i] <= fifthSpeciesNotesCp[(i*4)+3]), band3);
+            rel(home, isThirdSpeciesArray[(i*4)+3], BOT_AND, band3, 0);
+        }
+    }
+     
     //dissonant notes must be followed by the consonant note below
-    for(int i = 0; i < fifthSpeciesMTAIntervals.size(); i++){
-        //isFourthArray first note
-        //is Consonance array first note
-        //mTa intervals, general
-        BoolVar bNot = BoolVar(home, 0, 1);
-        BoolVar isCst = BoolVar(home, 0, 1);
-        BoolVar bAnd = BoolVar(home, 0, 1);
-
-        rel(home, isConsonance[i*4], BOT_EQV, BoolVar(home, 0, 0), bNot);
-        rel(home, bNot, BOT_AND, isFourthSpeciesArray[i*4], bAnd);
-        rel(home, fifthSpeciesMTAIntervals[i], IRT_LE, 0, Reify(bAnd, RM_IMP));
-        rel(home, fifthSpeciesMTAIntervals[i], IRT_GQ, -2, Reify(bAnd, RM_IMP));
+    if (activeConstraints[SP5_P2]) {
+        for(int i = 0; i < fifthSpeciesMTAIntervals.size(); i++){
+            //isFourthArray first note
+            //is Consonance array first note
+            //mTa intervals, general
+            BoolVar bNot = BoolVar(home, 0, 1);
+            BoolVar isCst = BoolVar(home, 0, 1);
+            BoolVar bAnd = BoolVar(home, 0, 1);
+    
+            rel(home, isConsonance[i*4], BOT_EQV, BoolVar(home, 0, 0), bNot);
+            rel(home, bNot, BOT_AND, isFourthSpeciesArray[i*4], bAnd);
+            rel(home, fifthSpeciesMTAIntervals[i], IRT_LE, 0, Reify(bAnd, RM_IMP));
+            rel(home, fifthSpeciesMTAIntervals[i], IRT_GQ, -2, Reify(bAnd, RM_IMP));
+        }
     }
     
     //no second dissonant note if the cantusFirmus is at the bass
-    for(int i = 0; i < nMeasures-1; i++){
-        BoolVar bUni = BoolVar(home, 0, 1);
-        BoolVar bAnd = BoolVar(home, 0, 1);
-        BoolVar isCst = BoolVar(home, 0, 1);
-        BoolVar bAndCst = BoolVar(home, 0, 1);
-
-        rel(home, isFourthSpeciesArray[((i+1)*4)], BOT_EQV, isCst, 1);
-        rel(home, fifthSpeciesHIntervals[(i*4)+2], IRT_EQ, 0, Reify(bUni));
-        rel(home, isNotLowest[i], BOT_AND, bUni, bAnd);
-        rel(home, bAnd, BOT_AND, isCst, bAndCst);
-        rel(home, fifthSpeciesHIntervals[((i+1)*4)], IRT_NQ, 1, Reify(bAndCst, RM_IMP));
-        rel(home, fifthSpeciesHIntervals[((i+1)*4)], IRT_NQ, 2, Reify(bAndCst, RM_IMP));
+    if (activeConstraints[SP5_P3]) {
+        for(int i = 0; i < nMeasures-1; i++){
+            BoolVar bUni = BoolVar(home, 0, 1);
+            BoolVar bAnd = BoolVar(home, 0, 1);
+            BoolVar isCst = BoolVar(home, 0, 1);
+            BoolVar bAndCst = BoolVar(home, 0, 1);
+    
+            rel(home, isFourthSpeciesArray[((i+1)*4)], BOT_EQV, isCst, 1);
+            rel(home, fifthSpeciesHIntervals[(i*4)+2], IRT_EQ, 0, Reify(bUni));
+            rel(home, isNotLowest[i], BOT_AND, bUni, bAnd);
+            rel(home, bAnd, BOT_AND, isCst, bAndCst);
+            rel(home, fifthSpeciesHIntervals[((i+1)*4)], IRT_NQ, 1, Reify(bAndCst, RM_IMP));
+            rel(home, fifthSpeciesHIntervals[((i+1)*4)], IRT_NQ, 2, Reify(bAndCst, RM_IMP));
+        }
     }
 
     //marcel's rule
-    for(int i = 0; i < fifthSpeciesSuccMIntervals.size()-1; i++){
-        BoolVar bSkip = BoolVar(home, 0, 1);
-        BoolVar bMbUp = BoolVar(home, 0, 1);
-        BoolVar bMbDown = BoolVar(home, 0, 1);
-        BoolVar bContrary = BoolVar(home, 0, 1);
-
-        rel(home, expr(home, abs(fifthSpeciesSuccMIntervals[i])), IRT_GR, 2, Reify(bSkip));
-        rel(home, fifthSpeciesSuccMIntervals[i], IRT_GR, 0, Reify(bMbUp));
-        rel(home, fifthSpeciesSuccMIntervals[i+1], IRT_LE, 1, Reify(bMbDown));
-        rel(home, bMbUp, BOT_EQV, bMbDown, bContrary);
-        rel(home, fifthSpeciesSuccMIntervals[i+1], IRT_LQ, 2, Reify(bSkip, RM_IMP));
-        rel(home, bSkip, BOT_IMP, bContrary, 1);
+    if (activeConstraints[SP5_P4]) {
+        for(int i = 0; i < fifthSpeciesSuccMIntervals.size()-1; i++){
+            BoolVar bSkip = BoolVar(home, 0, 1);
+            BoolVar bMbUp = BoolVar(home, 0, 1);
+            BoolVar bMbDown = BoolVar(home, 0, 1);
+            BoolVar bContrary = BoolVar(home, 0, 1);
+    
+            rel(home, expr(home, abs(fifthSpeciesSuccMIntervals[i])), IRT_GR, 2, Reify(bSkip));
+            rel(home, fifthSpeciesSuccMIntervals[i], IRT_GR, 0, Reify(bMbUp));
+            rel(home, fifthSpeciesSuccMIntervals[i+1], IRT_LE, 1, Reify(bMbDown));
+            rel(home, bMbUp, BOT_EQV, bMbDown, bContrary);
+            rel(home, fifthSpeciesSuccMIntervals[i+1], IRT_LQ, 2, Reify(bSkip, RM_IMP));
+            rel(home, bSkip, BOT_IMP, bContrary, 1);
+        }
     }
-
+    
     /** ===========================================================================
      *                              COST CONSTRAINS
      *  ===========================================================================
@@ -492,61 +523,75 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     }
 }
 
+/**
+ * 2 VOICES CONSTRUCTOR
+ */
 FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
 FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
     //following two rel are H2_1 but modified, so we check in TwoVoiceProblem that that constrained isn't activated if fifth species
-    //if the first note is constrained, then it must be a perfect consonance (works)
-    rel(home, (isConstrainedArray[0]==1) >> (fifthSpeciesHIntervals[0]==UNISSON || fifthSpeciesHIntervals[0]==PERFECT_FIFTH));
-    //else if the first note is not constrained, then the third note must be a perfect consonance (works)
-    rel(home, (isConstrainedArray[0]==0) >> (fifthSpeciesHIntervals[2]==UNISSON || fifthSpeciesHIntervals[2]==PERFECT_FIFTH));
+    if (activeConstraints[SP5_2V_1]) {
+        //if the first note is constrained, then it must be a perfect consonance (works)
+        rel(home, (isConstrainedArray[0]==1) >> (fifthSpeciesHIntervals[0]==UNISSON || fifthSpeciesHIntervals[0]==PERFECT_FIFTH));
+        //else if the first note is not constrained, then the third note must be a perfect consonance (works)
+        rel(home, (isConstrainedArray[0]==0) >> (fifthSpeciesHIntervals[2]==UNISSON || fifthSpeciesHIntervals[2]==PERFECT_FIFTH));
+    }
+    
 
     //If the cantusFirmus is in the upper part, then no hamonic seventh
-    for(int j = 1; j < c->getIsNotLowest().size(); j++){
-        rel(home, (getIsNotLowest()[j]==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MINOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MINOR_SEVENTH));
-        rel(home, (getIsNotLowest()[j]==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MAJOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MAJOR_SEVENTH));
+    if (activeConstraints[SP5_2V_2]) {
+        for(int j = 1; j < c->getIsNotLowest().size(); j++){
+            rel(home, (getIsNotLowest()[j]==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MINOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MINOR_SEVENTH));
+            rel(home, (getIsNotLowest()[j]==0 && isFourthSpeciesArray[j*4]) >> (firstSpeciesHarmonicIntervals[j]!=MAJOR_SEVENTH && firstSpeciesHarmonicIntervals[j]!=-MAJOR_SEVENTH));
+        }
     }
+    
 
     //H3_1 can be activated as-is
+    if (activeConstraints[SP5_2V_3]) {
+        //penultimate note (only applies if it is 3rd species)
+        BoolVar bandThen_1 = BoolVar(home, 0, 1);
+        BoolVar testNot_1 = BoolVar(home, 0, 1);
+        BoolVar bandElse_1 = BoolVar(home, 0, 1);
+        BoolVar test_1 = expr(home, c->getNotes()[c->getNotes().size()-2] <= fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2]);
 
-    //penultimate note (only applies if it is 3rd species)
-    BoolVar bandThen_1 = BoolVar(home, 0, 1);
-    BoolVar testNot_1 = BoolVar(home, 0, 1);
-    BoolVar bandElse_1 = BoolVar(home, 0, 1);
-    BoolVar test_1 = expr(home, c->getNotes()[c->getNotes().size()-2] <= fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2]);
+        rel(home, test_1, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandThen_1);
+        rel(home, test_1, BOT_EQV, BoolVar(home, 0, 0), testNot_1);
+        rel(home, testNot_1, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandElse_1);
 
-    rel(home, test_1, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandThen_1);
-    rel(home, test_1, BOT_EQV, BoolVar(home, 0, 0), testNot_1);
-    rel(home, testNot_1, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandElse_1);
+        rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MAJOR_SIXTH, Reify(bandThen_1, RM_IMP));
+        rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MINOR_THIRD, Reify(bandElse_1, RM_IMP));
 
-    rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MAJOR_SIXTH, Reify(bandThen_1, RM_IMP));
-    rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MINOR_THIRD, Reify(bandElse_1, RM_IMP));
+        //penultimate note (only applies if it is 4th species)
+        BoolVar bandThen = BoolVar(home, 0, 1);
+        BoolVar testNot = BoolVar(home, 0, 1);
+        BoolVar bandElse = BoolVar(home, 0, 1);
+        BoolVar test = expr(home, c->getNotes()[c->getNotes().size()-2] <= fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-3]);
 
-    //penultimate note (only applies if it is 4th species)
-    BoolVar bandThen = BoolVar(home, 0, 1);
-    BoolVar testNot = BoolVar(home, 0, 1);
-    BoolVar bandElse = BoolVar(home, 0, 1);
-    BoolVar test = expr(home, c->getNotes()[c->getNotes().size()-2] <= fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-3]);
-
-    rel(home, test, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandThen);
-    rel(home, test, BOT_EQV, BoolVar(home, 0, 0), testNot);
-    rel(home, testNot, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandElse);
-    rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-3]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MAJOR_SIXTH, Reify(bandThen, RM_IMP));
-    rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-3]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MINOR_THIRD, Reify(bandElse, RM_IMP));
+        rel(home, test, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandThen);
+        rel(home, test, BOT_EQV, BoolVar(home, 0, 0), testNot);
+        rel(home, testNot, BOT_AND, isThirdSpeciesArray[isThirdSpeciesArray.size()-2], bandElse);
+        rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-3]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MAJOR_SIXTH, Reify(bandThen, RM_IMP));
+        rel(home, expr(home, fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-3]-c->getNotes()[c->getNotes().size()-2]), IRT_EQ, MINOR_THIRD, Reify(bandElse, RM_IMP));
+    }
+    
 
     //no direct motion to reach a perfect consonance
-    for(int i = 0; i < fifthSpeciesMotions.size(); i++){
-        BoolVar isThirdSpeciesAndPCons = BoolVar(home, 0, 1);
-        BoolVar isPConsAndNotLowest = BoolVar(home, 0, 1);
-
-        rel(home, isThirdSpeciesArray[i*4], BOT_AND, expr(home, fifthSpeciesHIntervals[(i*4)+3]==UNISSON || fifthSpeciesHIntervals[(i*4)+3]==PERFECT_FIFTH ||
-            fifthSpeciesHIntervals[(i*4)+3]==-PERFECT_FIFTH), isThirdSpeciesAndPCons);
-        rel(home, isNotLowest[i], BOT_AND, isThirdSpeciesAndPCons, isPConsAndNotLowest);
-
-        rel(home, fifthSpeciesMotions[i], IRT_NQ, PARALLEL_MOTION, Reify(isPConsAndNotLowest, RM_IMP));
+    if (activeConstraints[SP5_2V_4]) {
+        for(int i = 0; i < fifthSpeciesMotions.size(); i++){
+            BoolVar isThirdSpeciesAndPCons = BoolVar(home, 0, 1);
+            BoolVar isPConsAndNotLowest = BoolVar(home, 0, 1);
     
+            rel(home, isThirdSpeciesArray[i*4], BOT_AND, expr(home, fifthSpeciesHIntervals[(i*4)+3]==UNISSON || fifthSpeciesHIntervals[(i*4)+3]==PERFECT_FIFTH ||
+                fifthSpeciesHIntervals[(i*4)+3]==-PERFECT_FIFTH), isThirdSpeciesAndPCons);
+            rel(home, isNotLowest[i], BOT_AND, isThirdSpeciesAndPCons, isPConsAndNotLowest);
+    
+            rel(home, fifthSpeciesMotions[i], IRT_NQ, PARALLEL_MOTION, Reify(isPConsAndNotLowest, RM_IMP));
+        
+        }
     }
+    
 
     costs = IntVarArray(home, 8, 0, 1000000);
     cost_names = {"fifth", "octave", "borrow", "melodic", "motion", "cambiata", "m2", "syncopation"};
@@ -569,6 +614,9 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     add_cost(home, 7, snycopeCostArray, costs);
 }
 
+/**
+ * 3 VOICES CONSTRUCTOR
+ */
 FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2):
 FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV2)
@@ -577,24 +625,29 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     varietyCostArray = IntVarArray(home, 3*(fifthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
 
     //3.H6 : harmonic triad should be used on the second or third beat
-    thirdHTriadArray = IntVarArray(home, nMeasures-1, IntSet({0, triad3rdCost}));
-    for(int i = 0; i < thirdHTriadArray.size(); i++){
-        rel(home, ((fifthSpeciesHIntervals[(i*4)+1]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+1]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=PERFECT_FIFTH)&&
-            (fifthSpeciesHIntervals[(i*4)+2]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+2]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
-            (thirdHTriadArray[i]==triad3rdCost));
-        rel(home, ((fifthSpeciesHIntervals[(i*4)+1]==UNISSON||fifthSpeciesHIntervals[(i*4)+1]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==PERFECT_FIFTH)||
-            (fifthSpeciesHIntervals[(i*4)+2]==UNISSON||fifthSpeciesHIntervals[(i*4)+2]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==PERFECT_FIFTH)) >> 
-            (thirdHTriadArray[i]==0));
+    if (activeConstraints[SP5_3V_1]) {
+        thirdHTriadArray = IntVarArray(home, nMeasures-1, IntSet({0, triad3rdCost}));
+        for(int i = 0; i < thirdHTriadArray.size(); i++){
+            rel(home, ((fifthSpeciesHIntervals[(i*4)+1]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+1]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=PERFECT_FIFTH)&&
+                (fifthSpeciesHIntervals[(i*4)+2]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+2]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
+                (thirdHTriadArray[i]==triad3rdCost));
+            rel(home, ((fifthSpeciesHIntervals[(i*4)+1]==UNISSON||fifthSpeciesHIntervals[(i*4)+1]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==PERFECT_FIFTH)||
+                (fifthSpeciesHIntervals[(i*4)+2]==UNISSON||fifthSpeciesHIntervals[(i*4)+2]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==PERFECT_FIFTH)) >> 
+                (thirdHTriadArray[i]==0));
+        }
     }
 
     //1.P1 3 voices version
-    for(int j = 0; j < fifthSpeciesMotions.size()-1; j++){
-        //set a cost when it is reached through direct motion, it is 0 when not
-        rel(home, (fifthSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
-            (directCostArray[j]==directMoveCost));
-        rel(home, (fifthSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
-            (directCostArray[j]==0));
+    if (activeConstraints[SP5_3V_2]) {
+        for(int j = 0; j < fifthSpeciesMotions.size()-1; j++){
+            //set a cost when it is reached through direct motion, it is 0 when not
+            rel(home, (fifthSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
+                (directCostArray[j]==directMoveCost));
+            rel(home, (fifthSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
+                (directCostArray[j]==0));
+        }
     }
+    
 
     costs = IntVarArray(home, 11, 0, 1000000);
     cost_names = {"fifth", "octave", "borrow", "melodic", "motion", "cambiata", "m2", "syncopation", "direct", "variety", "triad3"};
@@ -623,6 +676,9 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     add_cost(home, 10, thirdHTriadArray, costs);
 }
 
+/**
+ * 4 VOICES CONSTRUCTOR
+ */
 FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<int> cf, int lb, int ub, Stratum* low, CantusFirmus* c,  int v_type, 
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV1, int nV2, int nV3):
 FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV3)
@@ -631,23 +687,28 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     varietyCostArray = IntVarArray(home, 3*(fifthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
 
     //3.H6 : harmonic triad should be used on the second or third beat
-    thirdHTriadArray = IntVarArray(home, nMeasures-1, IntSet({0, triad3rdCost}));
-    for(int i = 0; i < thirdHTriadArray.size(); i++){
-        rel(home, ((fifthSpeciesHIntervals[(i*4)+1]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+1]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=PERFECT_FIFTH)&&
-            (fifthSpeciesHIntervals[(i*4)+2]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+2]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
-            (thirdHTriadArray[i]==triad3rdCost));
-        rel(home, ((fifthSpeciesHIntervals[(i*4)+1]==UNISSON||fifthSpeciesHIntervals[(i*4)+1]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==PERFECT_FIFTH)||
-            (fifthSpeciesHIntervals[(i*4)+2]==UNISSON||fifthSpeciesHIntervals[(i*4)+2]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==PERFECT_FIFTH)) >> 
-            (thirdHTriadArray[i]==0));
+    if (activeConstraints[SP5_4V_1]) {
+        thirdHTriadArray = IntVarArray(home, nMeasures-1, IntSet({0, triad3rdCost}));
+        for(int i = 0; i < thirdHTriadArray.size(); i++){
+            rel(home, ((fifthSpeciesHIntervals[(i*4)+1]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+1]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+1]!=PERFECT_FIFTH)&&
+                (fifthSpeciesHIntervals[(i*4)+2]!=UNISSON&&fifthSpeciesHIntervals[(i*4)+2]!=MINOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=MAJOR_THIRD&&fifthSpeciesHIntervals[(i*4)+2]!=PERFECT_FIFTH)) >> 
+                (thirdHTriadArray[i]==triad3rdCost));
+            rel(home, ((fifthSpeciesHIntervals[(i*4)+1]==UNISSON||fifthSpeciesHIntervals[(i*4)+1]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+1]==PERFECT_FIFTH)||
+                (fifthSpeciesHIntervals[(i*4)+2]==UNISSON||fifthSpeciesHIntervals[(i*4)+2]==MINOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==MAJOR_THIRD||fifthSpeciesHIntervals[(i*4)+2]==PERFECT_FIFTH)) >> 
+                (thirdHTriadArray[i]==0));
+        }
     }
+    
 
     //1.P1 4 voices version
-    for(int j = 0; j < fifthSpeciesMotions.size()-1; j++){
-        //set a cost when it is reached through direct motion, it is 0 when not
-        rel(home, (fifthSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
-            (directCostArray[j]==directMoveCost));
-        rel(home, (fifthSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
-            (directCostArray[j]==0));
+    if (activeConstraints[SP5_4V_2]) {
+        for(int j = 0; j < fifthSpeciesMotions.size()-1; j++){
+            //set a cost when it is reached through direct motion, it is 0 when not
+            rel(home, (fifthSpeciesMotions[j]==2&&(firstSpeciesHarmonicIntervals[j+1]==0||firstSpeciesHarmonicIntervals[j+1]==7))>>
+                (directCostArray[j]==directMoveCost));
+            rel(home, (fifthSpeciesMotions[j]!=2||(firstSpeciesHarmonicIntervals[j+1]!=0&&firstSpeciesHarmonicIntervals[j+1]!=7))>>
+                (directCostArray[j]==0));
+        }
     }
 
     costs = IntVarArray(home, 11, 0, 1000000);
