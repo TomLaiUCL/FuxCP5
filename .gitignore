@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+# Main
+FuxCP/c++/Main
+Main
+
+# Git
+../../.gitignore
+.gitignore
+
+# VS Code
+.json
