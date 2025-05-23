@@ -297,7 +297,6 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     add_cost(home, 5, snycopeCostArray, costs);
     //need to set cost[6] to be variety cost
     add_cost(home, 6, varietyCostArray, costs);
-    
 }
 
 /**

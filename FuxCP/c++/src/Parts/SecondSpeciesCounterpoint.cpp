@@ -125,8 +125,12 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     if (activeConstraints[SP2_2P3]) {
         P3_2_noBattuta(home, this);
     }
-    
 
+    // combined costs
+    toCombineCosts = IntVarArray(home, 1, 0, 10000);
+    toCombineCostNames = {"1H1"};
+    //need to set constraintCosts[0]
+    add_toCombineCost(home, 0, disArray, toCombineCosts);
 }
 
 /**

@@ -15,11 +15,13 @@
  * todo modify it so it also works for 3 and 4 voices. Add the appropriate constraints by making a constructor that takes the number of voices as a parameter
  * todo maybe it should take a Stratum (object or just IntVarArray) for the lowest voice or something like that depending on the formalization
  */
-class FirstSpeciesCounterpoint : public Part{
+class FirstSpeciesCounterpoint : public Part
+{
 protected:
     Species motherSpecies;                          /// The species from which this is called.
     CantusFirmus* cantus;
-    IntVarArray disCostArray;
+    IntVarArray disArray; // Array of dissonances
+
 public:
     /**
      * General constructor. It takes the mother species as an argument and calls the super constructor from the part class.

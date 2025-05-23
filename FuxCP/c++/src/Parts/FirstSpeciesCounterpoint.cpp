@@ -124,24 +124,24 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     
     /// Harmonic rules
     /// H1 from Thibault: All harmonic intervals must be consonances
-    if (activeConstraints[SP1_1H1]) {
+    if (activeConstraints[CF_SP1_1H1]) {
         // H1_1_harmonicIntervalsAreConsonances(home, this);
-        disCostArray = IntVarArray(home, notes.size(), IntSet{0, H1_1_cost});
+        disArray = IntVarArray(home, firstSpeciesHarmonicIntervals.size(), IntSet{0, 1});
         // Define the set of consonant intervals
         IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
             -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
 
         // Loop through each harmonic interval
-        for (size_t i = 0; i < h_intervals.size(); i++) {
+        for (size_t i = 0; i < firstSpeciesHarmonicIntervals.size(); i++) {
             // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
             BoolVar isConsonant(home, 0, 1);
-            dom(home, h_intervals[i], consonantIntervals, isConsonant);
+            dom(home, firstSpeciesHarmonicIntervals[i], consonantIntervals, isConsonant);
 
-            // If the interval is consonant, set disCostArray[i] to 0
-            rel(home, isConsonant >> (disCostArray[i] == 0));
+            // If the interval is consonant, set disArray[i] to 0
+            rel(home, isConsonant >> (disArray[i] == 0));
 
-            // Otherwise, set disCostArray[i] to H1_1_cost
-            rel(home, !isConsonant >> (disCostArray[i] == H1_1_cost));
+            // Otherwise, set disArray[i] to H1_1_cost
+            rel(home, !isConsonant >> (disArray[i] == 1));
         }
 
     }
@@ -154,6 +154,12 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     if (activeConstraints[SP1_1H6]) {
         H6_1_preferImperfectConsonances(home, this);
     }
+
+    // combined costs
+    toCombineCosts = IntVarArray(home, 1, 0, 10000);
+    toCombineCostNames = {"1H1"};
+    //need to set constraintCosts[0]
+    add_toCombineCost(home, 0, disArray, toCombineCosts);
 }
 
 /**
@@ -189,8 +195,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         P3_1_noBattuta(home, this);
     }
 
-    costs = IntVarArray(home, 6, 0, 1000000);
-    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "1H1"};
+    costs = IntVarArray(home, 5, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
@@ -202,8 +208,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
     //set cost[4] to be off cost
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
-    //set cost[5] to be 1H1 cost
-    add_cost(home, 5, disCostArray, costs);
 }
 
 /**
@@ -239,8 +243,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         P3_1_noBattuta(home, this);
     }
 
-    costs = IntVarArray(home, 8, 0, 1000000);
-    cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "1H1"};
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct"};
     //need to set cost[0] to be off cost
     add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
     //set cost[1] to be fifth cost
@@ -255,8 +259,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
     //need to set cost[6] to be direct cost
     add_cost(home, 6, directCostArray, costs);
-    //set cost[7] to be 1H1 cost
-    add_cost(home, 7, disCostArray, costs);
 }
 
 /**
@@ -287,8 +289,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         P3_1_noBattuta(home, this);
     }
 
-    costs = IntVarArray(home, 8, 0, 1000000);
-    cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct", "1H1"};
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"borrow", "fifth", "octave", "variety", "motion", "melodic", "direct"};
     //need to set cost[0] to be off cost
     add_cost(home, 0, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
     //set cost[1] to be fifth cost
@@ -303,8 +305,6 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     add_cost(home, 5, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
     //need to set cost[6] to be direct cost
     add_cost(home, 6, directCostArray, costs);
-    //set cost[7] to be 1H1 cost
-    add_cost(home, 7, disCostArray, costs);
 }
 
 /**

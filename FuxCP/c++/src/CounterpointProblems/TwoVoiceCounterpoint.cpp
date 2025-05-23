@@ -65,6 +65,9 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
 
     unitedCostNames = counterpoint_1->getCostNames();
 
+    // compute combined costs
+    computeCombinedCosts();
+
     orderCosts();
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size(), 0, 127);
@@ -82,7 +85,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     }
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
     
-    
+
 }
 // COPY CONSTRUCTOR
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(TwoVoiceCounterpoint& s) : CounterpointProblem(s){

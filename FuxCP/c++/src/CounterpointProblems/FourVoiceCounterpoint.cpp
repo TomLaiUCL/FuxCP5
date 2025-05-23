@@ -104,6 +104,9 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     uniteCounterpoints();
     uniteCosts();
 
+    // compute combined costs
+    computeCombinedCosts();
+
     orderCosts();
     
     //Branching strategies

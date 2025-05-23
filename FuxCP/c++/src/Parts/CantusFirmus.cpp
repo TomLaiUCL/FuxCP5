@@ -53,10 +53,10 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
     
 
     // 1.H1 cf version (commented by Tom Lai)
-    if (activeConstraints[CF_1H1]) {
+    if (activeConstraints[CF_SP1_1H1]) {
         // dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
         //     -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
-        disCostArray = IntVarArray(home, notes.size(), IntSet{0, H1_1_cost});
+        disArray = IntVarArray(home, notes.size(), IntSet{0, 1});
         // Define the set of consonant intervals
         IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
             -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
@@ -67,11 +67,11 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
             BoolVar isConsonant(home, 0, 1);
             dom(home, h_intervals[i], consonantIntervals, isConsonant);
 
-            // If the interval is consonant, set disCostArray[i] to 0
-            rel(home, isConsonant >> (disCostArray[i] == 0));
+            // If the interval is consonant, set disArray[i] to 0
+            rel(home, isConsonant >> (disArray[i] == 0));
 
-            // Otherwise, set disCostArray[i] to H1_1_cost
-            rel(home, !isConsonant >> (disCostArray[i] == H1_1_cost));
+            // Otherwise, set disArray[i] to H1_1_cost
+            rel(home, !isConsonant >> (disArray[i] == 1));
         }
     }
     
@@ -113,11 +113,11 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         P3_0_noBattuta(home, this);
     }
 
-    costs = IntVarArray(home, 1, 0, 10000);
-    cost_names = {"1H1"};
-    //set cost[0] to be 1H1 cost
-    add_cost(home, 0, disCostArray, costs);
-
+    // combined costs
+    toCombineCosts = IntVarArray(home, 1, 0, 10000);
+    toCombineCostNames = {"1H1"};
+    //need to set constraintCosts[0]
+    add_toCombineCost(home, 0, disArray, toCombineCosts);
 }
 
 string CantusFirmus::to_string() const {

@@ -50,6 +50,8 @@ protected:
     IntVar globalCost;
     // vector<int> species;        /// the species of the counterpoint to generate
 
+    IntVarArray combinedCosts;
+
 public:
     /**
      * Constructor of the class.
@@ -106,6 +108,9 @@ public:
     int  get_ext_cp_domain_size(int ctp_index);
 
     void setStrata();
+
+    IntVarArray get_combinedCosts(){ return combinedCosts; }
+    void computeCombinedCosts();
 };
 
 

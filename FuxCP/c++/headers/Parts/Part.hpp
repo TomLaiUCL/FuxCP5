@@ -84,7 +84,8 @@ class Part : public Voice {
         int obliqueCost;
         int contraryCost;
 
-        int H1_1_cost;
+        IntVarArray toCombineCosts;
+        vector<string> toCombineCostNames;
 
         //First Species specific variables
         IntVarArray firstSpeciesNotesCp;
@@ -220,6 +221,12 @@ class Part : public Voice {
         void add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 
         vector<string> getCostNames();
+        
+        IntVarArray getToCombineCosts();
+
+        vector<string> getToCombineCostNames();
+
+        void add_toCombineCost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
 };
 
 

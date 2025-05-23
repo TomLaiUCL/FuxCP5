@@ -51,8 +51,6 @@ Part::Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int 
     directCost = 0;
     obliqueCost = 1;
     contraryCost = 2;
-
-    H1_1_cost = 10;
 }
 
 string Part::to_string() const{
@@ -113,6 +111,9 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
 
     cost_names = s.cost_names;
 
+    toCombineCosts = s.toCombineCosts;
+    toCombineCostNames = s.toCombineCostNames;
+
     melodicDegreeCost.update(home, s.melodicDegreeCost);
     fifthCostArray.update(home, s.fifthCostArray);
     octaveCostArray.update(home, s.octaveCostArray);
@@ -147,6 +148,7 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
 
     speciesArray.update(home, s.speciesArray);
 
+    toCombineCosts.update(home, s.toCombineCosts);
 }
 
 // Virtual clone function
@@ -236,6 +238,15 @@ BoolVarArray Part::getConsonance(){
 }
 
 void Part::add_cost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs){
+    int sz = to_be_added.size();
+    IntVarArgs args(sz);
+    for(int i = 0; i < sz; i++){
+        args[i] = to_be_added[i];
+    }
+    rel(home, costs[idx], IRT_EQ, expr(home, sum(args)));
+}
+
+void Part::add_toCombineCost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs) {
     int sz = to_be_added.size();
     IntVarArgs args(sz);
     for(int i = 0; i < sz; i++){
@@ -370,4 +381,12 @@ IntVarArray Part::getSpeciesArray(){
 
 BoolVarArray Part::getIsHighest(){
     return isHighest;
+}
+
+IntVarArray Part::getToCombineCosts(){
+    return toCombineCosts;
+}
+
+vector<string> Part::getToCombineCostNames(){
+    return toCombineCostNames;
 }

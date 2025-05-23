@@ -9,27 +9,28 @@
 #include "../Utilities.hpp"
 #include "Part.hpp"
 class CantusFirmus : public Part {
-    protected:
-        vector<int> cf_vector;
-        IntVarArray disCostArray;
-    public:
-        CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
-            int nV);
+private:
+    vector<int> cf_vector;
+    IntVarArray disArray; // Array of dissonances
 
-        string to_string() const override;
+public:
+    CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, 
+        int nV);
 
-        CantusFirmus(Home home, CantusFirmus& s); // clone constructor
-        CantusFirmus* clone(Home home) override;
+    string to_string() const override;
 
-        IntVarArray getFirstHInterval() override;
+    CantusFirmus(Home home, CantusFirmus& s); // clone constructor
+    CantusFirmus* clone(Home home) override;
 
-        IntVarArray getFirstMInterval() override;
+    IntVarArray getFirstHInterval() override;
 
-        IntVarArray getMotions() override;
+    IntVarArray getFirstMInterval() override;
 
-        IntVarArgs getFirstNotes() override;
+    IntVarArray getMotions() override;
 
-        int getHIntervalSize() override;
+    IntVarArgs getFirstNotes() override;
+
+    int getHIntervalSize() override;
 
 };
 

@@ -5,7 +5,7 @@
 using namespace std;
 
 FigureTests::FigureTests() {
-    borrowMode = 0;
+    borrowMode = 1;
     melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
     general_params = {4, 1, 1, 2, 2, 2, 8, 1};
     specific_params = {8, 4, 0, 2, 1, 8, 50};
@@ -69,19 +69,6 @@ std::vector<CounterpointProblem*> FigureTests::get_all_solutions() {
     return solutions;
 }
 
-void FigureTests::test_configuration() {
-    activeConstraints = std::vector<bool>(activeConstraints.size(), false);
-    CounterpointProblem* problem = set_configuration();
-    if (!has_solution(problem)) {
-        std::cerr   << "\t /!\\ ERROR: It doesn't exist a solution but it should with the following configuration:" << endl;
-        cout << "\t Cantus firmus: ";
-        printVector(cantusFirmus);
-        cout << "\t Solution array: ";
-        printIntVarArray(problem->getSolutionArray());
-    }
-    delete problem;
-}
-
 /*
 * Check if the problem is unsatisfiable
 * @return true if the problem is unsatisfiable, false otherwise
@@ -126,8 +113,6 @@ std::set<int> FigureTests::minimize(const std::set<int>& cons_set) {
  * using a breadth-first search algorithm.
  */
 void FigureTests::findAllMUSes() {
-    // Test that the configuration has solutions without constraints desactivated
-    test_configuration();
     // Initialization
     set<int> cons_set; // all constraint indices
     for (int i = 0; i < activeConstraints.size(); i++) {
@@ -172,6 +157,16 @@ void FigureTests::findAllMUSes() {
     }
 }
 
+void FigureTests::find_unsat_constraints() {
+    for (int i = 0; i < consSize; i++) {
+        set<int> cons_set; // all constraint indices
+        cons_set.insert(i);
+        if (is_unsat(cons_set))  {
+            cout << "\t" << get_constraint_name(i) << " is unsatisfiable." << endl;
+        }
+    }
+}
+
 /* ============================================================================
                             FIGURES
 ============================================================================ */
@@ -182,8 +177,7 @@ void FigureTests::test_2v_1sp_fig22() {
     cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; 
     cp =           {69,64,67,65,64,72,69,71,71,69,68,69};
     v_type = {1};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_1sp_fig23() {
@@ -192,8 +186,7 @@ void FigureTests::test_2v_1sp_fig23() {
     cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; 
     cp =           {69,69,67,65,64,64,62,60,67,69,68,69};
     v_type = {1};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_2sp_fig38() {
@@ -202,8 +195,7 @@ void FigureTests::test_2v_2sp_fig38() {
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65};
     cp =           {-1,65,64,62,60,58,57,55,53,57,60,58,57,69,67,64,65,67,69,65,62,64,65};
     v_type = {0};
-    borrowMode = 1;
-    findAllMUSes(); 
+    find_unsat_constraints(); 
 }
 
 void FigureTests::test_2v_2sp_fig39() {
@@ -212,18 +204,16 @@ void FigureTests::test_2v_2sp_fig39() {
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
     cp =           {-1,53,52,48,53,52,50,48,46,58,55,60,57,53,52,48,53,41,45,50,48,52,53};
     v_type = {-2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_2sp_fig40() {
     cout << "Start test_2v_2sp_fig40" << endl;
     spList = {SECOND_SPECIES};
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; 
-    cp =           {-1, 67,64,65,67,69,71,69,67,72,71,72,74,72,71,69,67,65,64,72,71,69,67,62,64,66,67};
+    cp =           {-1, 67,64,65,67,69,71,69,67,72,71,72,74,72,71,69,67,65,64,72,71,69,67};
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_2sp_fig41() {
@@ -232,8 +222,7 @@ void FigureTests::test_2v_2sp_fig41() {
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; 
     cp =           {-1,67,64,65,67,65,64,62,60,64,60,72,71,69,67,71,72,71,69,67,66,62,67,59,62,66,67};  
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_2sp_fig42() {
@@ -242,8 +231,7 @@ void FigureTests::test_2v_2sp_fig42() {
     cantusFirmus = {57,60,59,60,64,65,64,62,60,59,57}; 
     cp =           {-1,69,64,65,67,62,64,76,72,71,69,65,67,71,74,69,72,64,66,68,69};
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_2sp_fig43() {
@@ -252,8 +240,7 @@ void FigureTests::test_2v_2sp_fig43() {
     cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; 
     cp =           {-1,45,57,52,55,52,50,53,57,59,60,48,50,45,48,52,53,55,57,45,52,56,57};
     v_type = {-1};   
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_2sp_fig44() {
@@ -262,8 +249,7 @@ void FigureTests::test_2v_2sp_fig44() {
     cantusFirmus = {60,64,65,67,64,69,67,64,65,64,62,60}; 
     cp =           {-1,67,72,71,69,74,71,69,67,71,72,74,76,74,72,71,69,71,72,67,69,71,72};
     v_type = {1};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_2sp_fig45() {
@@ -272,8 +258,7 @@ void FigureTests::test_2v_2sp_fig45() {
     cantusFirmus = {60,64,65,67,64,69,67,64,65,64,62,60}; 
     cp =           {-1,60,72,71,69,74,71,67,72,71,69,72,76,74,72,69,74,69,72,60,67,71,72};
     v_type = {1};   
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_3sp_fig55() {
@@ -282,8 +267,7 @@ void FigureTests::test_2v_3sp_fig55() {
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {62,64,65,67,69,71,72,74,76,74,71,72,74,72,70,69,70,72,74,76,77,65,69,71,72,69,70,72,70,69,67,71,69,62,64,65,67,69,71,73,74};
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_3sp_fig56() {
@@ -292,8 +276,7 @@ void FigureTests::test_2v_3sp_fig56() {
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {62,64,65,67,69,62,69,71,72,71,67,69,71,69,67,65,64,76,71,72,74,69,62,64,65,67,69,71,72,74,76,72,74,69,62,74,73,69,71,72,74};
     v_type = {1};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_3sp_fig57() {
@@ -302,8 +285,7 @@ void FigureTests::test_2v_3sp_fig57() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {71,67,69,71,72,71,69,67,65,67,69,71,72,64,65,67,69,72,76,74,72,71,69,72,71,74,71,69,67,71,72,71,69,71,72,74,76};
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_3sp_fig58() {
@@ -312,8 +294,7 @@ void FigureTests::test_2v_3sp_fig58() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {64,65,67,64,69,67,65,64,62,64,65,67,69,64,69,67,65,64,62,64,65,67,69,71,72,74,76,74,72,60,72,71,69,74,69,74,76};
     v_type = {1};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_3sp_fig59() {
@@ -322,8 +303,7 @@ void FigureTests::test_2v_3sp_fig59() {
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
     cp =           {65,64,62,60,59,62,67,65,64,62,60,58,57,60,62,64,65,62,64,65,67,64,65,67,69,67,65,69,67,65,64,62,60,64,60,64,65,64,62,60,58,60,62,64,65};
     v_type = {-1};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_3sp_fig60() {
@@ -332,8 +312,7 @@ void FigureTests::test_2v_3sp_fig60() {
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
     cp =           {62,74,72,71,72,69,71,72,74,72,71,69,71,69,66,65,66,74,78,77,76,69,81,78,77,76,74,71,72,69,71,72,74,72,71,69,71,72,74,71,72,69,71,72,74};
     v_type = {1};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_4sp_fig74() {
@@ -342,8 +321,7 @@ void FigureTests::test_2v_4sp_fig74() {
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {62,62,74,74,72,72,71,71,76,76,74,74,77,77,76,76,74,74,73,74};
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_4sp_fig75() {
@@ -352,8 +330,7 @@ void FigureTests::test_2v_4sp_fig75() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64};
     cp =           {76,76,72,72,71,72,64,64,65,65,72,72,71,71,76,76,74,76};
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_4sp_fig76() {
@@ -362,8 +339,7 @@ void FigureTests::test_2v_4sp_fig76() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64};
     cp =           {64,64,69,69,67,67,65,65,62,62,74,74,72,72,76,76,74,76};
     v_type = {0};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_4sp_fig77() {
@@ -372,8 +348,7 @@ void FigureTests::test_2v_4sp_fig77() {
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65};
     cp =           {65,65,64,64,60,60,65,65,69,69,67,67,65,65,64,64,69,69,65,65,64,65};
     v_type = {0};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_4sp_fig78() {
@@ -382,8 +357,7 @@ void FigureTests::test_2v_4sp_fig78() {
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
     cp =           {53,53,52,52,50,50,46,46,43,43,55,55,53,53,52,52,50,50,53,53,52,53};
     v_type = {-3};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_5sp_fig82() {
@@ -415,8 +389,7 @@ void FigureTests::test_2v_5sp_fig82() {
                     FOURTH_SPECIES
                 };
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_5sp_fig83() {
@@ -435,8 +408,7 @@ void FigureTests::test_2v_5sp_fig83() {
                     74,-1,73,-1,
                     74};
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_2v_5sp_fig87_1() {
@@ -470,8 +442,7 @@ void FigureTests::test_2v_5sp_fig87_1() {
                     FOURTH_SPECIES
                 };
     v_type = {2};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_1sp_fig108(){
@@ -481,8 +452,7 @@ void FigureTests::test_3v_1sp_fig108(){
     cp =           {67,64,65,69,72,72,76,72,69,68,
                     64,69,62,65,65,65,72,72,74,76};
     v_type = {1, 0};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_1sp_fig109(){
@@ -492,8 +462,7 @@ void FigureTests::test_3v_1sp_fig109(){
     cp =           {67,64,65,64,64,64,67,67,62,64,
                     71,72,69,69,72,72,71,71,69,71};
     v_type = {2, 3};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_1sp_fig110(){
@@ -503,8 +472,7 @@ void FigureTests::test_3v_1sp_fig110(){
     cp =           {60,60,60,62,58,59,57,69,65,62,64,65,
                     53,52,53,50,55,55,53,45,50,50,48,41};
     v_type = {-1, -3};
-    borrowMode = 1;
-    findAllMUSes();
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_1sp_fig111(){
@@ -514,8 +482,8 @@ void FigureTests::test_3v_1sp_fig111(){
     cp =           {69,72,72,74,74,70,69,67,65,77,76,77,
                     77,76,77,74,70,67,65,64,65,62,60,65};
     v_type = {1, 0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_1sp_fig112(){
@@ -525,8 +493,8 @@ void FigureTests::test_3v_1sp_fig112(){
     cp =           {69,70,72,69,70,72,69,67,72,69,70,69,
                     65,62,60,60,65,67,60,64,64,65,64,65};
     v_type = {1, 0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }   
 
 void FigureTests::test_3v_1sp_fig113(){
@@ -536,8 +504,8 @@ void FigureTests::test_3v_1sp_fig113(){
     cp =           {71,67,67,71,76,72,71,67,67,69,66,67,66,67,
                     55,52,52,52,48,48,55,52,48,45,47,43,50,43};
     v_type = {2, -1};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }   
 
 void FigureTests::test_3v_1sp_fig114(){
@@ -547,8 +515,8 @@ void FigureTests::test_3v_1sp_fig114(){
     cp =           {71,67,67,71,67,69,71,71,72,64,66,67,66,67,
                     55,52,52,52,52,48,55,52,48,48,47,43,50,43};
     v_type = {2, -1};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }  
 
 void FigureTests::test_3v_1sp_fig115(){
@@ -558,8 +526,8 @@ void FigureTests::test_3v_1sp_fig115(){
     cp =           {60,64,67,65,64,67,69,67,65,69,68,69,
                     69,69,76,74,69,67,65,72,74,69,76,69};
     v_type = {-1, 0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }         
 
 void FigureTests::test_3v_1sp_fig116(){
@@ -569,8 +537,8 @@ void FigureTests::test_3v_1sp_fig116(){
     cp =           {64,64,67,65,64,72,69,72,71,69,68,69,
                     45,45,52,50,57,57,50,48,55,57,52,45};
     v_type = {1, -1};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }     
 
 void FigureTests::test_3v_1sp_fig117(){
@@ -580,8 +548,8 @@ void FigureTests::test_3v_1sp_fig117(){
     cp =           {60,64,62,65,64,60,60,60,62,57,56,57,
                     69,69,71,71,72,67,69,67,65,64,62,64};
     v_type = {2, 3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_1sp_fig118(){
@@ -591,8 +559,8 @@ void FigureTests::test_3v_1sp_fig118(){
     cp =           {67, 72, 69, 67, 72, 72, 76, 72, 71, 72, 71, 72,
                     48, 48, 50, 52, 48, 53, 52, 57, 50, 48, 55, 48};
     v_type = {1, -1};
-    borrowMode = 1;
-   findAllMUSes();
+    
+   find_unsat_constraints();
 }
 
 void FigureTests::test_3v_1sp_fig119(){
@@ -602,8 +570,8 @@ void FigureTests::test_3v_1sp_fig119(){
     cp =           {64, 67, 69, 71, 72, 72, 76, 72, 69, 72, 71, 72,
                     72, 72, 69, 67, 69, 65, 72, 72, 74, 72, 67, 72};
     v_type = {1, 1};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_2sp_fig125(){
@@ -613,8 +581,8 @@ void FigureTests::test_3v_2sp_fig125(){
     cp =           {64,   64,   65,   64,   65,   64,   67,   67,   69,   68,
                     -1,71,72,71,69,65,67,64,69,71,72,69,71,74,76,74,72,69,71};
     v_type = {2 ,3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_2sp_fig126(){
@@ -624,8 +592,8 @@ void FigureTests::test_3v_2sp_fig126(){
     cp =           {64,69,65,69,65,77,76,72,69,68,
                     -1,52,53,52,50,52,53,48,50,52,53,57,60,55,57,52,52,50,52};
     v_type = {1, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_2sp_fig127(){
@@ -635,8 +603,8 @@ void FigureTests::test_3v_2sp_fig127(){
     cp =           {-1,65,64,62,60,57,62,57,58,57,55,60,57,69,67,64,60,57,62,65,65,64,65,
                     53,48,53,50,46,48,50,52,53,50,48,41};
     v_type = {-1, -3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 
@@ -648,8 +616,8 @@ void FigureTests::test_3v_2sp_fig128(){
     cp =           {-1,77,76,74,72,71,69,72,70,69,67,72,69,81,79,76,72,69,74,77,77,76,77,
                     65,   60,   65,   65,   67,   72,   74,   76,   77,   74,   72,   65};
     v_type = {1 ,0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_2sp_fig129(){
@@ -659,8 +627,8 @@ void FigureTests::test_3v_2sp_fig129(){
     cp =            {60,   60,   60,   62,   65,   67,   69,   67,   60,   62,   64,   65,
                      -1,53,52,48,53,52,50,48,46,45,43,48,41,53,52,48,53,52,50,46,43,48,41};
     v_type = {-1, -3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_3sp_fig130(){
@@ -670,8 +638,8 @@ void FigureTests::test_3v_3sp_fig130(){
     cp =           {69,62,65,67,69,65,69,71,72,71,67,69,71,72,74,71,76,74,71,73,74,77,76,74,72,69,72,74,76,74,72,71,69,62,69,71,73,69,71,72,74,
                     50,50,48,55,52,50,53,48,50,57,50};
     v_type = {1, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_3sp_fig131(){
@@ -681,8 +649,8 @@ void FigureTests::test_3v_3sp_fig131(){
     cp =           {62,64,65,67,69,57,60,62,64,65,67,64,65,69,65,64,62,58,62,64,65,69,67,65,64,60,64,65,67,64,65,67,69,57,60,62,64,62,59,61,62,
                     69,69,73,74,70,69,72,70,69,67,65};
     v_type = {2, 3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_3sp_fig132(){ 
@@ -692,8 +660,8 @@ void FigureTests::test_3v_3sp_fig132(){
     cp =           {69,69,72,71,71,74,72,76,74,73,74,
                     -1,62,65,64,62,64,65,67,69,67,64,65,67,62,67,65,64,67,65,64,62,74,62,64,65,67,69,71,72,76,74,72,74,62,65,67,69,67,69,57,62};
     v_type = {1, 1};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_3sp_fig133(){
@@ -703,8 +671,8 @@ void FigureTests::test_3v_3sp_fig133(){
     cp =            {65,62,65,67,69,65,69,71,72,64,67,69,71,74,71,69,67,69,71,73,74,76,77,74,72,69,72,74,76,74,72,71,69,74,69,71,73,69,71,72,74,
                      50,50,48,55,52,50,53,48,50,57,50};
     v_type = {1, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_4sp_fig146() {
@@ -714,8 +682,8 @@ void FigureTests::test_3v_4sp_fig146() {
     cp =           {76,76,72,72,71,71,69,69,72,72,74,74,72,72,69,69,71,68,
                     64,69,67,69,65,65,64,60,62,64};
     v_type = {2,0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_4sp_fig147() {
@@ -725,8 +693,8 @@ void FigureTests::test_3v_4sp_fig147() {
     cp =           {76,76,72,72,71,71,69,69,74,74,72,72,71,71,69,69,71,68,
                     52,57,55,57,53,53,52,48,50,52};
     v_type = {2,-2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_4sp_fig148() {
@@ -736,8 +704,8 @@ void FigureTests::test_3v_4sp_fig148() {
     cp =           {67,67,67,64,72,74,76,72,69,68,
                     52,52,48,48,47,47,45,45,53,53,50,50,48,48,52,52,50,52};
     v_type = {2,-2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_4sp_fig149() {
@@ -747,8 +715,8 @@ void FigureTests::test_3v_4sp_fig149() {
     cp =           {65,65,64,64,62,62,65,65,67,67,69,69,65,65,64,64,62,62,65,65,64,65,
                     53,48,53,50,46,48,50,57,53,50,48,41};
     v_type = {0,-2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_4sp_fig150(){
@@ -758,8 +726,8 @@ void FigureTests::test_3v_4sp_fig150(){
     cp =           {69,71,72,69,65,67,69,67,72,69,70,69,
                     65,65,64,64,60,60,57,57,62,62,60,60,65,65,64,64,60,60,65,65,64,65};
     v_type = {1, 0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_4sp_fig151(){
@@ -769,8 +737,8 @@ void FigureTests::test_3v_4sp_fig151(){
     cp =           {53,60,65,62,58,55,62,64,65,62,58,57,
                     53,53,52,52,50,50,46,46,43,-1,48,48,46,46,45,45,50,50,53,53,52,53};
     v_type = {-2, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_5sp_fig154() {
@@ -801,11 +769,12 @@ void FigureTests::test_3v_5sp_fig154() {
                         FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
                         FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
                         FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                        FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
                         FOURTH_SPECIES,
     };
     v_type = {2, 2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_5sp_fig155() {
@@ -839,8 +808,8 @@ void FigureTests::test_3v_5sp_fig155() {
                         FOURTH_SPECIES,
     };
     v_type = {2, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_5sp_fig156() {
@@ -874,8 +843,8 @@ void FigureTests::test_3v_5sp_fig156() {
                         FOURTH_SPECIES
     };
     v_type = {2,-2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_3v_5sp_fig157() {
@@ -907,8 +876,8 @@ void FigureTests::test_3v_5sp_fig157() {
                         FOURTH_SPECIES
     };
     v_type = {2,2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_1sp_fig166() {
@@ -919,8 +888,8 @@ void FigureTests::test_4v_1sp_fig166() {
                     68,69,65,64,64,65,72,72,69,68,
                     52,53,50,45,45,41,40,45,50,52};
     v_type = {-1,1,-3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_1sp_fig167() {
@@ -931,8 +900,8 @@ void FigureTests::test_4v_1sp_fig167() {
                     71,69,69,69,72,72,76,72,74,71,
                     52,53,50,45,45,41,40,45,50,52};
     v_type = {1,1,-3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_1sp_fig168() {
@@ -943,8 +912,8 @@ void FigureTests::test_4v_1sp_fig168() {
                     68,69,65,67,69,65,72,72,69,68,
                     64,65,62,64,65,65,64,69,62,64};
     v_type = {1,1,0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_1sp_fig169() {
@@ -955,8 +924,8 @@ void FigureTests::test_4v_1sp_fig169() {
                     60,60,60,62,65,67,65,64,62,57,60,57,
                     53,52,53,50,46,43,50,45,50,50,48,41};
     v_type = {0,-1,-3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_1sp_fig170() {
@@ -967,8 +936,8 @@ void FigureTests::test_4v_1sp_fig170() {
                     69,67,65,69,65,67,65,64,65,69,72,69,
                     53,52,53,41,46,43,50,45,50,50,48,41};
     v_type = {-1,0,-3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_1sp_fig171() {
@@ -979,8 +948,8 @@ void FigureTests::test_4v_1sp_fig171() {
                     60,60,60,62,62,58,57,57,53,57,60,57,
                     53,52,53,50,46,43,50,45,50,50,48,41};
     v_type = {0,-1,-3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_1sp_fig172() {
@@ -991,8 +960,8 @@ void FigureTests::test_4v_1sp_fig172() {
                     69,67,64,65,65,67,69,67,65,65,64,65,
                     65,62,60,60,62,60,60,64,60,62,58,60};
     v_type = {1,0,-1};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_2sp_fig173() {
@@ -1003,8 +972,8 @@ void FigureTests::test_4v_2sp_fig173() {
                     -1,65,69,71,72,67,71,69,67,64,69,65,64,65,64,72,69,65,69,69,69,
                     50,50,48,55,52,50,45,48,50,45,50};   
     v_type = {-1,1,-2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_2sp_fig174() {
@@ -1015,8 +984,8 @@ void FigureTests::test_4v_2sp_fig174() {
                     69,65,67,67,67,69,72,72,65,69,69,
                     50,50,48,55,52,50,45,48,50,45,50};   
     v_type = {1,1,-2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_2sp_fig175() {
@@ -1027,8 +996,8 @@ void FigureTests::test_4v_2sp_fig175() {
                     69,69,69,71,71,74,72,72,69,69,69,
                     -1,74,62,65,69,72,67,65,64,67,62,64,65,69,72,60,62,65,69,57,62};   
     v_type = {2,1,0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_2sp_fig176() {
@@ -1039,8 +1008,8 @@ void FigureTests::test_4v_2sp_fig176() {
                      -1,62,60,62,64,67,65,64,62,64,65,69,64,65,67,62,65,69,67,64,66,
                      69,   69,   67,   69,   70,   72,   72,   74,   69,   76,   69};
     v_type = {3, 2, 3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
     
 void FigureTests::test_4v_3sp_fig183() {
@@ -1051,8 +1020,8 @@ void FigureTests::test_4v_3sp_fig183() {
                     68,69,69,67,72,69,71,72,74,71,
                     52,53,50,52,53,53,52,57,50,52};   
     v_type = {0, 1, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_3sp_fig184(){
@@ -1063,8 +1032,8 @@ void FigureTests::test_4v_3sp_fig184(){
                     59,57,57,55,57,60,64,60,62,59,
                     64,65,62,64,65,65,64,69,62,64};
     v_type = {-2, -4, -3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_3sp_fig185(){
@@ -1075,8 +1044,8 @@ void FigureTests::test_4v_3sp_fig185(){
                     68,71,64,67,69,72,69,67,65,69,67,65,67,64,76,74,72,71,69,67,65,67,69,71,72,74,76,74,72,69,72,71,69,62,74,72,71,  
                     52,53,50,52,53,53,48,48,50,52};   
     v_type = {1, 0, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_3sp_fig186(){
@@ -1087,8 +1056,8 @@ void FigureTests::test_4v_3sp_fig186(){
                     68,69,69,72,72,72,72,72,74,71,
                     76,74,72,71,69,67,65,64,62,64,65,62,69,72,69,67,65,67,69,67,65,67,69,71,72,64,65,67,69,67,65,64,62,65,64,62,64};
     v_type = {1, 1, 0};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_4sp_fig196(){
@@ -1099,8 +1068,8 @@ void FigureTests::test_4v_4sp_fig196(){
                      65,69,69,62,74,74,72,72,69,69,69,
                      50,50,45,47,43,50,53,48,50,45,50};
     v_type = {-1, 1, -3};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_5sp_fig200(){
@@ -1136,8 +1105,8 @@ void FigureTests::test_4v_5sp_fig200(){
                         FOURTH_SPECIES,
     };
     v_type = {1, 1, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_5sp_fig201() {
@@ -1173,20 +1142,21 @@ void FigureTests::test_4v_5sp_fig201() {
                         FOURTH_SPECIES,
     };
     v_type = {1, 1, -2};
-    borrowMode = 1;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::test_4v_Xsp_fig204() {
     cout << "Start test_4v_Xsp_fig204" << endl;
     spList = {SECOND_SPECIES, THIRD_SPECIES, FOURTH_SPECIES};
     cantusFirmus =  {50,53,52,50,55,53,57,55,53,52,50}; 
-    cp = {  69,74,72,69,71,72,74,62,70,67,69,65,72,69,70,67,69,65,67,64,66,
+    cp = {  69,74,72,69,71,72,74,62,70,67,69,65,72,69,70,67,69,65,67,64,66, 
             62,64,65,67,69,67,65,69,67,65,64,67,65,62,65,64,62,60,58,62,65,67,69,65,64,62,60,57,62,60,58,55,60,59,57,62,64,52,53,55,57,
-            69,69,74,74,72,72,70,70,74,74,72,72,77,77,76,76,74,74,73,74,};
+            69,69,74,74,72,72,70,70,74,74,72,72,77,77,76,76,74,74,73,74,
+        };
     v_type = {2,2,3};
-    borrowMode = 0;
-    findAllMUSes();
+    
+    find_unsat_constraints();
 }
 
 void FigureTests::run_twoVoice_tests() {
@@ -1278,6 +1248,27 @@ void FigureTests::run_fourVoice_tests() {
     test_4v_4sp_fig196();
 }
 
+void FigureTests:: run_thirdSpecies_tests() {
+    cout << "Running third species tests..." << endl;
+    // Two voice third species figures
+    test_2v_3sp_fig55();
+    test_2v_3sp_fig56();
+    test_2v_3sp_fig57();
+    test_2v_3sp_fig58();
+    test_2v_3sp_fig59();
+    test_2v_3sp_fig60();
+    // Three voice third species figures
+    test_3v_3sp_fig130();
+    test_3v_3sp_fig131();
+    test_3v_3sp_fig132();
+    test_3v_3sp_fig133();
+    // Four voice third species figures
+    test_4v_3sp_fig183();
+    test_4v_3sp_fig184();
+    test_4v_3sp_fig185();
+    test_4v_3sp_fig186();
+}
+
 void FigureTests::run_fourthSpecies_tests() {
     cout << "Running four species tests..." << endl;
     // Two voice fourth species figures
@@ -1319,8 +1310,14 @@ void FigureTests::run_all_tests() {
     cout << "All figure tests completed." << endl;
 } 
 
+// Add to the MUSTest method to include our new test
 void FigureTests::MUSTest() {
     cout << "Running MUSTest..." << endl;
+    
+    // Test cost summing first
+    // test_cost_summing();
+    
+    // Then run the regular tests
     run_all_tests();
     
     cout << "MUSTest completed." << endl;

@@ -109,6 +109,10 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     //     cout << unitedCostNames[i] << endl;
     // }
 
+    // compute combined costs
+    computeCombinedCosts();
+
+
     orderCosts();
 
     //Branching strategies

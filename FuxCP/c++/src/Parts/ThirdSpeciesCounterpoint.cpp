@@ -139,7 +139,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     cambiataCostArray = IntVarArray(home, nMeasures-1, IntSet({0, cambiataCost}));
 
     m2ZeroArray = IntVarArray(home, thirdSpeciesMelodicIntervals.size()-2, IntSet({0, m2ZeroCost}));
-    
+  
     //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
     if (activeConstraints[SP3_3H1]) {
         H1_3_fiveConsecutiveNotesByJointDegree(home, this);
@@ -149,12 +149,10 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     if (activeConstraints[SP3_3H2]) {
         H2_3_disonanceImpliesDiminution(home, this);
     }
-
     //3.H3 : cambiata cost
     if (activeConstraints[SP3_3H3]) {
         H3_3_cambiataCost(home, this);
     }
-
     //3.M1 : each note and its two beats further peer are preferred to be different
     //i + i+1 + i+2
     if (activeConstraints[SP3_3M1]) {
@@ -204,6 +202,12 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         rel(home, expr(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-3]+thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2])
         , IRT_NQ, 1);
     }
+
+    // combined costs
+    toCombineCosts = IntVarArray(home, 1, 0, 10000);
+    toCombineCostNames = {"1H1"};
+    //need to set constraintCosts[0]
+    add_toCombineCost(home, 0, disArray, toCombineCosts);
 }
 
 /**
@@ -218,7 +222,6 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         rel(home, (getIsNotLowest()[getIsNotLowest().size()-2]==0) >> 
         (expr(home, abs(thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-5]))==MINOR_THIRD));
     }
-
     costs = IntVarArray(home, 7, 0, 10000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2"};
 
@@ -302,7 +305,6 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     add_cost(home, 8, m2ZeroArray, costs);
     //set cost[9] to be triad h third cost
     add_cost(home, 9, thirdHTriadArray, costs);
-    
 }
 
 /**

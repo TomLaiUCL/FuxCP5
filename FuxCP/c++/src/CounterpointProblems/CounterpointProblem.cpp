@@ -42,6 +42,24 @@ CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int>
 
     writeToLogFile("counterpointproblem constructor"); 
 
+    // Constraints Cost
+    combinedCosts = IntVarArray(*this, combinedCostNames.size(), 0, 10000);         //combinedCosts will contain the costs of the different counterpoints
+
+    // 1H1
+    // combined constraints has to be respect user preferences
+    int respect_percent_1H1 = 50; //50 allowed every Fux figures tested (figures 60 is the worst)
+    //TODO: should be replaced by the user preference  
+
+    int nCP = 1; // number of counterpoints
+    if (counterpoint_2 != nullptr) {
+        nCP ++;
+    }
+    if (counterpoint_3 != nullptr) {
+        nCP ++;
+    }
+    int n_thesis_notes = this->nMeasures * nCP;
+    int threshold = n_thesis_notes - (respect_percent_1H1 * n_thesis_notes) / 100;
+    rel(*this, combinedCosts[H1_1], IRT_LQ, threshold); // 1H1
 }
 
 // COPY CONSTRUCTOR
@@ -90,10 +108,12 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
     importance = s.importance;
     prefs = s.prefs;
     sorted_voices = s.sorted_voices;
+    combinedCosts = s.combinedCosts;
     unitedCostNames = s.unitedCostNames;
     costLevels = s.costLevels;
     n_unique_costs = s.n_unique_costs;
     importanceNames = s.importanceNames;
+    combinedCosts.update(*this, s.combinedCosts);
     successiveCostArray.update(*this, s.successiveCostArray);
     triadCostArray.update(*this, s.triadCostArray);
     unitedCosts.update(*this, s.unitedCosts);
@@ -551,3 +571,58 @@ CounterpointProblem* get_next_solution_space(Search::Base<CounterpointProblem>* 
     return sol_space;
 }
 
+void CounterpointProblem::computeCombinedCosts(){
+    int sz = 2;
+    if(counterpoint_2!=nullptr){
+        sz++;
+    }
+    if(counterpoint_3!=nullptr){
+        sz++;
+    }
+    for (size_t i = 0; i < combinedCostNames.size(); i++) {
+        string costName = combinedCostNames[i];
+        IntVarArgs to_combined(sz);
+        // get the cost of the cantus firmus
+        vector<string> cf_vec = cantusFirmus->getToCombineCostNames();
+        auto cf_it = std::find(cf_vec.begin(), cf_vec.end(), costName);
+        if (cf_it != cf_vec.end()) {
+            int index = std::distance(cf_vec.begin(), cf_it);
+            to_combined[0] = cantusFirmus->getToCombineCosts()[index];
+        } else {
+            to_combined[0] = IntVar(*this, 0, 0);
+        }
+        // get the cost of the counterpoint 1
+        vector<string> cp1_vec = counterpoint_1->getToCombineCostNames();
+        auto cp1_it = std::find(cp1_vec.begin(), cp1_vec.end(), costName);
+        if (cp1_it != cp1_vec.end()) {
+            int index = std::distance(cp1_vec.begin(), cp1_it);
+            to_combined[1] = counterpoint_1->getToCombineCosts()[index];
+        } else {
+            to_combined[1] = IntVar(*this, 0, 0);
+        }
+        // get the cost of the counterpoint 2
+        if(counterpoint_2!=nullptr){
+            vector<string> cp2_vec = counterpoint_2->getToCombineCostNames();
+            auto cp2_it = std::find(cp2_vec.begin(), cp2_vec.end(), costName);
+            if (cp2_it != cp2_vec.end()) {
+                int index = std::distance(cp2_vec.begin(), cp2_it);
+                to_combined[2] = counterpoint_2->getToCombineCosts()[index];
+            } else {
+                to_combined[2] = IntVar(*this, 0, 0);
+            }
+        }
+        // get the cost of the counterpoint 3
+        if(counterpoint_3!=nullptr){
+            vector<string> cp3_vec = counterpoint_3->getToCombineCostNames();
+            auto cp3_it = std::find(cp3_vec.begin(), cp3_vec.end(), costName);
+            if (cp3_it != cp3_vec.end()) {
+                int index = std::distance(cp3_vec.begin(), cp3_it);
+                to_combined[3] = counterpoint_3->getToCombineCosts()[index];
+            } else {
+                to_combined[3] = IntVar(*this, 0, 0);
+            }
+        }
+        // sum the costs
+        rel(*this, combinedCosts[i], IRT_EQ, expr(*this, sum(to_combined)));
+    }
+}
