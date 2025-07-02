@@ -191,8 +191,8 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
         }
     }
 
-    //Melodic intervals cannot be greater than Minor Sixth (except octave)
-    if (activeConstraints[SP4_U1]) {
+    //1.M2 Melodic intervals cannot be greater than Minor Sixth (except octave)
+    if (activeConstraints[SP4_1M2]) {
         dom(home, fourthSpeciesMelodicIntervals, IntSet({UNISSON, -PERFECT_OCTAVE, -MINOR_SIXTH, -PERFECT_FIFTH, -AUGMENTED_FOURTH, -PERFECT_FOURTH, 
             -MAJOR_THIRD, -MINOR_THIRD, -MAJOR_SECOND, -MINOR_SECOND, PERFECT_OCTAVE, MINOR_SIXTH, PERFECT_FIFTH, AUGMENTED_FOURTH, PERFECT_FOURTH, 
             MAJOR_THIRD, MINOR_THIRD, MAJOR_SECOND, MINOR_SECOND}));

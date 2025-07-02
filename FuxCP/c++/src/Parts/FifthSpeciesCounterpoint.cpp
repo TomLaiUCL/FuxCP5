@@ -245,17 +245,6 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     //     //rel(home, fifthSpeciesNotesCp[i], IRT_EQ, fifthSpeciesNotesCp[i+1], Reify(isNthSpeciesArray[(i*5)], RM_IMP));
     // }
     
-    //Third note of penult measure must be below the fourth one
-    if (activeConstraints[SP5_H1]) {
-        rel(home, fifthSpeciesSuccMIntervals[fifthSpeciesSuccMIntervals.size()-3], IRT_GR, MINOR_SECOND, 
-        Reify(isThirdSpeciesArray[isThirdSpeciesArray.size()-2], RM_IMP));
-    }
-    //Second and third note distant by more than one semi tone from fourth note
-    if (activeConstraints[SP5_H2]) {
-        rel(home, expr(home, abs(fifthSpeciesM2Intervals[fifthSpeciesM2Intervals.size()-2])), IRT_NQ, 1, 
-            Reify(isThirdSpeciesArray[isThirdSpeciesArray.size()-2], RM_IMP));
-    }
-    
     //is penult cons to cf
     if (activeConstraints[SP5_H3]) {
         BoolVar isPenultConsToCf = BoolVar(home, 0, 1);
@@ -274,7 +263,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         rel(home, sm, IRT_EQ, expr(home, sum(x)));                                     
         rel(home, sm, IRT_GR, 0, Reify(isPenultConsToCf));                     
 
-        rel(home, isFourthSpeciesArray[isFourthSpeciesArray.size()-5], BOT_AND, isPenultConsToCf, 0);
+        rel(home, isFourthSpeciesArray[isFourthSpeciesArray.size()-5], BOT_AND, isPenultConsToCf, 0); // if the penultimate note is part of the fourth species (isFourthSpeciesArray[isFourthSpeciesArray.size()-5] is true), then it must not be consonant with the cantus firmus (
     }
     
     
@@ -355,6 +344,17 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
             rel(home, (isFourthSpeciesArray[(i*4)]==1 && isConstrainedArray[(i*4)+2]==1) >> (fifthSpeciesNotesCp[(i*4)]!=fifthSpeciesNotesCp[(i*4)+2]));
         }
     }
+
+    //Third note of penult measure must be below the fourth one
+    if (activeConstraints[SP5_3M3]) {
+        rel(home, fifthSpeciesSuccMIntervals[fifthSpeciesSuccMIntervals.size()-3], IRT_GR, MINOR_SECOND, 
+        Reify(isThirdSpeciesArray[isThirdSpeciesArray.size()-2], RM_IMP));
+    }
+    //Second and third note distant by more than one semi tone from fourth note
+    if (activeConstraints[SP5_3M4]) {
+        rel(home, expr(home, abs(fifthSpeciesM2Intervals[fifthSpeciesM2Intervals.size()-2])), IRT_NQ, 1, 
+            Reify(isThirdSpeciesArray[isThirdSpeciesArray.size()-2], RM_IMP));
+    }
     
 
     /** ===========================================================================
@@ -385,7 +385,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     }
      
     //dissonant notes must be followed by the consonant note below
-    if (activeConstraints[SP5_P2]) {
+    if (activeConstraints[SP5_4P1]) {
         for(int i = 0; i < fifthSpeciesMTAIntervals.size(); i++){
             //isFourthArray first note
             //is Consonance array first note

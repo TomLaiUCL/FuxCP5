@@ -92,9 +92,9 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
         M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
     }
     
-    //two  fifth species counterpoints should be as different as possible
-    if (activeConstraints[V3_U1]) {
-        twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_2);
+    //5.R9 two  fifth species counterpoints should be as different as possible
+    if (activeConstraints[V3_5R9]) {
+        R9_5_twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_2);
     }
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size(), 0, 127);

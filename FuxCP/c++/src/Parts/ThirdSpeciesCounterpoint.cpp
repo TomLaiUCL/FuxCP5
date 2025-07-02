@@ -185,6 +185,7 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         }
     }
 
+    // 3.M2
     //no melodic interval between 9 and 11
     if (activeConstraints[SP3_U1]) {
         for(int i = 0; i < nMeasures-1; i++){
@@ -192,11 +193,13 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
         }
     }
     
+    // 3.M3
     //third note of the penultimate measure must be below the fourth one
     if (activeConstraints[SP3_U2]) {
         rel(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2], IRT_GR, 1);
     }
 
+    // 3.M4
     //second one must also be more distant than a semi tone from the last note of the penultimate measure
     if (activeConstraints[SP3_U3]) {
         rel(home, expr(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-3]+thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2])
