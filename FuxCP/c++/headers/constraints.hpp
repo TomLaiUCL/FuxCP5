@@ -167,7 +167,7 @@ void initializeIsOffArray(Home home, Part* part);
 /**
  * Two fifth species rhythms should be as diverse as possible
  */
-void twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2);
+void R9_5_twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2);
 
 /**
  * For the upper strata, there shouldn't be a minor second interval between the thesis notes

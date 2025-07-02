@@ -23,7 +23,7 @@ void initializeIsOffArray(Home home, Part* part){
     }
 }
 
-void twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2){
+void R9_5_twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2){
     if(cp1->getSpecies()==FIFTH_SPECIES && cp2->getSpecies()==FIFTH_SPECIES){
         BoolVarArray isSameSpecies = BoolVarArray(home, cp1->getNotes().size(), 0, 1);
         IntVarArray isSameSpeciesInt = IntVarArray(home, cp1->getNotes().size(), 0, 1);
@@ -38,12 +38,16 @@ void twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2){
 }
 
 void noMinorSecondBetweenUpper(Home home, vector<Part*> parts){
+    // For all pairs of voices v1 < v2:
     for(int v1 = 0; v1 < parts.size(); v1++){
         for(int v2 = v1+1; v2 < parts.size(); v2++){
+            // For each measure i:
             for(int i = 0; i < parts[1]->getNMeasures(); i++){
+                // Let noneLowest = (parts[v1] is not lowest at i) == (parts[v2] is not lowest at i)
                 BoolVar noneLowest = BoolVar(home, 0, 1);
                 rel(home, parts[v1]->getIsNotLowest()[i], IRT_EQ, parts[v2]->getIsNotLowest()[i], Reify(noneLowest, RM_PMI));
 
+                // Let interval = pitch difference between v1 and v2 at measure i (modulo 12, with special handling for fourth species)
                 IntVar interval = IntVar(home, -PERFECT_OCTAVE, PERFECT_OCTAVE);
                 if(i==parts[1]->getNMeasures()-1){
                     rel(home, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
@@ -57,6 +61,10 @@ void noMinorSecondBetweenUpper(Home home, vector<Part*> parts){
                 } else {
                     rel(home, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getNotes()[(i*4)+2])%12));
                 }
+                // Constraint: If noneLowest == 1, then |interval| != 1
+                // In math:
+                //    If isNotLowest_v1[i] == isNotLowest_v2[i] == 1:
+                //        |interval(v1, v2, i)| ≠ 1
                 rel(home, (noneLowest==1) >> (expr(home, abs(interval)!=1)));
             }
         }

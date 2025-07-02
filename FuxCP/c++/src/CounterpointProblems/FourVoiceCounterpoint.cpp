@@ -86,8 +86,8 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     }
 
     //two fifth species counterpoints should be as different as possible
-    if (activeConstraints[V4_U1]) {
-        twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_3);
+    if (activeConstraints[V4_5R9]) {
+        R9_5_twoFifthSpeciesDiversity_3v(*this, counterpoint_1, counterpoint_3);
     }
     
     //no minor second interval between upper
