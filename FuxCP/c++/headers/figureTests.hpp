@@ -21,6 +21,7 @@ private:
     bool is_unsat(const set<int>& cons_set);
     set<int> minimize (const std::set<int>& activeCons);
     void findAllMUSes();
+    void find_unsat_constraints();
 
 public:
     FigureTests();
@@ -138,10 +139,16 @@ public:
     void run_threeVoice_tests();
     void run_fourVoice_tests();
 
+    void run_thirdSpecies_tests();
     void run_fourthSpecies_tests();
     void run_fifthSpecies_tests();
 
     void MUSTest();
+
+    void quickTest();
+
+    // Add new method for testing cost summing
+    void test_cost_summing();
 };
 
-#endif // FIGURE_TESTS_HPP 
+#endif // FIGURE_TESTS_HPP
