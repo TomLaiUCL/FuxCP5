@@ -6,6 +6,7 @@ using namespace std;
 
 FigureTests::FigureTests() {
     borrowMode = 1;
+    borrowMode = 1;
     melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
     general_params = {4, 1, 1, 2, 2, 2, 8, 1};
     specific_params = {8, 4, 0, 2, 1, 8, 50};
@@ -169,6 +170,18 @@ void FigureTests::find_unsat_constraints() {
     }
 }
 
+void FigureTests::find_unsat_constraints() {
+    // activeConstraints = std::vector<bool>(activeConstraints.size(), false);
+    // cout << has_solution(set_configuration()) << endl;
+    for (int i = 0; i < consSize; i++) {
+        set<int> cons_set; // all constraint indices
+        cons_set.insert(i);
+        if (is_unsat(cons_set))  {
+            cout << "\t" << get_constraint_name(i) << " is unsatisfiable." << endl;
+        }
+    }
+}
+
 /* ============================================================================
                             FIGURES
 ============================================================================ */
@@ -205,6 +218,7 @@ void FigureTests::test_2v_2sp_fig38() {
     cout << "Start test_2v_2sp_fig38" << endl;
     spList = {SECOND_SPECIES};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
     cp =           {-1,65,64,62,60,58,57,55,53,57,60,58,57,69,67,64,65,67,69,65,62,64,65};
     v_type = {2};
     find_unsat_constraints(); 
@@ -213,6 +227,7 @@ void FigureTests::test_2v_2sp_fig38() {
 void FigureTests::test_2v_2sp_fig39() {
     cout << "Start test_2v_2sp_fig39" << endl;
     spList = {SECOND_SPECIES};
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cp =           {-1,53,52,48,53,52,50,48,46,58,55,60,57,53,52,48,53,41,45,50,48,52,53};
     v_type = {0};
@@ -350,6 +365,7 @@ void FigureTests::test_2v_3sp_fig59() {
     cout << "Start test_2v_3sp_fig59" << endl;
     spList = {THIRD_SPECIES};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cp =           {65,64,62,60,59,62,67,65,64,62,60,58,57,60,62,64,65,62,64,65,67,64,65,67,69,67,65,69,67,65,64,62,60,64,60,64,65,64,62,60,58,60,62,64,65};
     v_type = {1};
     find_unsat_constraints();
@@ -419,6 +435,8 @@ void FigureTests::test_2v_4sp_fig77() {
     spList = {FOURTH_SPECIES};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
                    
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
+                   
     cp =           {65,65,64,64,60,60,65,65,69,69,67,67,65,65,64,64,69,69,65,65,64,65};
     // {65,65,64,64,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
     v_type = {2};
@@ -435,6 +453,7 @@ void FigureTests::test_2v_4sp_fig77() {
 void FigureTests::test_2v_4sp_fig78() {
     cout << "Start test_2v_4sp_fig78" << endl;
     spList = {FOURTH_SPECIES};
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cp =           {53,53,52,52,50,50,46,46,43,43,55,55,53,53,52,52,50,50,53,53,52,53};
     v_type = {-1};
@@ -574,6 +593,7 @@ void FigureTests::test_3v_1sp_fig112(){
     cout << "Start test_3v_1sp_fig112" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
     cp =           {69,70,72,69,70,72,69,67,72,69,70,69,
                     65,62,60,60,65,67,60,64,64,65,64,65};
     v_type = {3, 2};
@@ -585,6 +605,7 @@ void FigureTests::test_3v_1sp_fig113(){
     cout << "Start test_3v_1sp_fig113" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55};
+    cp =           {59,55,55,59,64,60,59,55,55,57,54,55,54,55,
     cp =           {59,55,55,59,64,60,59,55,55,57,54,55,54,55,
                     55,52,52,52,48,48,55,52,48,45,47,43,50,43};
     v_type = {0, -1};
@@ -641,6 +662,7 @@ void FigureTests::test_3v_1sp_fig118(){
     spList = {FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {60, 64, 65, 67, 64, 69, 67, 64, 65, 64, 62, 60};
     cp =           {55, 60, 57, 55, 60, 60, 64, 60, 59, 60, 59, 60,
+    cp =           {55, 60, 57, 55, 60, 60, 64, 60, 59, 60, 59, 60,
                     48, 48, 50, 52, 48, 53, 52, 57, 50, 48, 55, 48};
     v_type = {-1, -1};
     
@@ -673,6 +695,7 @@ void FigureTests::test_3v_2sp_fig126(){
     cout << "Start test_3v_2sp_fig126" << endl;
     spList = {FIRST_SPECIES, SECOND_SPECIES};
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64};
+    cp =           {52,57,53,57,53,65,64,60,57,56,
     cp =           {52,57,53,57,53,65,64,60,57,56,
                     -1,52,53,52,50,52,53,48,50,52,53,57,60,55,57,52,52,50,52};
     v_type = {-1, -2};
@@ -709,6 +732,7 @@ void FigureTests::test_3v_2sp_fig128(){
 void FigureTests::test_3v_2sp_fig129(){
     cout << "Start test_3v_2sp_fig129" << endl;
     spList = {FIRST_SPECIES, SECOND_SPECIES};
+    cantusFirmus =  {53, 55, 57, 53, 50, 52, 53, 60, 57, 53, 55, 53};
     cantusFirmus =  {53, 55, 57, 53, 50, 52, 53, 60, 57, 53, 55, 53};
     cp =            {60,   60,   60,   62,   65,   67,   69,   67,   60,   62,   64,   65,
                      -1,53,52,48,53,52,50,48,46,45,43,48,41,53,52,48,53,52,50,46,43,48,41};
@@ -755,6 +779,7 @@ void FigureTests::test_3v_3sp_fig133(){
     spList = {THIRD_SPECIES, FIRST_SPECIES};
     cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62};
     cp =            {53,50,53,55,57,53,57,59,60,52,55,57,59,62,59,57,55,57,59,61,62,64,65,62,60,57,60,62,64,62,60,59,57,62,57,59,61,57,59,60,62,
+    cp =            {53,50,53,55,57,53,57,59,60,52,55,57,59,62,59,57,55,57,59,61,62,64,65,62,60,57,60,62,64,62,60,59,57,62,57,59,61,57,59,60,62,
                      50,50,48,55,52,50,53,48,50,57,50};
     v_type = {-1, -2};
     
@@ -776,6 +801,7 @@ void FigureTests::test_3v_4sp_fig147() {
     cout << "Start test_3v_4sp_fig147" << endl;
     spList = {FOURTH_SPECIES, FIRST_SPECIES};
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
+    cp =           {64,64,60,60,59,59,57,57,62,62,60,60,59,59,57,57,59,56,
     cp =           {64,64,60,60,59,59,57,57,62,62,60,60,59,59,57,57,59,56,
                     52,57,55,57,53,53,52,48,50,52};
     v_type = {0,-2};
@@ -811,6 +837,7 @@ void FigureTests::test_3v_4sp_fig149() {
 void FigureTests::test_3v_4sp_fig150(){
     cout << "Start test_3v_4sp_fig150" << endl;
     spList = {FIRST_SPECIES, FOURTH_SPECIES};
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53};
     cp =           {69,71,72,69,65,67,69,67,72,69,70,69,
                     65,65,64,64,60,60,57,57,62,62,60,60,65,65,64,64,60,60,65,65,64,65};
@@ -851,6 +878,7 @@ void FigureTests::test_3v_5sp_fig154() {
                     74,
 
                     50,62,60,55,52,50,53,60,62,57,50};
+                    50,62,60,55,52,50,53,60,62,57,50};
     notesSpeciesFor5sp = {
                         -1, -1, FOURTH_SPECIES, -1,
                         FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
@@ -882,6 +910,17 @@ void FigureTests::test_3v_5sp_fig155() {
     cout << "Start_test_3v_5sp_fig155" << endl;
     spList = {FIFTH_SPECIES, FIRST_SPECIES};
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62};
+    cp =           {-1,-1,57,-1,
+                    57,-1,57,59,
+                    60,55,60,-1,
+                    60,-1,59,-1,
+                    59,-1,59,61,
+                    62,57,62,-1,
+                    62,-1,65,-1,
+                    65,-1,64,-1,
+                    64,-1,62,-1,
+                    62,-1,61,-1,
+                    62,
     cp =           {-1,-1,57,-1,
                     57,-1,57,59,
                     60,55,60,-1,
@@ -967,6 +1006,7 @@ void FigureTests::test_3v_5sp_fig157() {
                     68,
 
                     52,57,53,57,53,53,60,60,62,64};
+                    52,57,53,57,53,53,60,60,62,64};
     notesSpeciesFor5sp = {
                         -1, -1, FOURTH_SPECIES, -1,
                         FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
@@ -990,6 +1030,7 @@ void FigureTests::test_4v_1sp_fig166() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {59,57,57,57,60,60,64,60,62,59,
                     56,57,53,52,52,53,60,60,57,56,
+                    56,57,53,52,52,53,60,60,57,56,
                     52,53,50,45,45,41,40,45,50,52};
     v_type = {-1,-1,-3};
     
@@ -999,6 +1040,7 @@ void FigureTests::test_4v_1sp_fig166() {
 void FigureTests::test_4v_1sp_fig167() {
     cout << "Start test_4v_1sp_fig167" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {68,69,65,64,64,65,72,72,69,68,
                     59,57,57,57,60,60,64,60,62,59,
@@ -1011,6 +1053,7 @@ void FigureTests::test_4v_1sp_fig167() {
 void FigureTests::test_4v_1sp_fig168() {
     cout << "Start test_4v_1sp_fig168" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {71,69,69,72,72,72,76,76,74,71,
                     68,69,65,67,69,65,72,72,69,68,
@@ -1045,6 +1088,7 @@ void FigureTests::test_4v_1sp_fig170() {
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
     cp =           {60,60,60,60,58,59,57,69,65,65,64,65,
                     57,55,53,57,53,55,53,52,53,57,60,57,
+                    57,55,53,57,53,55,53,52,53,57,60,57,
                     53,52,53,41,46,43,50,45,50,50,48,41};
     v_type = {-1,-2,-3};
     
@@ -1054,6 +1098,7 @@ void FigureTests::test_4v_1sp_fig170() {
 void FigureTests::test_4v_1sp_fig171() {
     cout << "Start test_4v_1sp_fig171" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cp =           {69,67,65,65,65,67,65,64,65,65,64,65,
                     60,60,60,62,62,58,57,57,53,57,60,57,
@@ -1071,6 +1116,7 @@ void FigureTests::test_4v_1sp_fig172() {
     cout << "Start test_4v_1sp_fig172" << endl;
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cp =           {72,71,72,69,69,72,72,72,72,69,70,65,
                     69,67,64,65,65,67,69,67,65,65,64,65,
                     65,62,60,60,62,60,60,64,60,62,58,60};
@@ -1084,6 +1130,7 @@ void FigureTests::test_4v_2sp_fig173() {
     spList = {FIRST_SPECIES, SECOND_SPECIES, FIRST_SPECIES};
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {57,62,55,55,59,62,60,64,62,61,62,
+                    -1,53,57,59,60,55,59,57,55,52,57,53,52,53,52,60,57,53,57,57,57,
                     -1,53,57,59,60,55,59,57,55,52,57,53,52,53,52,60,57,53,57,57,57,
                     50,50,48,55,52,50,45,48,50,45,50};   
     v_type = {-1,-1,-2};
@@ -1103,6 +1150,7 @@ void FigureTests::test_4v_2sp_fig174() {
     spList = {SECOND_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {-1,65,69,71,72,67,71,74,76,71,74,77,76,72,76,72,69,74,73,73,74,
+                    57,53,55,55,55,57,60,60,53,57,57,
                     57,53,55,55,55,57,60,60,53,57,57,
                     50,50,48,55,52,50,45,48,50,45,50};   
     v_type = {1,-1,-2};
@@ -1140,6 +1188,7 @@ void FigureTests::test_4v_3sp_fig183() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {71,64,71,72,69,72,69,67,65,62,64,65,67,64,65,67,69,65,69,71,72,69,72,74,76,71,76,74,72,76,72,71,69,74,69,71,68, 
                     56,57,57,55,60,57,59,60,62,59,
+                    56,57,57,55,60,57,59,60,62,59,
                     52,53,50,52,53,53,52,57,50,52};   
     v_type = {0, -1, -2};
     
@@ -1162,6 +1211,8 @@ void FigureTests::test_4v_3sp_fig185(){
     cout << "Start test_4v_3sp_fig185" << endl;
     spList = {FIRST_SPECIES, THIRD_SPECIES, FIRST_SPECIES};
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
+    cp =           {71,69,69,72,72,72,76,69,69,68, 
+                    56,59,52,55,57,60,57,55,53,57,55,53,55,52,64,62,60,59,57,55,53,55,57,59,60,62,64,62,60,57,60,59,57,50,62,60,59,  
     cp =           {71,69,69,72,72,72,76,69,69,68, 
                     56,59,52,55,57,60,57,55,53,57,55,53,55,52,64,62,60,59,57,55,53,55,57,59,60,62,64,62,60,57,60,59,57,50,62,60,59,  
                     52,53,50,52,53,53,48,48,50,52};   
@@ -1190,6 +1241,7 @@ void FigureTests::test_4v_4sp_fig196(){
     spList = {FOURTH_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =            {57,57,62,62,60,60,59,59,62,62,57,57,65,65,64,64,62,62,61,62,
+                    53, 57, 57, 50, 62, 62, 60, 60, 57, 57, 57,
                     53, 57, 57, 50, 62, 62, 60, 60, 57, 57, 57,
                      50,50,45,47,43,50,53,48,50,45,50};
     v_type = {-1, -1, -3};
@@ -1221,6 +1273,7 @@ void FigureTests::test_4v_5sp_fig200(){
                     74,-1,73,-1,
                     74,
 
+                    57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
                     57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
                     50,50,48,55,52,50,53,48,50,45,50};
     notesSpeciesFor5sp = {
@@ -1259,6 +1312,19 @@ void FigureTests::test_4v_5sp_fig201() {
                     62,
 
                     57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
+                    -1, -1, 57, -1,
+                    57, -1, 57, 59,
+                    60, 55, 60, -1, 
+                    60, -1, 59, -1, 
+                    59, -1, 59, 61, 
+                    62, 50, 62, -1, 
+                    62, -1, 65, -1, 
+                    65, -1, 64, -1, 
+                    64, -1, 62, -1, 
+                    62, -1, 61, -1, 
+                    62,
+
+                    57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
                     50,50,48,55,52,50,53,48,50,45,50};
     notesSpeciesFor5sp = {
                         -1, -1, FOURTH_SPECIES, -1,
@@ -1282,6 +1348,7 @@ void FigureTests::test_4v_Xsp_fig204() {
     cout << "Start test_4v_Xsp_fig204" << endl;
     spList = {SECOND_SPECIES, THIRD_SPECIES, FOURTH_SPECIES};
     cantusFirmus =  {50,53,52,50,55,53,57,55,53,52,50}; 
+    cp = {  69,74,72,69,71,72,74,62,70,67,69,65,72,69,70,67,69,65,67,64,66, 
     cp = {  69,74,72,69,71,72,74,62,70,67,69,65,72,69,70,67,69,65,67,64,66, 
             62,64,65,67,69,67,65,69,67,65,64,67,65,62,65,64,62,60,58,62,65,67,69,65,64,62,60,57,62,60,58,55,60,59,57,62,64,52,53,55,57,
             57, 57, 62, 62, 60, 60, 58, 58, 62, 62, 60, 60, 65, 65, 64, 64, 62, 62, 61, 62,
@@ -1328,6 +1395,9 @@ void FigureTests::run_twoVoice_tests() {
     test_2v_5sp_fig82();
     test_2v_5sp_fig83();
     test_2v_5sp_fig87_1();
+    test_2v_5sp_fig82();
+    test_2v_5sp_fig83();
+    test_2v_5sp_fig87_1();
 }
 
 void FigureTests::run_threeVoice_tests() {
@@ -1367,6 +1437,10 @@ void FigureTests::run_threeVoice_tests() {
     test_3v_5sp_fig154();
     test_3v_5sp_fig155();
     test_3v_5sp_fig156();
+    // Three voice fifth species figures
+    test_3v_5sp_fig154();
+    test_3v_5sp_fig155();
+    test_3v_5sp_fig156();
 }
 
 void FigureTests::run_fourVoice_tests() {
@@ -1391,6 +1465,29 @@ void FigureTests::run_fourVoice_tests() {
     test_4v_3sp_fig186();
     // Four voice fourth species figures
     test_4v_4sp_fig196();
+    // Four voice fifth species figures
+    test_4v_5sp_fig201();
+}
+
+void FigureTests:: run_thirdSpecies_tests() {
+    cout << "Running third species tests..." << endl;
+    // Two voice third species figures
+    test_2v_3sp_fig55();
+    test_2v_3sp_fig56();
+    test_2v_3sp_fig57();
+    test_2v_3sp_fig58();
+    test_2v_3sp_fig59();
+    test_2v_3sp_fig60();
+    // Three voice third species figures
+    test_3v_3sp_fig130();
+    test_3v_3sp_fig131();
+    test_3v_3sp_fig132();
+    test_3v_3sp_fig133();
+    // Four voice third species figures
+    test_4v_3sp_fig183();
+    test_4v_3sp_fig184();
+    test_4v_3sp_fig185();
+    test_4v_3sp_fig186();
     // Four voice fifth species figures
     test_4v_5sp_fig201();
 }
@@ -1456,6 +1553,7 @@ void FigureTests::run_all_tests() {
 } 
 
 // Add to the MUSTest method to include our new test
+// Add to the MUSTest method to include our new test
 void FigureTests::MUSTest() {
     cout << "Running MUSTest..." << endl;
     
@@ -1466,6 +1564,39 @@ void FigureTests::MUSTest() {
     // run_all_tests();
     
     cout << "MUSTest completed." << endl;
+}
+
+void FigureTests::quickTest() {
+    test_2v_1sp_fig22();
+    // test_2v_2sp_fig39();
+    // test_2v_2sp_fig40();
+    // test_2v_2sp_fig41();
+    // test_2v_2sp_fig42();
+    // test_2v_2sp_fig43();
+    // test_2v_2sp_fig44();
+    // test_2v_2sp_fig45();
+    // test_2v_3sp_fig56();
+    // test_2v_3sp_fig57();
+    // test_2v_3sp_fig58();
+    test_2v_4sp_fig74();
+    // test_2v_4sp_fig76();
+    // test_2v_4sp_fig77();
+    // test_2v_5sp_fig82();
+    // test_2v_5sp_fig83();
+    // test_3v_2sp_fig127();
+    // test_3v_2sp_fig128();
+    // test_3v_4sp_fig147();
+    // test_3v_4sp_fig151();
+    // test_3v_5sp_fig154();
+    // test_3v_5sp_fig156();
+    // test_4v_1sp_fig169();
+    // test_4v_1sp_fig171();
+    // test_4v_2sp_fig173();
+    // test_4v_3sp_fig183();
+    // test_4v_3sp_fig184();
+    // test_4v_3sp_fig186();
+    // test_4v_4sp_fig196();
+    // test_4v_Xsp_fig204();
 }
 
 void FigureTests::quickTest() {

@@ -67,6 +67,11 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         //     // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
         //     BoolVar isConsonant(home, 0, 1);
         //     dom(home, h_intervals[i], consonantIntervals, isConsonant);
+        // // Loop through each harmonic interval
+        // for (size_t i = 0; i < h_intervals.size(); i++) {
+        //     // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
+        //     BoolVar isConsonant(home, 0, 1);
+        //     dom(home, h_intervals[i], consonantIntervals, isConsonant);
 
         //     // If the interval is consonant, set disArray[i] to 0
         //     rel(home, isConsonant >> (disArray[i] == 0));
