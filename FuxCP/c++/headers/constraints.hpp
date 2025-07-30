@@ -146,7 +146,9 @@ void P3_2_noBattuta(Home home, Part* part);
 
 void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray successiveCostArray, vector<Species> species);
 
-void P6_noMoveInSameDirection(Home home, vector<Part*> parts);
+void P6_3v_noMoveInSameDirection(Home home, vector<Part*> parts);
+
+void P6_4v_noMoveInSameDirection(Home home, vector<Part*> parts);
 
 void P7_noSuccessiveAscendingSixths(Home home, vector<Part*> parts);
 

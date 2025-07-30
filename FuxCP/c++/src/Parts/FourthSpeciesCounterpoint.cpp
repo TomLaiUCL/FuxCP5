@@ -58,6 +58,46 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     for(int i = 0; i < fourthSpeciesNotesCp.size()-2; i++){
         rel(home, m2IntervalsArray[i], IRT_EQ, expr(home, fourthSpeciesNotesCp[i+2]-fourthSpeciesNotesCp[i]));
     }
+
+    //create motions array
+    // Arsis motions for the fourth species correspond to the first species motions
+    firstSpeciesMotions = IntVarArray(home, nMeasures-1, IntSet{-1, CONTRARY_MOTION, OBLIQUE_MOTION, PARALLEL_MOTION});
+    firstSpeciesMotionCosts = IntVarArray(home, firstSpeciesMotions.size(), IntSet{0, directCost, obliqueCost, contraryCost});
+
+    //create motions
+    for(int i = 0; i < firstSpeciesMotions.size(); i++){
+        // cout << "i: " << i << endl;
+        int j = 1;
+        if (i == firstSpeciesMotions.size()-1) {
+            j = 0; // last motion is between the arsis of penultimate measure and the thesis of the last measure
+        }
+
+        //direct motions help creation
+        BoolVar both_up = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]>0)&&(low->getMelodicIntervals()[i]>0)); //if both parts are going in the same direction
+        BoolVar both_stay = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]==0)&&(low->getMelodicIntervals()[i]==0)); //if both parts are staying
+        BoolVar both_down = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]<0)&&(low->getMelodicIntervals()[i]<0)); //if both parts are going 
+        //oblique motions help creation
+        BoolVar cf_stays_1 = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]>0)&&(low->getMelodicIntervals()[i]==0)); //if the lowest part stays and one goes up
+        BoolVar cf_stays_2 = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]<0)&&(low->getMelodicIntervals()[i]==0)); //if the lowest part stays and one goes down
+        BoolVar cp_stays_1 = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]==0)&&(low->getMelodicIntervals()[i]>0)); //if the lowest part goes up and one stays
+        BoolVar cp_stays_2 = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]==0)&&(low->getMelodicIntervals()[i]<0)); //if the lowest part goes down and one stays
+        //contrary motions help creation
+        BoolVar cpd_cfu = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]<0)&&(low->getMelodicIntervals()[i]>0)); //if the cf goes up and the cp down
+        BoolVar cpu_cfd = expr(home, (fourthSpeciesMelodicIntervals[i*2+j]>0)&&(low->getMelodicIntervals()[i]<0)); //if the cf goes down and the cp up
+
+        //direct constraints
+        rel(home, ((both_up || both_stay || both_down) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotions[i]==PARALLEL_MOTION));
+        rel(home, ((both_up || both_stay || both_down) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==directCost));
+        //oblique constraints
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotions[i]==OBLIQUE_MOTION));
+        rel(home, ((cf_stays_1 || cf_stays_2 || cp_stays_1 || cp_stays_2) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==obliqueCost));
+        //contrary constraints
+        rel(home, ((cpd_cfu || cpu_cfd) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotions[i]==CONTRARY_MOTION));
+        rel(home, ((cpd_cfu || cpu_cfd) && (this->isNotLowest[i]==1)) >> (firstSpeciesMotionCosts[i]==contraryCost));
+        //bass constraints
+        rel(home, (this->isNotLowest[i]==0) >> (firstSpeciesMotions[i]==-1));
+        rel(home, (this->isNotLowest[i]==0) >> (firstSpeciesMotionCosts[i]==0));
+    }
     
     is_off = BoolVarArray(home, notes.size(), 0, 1);
     for(int i = 0; i < is_off.size(); i++){
@@ -174,8 +214,8 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     //4.P1
     if (activeConstraints[SP4_4P1]) {
         for(int i = 1; i < nMeasures-2; i++){
-            rel(home, (isConsonance[(i*4)]==0) >> ((fourthSpeciesMelodicIntervals[(i*2)+1]==-MINOR_SECOND) || 
-               (fourthSpeciesMelodicIntervals[(i*2)+1]==-MAJOR_SECOND)));
+            rel(home, (isConsonance[(i*4)]==0) >> ((fourthSpeciesMelodicIntervals[(i*2)-1]==-MINOR_SECOND) || 
+               (fourthSpeciesMelodicIntervals[(i*2)-1]==-MAJOR_SECOND)));
         }
     }
 

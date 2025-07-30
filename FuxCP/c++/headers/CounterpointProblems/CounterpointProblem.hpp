@@ -103,6 +103,10 @@ public:
     Part* getCounterpoint_3();
     // ---
 
+    Stratum* getUpper_1(){ return upper_1; }
+    Stratum* getUpper_2(){ return upper_2; }
+    Stratum* getUpper_3(){ return upper_3; }
+
     int* get_species_array_5sp(int ctp_index);
     int* get_extended_cp_domain(int ctp_index);
     int  get_ext_cp_domain_size(int ctp_index);

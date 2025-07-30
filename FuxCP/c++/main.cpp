@@ -45,6 +45,8 @@ int main(int argc, char* argv[]) {
                 figureTests.run_fifthSpecies_tests();
             } else if (arg2 == "MUS") {
                 figureTests.MUSTest();
+            } else if (arg2 == "quick") {
+                figureTests.quickTest();
             }
             else {
                 std::cout << "Invalid argument: " << arg2 << std::endl;

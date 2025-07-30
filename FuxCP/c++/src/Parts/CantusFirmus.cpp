@@ -53,26 +53,27 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
     
 
     // 1.H1 cf version (commented by Tom Lai)
-    if (activeConstraints[CF_SP1_1H1]) {
-        // dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
-        //     -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
-        disArray = IntVarArray(home, notes.size(), IntSet{0, 1});
-        // Define the set of consonant intervals
-        IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
-            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
+    if (activeConstraints[CF_1H1]) {
+        dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
+        
+        // disArray = IntVarArray(home, notes.size(), IntSet{0, 1});
+        // // Define the set of consonant intervals
+        // IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+        //     -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
 
-        // Loop through each harmonic interval
-        for (size_t i = 0; i < h_intervals.size(); i++) {
-            // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
-            BoolVar isConsonant(home, 0, 1);
-            dom(home, h_intervals[i], consonantIntervals, isConsonant);
+        // // Loop through each harmonic interval
+        // for (size_t i = 0; i < h_intervals.size(); i++) {
+        //     // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
+        //     BoolVar isConsonant(home, 0, 1);
+        //     dom(home, h_intervals[i], consonantIntervals, isConsonant);
 
-            // If the interval is consonant, set disArray[i] to 0
-            rel(home, isConsonant >> (disArray[i] == 0));
+        //     // If the interval is consonant, set disArray[i] to 0
+        //     rel(home, isConsonant >> (disArray[i] == 0));
 
-            // Otherwise, set disArray[i] to H1_1_cost
-            rel(home, !isConsonant >> (disArray[i] == 1));
-        }
+        //     // Otherwise, set disArray[i] to H1_1_cost
+        //     rel(home, !isConsonant >> (disArray[i] == 1));
+        // }
     }
     
     if(nV==TWO_VOICES){
@@ -115,9 +116,9 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
 
     // combined costs
     toCombineCosts = IntVarArray(home, 1, 0, 10000);
-    toCombineCostNames = {"1H1"};
+    // toCombineCostNames = {"1H1"};
     //need to set constraintCosts[0]
-    add_toCombineCost(home, 0, disArray, toCombineCosts);
+    // add_toCombineCost(home, 0, disArray, toCombineCosts);
 }
 
 string CantusFirmus::to_string() const {

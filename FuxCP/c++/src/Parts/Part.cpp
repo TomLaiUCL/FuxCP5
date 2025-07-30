@@ -375,6 +375,10 @@ IntVarArray Part::getSyncopeCostArray(){
     return snycopeCostArray;
 }
 
+IntVarArray Part::getFourthSpeciesMIntervals(){
+    return fourthSpeciesMelodicIntervals;
+}
+
 IntVarArray Part::getSpeciesArray(){
     return speciesArray;
 }

@@ -309,7 +309,7 @@ const int MAX_STEP = 19; // Tom Lai
 //** Constraints */
 // constraints enum
 enum constraints{
-    CF_SP1_1H1,
+    CF_1H1,
     CF_1H2_2V,
     CF_1H3_2V,
     CF_1H7_2V,
@@ -347,7 +347,8 @@ enum constraints{
     V4_5R9,
     V4_U2,
     SP1_G4,
-    SP1_G7,         
+    SP1_G7,
+    SP1_1H1,         
     SP1_1H6,  
     SP1_1H7_2V,
     SP1_1M2_2V,
@@ -432,12 +433,12 @@ enum toCombineConstraints{
 };
 
 const vector<string> constraintNames = {
-    "CF_SP1_1H1", "CF_1H2_2V", "CF_1H3_2V", "CF_1H7_2V", "CF_1P1", "CF_1H7_3V", "CF_1P3",
+    "CF_1H1", "CF_1H2_2V", "CF_1H3_2V", "CF_1H7_2V", "CF_1P1", "CF_1H7_3V", "CF_1P3",
     "STRATUM_UPPER_1H3", "STRATUM_UPPER_1H10", "STRATUM_UPPER_1H12", "STRATUM_1H3", "STRATUM_1H12", 
     "V2_G6", "V2_G9", "V2_1H2", "V2_1H3", "V2_1H5",
     "V3_G6", "V3_1H4", "V3_1H5", "V3_1H8", "V3_1M4", "V3_1P4", "V3_1P6", "V3_1P7", "V3_2M2", "V3_5R9",
     "V4_G6", "V4_1H4", "V4_1H8", "V4_1M4", "V4_1P4", "V4_1P6", "V4_1P7", "V4_2M2",  "V4_5R9","V4_U2",
-    "SP1_G4", "SP1_G7", "SP1_1H6", "SP1_1H7_2V", "SP1_1M2_2V", "SP1_1P1_2V", "SP1_1P3_2V", "SP1_1H7_3V", "SP1_1M2_3V", "SP1_1P1_3V", "SP1_1P3_3V", "SP1_1M2_4V", "SP1_1P1_4V", "SP1_1P3_4V",
+    "SP1_G4", "SP1_G7", "SP1_1H1", "SP1_1H6", "SP1_1H7_2V", "SP1_1M2_2V", "SP1_1P1_2V", "SP1_1P3_2V", "SP1_1H7_3V", "SP1_1M2_3V", "SP1_1P1_3V", "SP1_1P3_3V", "SP1_1M2_4V", "SP1_1P1_4V", "SP1_1P3_4V",
     "SP2_2H2", "SP2_2M1", "SP2_2P3", "SP2_2H3_2V", "SP2_2M2_2V", "SP2_2P1_2V", "SP2_2H3_3V", "SP2_1P1_3V", "SP2_2H3_4V", "SP2_1P1_4V",
     "SP3_3H1", "SP3_3H2", "SP3_3H3", "SP3_3M1", "SP3_1P3", "SP3_U1", "SP3_U2", "SP3_U3", "SP3_3H4_2V", "SP3_1H7_3V", "SP3_3H6_3V", "SP3_1P1_3V", "SP3_1H7_4V", "SP3_3H6_4V", "SP3_1P1_4V",
     "SP4_G6", "SP4_G7", "SP4_1H6", "SP4_4H1", "SP4_4M1", "SP4_4M2", "SP4_4P1", "SP4_4P2", "SP4_1M2", "SP4_U2", "SP4_4H2_2V", "SP4_4H3_2V", "SP4_1H2_2V", "SP4_4P5_3V", "SP4_4P5_4V",

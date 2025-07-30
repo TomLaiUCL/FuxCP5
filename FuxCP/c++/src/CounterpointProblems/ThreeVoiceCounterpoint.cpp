@@ -77,9 +77,10 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     
     //P6 : no move in same direction
     if (activeConstraints[V3_1P6]) {
-        if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES){ //doesn't apply to 4th species
-            P6_noMoveInSameDirection(*this, parts);
-        }
+        P6_3v_noMoveInSameDirection(*this, parts);
+        // if(counterpoint_1->getSpecies()!=FOURTH_SPECIES&&counterpoint_2->getSpecies()!=FOURTH_SPECIES){ //doesn't apply to 4th species
+            // P6_3v_noMoveInSameDirection(*this, parts);
+        // }
     }
     
     //P7 : no suxxessive ascending sixths

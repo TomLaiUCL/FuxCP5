@@ -20,7 +20,6 @@ protected:
     CantusFirmus* cantus;
     IntVarArray fourthSpeciesNotesCp;
     IntVarArray fourthSpeciesHIntervals;
-    IntVarArray fourthSpeciesMelodicIntervals;
     IntVarArray m2IntervalsArray;
     IntVarArray firstHInterval;
     IntVarArray m2ZeroArray;

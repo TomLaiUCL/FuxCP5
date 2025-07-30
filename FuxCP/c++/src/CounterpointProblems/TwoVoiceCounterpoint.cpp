@@ -55,6 +55,24 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
         H5_1_cpAndCfDifferentNotes(*this, counterpoint_1, cantusFirmus);
     }
 
+    //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
+    if (activeConstraints[SP3_3H4_2V]) {
+        // Create Boolean variables for each condition
+        BoolVar isThirdSpecies(*this, 0, 1);
+        BoolVar isNotLowestCantus(*this, 0, 1);
+
+        rel(*this, isThirdSpecies == (counterpoint_1->getSpecies() == THIRD_SPECIES));
+        rel(*this, isNotLowestCantus == (cantusFirmus->getIsNotLowest()[cantusFirmus->getIsNotLowest().size()-2] == 1));
+
+        // Combine the conditions using Gecode's AND operator
+        BoolVar is3H4active(*this, 0, 1);
+        rel(*this, is3H4active == (isThirdSpecies && isNotLowestCantus));
+
+        // Implication constraint
+        rel(*this, is3H4active >> 
+            (expr(*this, abs(cantusFirmus->getFirstHInterval()[cantusFirmus->getFirstHInterval().size()-2])) == MINOR_THIRD));
+    }
+
     setStrata();
 
     unitedCosts = IntVarArray(*this, counterpoint_1->getCosts().size(), 0, 1000000);

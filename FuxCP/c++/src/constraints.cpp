@@ -156,10 +156,10 @@ void H3_1_endWithPerfectConsonance(Home home, Part* part){
 }
 
 void H3_2_penultimateNoteDomain(Home home, Part* part){ 
-    dom(home, expr(home, abs(part->getHInterval()[part->getHIntervalSize()-3])), IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
+    dom(home, expr(home, abs(part->getHInterval()[part->getHInterval().size()-5])), IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
 
-    rel(home, (part->getHInterval()[part->getHIntervalSize()-3]!=PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==part->getPenultCost()));
-    rel(home, (part->getHInterval()[part->getHIntervalSize()-3]==PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==0));
+    rel(home, (part->getHInterval()[part->getHInterval().size()-5]!=PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==part->getPenultCost()));
+    rel(home, (part->getHInterval()[part->getHInterval().size()-5]==PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==0));
 }
 
 void H3_3_cambiataCost(Home home, Part* part){
@@ -191,9 +191,10 @@ void H5_1_differentNotes(Home home, vector<Part*> parts){
             if(parts[v1]->getSpecies()==CANTUS_FIRMUS){
                 // check voice v2 doesn't play same note as cantusFirmus
                 for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
-                    for (int j = i*4; j < (i*4)+4; j++) {
-                        rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[j]);
-                    }
+                    rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i*4]);
+                    // for (int j = i*4; j < (i*4)+4; j++) {
+                    //     rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[j]);
+                    // }
                 }
             } else {
                 // check voice v1 doesn't play same note as voice v2 with v1 and v2 are counterpoints
@@ -268,6 +269,9 @@ void H8_3v_preferHarmonicTriad(Home home, Part* part, IntVarArray triadCostArray
 }
 
 void H8_4v_preferHarmonicTriad(Home home, IntVarArray triadCostArray, Stratum* upper1, Stratum* upper2, Stratum* upper3){
+    // cout << upper1->getHInterval().size() << endl;
+    // cout << upper2->getHInterval().size() << endl;
+    // cout << upper3->getHInterval().size() << endl;
     for(int i = 0; i < triadCostArray.size(); i++){
 
         IntVar H_b = upper1->getHInterval()[i*4];
@@ -296,10 +300,10 @@ void H8_4v_preferHarmonicTriad(Home home, IntVarArray triadCostArray, Stratum* u
 
         // now we are left with only combinations with at a third, a fifth, and another note of the harmonic triad. 
         // Doubling the fifth
-        rel(home, expr(home, H_b_is_fifth + H_c_is_fifth + H_d_is_fifth == 2) >> (triadCostArray[i] == double_fifths_cost));
+        rel(home, expr(home, (H_b_is_fifth + H_c_is_fifth + H_d_is_fifth == 2) && !note_outside_harmonic_triad && !no_fifth_or_no_third) >> (triadCostArray[i] == double_fifths_cost));
 
         // Doubling the third, and ensure it is the same type of third (not a major and a minor)
-        rel(home, expr(home, H_b_is_third + H_c_is_third + H_d_is_third == 2) >> (triadCostArray[i] == double_thirds_cost));
+        rel(home, expr(home, (H_b_is_third + H_c_is_third + H_d_is_third == 2) && !note_outside_harmonic_triad && !no_fifth_or_no_third) >> (triadCostArray[i] == double_thirds_cost));
         rel(home, (H_b_is_third && H_c_is_third) >> (H_b == H_c));
         rel(home, (H_b_is_third && H_d_is_third) >> (H_b == H_d));
         rel(home, (H_c_is_third && H_d_is_third) >> (H_c == H_d));
@@ -629,9 +633,20 @@ void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray s
     }
 }
 
-void P6_noMoveInSameDirection(Home home, vector<Part*> parts){
-    for(int i = 0; i < parts[0]->getMotions().size(); i++){
-        rel(home, expr(home, parts[0]->getMotions()[i]==2 && parts[1]->getMotions()[i]==2), BOT_AND, expr(home, parts[2]->getMotions()[i]==2), 0);
+void P6_3v_noMoveInSameDirection(Home home, vector<Part*> parts){
+    for(int i = 0; i < parts[0]->getFirstSpeciesMotions().size(); i++){
+        // cout << "i : " << i << endl;
+        // cout << "parts[0] : " << parts[0]->getFirstSpeciesMotions()[i] << endl;
+        // cout << "parts[1] : " << parts[1]->getFirstSpeciesMotions()[i] << endl;
+        // cout << "parts[2] : " << parts[2]->getFirstSpeciesMotions()[i] << endl;
+        // cout << "parts[3] : " << parts[3]->getFirstSpeciesMotions()[i] << endl;
+        rel(home, expr(home, parts[0]->getFirstSpeciesMotions()[i]==2 && parts[1]->getFirstSpeciesMotions()[i]==2), BOT_AND, expr(home, parts[2]->getFirstSpeciesMotions()[i]==2), 0);
+    }
+}
+
+void P6_4v_noMoveInSameDirection(Home home, vector<Part*> parts){
+    for(int i = 0; i < parts[0]->getFirstSpeciesMotions().size(); i++){
+        rel(home, expr(home, parts[0]->getFirstSpeciesMotions()[i]==2 && parts[1]->getFirstSpeciesMotions()[i]==2 && parts[2]->getFirstSpeciesMotions()[i]==2), BOT_AND, expr(home, parts[3]->getFirstSpeciesMotions()[i]==2), 0);
     }
 }
 

@@ -145,6 +145,8 @@ public:
 
     void MUSTest();
 
+    void quickTest();
+
     // Add new method for testing cost summing
     void test_cost_summing();
 };

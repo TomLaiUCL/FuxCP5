@@ -356,7 +356,26 @@ void CounterpointProblem::setStrata(){
                 } else if(curr_cp->getSpecies()==THIRD_SPECIES){
                     corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(3, 4, curr_cp->getMelodicIntervals().size())));
                 } else if(curr_cp->getSpecies()==FOURTH_SPECIES){
-                    corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
+
+                    // corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(4, 4, curr_cp->getMelodicIntervals().size())));
+                    std::vector<int> selectedIndices;
+
+                    // Start from index 4 and take every 4th element
+                    for (int i = 4; i < curr_cp->getMelodicIntervals().size(); i += 4) {
+                        selectedIndices.push_back(i);
+                    }
+
+                    // include the last melodic interval (between the penultimate note and the last note)
+                    selectedIndices.push_back(curr_cp->getMelodicIntervals().size() - 2);
+
+                    // Create a new IntVarArray with the selected intervals
+                    IntVarArray selectedIntervals(*this, selectedIndices.size());
+                    for (size_t i = 0; i < selectedIndices.size(); ++i) {
+                        selectedIntervals[i] = curr_cp->getMelodicIntervals()[selectedIndices[i]];
+                    }
+
+                    // Push the new IntVarArray to the corresponding_m_intervals vector
+                    corresponding_m_intervals.push_back(selectedIntervals);
                 } else if(curr_cp->getSpecies()==FIFTH_SPECIES){
                     corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
                 }

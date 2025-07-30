@@ -267,7 +267,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     }
     
     
-    //every thesis note should be consonant
+    // 1.H1 every thesis note should be consonant
     if (activeConstraints[SP5_H4]) {
         for(int i = 0; i < isConsonance.size(); i+=4){ //checks every thesis note
             rel(home, isNthSpeciesArray[(i*5)+1], BOT_IMP, isConsonance[i], 1); //first species check
@@ -286,7 +286,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         }
     }
     
-    //five consecutive notes by joint degree (3rd species)
+    // 3.H1 five consecutive notes by joint degree (3rd species)
     if (activeConstraints[SP5_H5]) {
         for(int i = 0; i < is5QNArray.size(); i++){
             BoolVar b = BoolVar(home, 0, 1);
@@ -295,7 +295,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
         }
     }
     
-    //any dissonant note implies it is surrounded by consonant notes (3rd species)
+    // 3.H2 any dissonant note implies it is surrounded by consonant notes (3rd species)
     if (activeConstraints[SP5_H6]) {
         for(int i = 0; i < isDiminution.size(); i++){
             BoolVar band1 = BoolVar(home, 0, 1);
@@ -335,7 +335,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     }
     
     
-    //no same syncopation
+    // 4.M1 ? no same syncopation
     if (activeConstraints[SP5_M4]) {
         for(int i = 1; i < nMeasures-1; i++){
             rel(home, fifthSpeciesNotesCp[(i*4)], IRT_NQ, fifthSpeciesNotesCp[(i*4)+2], 

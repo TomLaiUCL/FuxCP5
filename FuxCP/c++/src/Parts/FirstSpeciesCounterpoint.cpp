@@ -124,25 +124,25 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     
     /// Harmonic rules
     /// H1 from Thibault: All harmonic intervals must be consonances
-    if (activeConstraints[CF_SP1_1H1]) {
-        // H1_1_harmonicIntervalsAreConsonances(home, this);
-        disArray = IntVarArray(home, firstSpeciesHarmonicIntervals.size(), IntSet{0, 1});
-        // Define the set of consonant intervals
-        IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
-            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
+    if (activeConstraints[SP1_1H1]) {
+        H1_1_harmonicIntervalsAreConsonances(home, this);
+        // disArray = IntVarArray(home, firstSpeciesHarmonicIntervals.size(), IntSet{0, 1});
+        // // Define the set of consonant intervals
+        // IntSet consonantIntervals({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+        //     -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
 
-        // Loop through each harmonic interval
-        for (size_t i = 0; i < firstSpeciesHarmonicIntervals.size(); i++) {
-            // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
-            BoolVar isConsonant(home, 0, 1);
-            dom(home, firstSpeciesHarmonicIntervals[i], consonantIntervals, isConsonant);
+        // // Loop through each harmonic interval
+        // for (size_t i = 0; i < firstSpeciesHarmonicIntervals.size(); i++) {
+        //     // Create a Boolean variable to check if h_intervals[i] is in consonantIntervals
+        //     BoolVar isConsonant(home, 0, 1);
+        //     dom(home, firstSpeciesHarmonicIntervals[i], consonantIntervals, isConsonant);
 
-            // If the interval is consonant, set disArray[i] to 0
-            rel(home, isConsonant >> (disArray[i] == 0));
+        //     // If the interval is consonant, set disArray[i] to 0
+        //     rel(home, isConsonant >> (disArray[i] == 0));
 
-            // Otherwise, set disArray[i] to H1_1_cost
-            rel(home, !isConsonant >> (disArray[i] == 1));
-        }
+        //     // Otherwise, set disArray[i] to H1_1_cost
+        //     rel(home, !isConsonant >> (disArray[i] == 1));
+        // }
 
     }
     
@@ -157,9 +157,9 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 
     // combined costs
     toCombineCosts = IntVarArray(home, 1, 0, 10000);
-    toCombineCostNames = {"1H1"};
-    //need to set constraintCosts[0]
-    add_toCombineCost(home, 0, disArray, toCombineCosts);
+    // toCombineCostNames = {"1H1"};
+    // //need to set constraintCosts[0]
+    // add_toCombineCost(home, 0, disArray, toCombineCosts);
 }
 
 /**

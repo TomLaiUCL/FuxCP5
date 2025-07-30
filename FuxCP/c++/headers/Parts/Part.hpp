@@ -110,6 +110,8 @@ class Part : public Voice {
         //Fourth species specific variables
         BoolVarArray isNoSyncopeArray;
         IntVarArray snycopeCostArray;
+        IntVarArray fourthSpeciesMelodicIntervals;
+
     public:
         Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int v_type, vector<int> m_costs, vector<int> g_costs,
             vector<int> s_costs, int nV, int bm);
@@ -215,6 +217,8 @@ class Part : public Voice {
         BoolVarArray getNoSyncope();
 
         IntVarArray getSyncopeCostArray();
+
+        IntVarArray getFourthSpeciesMIntervals();
 
         IntVarArray getSpeciesArray();
 
