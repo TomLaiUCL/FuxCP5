@@ -1264,19 +1264,6 @@ void FigureTests::test_4v_5sp_fig201() {
                     62,
 
                     57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
-                    -1, -1, 57, -1,
-                    57, -1, 57, 59,
-                    60, 55, 60, -1, 
-                    60, -1, 59, -1, 
-                    59, -1, 59, 61, 
-                    62, 50, 62, -1, 
-                    62, -1, 65, -1, 
-                    65, -1, 64, -1, 
-                    64, -1, 62, -1, 
-                    62, -1, 61, -1, 
-                    62,
-
-                    57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
                     50,50,48,55,52,50,53,48,50,45,50};
     notesSpeciesFor5sp = {
                         -1, -1, FOURTH_SPECIES, -1,
@@ -1442,27 +1429,6 @@ void FigureTests:: run_thirdSpecies_tests() {
     test_4v_3sp_fig186();
     // Four voice fifth species figures
     test_4v_5sp_fig201();
-}
-
-void FigureTests:: run_thirdSpecies_tests() {
-    cout << "Running third species tests..." << endl;
-    // Two voice third species figures
-    test_2v_3sp_fig55();
-    test_2v_3sp_fig56();
-    test_2v_3sp_fig57();
-    test_2v_3sp_fig58();
-    test_2v_3sp_fig59();
-    test_2v_3sp_fig60();
-    // Three voice third species figures
-    test_3v_3sp_fig130();
-    test_3v_3sp_fig131();
-    test_3v_3sp_fig132();
-    test_3v_3sp_fig133();
-    // Four voice third species figures
-    test_4v_3sp_fig183();
-    test_4v_3sp_fig184();
-    test_4v_3sp_fig185();
-    test_4v_3sp_fig186();
 }
 
 void FigureTests::run_fourthSpecies_tests() {
