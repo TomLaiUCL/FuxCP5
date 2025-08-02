@@ -169,18 +169,6 @@ void FigureTests::find_unsat_constraints() {
     }
 }
 
-void FigureTests::find_unsat_constraints() {
-    // activeConstraints = std::vector<bool>(activeConstraints.size(), false);
-    // cout << has_solution(set_configuration()) << endl;
-    for (int i = 0; i < consSize; i++) {
-        set<int> cons_set; // all constraint indices
-        cons_set.insert(i);
-        if (is_unsat(cons_set))  {
-            cout << "\t" << get_constraint_name(i) << " is unsatisfiable." << endl;
-        }
-    }
-}
-
 /* ============================================================================
                             FIGURES
 ============================================================================ */
@@ -1304,7 +1292,8 @@ void FigureTests::test_4v_5sp_fig201() {
                         FOURTH_SPECIES,
     };
     v_type = {-1, -1, -2};
-    
+    CounterpointProblem* problem = set_configuration();
+    has_solution(problem);
     find_unsat_constraints();
 }
 
@@ -1535,7 +1524,7 @@ void FigureTests::quickTest() {
     // test_2v_3sp_fig56();
     // test_2v_3sp_fig57();
     // test_2v_3sp_fig58();
-    test_2v_4sp_fig74();
+    // test_2v_4sp_fig74();
     // test_2v_4sp_fig76();
     // test_2v_4sp_fig77();
     // test_2v_5sp_fig82();
@@ -1553,5 +1542,6 @@ void FigureTests::quickTest() {
     // test_4v_3sp_fig184();
     // test_4v_3sp_fig186();
     // test_4v_4sp_fig196();
+    test_4v_5sp_fig201();
     // test_4v_Xsp_fig204();
 }
