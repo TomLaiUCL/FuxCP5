@@ -217,6 +217,30 @@ void CounterpointProblem::orderCosts(){
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
 }
 
+/* HELPER FUNCTION
+ * @brief Checks if a note is consonant with a set of voices.
+ * @param note The note to check.
+ * @param voices The voices to check against.
+ * @return A BoolVar indicating if the note is consonant with the voices.
+ */
+BoolVar CounterpointProblem::isConsonantWithVoices(IntVar note, IntVarArray& voices) {
+    BoolVar isConsonant(*this, 0, 1);
+    BoolVarArray allConsonant(*this, voices.size(), 0, 1);
+    
+    for (int v = 0; v < voices.size(); ++v) {
+        BoolVarArray matches(*this, CONSONANCES.size(), 0, 1);
+        for (size_t k = 0; k < CONSONANCES.size(); ++k) {
+            IntVar interval(*this, -12, 12);
+            rel(*this, interval, IRT_EQ, expr(*this, (note - voices[v]) % 12));
+            rel(*this, interval, IRT_EQ, CONSONANCES[k], Reify(matches[k]));
+        }
+        rel(*this, BOT_OR, matches, allConsonant[v]);
+    }
+    
+    rel(*this, BOT_AND, allConsonant, isConsonant);
+    return isConsonant;
+}
+
 void CounterpointProblem::setStrata(){
     //decided how many voices we have
     int nVoices = 2;
@@ -236,29 +260,44 @@ void CounterpointProblem::setStrata(){
         //at index 0, we have the cantusFirmus
         rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
         //adds the correct note to the voices array at the index. special rules for fourth and fifth species apply
-        if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
+        if((counterpoint_1->getSpecies()==FOURTH_SPECIES || counterpoint_1->getSpecies()==FIFTH_SPECIES) && i==0){
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
-        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0) {
-            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]); 
+        } else if((counterpoint_1->getSpecies()==FOURTH_SPECIES || counterpoint_1->getSpecies()==FIFTH_SPECIES) && i!=0 && i!=size-1){
+            //if the counterpoint is a fourth or fifth species, we need to check if the note is consonant with the previous voices
+            //if it is, we take the first note, otherwise we take the second note
+            //this is done to handle syncopation
+            IntVarArray previousVoices(*this, 1, 0, 127);
+            previousVoices[0] = voices[0]; // cantus firmus
+            BoolVar b1 = isConsonantWithVoices(counterpoint_1->getNotes()[i*4], previousVoices);
+            ite(*this, b1, counterpoint_1->getNotes()[(i*4)], counterpoint_1->getNotes()[(i*4)+2], voices[1]);
         } else{
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
         }
         //same for 3 voices
         if(nVoices>=3){
-            if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
+            if((counterpoint_2->getSpecies()==FOURTH_SPECIES || counterpoint_2->getSpecies()==FIFTH_SPECIES) && i==0){
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0) {
-                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
+            } else if((counterpoint_2->getSpecies()==FOURTH_SPECIES || counterpoint_2->getSpecies()==FIFTH_SPECIES) && i!=0 && i!=size-1){
+                IntVarArray previousVoices(*this, 2, 0, 127);
+                previousVoices[0] = voices[0]; // cantus firmus
+                previousVoices[1] = voices[1]; // first counterpoint
+                BoolVar b1 = isConsonantWithVoices(counterpoint_2->getNotes()[i*4], previousVoices);
+                ite(*this, b1, counterpoint_2->getNotes()[(i*4)], counterpoint_2->getNotes()[(i*4)+2], voices[2]);
             }else{
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
             }
         }
         //same for 4 voices
         if(nVoices>=4){
-            if(counterpoint_3->getSpecies()==FOURTH_SPECIES && i!=size-1){
+            if((counterpoint_3->getSpecies()==FOURTH_SPECIES || counterpoint_3->getSpecies()==FIFTH_SPECIES) && i==0){
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i==0) {
-                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
+            } else if((counterpoint_3->getSpecies()==FOURTH_SPECIES || counterpoint_3->getSpecies()==FIFTH_SPECIES) && i!=0 && i!=size-1){
+                IntVarArray previousVoices(*this, 2, 0, 127);
+                previousVoices[0] = voices[0]; // cantus firmus
+                previousVoices[1] = voices[1]; // first counterpoint
+                previousVoices[2] = voices[2]; // second counterpoint
+                BoolVar b1 = isConsonantWithVoices(counterpoint_3->getNotes()[i*4], previousVoices);
+                ite(*this, b1, counterpoint_3->getNotes()[(i*4)], counterpoint_3->getNotes()[(i*4)+2], voices[3]);
             }else{
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
             }
