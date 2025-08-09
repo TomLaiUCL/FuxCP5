@@ -217,29 +217,6 @@ void CounterpointProblem::orderCosts(){
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
 }
 
-/* HELPER FUNCTION
- * @brief Checks if a note is consonant with a set of voices.
- * @param note The note to check.
- * @param voices The voices to check against.
- * @return A BoolVar indicating if the note is consonant with the voices.
- */
-BoolVar CounterpointProblem::isConsonantWithVoices(IntVar note, IntVarArray& voices) {
-    BoolVar isConsonant(*this, 0, 1);
-    BoolVarArray allConsonant(*this, voices.size(), 0, 1);
-    
-    for (int v = 0; v < voices.size(); ++v) {
-        BoolVarArray matches(*this, CONSONANCES.size(), 0, 1);
-        for (size_t k = 0; k < CONSONANCES.size(); ++k) {
-            IntVar interval(*this, -12, 12);
-            rel(*this, interval, IRT_EQ, expr(*this, (note - voices[v]) % 12));
-            rel(*this, interval, IRT_EQ, CONSONANCES[k], Reify(matches[k]));
-        }
-        rel(*this, BOT_OR, matches, allConsonant[v]);
-    }
-    
-    rel(*this, BOT_AND, allConsonant, isConsonant);
-    return isConsonant;
-}
 
 void CounterpointProblem::setStrata(){
     //decided how many voices we have
@@ -250,73 +227,172 @@ void CounterpointProblem::setStrata(){
     if(upper_3!=nullptr){
         nVoices++;
     }
-    
     int size = counterpoint_1->getNMeasures();
     //sortedVoices : will contain in order at index 0 the lowest note and then the next highest at index 1 etc.
     sorted_voices = {};
+    // Add arrays to track which voice is at which position after sorting
+    vector<IntVarArray> voice_mapping;  // voice_mapping[measure][sorted_position] = original_voice_index
     for(int i = 0; i < size; i++){
         //initialize the voices array which will contain the current note of a part
         IntVarArray voices = IntVarArray(*this, nVoices, 0, 127);
         //at index 0, we have the cantusFirmus
         rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
         //adds the correct note to the voices array at the index. special rules for fourth and fifth species apply
-        if((counterpoint_1->getSpecies()==FOURTH_SPECIES || counterpoint_1->getSpecies()==FIFTH_SPECIES) && i==0){
+        if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
-        } else if((counterpoint_1->getSpecies()==FOURTH_SPECIES || counterpoint_1->getSpecies()==FIFTH_SPECIES) && i!=0 && i!=size-1){
-            //if the counterpoint is a fourth or fifth species, we need to check if the note is consonant with the previous voices
-            //if it is, we take the first note, otherwise we take the second note
-            //this is done to handle syncopation
-            IntVarArray previousVoices(*this, 1, 0, 127);
-            previousVoices[0] = voices[0]; // cantus firmus
-            BoolVar b1 = isConsonantWithVoices(counterpoint_1->getNotes()[i*4], previousVoices);
-            ite(*this, b1, counterpoint_1->getNotes()[(i*4)], counterpoint_1->getNotes()[(i*4)+2], voices[1]);
+        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0) {
+            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]); 
+        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i!=0 && i!=size-1){
+            // Use conditional constraint based on isFourthSpeciesArray
+            // If it's fourth species, check the interval size
+            BoolVar isLargeInterval(*this, 0, 1);
+            rel(*this, expr(*this, abs(counterpoint_1->getNotes()[i*4+2] - counterpoint_1->getNotes()[i*4])), IRT_GR, 2, Reify(isLargeInterval));
+            
+            // If fourth species AND large interval (>2), use retarded note
+            rel(*this, (counterpoint_1->getIsFourthSpeciesArray()[i*4] && isLargeInterval) >> 
+                (voices[1] == counterpoint_1->getNotes()[i*4]));
+            
+            // If fourth species AND small interval (<=2), use resolution note  
+            rel(*this, (counterpoint_1->getIsFourthSpeciesArray()[i*4] && !isLargeInterval) >> 
+                (voices[1] == counterpoint_1->getNotes()[(i*4)+2]));
+            
+            // If not fourth species, use first note
+            rel(*this, (counterpoint_1->getIsFourthSpeciesArray()[i*4] == 0) >> 
+                (voices[1] == counterpoint_1->getNotes()[i*4]));                     
         } else{
             rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
         }
         //same for 3 voices
         if(nVoices>=3){
-            if((counterpoint_2->getSpecies()==FOURTH_SPECIES || counterpoint_2->getSpecies()==FIFTH_SPECIES) && i==0){
+            if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-            } else if((counterpoint_2->getSpecies()==FOURTH_SPECIES || counterpoint_2->getSpecies()==FIFTH_SPECIES) && i!=0 && i!=size-1){
-                IntVarArray previousVoices(*this, 2, 0, 127);
-                previousVoices[0] = voices[0]; // cantus firmus
-                previousVoices[1] = voices[1]; // first counterpoint
-                BoolVar b1 = isConsonantWithVoices(counterpoint_2->getNotes()[i*4], previousVoices);
-                ite(*this, b1, counterpoint_2->getNotes()[(i*4)], counterpoint_2->getNotes()[(i*4)+2], voices[2]);
+            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0) {
+                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
+            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i!=0 && i!=size-1){
+                // Use conditional constraint based on isFourthSpeciesArray
+                rel(*this, counterpoint_2->getIsFourthSpeciesArray()[i*4] >> 
+                    (voices[2] == counterpoint_2->getNotes()[(i*4)+2]));
+                rel(*this, (counterpoint_2->getIsFourthSpeciesArray()[i*4] == 0) >> 
+                    (voices[2] == counterpoint_2->getNotes()[i*4]));           
             }else{
                 rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
             }
         }
         //same for 4 voices
         if(nVoices>=4){
-            if((counterpoint_3->getSpecies()==FOURTH_SPECIES || counterpoint_3->getSpecies()==FIFTH_SPECIES) && i==0){
+            if(counterpoint_3->getSpecies()==FOURTH_SPECIES && i!=size-1){
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-            } else if((counterpoint_3->getSpecies()==FOURTH_SPECIES || counterpoint_3->getSpecies()==FIFTH_SPECIES) && i!=0 && i!=size-1){
-                IntVarArray previousVoices(*this, 2, 0, 127);
-                previousVoices[0] = voices[0]; // cantus firmus
-                previousVoices[1] = voices[1]; // first counterpoint
-                previousVoices[2] = voices[2]; // second counterpoint
-                BoolVar b1 = isConsonantWithVoices(counterpoint_3->getNotes()[i*4], previousVoices);
-                ite(*this, b1, counterpoint_3->getNotes()[(i*4)], counterpoint_3->getNotes()[(i*4)+2], voices[3]);
+            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i==0) {
+                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
+            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i!=0 && i!=size-1){
+                // Use conditional constraint based on isFourthSpeciesArray
+                rel(*this, counterpoint_3->getIsFourthSpeciesArray()[i*4] >> 
+                    (voices[3] == counterpoint_3->getNotes()[(i*4)+2]));
+                rel(*this, (counterpoint_3->getIsFourthSpeciesArray()[i*4] == 0) >> 
+                    (voices[3] == counterpoint_3->getNotes()[i*4])); 
             }else{
                 rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
             }
         }
 
+        
         //sorting the voices. Order is necessary to get the correct index of the voices array to put into the sorted_voices array
         IntVarArray order = IntVarArray(*this, nVoices, 0, nVoices-1);
         sorted_voices.push_back(IntVarArray(*this, nVoices, 0, 127));
         sorted(*this, voices, sorted_voices[i], order);
 
-        //set lowest and upper strata notes
-        lowest->setNote(*this, i*4, sorted_voices[i][0]);
-
-        upper_1->setNote(*this, i*4, sorted_voices[i][1]);
-        if(nVoices>=3){
-            upper_2->setNote(*this, i*4, sorted_voices[i][2]);
+        // store the voice mapping for this measure
+        voice_mapping.push_back(IntVarArray(*this, nVoices, 0, nVoices-1));
+        for(int j = 0; j < nVoices; j++){
+            rel(*this, voice_mapping[i][j], IRT_EQ, order[j]);
         }
-        if(nVoices>=4){
-            upper_3->setNote(*this, i*4, sorted_voices[i][3]);
+
+        //Set lowest and upper strata notes
+        int maxPos = (i == size-1) ? 1 : 4;  // Only set first position for last measure
+        for(int pos = 0; pos < maxPos; pos++){
+            if(pos == 0){
+                // For the first note of each measure, use the sorted values directly
+                rel(*this, lowest->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][0]);
+                rel(*this, upper_1->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][1]);
+                
+                if(nVoices >= 3){
+                    rel(*this, upper_2->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][2]);
+                }
+                
+                if(nVoices >= 4){
+                    rel(*this, upper_3->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][3]);
+                }
+            } else {
+                // For other positions in the measure, use the actual voice notes based on mapping
+                
+                // For the lowest stratum (position 0 in sorted array)
+                BoolVar cfIsLowest(*this, 0, 1);
+                BoolVar cp1IsLowest(*this, 0, 1);
+                BoolVar cp2IsLowest(*this, 0, 1);
+                BoolVar cp3IsLowest(*this, 0, 1);
+                
+                rel(*this, voice_mapping[i][0], IRT_EQ, 0, Reify(cfIsLowest));      // cantus firmus is lowest
+                rel(*this, voice_mapping[i][0], IRT_EQ, 1, Reify(cp1IsLowest));     // counterpoint_1 is lowest
+                if(nVoices >= 3) rel(*this, voice_mapping[i][0], IRT_EQ, 2, Reify(cp2IsLowest)); // counterpoint_2 is lowest
+                if(nVoices >= 4) rel(*this, voice_mapping[i][0], IRT_EQ, 3, Reify(cp3IsLowest)); // counterpoint_3 is lowest
+
+                // Set lowest stratum note based on which voice is lowest
+                rel(*this, cfIsLowest >> (lowest->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
+                rel(*this, cp1IsLowest >> (lowest->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
+                if(nVoices >= 3) rel(*this, cp2IsLowest >> (lowest->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
+                if(nVoices >= 4) rel(*this, cp3IsLowest >> (lowest->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
+                
+                // For upper_1 stratum (position 1 in sorted array)
+                BoolVar cfIsUpper1(*this, 0, 1);
+                BoolVar cp1IsUpper1(*this, 0, 1);
+                BoolVar cp2IsUpper1(*this, 0, 1);
+                BoolVar cp3IsUpper1(*this, 0, 1);
+                
+                rel(*this, voice_mapping[i][1], IRT_EQ, 0, Reify(cfIsUpper1));
+                rel(*this, voice_mapping[i][1], IRT_EQ, 1, Reify(cp1IsUpper1));
+                if(nVoices >= 3) rel(*this, voice_mapping[i][1], IRT_EQ, 2, Reify(cp2IsUpper1));
+                if(nVoices >= 4) rel(*this, voice_mapping[i][1], IRT_EQ, 3, Reify(cp3IsUpper1));
+                
+                rel(*this, cfIsUpper1 >> (upper_1->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
+                rel(*this, cp1IsUpper1 >> (upper_1->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
+                if(nVoices >= 3) rel(*this, cp2IsUpper1 >> (upper_1->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
+                if(nVoices >= 4) rel(*this, cp3IsUpper1 >> (upper_1->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
+                
+                // Continue for upper_2 and upper_3 if they exist...
+                if(nVoices >= 3){
+                    BoolVar cfIsUpper2(*this, 0, 1);
+                    BoolVar cp1IsUpper2(*this, 0, 1);
+                    BoolVar cp2IsUpper2(*this, 0, 1);
+                    BoolVar cp3IsUpper2(*this, 0, 1);
+                    
+                    rel(*this, voice_mapping[i][2], IRT_EQ, 0, Reify(cfIsUpper2));
+                    rel(*this, voice_mapping[i][2], IRT_EQ, 1, Reify(cp1IsUpper2));
+                    rel(*this, voice_mapping[i][2], IRT_EQ, 2, Reify(cp2IsUpper2));
+                    if(nVoices >= 4) rel(*this, voice_mapping[i][2], IRT_EQ, 3, Reify(cp3IsUpper2));
+                    
+                    rel(*this, cfIsUpper2 >> (upper_2->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
+                    rel(*this, cp1IsUpper2 >> (upper_2->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
+                    rel(*this, cp2IsUpper2 >> (upper_2->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
+                    if(nVoices >= 4) rel(*this, cp3IsUpper2 >> (upper_2->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
+                }
+                
+                if(nVoices >= 4){
+                    BoolVar cfIsUpper3(*this, 0, 1);
+                    BoolVar cp1IsUpper3(*this, 0, 1);
+                    BoolVar cp2IsUpper3(*this, 0, 1);
+                    BoolVar cp3IsUpper3(*this, 0, 1);
+                    
+                    rel(*this, voice_mapping[i][3], IRT_EQ, 0, Reify(cfIsUpper3));
+                    rel(*this, voice_mapping[i][3], IRT_EQ, 1, Reify(cp1IsUpper3));
+                    rel(*this, voice_mapping[i][3], IRT_EQ, 2, Reify(cp2IsUpper3));
+                    rel(*this, voice_mapping[i][3], IRT_EQ, 3, Reify(cp3IsUpper3));
+                    
+                    rel(*this, cfIsUpper3 >> (upper_3->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
+                    rel(*this, cp1IsUpper3 >> (upper_3->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
+                    rel(*this, cp2IsUpper3 >> (upper_3->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
+                    rel(*this, cp3IsUpper3 >> (upper_3->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
+                }
+            }
         }
 
         //if the lowest note is the same as the cantusFirmus note, then the cantusFirmus is the lowest stratum
