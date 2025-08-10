@@ -192,13 +192,10 @@ void H5_1_differentNotes(Home home, vector<Part*> parts){
                 // check voice v2 doesn't play same note as cantusFirmus
                 for(int i = 1; i < parts[v1]->getNotes().size()-1; i++){
                     rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i*4]);
-                    // for (int j = i*4; j < (i*4)+4; j++) {
-                    //     rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[j]);
-                    // }
                 }
             } else {
                 // check voice v1 doesn't play same note as voice v2 with v1 and v2 are counterpoints
-                for(int i = 4; i < parts[v1]->getNotes().size()-1; i++){
+                for(int i = 4; i < parts[v1]->getNotes().size()-1; i+=4){
                     rel(home, parts[v1]->getNotes()[i], IRT_NQ, parts[v2]->getNotes()[i]);
                 }
             }
