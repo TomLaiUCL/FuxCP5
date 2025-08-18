@@ -39,6 +39,11 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
 
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
     
+    //Harmonic intervals
+    for (int i = 0; i < h_intervals.size(); i++) {
+        rel(home, (h_intervals[i])==(notes[i]-low->getNotes()[i])%12);
+    }
+
     /// Harmonic intervals for the first species notes
     firstSpeciesHarmonicIntervals = IntVarArray(home, nMeasures* notesPerMeasure.at(FIRST_SPECIES), -PERFECT_OCTAVE, PERFECT_OCTAVE);
     
@@ -173,6 +178,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     rel(home, firstSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),m_intervals_brut.size()));
 
     //H7,H8 from Thibault : penultimate note major sixth or minor third
+    // cout << "H7_1_2v_penultimateSixthOrThird" << endl;
     if (activeConstraints[SP1_1H7_2V]) {
         H7_1_2v_penultimateSixthOrThird(home, this);
     }

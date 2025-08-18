@@ -174,6 +174,6 @@ void R9_5_twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2);
 /**
  * For the upper strata, there shouldn't be a minor second interval between the thesis notes
  */
-void noMinorSecondBetweenUpper(Home home, vector<Part*> parts);
+void noMinorSecondBetweenUpper(Home home, vector<Stratum*> strata);
 
 #endif

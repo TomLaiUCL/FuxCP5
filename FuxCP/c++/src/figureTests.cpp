@@ -179,16 +179,7 @@ void FigureTests::test_2v_1sp_fig22() {
     cantusFirmus = {57,60,59,62,60,64,65,64,62,60,59,57}; 
     cp =           {69,64,67,65,64,72,69,71,71,69,68,69};
     v_type = {1};
-    CounterpointProblem* problem = set_configuration();
-    has_solution(problem);
-    cout << problem->getLowest()->getMelodicIntervals() << endl;
-    cout << problem->getCounterpoint_1()->getMelodicIntervals() << endl;
-    cout << problem->getCounterpoint_1()->getMelodicIntervals().size() << endl;
-    cout << cantusFirmus.size() << endl;
-
-    cout << problem->getCounterpoint_1()->getFirstMInterval() << endl;
-    cout << problem->getCounterpoint_1()->getMotions() << endl;
-    find_unsat_constraints();
+    findAllMUSes();
 }
 
 void FigureTests::test_2v_1sp_fig23() {
@@ -213,12 +204,8 @@ void FigureTests::test_2v_2sp_fig39() {
     cout << "Start test_2v_2sp_fig39" << endl;
     spList = {SECOND_SPECIES};
     cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
-    cp =           {-1,53,52,48,53,52,50,48,46,58,55,60,57,53,52,48,53,41,45,50,48,52,53};
+    cp =        {-1,53,52,48,53,52,50,48,46,58,55,60,57,53,52,48,53,41,45,50,48,52,53};
     v_type = {0};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCounterpoint_1()->getIsNotLowest() << endl;
-    // cout << problem->getCounterpoint_1()->getFirstHInterval() << endl;
     find_unsat_constraints();
 }
 
@@ -228,8 +215,6 @@ void FigureTests::test_2v_2sp_fig40() {
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; 
     cp =           {-1, 67,64,65,67,69,71,69,67,72,71,72,74,72,71,69,67,65,64,72,71,69,67,62,64,66,67};
     v_type = {2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
     find_unsat_constraints();
 }
 
@@ -239,14 +224,6 @@ void FigureTests::test_2v_2sp_fig41() {
     cantusFirmus = {55,60,59,55,60,64,62,67,64,60,62,59,57,55}; 
     cp =           {-1,55,52,53,55,53,52,50,48,52,48,60,59,57,55,59,60,59,57,55,54,50,55,47,50,54,55};  
     v_type = {0};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCantusFirmus()->getHIntervalSize() << endl;
-    // cout << problem->getCantusFirmus()->getHInterval().size() << endl;
-    // cout << problem->getCantusFirmus()->getHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getHIntervalSize() << endl;
-    // cout << problem->getCounterpoint_1()->getHInterval().size() << endl;
-    // cout << problem->getCounterpoint_1()->getHInterval() << endl;
     find_unsat_constraints();
 }
 
@@ -256,12 +233,6 @@ void FigureTests::test_2v_2sp_fig42() {
     cantusFirmus = {57,60,59,60,64,65,64,62,60,59,57}; 
     cp =           {-1,69,64,65,67,62,64,76,72,71,69,65,67,71,74,69,72,64,66,68,69};
     v_type = {2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCounterpoint_1()->getFirstHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getIsNotLowest() << endl;
-    // cout << problem->getCounterpoint_1()->getSecondSpeciesMIntervals() << endl;
-    // cout << problem->getCounterpoint_1()->getSecondSpeciesRealMotions() << endl;
     find_unsat_constraints();
 }
 
@@ -307,10 +278,6 @@ void FigureTests::test_2v_3sp_fig56() {
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {50,52,53,55,57,50,57,59,60,59,55,57,59,57,55,53,52,64,59,60,62,57,50,52,53,55,57,59,60,62,64,60,62,57,50,62,61,57,59,60,62};
     v_type = {-1};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCounterpoint_1()->getIs5QNArray() << endl;
-    // cout << problem->getCounterpoint_1()->getConsonance() << endl;
     find_unsat_constraints();
 }
 
@@ -320,10 +287,6 @@ void FigureTests::test_2v_3sp_fig57() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {71,67,69,71,72,71,69,67,65,67,69,71,72,64,65,67,69,72,76,74,72,71,69,72,71,74,71,69,67,71,72,71,69,71,72,74,76};
     v_type = {2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCounterpoint_1()->getIsNotLowest() << endl;
-    // cout << problem->getCantusFirmus()->getHInterval() << endl;
     find_unsat_constraints();
 }
 
@@ -333,15 +296,6 @@ void FigureTests::test_2v_3sp_fig58() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {52,53,55,52,57,55,53,52,50,52,53,55,57,52,57,55,53,52,50,52,53,55,57,59,60,62,64,62,60,48,60,59,57,62,57,62,64};
     v_type = {-1};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCantusFirmus()->getHInterval() << endl;
-    // cout << problem->getCantusFirmus()->getFirstHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getFirstHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getFirstSpeciesHIntervals() << endl;
-    // cout << problem->getCounterpoint_1()->getHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getIs5QNArray() << endl;
-    // cout << problem->getCounterpoint_1()->getConsonance() << endl;
     find_unsat_constraints();
 }
 
@@ -369,23 +323,6 @@ void FigureTests::test_2v_4sp_fig74() {
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {50,50,62,62,60,60,59,59,64,64,62,62,65,65,64,64,62,62,61,62};
     v_type = {-1};
-    CounterpointProblem* problem = set_configuration();
-    has_solution(problem);
-    cout << "Lowest melodic intervals" << endl;
-    cout << problem->getLowest()->getMelodicIntervals() << endl;
-    cout << "Fourth Species melodic intervals" << endl;
-    cout << problem->getCounterpoint_1()->getFourthSpeciesMIntervals() << endl;
-
-    // cout << problem->getCounterpoint_1()->getFourthSpeciesMIntervals() << endl;
-    // for(int i = 1; i < 11-2; i++){
-    //     cout << "i: " << i << endl;
-    //     cout << "isConsonance: " << problem->getCounterpoint_1()->getConsonance()[i*4] << endl;
-    //     cout << "fourthSpeciesMelodicIntervals: " << problem->getCounterpoint_1()->getFourthSpeciesMIntervals()[i*2-1] << endl;
-    // }
-    // cout << problem->getCounterpoint_1()->getIsNotLowest() << endl;
-    // cout << problem->getCounterpoint_1()->getFirstSpeciesMotions() << endl;
-    // cout << problem->getCounterpoint_1()->getFourthSpeciesMIntervals() << endl;
-    // cout << problem->getLowest()->getMelodicIntervals() << endl;
     find_unsat_constraints();
 }
 
@@ -404,12 +341,10 @@ void FigureTests::test_2v_4sp_fig76() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64};
     cp =           {52,52,57,57,55,55,53,53,50,50,62,62,60,60,64,64,62,64};
     v_type = {-2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getLowest()->getNotes() << endl;
-    // cout << problem->getCounterpoint_1()->getHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getIsNotLowest() << endl;
-    // cout << problem->getCounterpoint_1()->getConsonance() << endl;
+        CounterpointProblem* problem = set_configuration();
+    has_solution(problem);
+    cout << problem->getCantusFirmus()->getHIntervals() << endl;
+    cout << problem->getCantusFirmus()->getMotions() << endl;
     find_unsat_constraints();
 }
 
@@ -420,13 +355,6 @@ void FigureTests::test_2v_4sp_fig77() {
     cp =           {65,65,64,64,60,60,65,65,69,69,67,67,65,65,64,64,69,69,65,65,64,65};
     // {65,65,64,64,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
     v_type = {2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getLowest()->getNotes() << endl;
-    // cout << problem->getCounterpoint_1()->getHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getIsNotLowest() << endl;
-    // cout << problem->getCounterpoint_1()->getFourthSpeciesMIntervals() << endl;
-    // cout << problem->getCounterpoint_1()->getConsonance() << endl;
     find_unsat_constraints();
 }
 
@@ -468,6 +396,10 @@ void FigureTests::test_2v_5sp_fig82() {
                     FOURTH_SPECIES
                 };
     v_type = {2};
+    CounterpointProblem* problem = set_configuration();
+    has_solution(problem);
+    cout << problem->getCounterpoint_1()->getHIntervals() << endl;
+    cout << problem->getCounterpoint_1()->getConsonance() << endl;
     find_unsat_constraints();
 }
 
@@ -486,10 +418,20 @@ void FigureTests::test_2v_5sp_fig83() {
                     64,-1,62,-1,
                     62,-1,61,-1,
                     62};
+    notesSpeciesFor5sp = {
+                    -1, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES,-1, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES,
+                    THIRD_SPECIES, THIRD_SPECIES, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES, -1, FOURTH_SPECIES, -1,
+                    FOURTH_SPECIES
+    };
     v_type = {0};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getLowest()->getNotes() << endl;
     find_unsat_constraints();
 }
 
@@ -674,9 +616,9 @@ void FigureTests::test_3v_2sp_fig126(){
     cp =           {52,57,53,57,53,65,64,60,57,56,
                     -1,52,53,52,50,52,53,48,50,52,53,57,60,55,57,52,52,50,52};
     v_type = {-1, -2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    
+    CounterpointProblem* problem = set_configuration();
+    has_solution(problem);
+    cout << problem->getCantusFirmus()->getHIntervals() << endl;
     find_unsat_constraints();
 }
 
@@ -722,7 +664,7 @@ void FigureTests::test_3v_3sp_fig130(){
     cp =           {69,62,65,67,69,65,69,71,72,71,67,69,71,72,74,71,76,74,71,73,74,77,76,74,72,69,72,74,76,74,72,71,69,62,69,71,73,69,71,72,74,
                     50,50,48,55,52,50,53,48,50,57,50};
     v_type = {1, -2};
-    
+
     find_unsat_constraints();
 }
 
@@ -731,7 +673,7 @@ void FigureTests::test_3v_3sp_fig131(){
     spList = {THIRD_SPECIES, FIRST_SPECIES};
     cantusFirmus = {50,53,52,50,55,53,57,55,53,52,50};
     cp =           {62,64,65,67,69,57,60,62,64,65,67,64,65,69,65,64,62,58,62,64,65,69,67,65,64,60,64,65,67,64,65,67,69,57,60,62,64,62,59,61,62,
-                    57,57,61,62,58,57,60,58,57,55,53};
+                    57,57,61,62,58,57,60,58,57,55,54};
     v_type = {2, 1};
     
     find_unsat_constraints();
@@ -755,7 +697,7 @@ void FigureTests::test_3v_3sp_fig133(){
     cp =            {53,50,53,55,57,53,57,59,60,52,55,57,59,62,59,57,55,57,59,61,62,64,65,62,60,57,60,62,64,62,60,59,57,62,57,59,61,57,59,60,62,
                      50,50,48,55,52,50,53,48,50,57,50};
     v_type = {-1, -2};
-    
+
     find_unsat_constraints();
 }
 
@@ -766,7 +708,6 @@ void FigureTests::test_3v_4sp_fig146() {
     cp =           {76,76,72,72,71,71,69,69,72,72,74,74,72,72,69,69,71,68,
                     52,57,55,57,53,53,52,48,50,52};
     v_type = {2,-2};
-    
     find_unsat_constraints();
 }
 
@@ -777,10 +718,7 @@ void FigureTests::test_3v_4sp_fig147() {
     cp =           {64,64,60,60,59,59,57,57,62,62,60,60,59,59,57,57,59,56,
                     52,57,55,57,53,53,52,48,50,52};
     v_type = {0,-2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCantusFirmus()->getNotes() << endl;
-    // cout << problem->getCounterpoint_1()->getNotes() << endl;
+
     find_unsat_constraints();
 }
 
@@ -791,17 +729,17 @@ void FigureTests::test_3v_4sp_fig148() {
     cp =           {67,67,67,64,72,74,76,72,69,68,
                     52,52,48,48,47,47,45,45,53,53,50,50,48,48,52,52,50,52};
     v_type = {2,-2};
-    
+
     find_unsat_constraints();
 }
 
 void FigureTests::test_3v_4sp_fig149() {
     cout << "Start test_3v_4sp_fig149" << endl;
     spList = {FOURTH_SPECIES, FIRST_SPECIES};
-    cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
+    cantusFirmus = {53,55,57,53,50,52,53,60,57,53,55,53}; 
     cp =           {65,65,64,64,62,62,65,65,67,67,69,69,65,65,64,64,62,62,65,65,64,65,
                     53,48,53,50,46,48,50,57,53,50,48,41};
-    v_type = {0,-2};
+    v_type = {2,0};
     
     find_unsat_constraints();
 }
@@ -824,11 +762,6 @@ void FigureTests::test_3v_4sp_fig151(){
     cp =           {53,60,65,62,58,55,62,64,65,62,58,57,
                     53,53,52,52,50,50,46,46,43,-1,48,48,46,46,45,45,50,50,53,53,52,53};
     v_type = {-2, -2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getLowest()->getNotes() << endl;
-    // cout << problem->getCantusFirmus()->getConsonance() << endl;
-    // cout << problem->getCounterpoint_1()->getConsonance() << endl;
     find_unsat_constraints();
 }
 
@@ -863,16 +796,6 @@ void FigureTests::test_3v_5sp_fig154() {
                         FOURTH_SPECIES,
     };
     v_type = {2, -2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCounterpoint_1()->getNotes() << endl;
-    // cout << problem->getCounterpoint_1()->getSpeciesArray() << endl;
-    // for(int i = 1; i < 11-1; i++){
-    //     cout << "Species " << i << ": " << problem->getCounterpoint_1()->getSpeciesArray()[i*4] << endl;
-    //     cout << " Notes: " << problem->getCounterpoint_1()->getNotes()[i*4] << endl;
-    //     cout << " Notes: " << problem->getCounterpoint_1()->getNotes()[(i*4)+2] << endl;
-    // }
-    
     find_unsat_constraints();
 }
 
@@ -942,10 +865,6 @@ void FigureTests::test_3v_5sp_fig156() {
                         FOURTH_SPECIES
     };
     v_type = {2,-2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getLowest()->getNotes() << endl;
-    // cout << problem->getCounterpoint_1()->getConsonance() << endl;
     find_unsat_constraints();
 }
 
@@ -988,10 +907,9 @@ void FigureTests::test_4v_1sp_fig166() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {59,57,57,57,60,60,64,60,62,59,
                     56,57,53,52,52,53,60,60,57,56,
-                    56,57,53,52,52,53,60,60,57,56,
                     52,53,50,45,45,41,40,45,50,52};
     v_type = {-1,-1,-3};
-    
+
     find_unsat_constraints();
 }
 
@@ -1026,15 +944,7 @@ void FigureTests::test_4v_1sp_fig169() {
     cp =           {69,67,65,69,70,71,69,69,65,65,64,65,
                     60,60,60,62,65,67,65,64,62,57,60,57,
                     53,52,53,50,46,43,50,45,50,50,48,41};
-    v_type = {0,-1,-3};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getUpper_1()->getHInterval() << endl;
-    // cout << problem->getUpper_2()->getHInterval() << endl;
-    // cout << problem->getUpper_3()->getHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getFirstHInterval() << endl;
-    // cout << problem->getCantusFirmus()->getFirstHInterval() << endl;
-    // cout << problem->getCounterpoint_2()->getFirstHInterval() << endl;
+    v_type = {0,-1,-3};;
     find_unsat_constraints();
 }
 
@@ -1043,7 +953,6 @@ void FigureTests::test_4v_1sp_fig170() {
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {65,67,69,65,62,64,65,72,69,65,67,65}; 
     cp =           {60,60,60,60,58,59,57,69,65,65,64,65,
-                    57,55,53,57,53,55,53,52,53,57,60,57,
                     57,55,53,57,53,55,53,52,53,57,60,57,
                     53,52,53,41,46,43,50,45,50,50,48,41};
     v_type = {-1,-2,-3};
@@ -1059,11 +968,6 @@ void FigureTests::test_4v_1sp_fig171() {
                     60,60,60,62,62,58,57,57,53,57,60,57,
                     53,52,53,50,46,43,50,45,50,50,48,41};
     v_type = {2,1,-1};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCounterpoint_1()->getFirstHInterval() << endl;
-    // cout << problem->getCounterpoint_2()->getFirstHInterval() << endl;
-    // cout << problem->getCantusFirmus()->getFirstHInterval() << endl;
     find_unsat_constraints();
 }
 
@@ -1085,17 +989,9 @@ void FigureTests::test_4v_2sp_fig173() {
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {57,62,55,55,59,62,60,64,62,61,62,
                     -1,53,57,59,60,55,59,57,55,52,57,53,52,53,52,60,57,53,57,57,57,
-                    -1,53,57,59,60,55,59,57,55,52,57,53,52,53,52,60,57,53,57,57,57,
                     50,50,48,55,52,50,45,48,50,45,50};   
     v_type = {-1,-1,-2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getLowest()->getFirstNotes() << endl;
-    // cout << problem->getLowest()->getMelodicIntervals() << endl;
-    // cout << problem->getCantusFirmus()->getMotions() << endl;
-    // cout << problem->getCounterpoint_1()->getMotions() << endl;
-    // cout << problem->getCounterpoint_2()->getMotions() << endl;
-    // cout << problem->getCounterpoint_3()->getMotions() << endl;
+
     find_unsat_constraints();
 }
 
@@ -1104,7 +1000,6 @@ void FigureTests::test_4v_2sp_fig174() {
     spList = {SECOND_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
     cantusFirmus = {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =           {-1,65,69,71,72,67,71,74,76,71,74,77,76,72,76,72,69,74,73,73,74,
-                    57,53,55,55,55,57,60,60,53,57,57,
                     57,53,55,55,55,57,60,60,53,57,57,
                     50,50,48,55,52,50,45,48,50,45,50};   
     v_type = {1,-1,-2};
@@ -1142,10 +1037,9 @@ void FigureTests::test_4v_3sp_fig183() {
     cantusFirmus = {64,60,62,60,57,69,67,64,65,64}; 
     cp =           {71,64,71,72,69,72,69,67,65,62,64,65,67,64,65,67,69,65,69,71,72,69,72,74,76,71,76,74,72,76,72,71,69,74,69,71,68, 
                     56,57,57,55,60,57,59,60,62,59,
-                    56,57,57,55,60,57,59,60,62,59,
                     52,53,50,52,53,53,52,57,50,52};   
     v_type = {0, -1, -2};
-    
+
     find_unsat_constraints();
 }
 
@@ -1181,10 +1075,7 @@ void FigureTests::test_4v_3sp_fig186(){
                     68,69,69,72,72,72,72,72,74,71,
                     64, 62, 60, 59, 57, 55, 53, 52, 50, 52, 53, 50, 57, 60, 57, 55, 53, 55, 57, 55, 53, 55, 57, 59, 60, 52, 53, 55, 57, 55, 53, 52, 50, 53, 52, 50, 52};
     v_type = {1, 1, -2};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCounterpoint_3()->getIs5QNArray() << endl;
-    // cout << problem->getCounterpoint_3()->getConsonance() << endl;
+
     find_unsat_constraints();
 }
 
@@ -1194,17 +1085,9 @@ void FigureTests::test_4v_4sp_fig196(){
     cantusFirmus =  {62,65,64,62,67,65,69,67,65,64,62}; 
     cp =            {57,57,62,62,60,60,59,59,62,62,57,57,65,65,64,64,62,62,61,62,
                     53, 57, 57, 50, 62, 62, 60, 60, 57, 57, 57,
-                    53, 57, 57, 50, 62, 62, 60, 60, 57, 57, 57,
                      50,50,45,47,43,50,53,48,50,45,50};
     v_type = {-1, -1, -3};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getUpper_1()->getHInterval() << endl;
-    // cout << problem->getUpper_2()->getHInterval() << endl;
-    // cout << problem->getUpper_3()->getHInterval() << endl;
-    // cout << problem->getCantusFirmus()->getHInterval() << endl;
-    // cout << problem->getCounterpoint_1()->getHInterval() << endl;
-    // cout << problem->getCounterpoint_2()->getHInterval() << endl;
+
     find_unsat_constraints();
 }
 
@@ -1225,7 +1108,6 @@ void FigureTests::test_4v_5sp_fig200(){
                     74,-1,73,-1,
                     74,
 
-                    57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
                     57, 53, 55, 55, 55, 57, 57, 60, 57, 57, 57,
                     50,50,48,55,52,50,53,48,50,45,50};
     notesSpeciesFor5sp = {
@@ -1279,8 +1161,7 @@ void FigureTests::test_4v_5sp_fig201() {
                         FOURTH_SPECIES,
     };
     v_type = {-1, -1, -2};
-    CounterpointProblem* problem = set_configuration();
-    has_solution(problem);
+
     find_unsat_constraints();
 }
 
@@ -1293,13 +1174,7 @@ void FigureTests::test_4v_Xsp_fig204() {
             57, 57, 62, 62, 60, 60, 58, 58, 62, 62, 60, 60, 65, 65, 64, 64, 62, 62, 61, 62,
         };
     v_type = {2,2,1};
-    // CounterpointProblem* problem = set_configuration();
-    // has_solution(problem);
-    // cout << problem->getCantusFirmus()->getFirstSpeciesMotions() << endl;
-    // cout << problem->getCounterpoint_1()->getFirstSpeciesMotions() << endl;
-    // cout << problem->getCounterpoint_2()->getFirstSpeciesMotions() << endl;
-    // cout << problem->getCounterpoint_3()->getFourthSpeciesMIntervals() << endl;
-    // cout << problem->getCounterpoint_3()->getFirstSpeciesMotions() << endl;
+
     find_unsat_constraints();
 }
 
@@ -1372,10 +1247,6 @@ void FigureTests::run_threeVoice_tests() {
     test_3v_4sp_fig149();
     test_3v_4sp_fig150();
     test_3v_4sp_fig151();
-    // Three voice fifth species figures
-    test_3v_5sp_fig154();
-    test_3v_5sp_fig155();
-    test_3v_5sp_fig156();
     // Three voice fifth species figures
     test_3v_5sp_fig154();
     test_3v_5sp_fig155();
@@ -1479,7 +1350,7 @@ void FigureTests::MUSTest() {
 }
 
 void FigureTests::quickTest() {
-    test_2v_1sp_fig22();
+    // test_2v_1sp_fig22();
     // test_2v_2sp_fig39();
     // test_2v_2sp_fig40();
     // test_2v_2sp_fig41();
@@ -1487,17 +1358,27 @@ void FigureTests::quickTest() {
     // test_2v_2sp_fig43();
     // test_2v_2sp_fig44();
     // test_2v_2sp_fig45();
+    // test_2v_3sp_fig55();
     // test_2v_3sp_fig56();
     // test_2v_3sp_fig57();
     // test_2v_3sp_fig58();
     // test_2v_4sp_fig74();
     // test_2v_4sp_fig76();
     // test_2v_4sp_fig77();
+    // test_2v_4sp_fig78();
     // test_2v_5sp_fig82();
     // test_2v_5sp_fig83();
+    // test_3v_1sp_fig108();
+    // test_3v_1sp_fig109();
+    // test_3v_1sp_fig110();
+    test_3v_2sp_fig126();
     // test_3v_2sp_fig127();
     // test_3v_2sp_fig128();
+    // test_3v_3sp_fig130();
+    // test_3v_3sp_fig133();
+    // test_3v_4sp_fig146();
     // test_3v_4sp_fig147();
+    // test_3v_4sp_fig148();
     // test_3v_4sp_fig151();
     // test_3v_5sp_fig154();
     // test_3v_5sp_fig156();
@@ -1505,9 +1386,11 @@ void FigureTests::quickTest() {
     // test_4v_1sp_fig171();
     // test_4v_2sp_fig173();
     // test_4v_3sp_fig183();
+    // test_4v_3sp_fig185();
+    // test_4v_3sp_fig186();
     // test_4v_3sp_fig184();
     // test_4v_3sp_fig186();
     // test_4v_4sp_fig196();
-    test_4v_5sp_fig201();
+    // test_4v_5sp_fig201();
     // test_4v_Xsp_fig204();
 }

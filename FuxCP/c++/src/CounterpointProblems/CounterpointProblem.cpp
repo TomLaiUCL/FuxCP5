@@ -219,293 +219,615 @@ void CounterpointProblem::orderCosts(){
 
 
 void CounterpointProblem::setStrata(){
-    //decided how many voices we have
+    // Determine number of voices
     int nVoices = 2;
-    if(upper_2!=nullptr){
-        nVoices ++;
-    }
-    if(upper_3!=nullptr){
-        nVoices++;
-    }
+    if(upper_2 != nullptr) nVoices++;
+    if(upper_3 != nullptr) nVoices++;
+    
     int size = counterpoint_1->getNMeasures();
-    //sortedVoices : will contain in order at index 0 the lowest note and then the next highest at index 1 etc.
+
+    // Initialize measure_orders for each measure
     sorted_voices = {};
-    // Add arrays to track which voice is at which position after sorting
-    vector<IntVarArray> voice_mapping;  // voice_mapping[measure][sorted_position] = original_voice_index
+    measures_order = {};
+
+    // Process each measure
     for(int i = 0; i < size; i++){
-        //initialize the voices array which will contain the current note of a part
+        // For each measure, create voices array with the actual notes at that measure
         IntVarArray voices = IntVarArray(*this, nVoices, 0, 127);
-        //at index 0, we have the cantusFirmus
-        rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
-        //adds the correct note to the voices array at the index. special rules for fourth and fifth species apply
-        if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
-            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]);
-        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0) {
-            rel(*this, voices[1], IRT_EQ, counterpoint_1->getNotes()[(i*4)+2]); 
-        } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i!=0 && i!=size-1){
-            // Use conditional constraint based on isFourthSpeciesArray
-            // If it's fourth species, check the interval size
-            BoolVar isLargeInterval(*this, 0, 1);
-            rel(*this, expr(*this, abs(counterpoint_1->getNotes()[i*4+2] - counterpoint_1->getNotes()[i*4])), IRT_GR, 2, Reify(isLargeInterval));
-            
-            // If fourth species AND large interval (>2), use retarded note
-            rel(*this, (counterpoint_1->getIsFourthSpeciesArray()[i*4] && isLargeInterval) >> 
-                (voices[1] == counterpoint_1->getNotes()[i*4]));
-            
-            // If fourth species AND small interval (<=2), use resolution note  
-            rel(*this, (counterpoint_1->getIsFourthSpeciesArray()[i*4] && !isLargeInterval) >> 
-                (voices[1] == counterpoint_1->getNotes()[(i*4)+2]));
-            
-            // If not fourth species, use first note
-            rel(*this, (counterpoint_1->getIsFourthSpeciesArray()[i*4] == 0) >> 
-                (voices[1] == counterpoint_1->getNotes()[i*4]));                     
-        } else{
-            rel(*this, voices[1], IRT_EQ, counterpoint_1->getFirstNotes()[i]);
-        }
-        //same for 3 voices
-        if(nVoices>=3){
-            if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0) {
-                rel(*this, voices[2], IRT_EQ, counterpoint_2->getNotes()[(i*4)+2]);
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i!=0 && i!=size-1){
-                // Use conditional constraint based on isFourthSpeciesArray
-                rel(*this, counterpoint_2->getIsFourthSpeciesArray()[i*4] >> 
-                    (voices[2] == counterpoint_2->getNotes()[(i*4)+2]));
-                rel(*this, (counterpoint_2->getIsFourthSpeciesArray()[i*4] == 0) >> 
-                    (voices[2] == counterpoint_2->getNotes()[i*4]));           
-            }else{
-                rel(*this, voices[2], IRT_EQ, counterpoint_2->getFirstNotes()[i]);
-            }
-        }
-        //same for 4 voices
-        if(nVoices>=4){
-            if(counterpoint_3->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i==0) {
-                rel(*this, voices[3], IRT_EQ, counterpoint_3->getNotes()[(i*4)+2]);
-            } else if(counterpoint_3->getSpecies()==FIFTH_SPECIES && i!=0 && i!=size-1){
-                // Use conditional constraint based on isFourthSpeciesArray
-                rel(*this, counterpoint_3->getIsFourthSpeciesArray()[i*4] >> 
-                    (voices[3] == counterpoint_3->getNotes()[(i*4)+2]));
-                rel(*this, (counterpoint_3->getIsFourthSpeciesArray()[i*4] == 0) >> 
-                    (voices[3] == counterpoint_3->getNotes()[i*4])); 
-            }else{
-                rel(*this, voices[3], IRT_EQ, counterpoint_3->getFirstNotes()[i]);
-            }
-        }
-
         
-        //sorting the voices. Order is necessary to get the correct index of the voices array to put into the sorted_voices array
-        IntVarArray order = IntVarArray(*this, nVoices, 0, nVoices-1);
+        // Set cantus firmus note
+        rel(*this, voices[0], IRT_EQ, cantusFirmus->getNotes()[i]);
+
+        // Set counterpoint notes based on species-specific rules for this measure
+        setVoiceNote(voices, 1, counterpoint_1, i);
+        if(nVoices >= 3) setVoiceNote(voices, 2, counterpoint_2, i);
+        if(nVoices >= 4) setVoiceNote(voices, 3, counterpoint_3, i);
+
+        // Sort voices and create order array for this specific measure
+        measures_order.push_back(IntVarArray(*this, nVoices, 0, nVoices-1));
         sorted_voices.push_back(IntVarArray(*this, nVoices, 0, 127));
-        sorted(*this, voices, sorted_voices[i], order);
+        sorted(*this, voices, sorted_voices[i], measures_order[i]);
 
-        // store the voice mapping for this measure
-        voice_mapping.push_back(IntVarArray(*this, nVoices, 0, nVoices-1));
-        for(int j = 0; j < nVoices; j++){
-            rel(*this, voice_mapping[i][j], IRT_EQ, order[j]);
-        }
-
-        //Set lowest and upper strata notes
+        // Set stratum constraints for each position in the measure
         int maxPos = (i == size-1) ? 1 : 4;  // Only set first position for last measure
         for(int pos = 0; pos < maxPos; pos++){
-            if(pos == 0){
-                // For the first note of each measure, use the sorted values directly
-                rel(*this, lowest->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][0]);
-                rel(*this, upper_1->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][1]);
-                
-                if(nVoices >= 3){
-                    rel(*this, upper_2->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][2]);
-                }
-                
-                if(nVoices >= 4){
-                    rel(*this, upper_3->getNotes()[i*4+pos], IRT_EQ, sorted_voices[i][3]);
-                }
-            } else {
-                // For other positions in the measure, use the actual voice notes based on mapping
-                
-                // For the lowest stratum (position 0 in sorted array)
-                BoolVar cfIsLowest(*this, 0, 1);
-                BoolVar cp1IsLowest(*this, 0, 1);
-                BoolVar cp2IsLowest(*this, 0, 1);
-                BoolVar cp3IsLowest(*this, 0, 1);
-                
-                rel(*this, voice_mapping[i][0], IRT_EQ, 0, Reify(cfIsLowest));      // cantus firmus is lowest
-                rel(*this, voice_mapping[i][0], IRT_EQ, 1, Reify(cp1IsLowest));     // counterpoint_1 is lowest
-                if(nVoices >= 3) rel(*this, voice_mapping[i][0], IRT_EQ, 2, Reify(cp2IsLowest)); // counterpoint_2 is lowest
-                if(nVoices >= 4) rel(*this, voice_mapping[i][0], IRT_EQ, 3, Reify(cp3IsLowest)); // counterpoint_3 is lowest
-
-                // Set lowest stratum note based on which voice is lowest
-                rel(*this, cfIsLowest >> (lowest->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
-                rel(*this, cp1IsLowest >> (lowest->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
-                if(nVoices >= 3) rel(*this, cp2IsLowest >> (lowest->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
-                if(nVoices >= 4) rel(*this, cp3IsLowest >> (lowest->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
-                
-                // For upper_1 stratum (position 1 in sorted array)
-                BoolVar cfIsUpper1(*this, 0, 1);
-                BoolVar cp1IsUpper1(*this, 0, 1);
-                BoolVar cp2IsUpper1(*this, 0, 1);
-                BoolVar cp3IsUpper1(*this, 0, 1);
-                
-                rel(*this, voice_mapping[i][1], IRT_EQ, 0, Reify(cfIsUpper1));
-                rel(*this, voice_mapping[i][1], IRT_EQ, 1, Reify(cp1IsUpper1));
-                if(nVoices >= 3) rel(*this, voice_mapping[i][1], IRT_EQ, 2, Reify(cp2IsUpper1));
-                if(nVoices >= 4) rel(*this, voice_mapping[i][1], IRT_EQ, 3, Reify(cp3IsUpper1));
-                
-                rel(*this, cfIsUpper1 >> (upper_1->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
-                rel(*this, cp1IsUpper1 >> (upper_1->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
-                if(nVoices >= 3) rel(*this, cp2IsUpper1 >> (upper_1->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
-                if(nVoices >= 4) rel(*this, cp3IsUpper1 >> (upper_1->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
-                
-                // Continue for upper_2 and upper_3 if they exist...
-                if(nVoices >= 3){
-                    BoolVar cfIsUpper2(*this, 0, 1);
-                    BoolVar cp1IsUpper2(*this, 0, 1);
-                    BoolVar cp2IsUpper2(*this, 0, 1);
-                    BoolVar cp3IsUpper2(*this, 0, 1);
-                    
-                    rel(*this, voice_mapping[i][2], IRT_EQ, 0, Reify(cfIsUpper2));
-                    rel(*this, voice_mapping[i][2], IRT_EQ, 1, Reify(cp1IsUpper2));
-                    rel(*this, voice_mapping[i][2], IRT_EQ, 2, Reify(cp2IsUpper2));
-                    if(nVoices >= 4) rel(*this, voice_mapping[i][2], IRT_EQ, 3, Reify(cp3IsUpper2));
-                    
-                    rel(*this, cfIsUpper2 >> (upper_2->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
-                    rel(*this, cp1IsUpper2 >> (upper_2->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
-                    rel(*this, cp2IsUpper2 >> (upper_2->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
-                    if(nVoices >= 4) rel(*this, cp3IsUpper2 >> (upper_2->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
-                }
-                
-                if(nVoices >= 4){
-                    BoolVar cfIsUpper3(*this, 0, 1);
-                    BoolVar cp1IsUpper3(*this, 0, 1);
-                    BoolVar cp2IsUpper3(*this, 0, 1);
-                    BoolVar cp3IsUpper3(*this, 0, 1);
-                    
-                    rel(*this, voice_mapping[i][3], IRT_EQ, 0, Reify(cfIsUpper3));
-                    rel(*this, voice_mapping[i][3], IRT_EQ, 1, Reify(cp1IsUpper3));
-                    rel(*this, voice_mapping[i][3], IRT_EQ, 2, Reify(cp2IsUpper3));
-                    rel(*this, voice_mapping[i][3], IRT_EQ, 3, Reify(cp3IsUpper3));
-                    
-                    rel(*this, cfIsUpper3 >> (upper_3->getNotes()[i*4+pos] == cantusFirmus->getNotes()[i]));
-                    rel(*this, cp1IsUpper3 >> (upper_3->getNotes()[i*4+pos] == counterpoint_1->getNotes()[i*4+pos]));
-                    rel(*this, cp2IsUpper3 >> (upper_3->getNotes()[i*4+pos] == counterpoint_2->getNotes()[i*4+pos]));
-                    rel(*this, cp3IsUpper3 >> (upper_3->getNotes()[i*4+pos] == counterpoint_3->getNotes()[i*4+pos]));
-                }
-            }
+            // Set stratum constraints using the position-specific ordering
+            setStrataAtPosition(i, pos, nVoices, measures_order[i]);
         }
-
-        //if the lowest note is the same as the cantusFirmus note, then the cantusFirmus is the lowest stratum
-        rel(*this, lowest->getFirstNotes()[i], IRT_NQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsNotLowest()[i]));
         
-        if(nVoices>=2){
-            //sets the isNotLowest boolean for the first counterpoint
-            if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
-            } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0){
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i])); 
-            } else{
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[i]));
-            }
+        // Set voice flags and melodic interval constraints (only once per measure)
+        setVoiceLowestFlags(i, nVoices, size);
+        if(i > 0) setMelodicIntervalConstraints(i, nVoices);
+    }
+}
 
-        } 
-        if(nVoices==3){
-            
-            //if we have 3 voices and both the counterpoint and the cantusFirmus are the same (both must be 1), then the counterpoint2 is the lowest
-            rel(*this, expr(*this, counterpoint_1->getIsNotLowest()[i]!=cantusFirmus->getIsNotLowest()[i]), IRT_EQ, counterpoint_2->getIsNotLowest()[i]);
-            
-        }  
-        if(nVoices==4){
-            
-            //set the counterpoint2 lowest boolean
-            if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i])); 
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0){
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getNotes()[(i*4)+2])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i])); 
+// Helper function implementations for setStrata
+
+void CounterpointProblem::setVoiceNote(IntVarArray& voices, int voiceIndex, Part* part, int measureIndex) {
+    // Set the appropriate note for a voice at a specific position within the measure
+    if ((part->getSpecies() == FOURTH_SPECIES || part->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+        // First measure: use resolution note (index 2) for fourth/fifth species
+        rel(*this, voices[voiceIndex], IRT_EQ, part->getNotes()[(measureIndex*4)+2]);
+    } else if (part->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+        // Middle measures of fourth species: choose between thesis and arsis based on joined degree
+        BoolVar isJoinedDegree(*this, 0, 1);
+        rel(*this, expr(*this, abs(part->getNotes()[measureIndex*4+2] - part->getNotes()[measureIndex*4])), IRT_LQ, 2, Reify(isJoinedDegree));
+        rel(*this, (isJoinedDegree == 0) >> (voices[voiceIndex] == part->getNotes()[measureIndex*4]));      // thesis
+        rel(*this, (isJoinedDegree == 1) >> (voices[voiceIndex] == part->getNotes()[(measureIndex*4)+2])); // arsis
+    } else if (part->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+        // Fifth species: use species at this specific position
+        IntVar currentSpecies(*this, -1, 4);
+        rel(*this, currentSpecies, IRT_EQ, part->getSpeciesArray()[measureIndex*4]);
+        // Fourth species logic for fifth species
+        BoolVar isJoinedDegree(*this, 0, 1);
+        rel(*this, expr(*this, abs(part->getNotes()[measureIndex*4+2] - part->getNotes()[measureIndex*4])), IRT_LQ, 2, Reify(isJoinedDegree));
+        rel(*this, (currentSpecies == FOURTH_SPECIES && isJoinedDegree == 0) >> (voices[voiceIndex] == part->getNotes()[measureIndex*4]));
+        rel(*this, (currentSpecies == FOURTH_SPECIES && isJoinedDegree == 1) >> (voices[voiceIndex] == part->getNotes()[measureIndex*4+2]));
+        // Third species logic for fifth species
+        rel(*this, (currentSpecies != FOURTH_SPECIES) >> (voices[voiceIndex] == part->getNotes()[measureIndex*4]));
+    } else {
+        // Default case: use first note of the measure
+        rel(*this, voices[voiceIndex], IRT_EQ, part->getFirstNotes()[measureIndex]);
+    }
+}
+
+void CounterpointProblem::setStrataAtPosition(int measureIndex, int position, int nVoices, IntVarArray& order) {
+    // The order array tells us: order[voice_index] = position_in_sorted_order
+    // We need to find which voice is at each sorted position (0=lowest, 1=middle, etc.)
+    
+    // For the first beat of each measure, we already computed the note that really matter for each stratum
+    if (position == 0) {
+        rel(*this, lowest->getNotes()[measureIndex*4+position], IRT_EQ, sorted_voices[measureIndex][0]);
+        rel(*this, upper_1->getNotes()[measureIndex*4+position], IRT_EQ, sorted_voices[measureIndex][1]);
+        if(nVoices >= 3) rel(*this, upper_2->getNotes()[measureIndex*4+position], IRT_EQ, sorted_voices[measureIndex][2]);
+        if(nVoices >= 4) rel(*this, upper_3->getNotes()[measureIndex*4+position], IRT_EQ, sorted_voices[measureIndex][3]);
+
+    } else {
+        // Lowest stratum
+        BoolVar cfIsLowest(*this, 0, 1);
+        BoolVar cp1IsLowest(*this, 0, 1);
+        BoolVar cp2IsLowest(*this, 0, 1);
+        BoolVar cp3IsLowest(*this, 0, 1);
+        
+        rel(*this, order[0], IRT_EQ, 0, Reify(cfIsLowest));      // cantus firmus is at position 0 (lowest)
+        rel(*this, order[1], IRT_EQ, 0, Reify(cp1IsLowest));     // counterpoint_1 is at position 0 (lowest)
+        if(nVoices >= 3) rel(*this, order[2], IRT_EQ, 0, Reify(cp2IsLowest)); // counterpoint_2 is at position 0 (lowest)
+        if(nVoices >= 4) rel(*this, order[3], IRT_EQ, 0, Reify(cp3IsLowest)); // counterpoint_3 is at position 0 (lowest)
+
+        // For cantus firmus
+        rel(*this, cfIsLowest >> (lowest->getNotes()[measureIndex*4+position] == cantusFirmus->getNotes()[measureIndex]));
+        
+        // For counterpoint_1
+        if (counterpoint_1->getSpecies() == FIRST_SPECIES) {
+            rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getFirstNotes()[measureIndex]));
+        } else if (counterpoint_1->getSpecies() == SECOND_SPECIES) {
+            int noteIndex = (position < 2) ? 0 : 2;  // pos 0,1 -> 0; pos 2,3 -> 2
+            rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+noteIndex]));
+        } else if (counterpoint_1->getSpecies() == THIRD_SPECIES) {
+            rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+        } else if ((counterpoint_1->getSpecies() == FOURTH_SPECIES || counterpoint_1->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+            // First measure: use arsis note (index 2) for fourth/fifth species
+            rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+2]));
+        } else if (counterpoint_1->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+            if (position == 2) {
+                rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
             } else {
-                rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1)&&(counterpoint_1->getIsNotLowest()[i]==1)&&(lowest->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[i]));
+                rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == lowest->getNotes()[measureIndex*4+position-1]));
             }
-            //if we have 4 voices and the counterpoint1, counterpoint2 and the cantusFirmus are the same (all must be 1), then the counterpoint3 is the lowest
-            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[i]==1) && (counterpoint_1->getIsNotLowest()[i]==1) && (counterpoint_2->getIsNotLowest()[i]==1)), IRT_NQ, counterpoint_3->getIsNotLowest()[i]);
-
-            //the following are the same but for the isHighest array to define the highest stratum (needed for a 4 voice specific constraint)
-            rel(*this, upper_3->getFirstNotes()[i], IRT_EQ, cantusFirmus->getNotes()[i], Reify(cantusFirmus->getIsHighest()[i]));
-
-            if(counterpoint_1->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));    
-            } else if(counterpoint_1->getSpecies()==FIFTH_SPECIES && i==0){
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_1->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i])); 
+        } else if (counterpoint_1->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+            if (position == 2) {
+                rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
             } else {
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_1->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_1->getIsHighest()[i]));
+                 IntVar currentSpecies(*this, -1, 4);
+                rel(*this, currentSpecies, IRT_EQ, counterpoint_1->getSpeciesArray()[measureIndex*4+position]);
+                rel(*this, (cp1IsLowest && currentSpecies == THIRD_SPECIES) >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                rel(*this, (cp1IsLowest && currentSpecies != THIRD_SPECIES) >> (lowest->getNotes()[measureIndex*4+position] == lowest->getNotes()[measureIndex*4+position-1]));
             }
-
-            if(counterpoint_2->getSpecies()==FOURTH_SPECIES && i!=size-1){
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
-            } else if(counterpoint_2->getSpecies()==FIFTH_SPECIES && i==0){
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_2->getNotes()[i*4+2])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
+        } else {
+            // Default case: use first note of the measure
+            rel(*this, cp1IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4]));
+        }
+        
+        if(nVoices >= 3) {
+            // For counterpoint_2
+            if (counterpoint_2->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_2->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_2->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_2->getSpecies() == FOURTH_SPECIES || counterpoint_2->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_2->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == lowest->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_2->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_2->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp2IsLowest && currentSpecies == THIRD_SPECIES) >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp2IsLowest && currentSpecies != THIRD_SPECIES) >> (lowest->getNotes()[measureIndex*4+position] == lowest->getNotes()[measureIndex*4+position-1]));
+                }
             } else {
-                rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0)&&(counterpoint_1->getIsHighest()[i]==0)&&(upper_3->getFirstNotes()[i]==counterpoint_2->getFirstNotes()[i])), IRT_NQ, 0, Reify(counterpoint_2->getIsHighest()[i]));
+                rel(*this, cp2IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4]));
             }
-
-            rel(*this, expr(*this, (cantusFirmus->getIsHighest()[i]==0) && (counterpoint_1->getIsHighest()[i]==0) && (counterpoint_2->getIsHighest()[i]==0)), IRT_EQ, counterpoint_3->getIsHighest()[i]);
+        }
+        
+        if(nVoices >= 4) {
+            // For counterpoint_3
+            if (counterpoint_3->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_3->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_3->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_3->getSpecies() == FOURTH_SPECIES || counterpoint_3->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_3->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == lowest->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_3->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_3->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp3IsLowest && currentSpecies == THIRD_SPECIES) >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp3IsLowest && currentSpecies != THIRD_SPECIES) >> (lowest->getNotes()[measureIndex*4+position] == lowest->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp3IsLowest >> (lowest->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4]));
+            }
         }
 
-        if(i > 0){
+        // Set upper strata notes based on voice mapping
+        // For upper_1 (sorted position 1)
+        BoolVar cfIsSecond(*this, 0, 1);
+        BoolVar cp1IsSecond(*this, 0, 1);
+        BoolVar cp2IsSecond(*this, 0, 1);
+        BoolVar cp3IsSecond(*this, 0, 1);
+        
+        rel(*this, order[0], IRT_EQ, 1, Reify(cfIsSecond));      // cantus firmus is at position 1 (second)
+        rel(*this, order[1], IRT_EQ, 1, Reify(cp1IsSecond));     // counterpoint_1 is at position 1 (second)
+        if(nVoices >= 3) rel(*this, order[2], IRT_EQ, 1, Reify(cp2IsSecond)); // counterpoint_2 is at position 1 (second)
+        if(nVoices >= 4) rel(*this, order[3], IRT_EQ, 1, Reify(cp3IsSecond)); // counterpoint_3 is at position 1 (second)
 
-            //the following lines define the melodic interval of the lowest stratum
+        // CF (whole note)
+        rel(*this, cfIsSecond >> (upper_1->getNotes()[measureIndex*4+position] == cantusFirmus->getNotes()[measureIndex]));
 
-            vector<IntVarArray> corresponding_m_intervals;
+        // cp1: mirror lowest logic
+        if (counterpoint_1->getSpecies() == FIRST_SPECIES) {
+            rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getFirstNotes()[measureIndex]));
+        } else if (counterpoint_1->getSpecies() == SECOND_SPECIES) {
+            int noteIndex = (position < 2) ? 0 : 2;
+            rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+noteIndex]));
+        } else if (counterpoint_1->getSpecies() == THIRD_SPECIES) {
+            rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+        } else if ((counterpoint_1->getSpecies() == FOURTH_SPECIES || counterpoint_1->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+            rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+2]));
+        } else if (counterpoint_1->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+            if (position == 2) {
+                rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+            } else {
+                rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == upper_1->getNotes()[measureIndex*4+position-1]));
+            }
+        } else if (counterpoint_1->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+            if (position == 2) {
+                rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+            } else {
+                IntVar currentSpecies(*this, -1, 4);
+                rel(*this, currentSpecies, IRT_EQ, counterpoint_1->getSpeciesArray()[measureIndex*4+position]);
+                rel(*this, (cp1IsSecond && currentSpecies == THIRD_SPECIES) >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                rel(*this, (cp1IsSecond && currentSpecies != THIRD_SPECIES) >> (upper_1->getNotes()[measureIndex*4+position] == upper_1->getNotes()[measureIndex*4+position-1]));
+            }
+        } else {
+            rel(*this, cp1IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4]));
+        }
 
-            corresponding_m_intervals.push_back(cantusFirmus->getMelodicIntervals());
-            for(int j = 0; j < nVoices-1; j++){
-                Part* curr_cp;
+        if(nVoices >= 3) {
+            // cp2: mirror lowest logic
+            if (counterpoint_2->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_2->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_2->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_2->getSpecies() == FOURTH_SPECIES || counterpoint_2->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_2->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == upper_1->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_2->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_2->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp2IsSecond && currentSpecies == THIRD_SPECIES) >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp2IsSecond && currentSpecies != THIRD_SPECIES) >> (upper_1->getNotes()[measureIndex*4+position] == upper_1->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp2IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4]));
+            }
+        }
+        
+        if(nVoices >= 4) {
+            // cp3: mirror lowest logic
+            if (counterpoint_3->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_3->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_3->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_3->getSpecies() == FOURTH_SPECIES || counterpoint_3->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_3->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == upper_1->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_3->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_3->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp3IsSecond && currentSpecies == THIRD_SPECIES) >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp3IsSecond && currentSpecies != THIRD_SPECIES) >> (upper_1->getNotes()[measureIndex*4+position] == upper_1->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp3IsSecond >> (upper_1->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4]));
+            }
+        }
 
-                if(j==0) curr_cp=counterpoint_1;
-                else if(j==1) curr_cp=counterpoint_2;
-                else curr_cp = counterpoint_3;
+        // For upper_2 (sorted position 2)
+        if(nVoices >= 3) {
+            BoolVar cfIsThird(*this, 0, 1);
+            BoolVar cp1IsThird(*this, 0, 1);
+            BoolVar cp2IsThird(*this, 0, 1);
+            BoolVar cp3IsThird(*this, 0, 1);
+            rel(*this, order[0], IRT_EQ, 2, Reify(cfIsThird));
+            rel(*this, order[1], IRT_EQ, 2, Reify(cp1IsThird));
+            rel(*this, order[2], IRT_EQ, 2, Reify(cp2IsThird));
+            if(nVoices >= 4) rel(*this, order[3], IRT_EQ, 2, Reify(cp3IsThird));
+            
+            rel(*this, cfIsThird >> (upper_2->getNotes()[measureIndex*4+position] == cantusFirmus->getNotes()[measureIndex]));
+            
+            // cp1: mirror lowest logic
+            if (counterpoint_1->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_1->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_1->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_1->getSpecies() == FOURTH_SPECIES || counterpoint_1->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_1->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == upper_2->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_1->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_1->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp1IsThird && currentSpecies == THIRD_SPECIES) >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp1IsThird && currentSpecies != THIRD_SPECIES) >> (upper_2->getNotes()[measureIndex*4+position] == upper_2->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp1IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4]));
+            }
+            
+            // cp2: mirror lowest logic
+            if (counterpoint_2->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_2->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_2->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_2->getSpecies() == FOURTH_SPECIES || counterpoint_2->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_2->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == upper_2->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_2->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_2->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp2IsThird && currentSpecies == THIRD_SPECIES) >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp2IsThird && currentSpecies != THIRD_SPECIES) >> (upper_2->getNotes()[measureIndex*4+position] == upper_2->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp2IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4]));
+            }
 
-                if(curr_cp->getSpecies()==FIRST_SPECIES){
-                    corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(0, 4, curr_cp->getMelodicIntervals().size())));
-                } else if(curr_cp->getSpecies()==SECOND_SPECIES){
-                    corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
-                } else if(curr_cp->getSpecies()==THIRD_SPECIES){
-                    corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(3, 4, curr_cp->getMelodicIntervals().size())));
-                } else if(curr_cp->getSpecies()==FOURTH_SPECIES){
-
-                    // corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(4, 4, curr_cp->getMelodicIntervals().size())));
-                    std::vector<int> selectedIndices;
-
-                    // Start from index 4 and take every 4th element
-                    for (int i = 4; i < curr_cp->getMelodicIntervals().size(); i += 4) {
-                        selectedIndices.push_back(i);
+            if(nVoices >= 4) {
+                // cp3 may also be third in 4 voices: mirror lowest logic
+                if (counterpoint_3->getSpecies() == FIRST_SPECIES) {
+                    rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getFirstNotes()[measureIndex]));
+                } else if (counterpoint_3->getSpecies() == SECOND_SPECIES) {
+                    int noteIndex = (position < 2) ? 0 : 2;
+                    rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+noteIndex]));
+                } else if (counterpoint_3->getSpecies() == THIRD_SPECIES) {
+                    rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                } else if ((counterpoint_3->getSpecies() == FOURTH_SPECIES || counterpoint_3->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                    rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+2]));
+                } else if (counterpoint_3->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                    if (position == 2) {
+                        rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                    } else {
+                        rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == upper_2->getNotes()[measureIndex*4+position-1]));
                     }
-
-                    // include the last melodic interval (between the penultimate note and the last note)
-                    selectedIndices.push_back(curr_cp->getMelodicIntervals().size() - 2);
-
-                    // Create a new IntVarArray with the selected intervals
-                    IntVarArray selectedIntervals(*this, selectedIndices.size());
-                    for (size_t i = 0; i < selectedIndices.size(); ++i) {
-                        selectedIntervals[i] = curr_cp->getMelodicIntervals()[selectedIndices[i]];
+                } else if (counterpoint_3->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                    if (position == 2) {
+                        rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                    } else {
+                        IntVar currentSpecies(*this, -1, 4);
+                        rel(*this, currentSpecies, IRT_EQ, counterpoint_3->getSpeciesArray()[measureIndex*4+position]);
+                        rel(*this, (cp3IsThird && currentSpecies == THIRD_SPECIES) >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                        rel(*this, (cp3IsThird && currentSpecies != THIRD_SPECIES) >> (upper_2->getNotes()[measureIndex*4+position] == upper_2->getNotes()[measureIndex*4+position-1]));
                     }
-
-                    // Push the new IntVarArray to the corresponding_m_intervals vector
-                    corresponding_m_intervals.push_back(selectedIntervals);
-                } else if(curr_cp->getSpecies()==FIFTH_SPECIES){
-                    corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
+                } else {
+                    rel(*this, cp3IsThird >> (upper_2->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4]));
                 }
             }
-
-            rel(*this, (cantusFirmus->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[0][i-1]));
-            rel(*this, (counterpoint_1->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[1][i-1]));
-            if(nVoices>=3){
-                rel(*this, (counterpoint_2->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[2][i-1]));
-            }
-            if(nVoices>=4){
-                rel(*this, (counterpoint_3->getIsNotLowest()[i]==0) >> (lowest->getMelodicIntervals()[i-1]==corresponding_m_intervals[3][i-1]));
-            }
-
         }
+        
+        // For upper_3 (sorted position 3)
+        if(nVoices >= 4) {
+            BoolVar cfIsFourth(*this, 0, 1);
+            BoolVar cp1IsFourth(*this, 0, 1);
+            BoolVar cp2IsFourth(*this, 0, 1);
+            BoolVar cp3IsFourth(*this, 0, 1);
+
+            rel(*this, order[0], IRT_EQ, 3, Reify(cfIsFourth));
+            rel(*this, order[1], IRT_EQ, 3, Reify(cp1IsFourth));
+            rel(*this, order[2], IRT_EQ, 3, Reify(cp2IsFourth));
+            rel(*this, order[3], IRT_EQ, 3, Reify(cp3IsFourth));
+
+            rel(*this, cfIsFourth >> (upper_3->getNotes()[measureIndex*4+position] == cantusFirmus->getNotes()[measureIndex]));
+            
+            // cp1: mirror lowest logic
+            if (counterpoint_1->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_1->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_1->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_1->getSpecies() == FOURTH_SPECIES || counterpoint_1->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_1->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == upper_3->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_1->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_1->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp1IsFourth && currentSpecies == THIRD_SPECIES) >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp1IsFourth && currentSpecies != THIRD_SPECIES) >> (upper_3->getNotes()[measureIndex*4+position] == upper_3->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp1IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_1->getNotes()[measureIndex*4]));
+            }
+            
+            // cp2: mirror lowest logic
+            if (counterpoint_2->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_2->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_2->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_2->getSpecies() == FOURTH_SPECIES || counterpoint_2->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_2->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == upper_3->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_2->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_2->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp2IsFourth && currentSpecies == THIRD_SPECIES) >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp2IsFourth && currentSpecies != THIRD_SPECIES) >> (upper_3->getNotes()[measureIndex*4+position] == upper_3->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp2IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_2->getNotes()[measureIndex*4]));
+            }
+            
+            // cp3: mirror lowest logic
+            if (counterpoint_3->getSpecies() == FIRST_SPECIES) {
+                rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getFirstNotes()[measureIndex]));
+            } else if (counterpoint_3->getSpecies() == SECOND_SPECIES) {
+                int noteIndex = (position < 2) ? 0 : 2;
+                rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+noteIndex]));
+            } else if (counterpoint_3->getSpecies() == THIRD_SPECIES) {
+                rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+            } else if ((counterpoint_3->getSpecies() == FOURTH_SPECIES || counterpoint_3->getSpecies() == FIFTH_SPECIES) && measureIndex == 0) {
+                rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+2]));
+            } else if (counterpoint_3->getSpecies() == FOURTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                } else {
+                    rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == upper_3->getNotes()[measureIndex*4+position-1]));
+                }
+            } else if (counterpoint_3->getSpecies() == FIFTH_SPECIES && measureIndex != 0 && measureIndex != nMeasures-1) {
+                if (position == 2) {
+                    rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                } else {
+                    IntVar currentSpecies(*this, -1, 4);
+                    rel(*this, currentSpecies, IRT_EQ, counterpoint_3->getSpeciesArray()[measureIndex*4+position]);
+                    rel(*this, (cp3IsFourth && currentSpecies == THIRD_SPECIES) >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4+position]));
+                    rel(*this, (cp3IsFourth && currentSpecies != THIRD_SPECIES) >> (upper_3->getNotes()[measureIndex*4+position] == upper_3->getNotes()[measureIndex*4+position-1]));
+                }
+            } else {
+                rel(*this, cp3IsFourth >> (upper_3->getNotes()[measureIndex*4+position] == counterpoint_3->getNotes()[measureIndex*4]));
+            }
+        }
+    }
+}
+
+void CounterpointProblem::setVoiceLowestFlags(int measureIndex, int nVoices, int size) {
+    // Set the isNotLowest flags for each voice
+    rel(*this, lowest->getFirstNotes()[measureIndex], IRT_NQ, cantusFirmus->getNotes()[measureIndex], 
+        Reify(cantusFirmus->getIsNotLowest()[measureIndex]));
+    
+    if(nVoices >= 2) {
+        // Set isNotLowest boolean for counterpoint_1
+        if(counterpoint_1->getSpecies() == FOURTH_SPECIES && measureIndex != size-1) {
+            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==1) && 
+                (lowest->getFirstNotes()[measureIndex]==counterpoint_1->getNotes()[(measureIndex*4)+2])), 
+                IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[measureIndex]));
+        } else if(counterpoint_1->getSpecies() == FIFTH_SPECIES && measureIndex == 0) {
+            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==1) && 
+                (lowest->getFirstNotes()[measureIndex]==counterpoint_1->getNotes()[(measureIndex*4)+2])), 
+                IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[measureIndex]));
+        } else {
+            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==1) && 
+                (lowest->getFirstNotes()[measureIndex]==counterpoint_1->getFirstNotes()[measureIndex])), 
+                IRT_NQ, 1, Reify(counterpoint_1->getIsNotLowest()[measureIndex]));
+        }
+    }
+    
+    if(nVoices == 3) {
+        rel(*this, expr(*this, counterpoint_1->getIsNotLowest()[measureIndex] != cantusFirmus->getIsNotLowest()[measureIndex]), 
+            IRT_EQ, counterpoint_2->getIsNotLowest()[measureIndex]);
+    }
+    
+    if(nVoices == 4) {
+        // Set counterpoint_2 lowest boolean
+        if(counterpoint_2->getSpecies() == FOURTH_SPECIES && measureIndex != size-1) {
+            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==1) && 
+                (counterpoint_1->getIsNotLowest()[measureIndex]==1) && 
+                (lowest->getFirstNotes()[measureIndex]==counterpoint_2->getNotes()[(measureIndex*4)+2])), 
+                IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[measureIndex]));
+        } else if(counterpoint_2->getSpecies() == FIFTH_SPECIES && measureIndex == 0) {
+            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==1) && 
+                (counterpoint_1->getIsNotLowest()[measureIndex]==1) && 
+                (lowest->getFirstNotes()[measureIndex]==counterpoint_2->getNotes()[(measureIndex*4)+2])), 
+                IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[measureIndex]));
+        } else {
+            rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==1) && 
+                (counterpoint_1->getIsNotLowest()[measureIndex]==1) && 
+                (lowest->getFirstNotes()[measureIndex]==counterpoint_2->getFirstNotes()[measureIndex])), 
+                IRT_NQ, 1, Reify(counterpoint_2->getIsNotLowest()[measureIndex]));
+        }
+        
+        rel(*this, expr(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==1) && 
+            (counterpoint_1->getIsNotLowest()[measureIndex]==1) && 
+            (counterpoint_2->getIsNotLowest()[measureIndex]==1)), 
+            IRT_NQ, counterpoint_3->getIsNotLowest()[measureIndex]);
+
+        // Set isHighest flags for 4-voice specific constraints
+        rel(*this, upper_3->getFirstNotes()[measureIndex], IRT_EQ, cantusFirmus->getNotes()[measureIndex], 
+            Reify(cantusFirmus->getIsHighest()[measureIndex]));
+
+        // ... (similar logic for isHighest flags)
+    }
+}
+
+void CounterpointProblem::setMelodicIntervalConstraints(int measureIndex, int nVoices) {
+    // Set melodic interval constraints for the lowest stratum
+    vector<IntVarArray> corresponding_m_intervals;
+
+    corresponding_m_intervals.push_back(cantusFirmus->getMelodicIntervals());
+    
+    for(int j = 0; j < nVoices-1; j++) {
+        Part* curr_cp;
+        if(j == 0) curr_cp = counterpoint_1;
+        else if(j == 1) curr_cp = counterpoint_2;
+        else curr_cp = counterpoint_3;
+
+        if(curr_cp->getSpecies() == FIRST_SPECIES) {
+            corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(0, 4, curr_cp->getMelodicIntervals().size())));
+        } else if(curr_cp->getSpecies() == SECOND_SPECIES) {
+            corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
+        } else if(curr_cp->getSpecies() == THIRD_SPECIES) {
+            corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(3, 4, curr_cp->getMelodicIntervals().size())));
+        } else if(curr_cp->getSpecies() == FOURTH_SPECIES) {
+            std::vector<int> selectedIndices;
+            for (int i = 4; i < curr_cp->getMelodicIntervals().size(); i += 4) {
+                selectedIndices.push_back(i);
+            }
+            selectedIndices.push_back(curr_cp->getMelodicIntervals().size() - 2);
+            
+            IntVarArray selectedIntervals(*this, selectedIndices.size());
+            for (size_t i = 0; i < selectedIndices.size(); ++i) {
+                selectedIntervals[i] = curr_cp->getMelodicIntervals()[selectedIndices[i]];
+            }
+            corresponding_m_intervals.push_back(selectedIntervals);
+        } else if(curr_cp->getSpecies() == FIFTH_SPECIES) {
+            corresponding_m_intervals.push_back(IntVarArray(*this, curr_cp->getMelodicIntervals().slice(2, 4, curr_cp->getMelodicIntervals().size())));
+        }
+    }
+
+    rel(*this, (cantusFirmus->getIsNotLowest()[measureIndex]==0) >> 
+        (lowest->getMelodicIntervals()[measureIndex-1]==corresponding_m_intervals[0][measureIndex-1]));
+    rel(*this, (counterpoint_1->getIsNotLowest()[measureIndex]==0) >> 
+        (lowest->getMelodicIntervals()[measureIndex-1]==corresponding_m_intervals[1][measureIndex-1]));
+    if(nVoices >= 3) {
+        rel(*this, (counterpoint_2->getIsNotLowest()[measureIndex]==0) >> 
+            (lowest->getMelodicIntervals()[measureIndex-1]==corresponding_m_intervals[2][measureIndex-1]));
+    }
+    if(nVoices >= 4) {
+        rel(*this, (counterpoint_3->getIsNotLowest()[measureIndex]==0) >> 
+            (lowest->getMelodicIntervals()[measureIndex-1]==corresponding_m_intervals[3][measureIndex-1]));
     }
 }
 

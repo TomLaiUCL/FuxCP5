@@ -122,7 +122,7 @@ bool notInt(char* argv){
 bool has_solution(CounterpointProblem* problem) {
     BAB<CounterpointProblem> e(problem);
     if (e.next()) {
-        // cout << problem->getCantusFirmus()->getHInterval() << endl;
+        // cout << problem->getCantusFirmus()->getHIntervals() << endl;
         // cout << problem->getCounterpoint_1()->getFirstSpeciesHIntervals() << endl;
         // cout << problem->getCounterpoint_2()->getFirstSpeciesHIntervals() << endl;
         return true;

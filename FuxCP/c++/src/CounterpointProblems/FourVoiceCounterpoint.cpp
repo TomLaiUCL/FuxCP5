@@ -56,7 +56,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     if (activeConstraints[V4_1H8]) {
         H8_4v_preferHarmonicTriad(*this, triadCostArray, upper_1, upper_2, upper_3);
     }
-    
+
     //M4 variety cost (notes should be as diverse as possible)
     if (activeConstraints[V4_1M4]) {
         M2_1_varietyCost(*this, parts);
@@ -93,7 +93,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     
     //no minor second interval between upper
     if (activeConstraints[V4_U2]) {
-        noMinorSecondBetweenUpper(*this, parts);
+        noMinorSecondBetweenUpper(*this, vector<Stratum*>{upper_1, upper_2, upper_3});
     }
 
     solutionArray = IntVarArray(*this, counterpoint_1->getBranchingNotes().size() + counterpoint_2->getBranchingNotes().size() + 

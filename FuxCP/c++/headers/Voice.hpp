@@ -56,7 +56,7 @@ class Voice{
 
         virtual IntVarArgs getFirstNotes();
 
-        IntVarArray getHInterval();
+        IntVarArray getHIntervals();
 
         IntVarArgs getSecondHInterval();
 

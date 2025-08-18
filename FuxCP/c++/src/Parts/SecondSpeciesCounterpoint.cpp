@@ -20,7 +20,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     rel(home, secondSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(notes.size())));
     /// Harmonic intervals for the second species notes
     secondSpeciesHarmonicIntervals = IntVarArray(home, (nMeasures*notesPerMeasure.at(SECOND_SPECIES))-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-    rel(home, secondSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(h_intervals.size())));
+    // rel(home, secondSpeciesHarmonicIntervals, IRT_EQ, h_intervals.slice(0,4/notesPerMeasure.at(SECOND_SPECIES),(h_intervals.size())));
     for(int i = 0; i < secondSpeciesHarmonicIntervals.size(); i++){
         rel(home, (secondSpeciesHarmonicIntervals[i])==((secondSpeciesNotesCp[i]-low->getNotes()[floor(i/2)*4])%12));
     }
@@ -35,7 +35,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     secondSpeciesArsisArray = IntVarArray(home, firstSpeciesMelodicIntervals.size(), -MAX_STEP, MAX_STEP);
     for(int i = 0; i < secondSpeciesArsisArray.size()-1; i++){
-        rel(home, secondSpeciesArsisArray[i], IRT_EQ, expr(home, (secondSpeciesNotesCp[(i*2)+3]-secondSpeciesNotesCp[(i*2)+1]))); // modified by Tom Lai
+        rel(home, secondSpeciesArsisArray[i], IRT_EQ, expr(home, (secondSpeciesNotesCp[(i*2)+2]-secondSpeciesNotesCp[(i*2)+1]))); // modified by Tom Lai
     }
     rel(home, secondSpeciesArsisArray[secondSpeciesArsisArray.size()-1], IRT_EQ, expr(home, secondSpeciesNotesCp[secondSpeciesNotesCp.size()-2]-
         secondSpeciesNotesCp[secondSpeciesNotesCp.size()-1]));
@@ -126,6 +126,15 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
         P3_2_noBattuta(home, this);
     }
 
+    //1.M2
+    if (activeConstraints[SP1_1M2_2V]) {
+        for (size_t i = 0; i < secondSpeciesMelodicIntervals.size(); i++)
+        {
+            rel(home, (secondSpeciesMelodicIntervals[i] <= 8) || (secondSpeciesMelodicIntervals[i] == 12));
+        }
+        
+    }
+
     // combined costs
     toCombineCosts = IntVarArray(home, 1, 0, 10000);
     toCombineCostNames = {"1H1"};
@@ -186,10 +195,11 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, directMoveCost}));
 
-    // 2.H3 : penult cost
-    if (activeConstraints[SP2_2H3_3V]) {
-        H3_2_penultimateNoteDomain(home, this);
-    }
+    // DISABLED
+    // // 2.H3 : penult cost
+    // if (activeConstraints[SP2_2H3_3V]) {
+    //     H3_2_penultimateNoteDomain(home, this);
+    // }
 
     //P1 3 voices version
     if (activeConstraints[SP2_1P1_3V]) {
@@ -230,10 +240,11 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
     directCostArray = IntVarArray(home, secondSpeciesRealMotions.size()-1,IntSet({0, 2, directMoveCost}));
 
+    // DISABLED
     // 2.H3 : penult cost
-    if (activeConstraints[SP2_2H3_4V]) {
-        H3_2_penultimateNoteDomain(home, this);
-    }
+    // if (activeConstraints[SP2_2H3_4V]) {
+    //     H3_2_penultimateNoteDomain(home, this);
+    // }
     
     //P1 4 voices version
     if (activeConstraints[SP2_1P1_4V]) {

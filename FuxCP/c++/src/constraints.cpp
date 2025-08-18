@@ -37,35 +37,13 @@ void R9_5_twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2){
     }
 }
 
-void noMinorSecondBetweenUpper(Home home, vector<Part*> parts){
-    // For all pairs of voices v1 < v2:
-    for(int v1 = 0; v1 < parts.size(); v1++){
-        for(int v2 = v1+1; v2 < parts.size(); v2++){
+void noMinorSecondBetweenUpper(Home home, vector<Stratum*> strata){
+    // For all pairs of voices s1 < s2:
+    for(int s1 = 0; s1 < strata.size(); s1++){
+        for(int s2 = s1+1; s2 < strata.size(); s2++){
             // For each measure i:
-            for(int i = 0; i < parts[1]->getNMeasures(); i++){
-                // Let noneLowest = (parts[v1] is not lowest at i) == (parts[v2] is not lowest at i)
-                BoolVar noneLowest = BoolVar(home, 0, 1);
-                rel(home, parts[v1]->getIsNotLowest()[i], IRT_EQ, parts[v2]->getIsNotLowest()[i], Reify(noneLowest, RM_PMI));
-
-                // Let interval = pitch difference between v1 and v2 at measure i (modulo 12, with special handling for fourth species)
-                IntVar interval = IntVar(home, -PERFECT_OCTAVE, PERFECT_OCTAVE);
-                if(i==parts[1]->getNMeasures()-1){
-                    rel(home, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
-                }
-                else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
-                    rel(home, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getFirstNotes()[i])%12));
-                } else if(parts[v1]->getSpecies()==FOURTH_SPECIES&&parts[v2]->getSpecies()!=FOURTH_SPECIES){
-                    rel(home, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getFirstNotes()[i])%12));
-                } else if(parts[v1]->getSpecies()!=FOURTH_SPECIES&&parts[v2]->getSpecies()==FOURTH_SPECIES){
-                    rel(home, interval == ((parts[v1]->getFirstNotes()[i]-parts[v2]->getNotes()[(i*4)+2])%12));
-                } else {
-                    rel(home, interval == ((parts[v1]->getNotes()[(i*4)+2]-parts[v2]->getNotes()[(i*4)+2])%12));
-                }
-                // Constraint: If noneLowest == 1, then |interval| != 1
-                // In math:
-                //    If isNotLowest_v1[i] == isNotLowest_v2[i] == 1:
-                //        |interval(v1, v2, i)| ≠ 1
-                rel(home, (noneLowest==1) >> (expr(home, abs(interval)!=1)));
+            for(int i = 0; i < strata[1]->getNMeasures(); i++){               
+                rel(home, expr(home, abs(strata[s2]->getNotes()[i*4] - strata[s1]->getNotes()[i*4]) % 12), IRT_NQ, MINOR_SECOND);
             }
         }
     }
@@ -128,7 +106,7 @@ void H1_3_fiveConsecutiveNotesByJointDegree(Home home, Part* part){
 }
 
 void H2_1_startWithPerfectConsonance(Home home, Part* part){
-    dom(home, part->getHInterval()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    dom(home, part->getHIntervals()[0], IntSet(IntArgs(PERFECT_CONSONANCES)));
 }
 
 void H2_2_arsisHarmoniesCannotBeDisonnant(Home home, Part* part){
@@ -136,7 +114,7 @@ void H2_2_arsisHarmoniesCannotBeDisonnant(Home home, Part* part){
     for(int i = 0; i < part->getNMeasures()-1; i++){
         if(i != part->getNMeasures()-2){ //if it is the penultimate measure
             for(int d : DISONANCE){
-                rel(home, part->getHInterval()[(i*4)+2], IRT_EQ, d, Reify(part->getIsDiminution()[i], RM_PMI));
+                rel(home, part->getHIntervals()[(i*4)+2], IRT_EQ, d, Reify(part->getIsDiminution()[i], RM_PMI));
             }
         }
     }
@@ -152,14 +130,14 @@ void H2_3_disonanceImpliesDiminution(Home home, Part* part){
 }
 
 void H3_1_endWithPerfectConsonance(Home home, Part* part){
-    dom(home, part->getHInterval()[part->getHInterval().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
+    dom(home, part->getHIntervals()[part->getHIntervals().size()-1], IntSet(IntArgs(PERFECT_CONSONANCES)));
 }
 
 void H3_2_penultimateNoteDomain(Home home, Part* part){ 
-    dom(home, expr(home, abs(part->getHInterval()[part->getHInterval().size()-5])), IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
+    dom(home, expr(home, abs(part->getHIntervals()[part->getHIntervals().size()-5])), IntSet({UNISSON, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH}));
 
-    rel(home, (part->getHInterval()[part->getHInterval().size()-5]!=PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==part->getPenultCost()));
-    rel(home, (part->getHInterval()[part->getHInterval().size()-5]==PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==0));
+    rel(home, (part->getHIntervals()[part->getHIntervals().size()-5]!=PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==part->getPenultCost()));
+    rel(home, (part->getHIntervals()[part->getHIntervals().size()-5]==PERFECT_FIFTH) >> (part->getPenultCostArray()[0]==0));
 }
 
 void H3_3_cambiataCost(Home home, Part* part){
@@ -204,27 +182,53 @@ void H5_1_differentNotes(Home home, vector<Part*> parts){
 }
 
 void H6_1_preferImperfectConsonances(Home home, Part* part){
-    for(int i = 0; i < part->getHInterval().size(); i++){
+    for(int i = 0; i < part->getHIntervals().size(); i++){
         //set the octave cost
-        rel(home, part->getOctaveCostArray()[i], IRT_EQ, part->getHOctaveCost(), Reify(expr(home, part->getHInterval()[i]==UNISSON), RM_PMI));
-        rel(home, part->getOctaveCostArray()[i], IRT_EQ, 0, Reify(expr(home, part->getHInterval()[i]!=UNISSON), RM_PMI));
+        rel(home, part->getOctaveCostArray()[i], IRT_EQ, part->getHOctaveCost(), Reify(expr(home, part->getHIntervals()[i]==UNISSON), RM_PMI));
+        rel(home, part->getOctaveCostArray()[i], IRT_EQ, 0, Reify(expr(home, part->getHIntervals()[i]!=UNISSON), RM_PMI));
 
         //set the fifth cost
-        rel(home, part->getFifthCostArray()[i], IRT_EQ, part->getHFifthCost(), Reify(expr(home, part->getHInterval()[i]==PERFECT_FIFTH), RM_PMI));
-        rel(home, part->getFifthCostArray()[i], IRT_EQ, 0, Reify(expr(home, part->getHInterval()[i]!=PERFECT_FIFTH), RM_PMI));
+        rel(home, part->getFifthCostArray()[i], IRT_EQ, part->getHFifthCost(), Reify(expr(home, part->getHIntervals()[i]==PERFECT_FIFTH), RM_PMI));
+        rel(home, part->getFifthCostArray()[i], IRT_EQ, 0, Reify(expr(home, part->getHIntervals()[i]!=PERFECT_FIFTH), RM_PMI));
     }
 }
 
 void H7_1_2v_penultimateSixthOrThird(Home home, Part* part){
-    int p = part->getFirstSpeciesNotes().size()-2; //index of the penultimate note
-
-    //if it is the lowest, then it is a major sixth (cf version in the cantusFirmus class)
-    rel(home, part->getFirstSpeciesHIntervals()[part->getFirstSpeciesHIntervals().size()-2], IRT_EQ, MAJOR_SIXTH, 
-        Reify(part->getIsNotLowest()[part->getIsNotLowest().size()-2], RM_IMP));
+    // If the part is not the lowest voice, then it must have a major sixth in the penultimate 
+    IntVar penultimateInterval(home, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    if(part->getSpecies()==FIRST_SPECIES){
+        penultimateInterval = part->getHIntervals()[part->getHIntervals().size()-5];
+    } else if(part->getSpecies()==SECOND_SPECIES || part->getSpecies()==FOURTH_SPECIES){
+        penultimateInterval = part->getHIntervals()[part->getHIntervals().size()-3];
+    } else if(part->getSpecies()==THIRD_SPECIES){
+        penultimateInterval = part->getHIntervals()[part->getHIntervals().size()-2];
+    } else if(part->getSpecies()==FIFTH_SPECIES){
+        rel(home, expr(home, part->getSpeciesArray()[part->getSpeciesArray().size()-3] == FOURTH_SPECIES) >>
+               (penultimateInterval == part->getHIntervals()[part->getHIntervals().size()-3]));
+        rel(home, expr(home, part->getSpeciesArray()[part->getSpeciesArray().size()-2] == THIRD_SPECIES) >>
+               (penultimateInterval == part->getHIntervals()[part->getHIntervals().size()-2]));
+    }
+    rel(home, (part->getIsNotLowest()[part->getIsNotLowest().size()-2]==1) >> (penultimateInterval==MAJOR_SIXTH));
 }
 
 void H7_1_3v_penultimateSixthOrThird(Home home, Part* part){
-    dom(home, part->getFirstSpeciesHIntervals()[part->getFirstSpeciesHIntervals().size()-2], IntSet({UNISSON, MINOR_THIRD, PERFECT_FIFTH, MAJOR_SIXTH}));
+    // If the part is not the lowest voice, then it must have a major sixth in the penultimate measure
+    // The penultimate measure is the second to last measure, so we check the second to last interval
+    // We also check that the penultimate interval is a minor third, perfect fifth, or major sixth
+    IntVar penultimateInterval(home, -PERFECT_OCTAVE, PERFECT_OCTAVE);
+    if(part->getSpecies()==FIRST_SPECIES){
+        penultimateInterval = part->getFirstSpeciesHIntervals()[part->getFirstSpeciesHIntervals().size()-2];
+    } else if(part->getSpecies()==SECOND_SPECIES || part->getSpecies()==FOURTH_SPECIES){
+        penultimateInterval = part->getSecondHInterval()[part->getSecondHInterval().size()-2];
+    } else if(part->getSpecies()==THIRD_SPECIES){
+        penultimateInterval = part->getThirdSpeciesHIntervals()[part->getThirdSpeciesHIntervals().size()-2];
+    } else if(part->getSpecies()==FIFTH_SPECIES){
+        rel(home, expr(home, part->getSpeciesArray()[part->getSpeciesArray().size()-3] == FOURTH_SPECIES) >>
+               (penultimateInterval == part->getHIntervals()[part->getHIntervals().size()-3]));
+        rel(home, expr(home, part->getSpeciesArray()[part->getSpeciesArray().size()-2] == THIRD_SPECIES) >>
+               (penultimateInterval == part->getHIntervals()[part->getHIntervals().size()-2]));
+    }
+    rel(home, (part->getIsNotLowest()[part->getIsNotLowest().size()-2]==1) >> (penultimateInterval==MAJOR_SIXTH || penultimateInterval==MINOR_THIRD || penultimateInterval==MAJOR_THIRD || penultimateInterval==PERFECT_FIFTH));
 }
 
 void H8_3v_preferHarmonicTriad(Home home, Part* part, IntVarArray triadCostArray, Stratum* upper1, Stratum* upper2){
@@ -245,16 +249,16 @@ void H8_3v_preferHarmonicTriad(Home home, Part* part, IntVarArray triadCostArray
         BoolVar not_triad = BoolVar(home, 0, 1);    //check if it is not a triad
 
         //check for the first possibility
-        rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 3, Reify(h1_3));
-        rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 4, Reify(h1_4));
-        rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 7, Reify(h2_7));
+        rel(home, expr(home, abs(upper1->getHIntervals()[i*4])), IRT_EQ, 3, Reify(h1_3));
+        rel(home, expr(home, abs(upper1->getHIntervals()[i*4])), IRT_EQ, 4, Reify(h1_4));
+        rel(home, expr(home, abs(upper2->getHIntervals()[i*4])), IRT_EQ, 7, Reify(h2_7));
         rel(home, h1_3, BOT_OR, h1_4, h1_third);
         rel(home, h1_third, BOT_AND, h2_7, h_firstPoss);
 
         //check for the second possibility
-        rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 3, Reify(h2_3));
-        rel(home, expr(home, abs(upper2->getHInterval()[i*4])), IRT_EQ, 4, Reify(h2_4));
-        rel(home, expr(home, abs(upper1->getHInterval()[i*4])), IRT_EQ, 7, Reify(h1_7));
+        rel(home, expr(home, abs(upper2->getHIntervals()[i*4])), IRT_EQ, 3, Reify(h2_3));
+        rel(home, expr(home, abs(upper2->getHIntervals()[i*4])), IRT_EQ, 4, Reify(h2_4));
+        rel(home, expr(home, abs(upper1->getHIntervals()[i*4])), IRT_EQ, 7, Reify(h1_7));
         rel(home, h2_3, BOT_OR, h2_4, h2_third);
         rel(home, h2_third, BOT_AND, h1_7, h_secondPoss);
 
@@ -266,14 +270,14 @@ void H8_3v_preferHarmonicTriad(Home home, Part* part, IntVarArray triadCostArray
 }
 
 void H8_4v_preferHarmonicTriad(Home home, IntVarArray triadCostArray, Stratum* upper1, Stratum* upper2, Stratum* upper3){
-    // cout << upper1->getHInterval().size() << endl;
-    // cout << upper2->getHInterval().size() << endl;
-    // cout << upper3->getHInterval().size() << endl;
+    // cout << upper1->getHIntervals().size() << endl;
+    // cout << upper2->getHIntervals().size() << endl;
+    // cout << upper3->getHIntervals().size() << endl;
     for(int i = 0; i < triadCostArray.size(); i++){
 
-        IntVar H_b = upper1->getHInterval()[i*4];
-        IntVar H_c = upper2->getHInterval()[i*4];
-        IntVar H_d = upper3->getHInterval()[i*4];
+        IntVar H_b = upper1->getHIntervals()[i*4];
+        IntVar H_c = upper2->getHIntervals()[i*4];
+        IntVar H_d = upper3->getHIntervals()[i*4];
 
 
         BoolVar H_b_is_third    = expr(home, H_b==MINOR_THIRD || H_b==MAJOR_THIRD);
@@ -462,7 +466,7 @@ void P1_2_4v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
 
 void P3_0_noBattuta(Home home, Part* part){
     for(int j = 0; j < part->getMotions().size(); j++){
-        rel(home, expr(home, part->getMotions()[j]==CONTRARY_MOTION && part->getHInterval()[j+1]==0 && 
+        rel(home, expr(home, part->getMotions()[j]==CONTRARY_MOTION && part->getHIntervals()[j+1]==0 && 
             part->getMelodicIntervals()[j]<-4), BOT_AND, part->getIsNotLowest()[j], 0);
     }
 }
@@ -632,11 +636,6 @@ void P4_successiveCost(Home home, vector<Part*> parts, int scc_cz, IntVarArray s
 
 void P6_3v_noMoveInSameDirection(Home home, vector<Part*> parts){
     for(int i = 0; i < parts[0]->getFirstSpeciesMotions().size(); i++){
-        // cout << "i : " << i << endl;
-        // cout << "parts[0] : " << parts[0]->getFirstSpeciesMotions()[i] << endl;
-        // cout << "parts[1] : " << parts[1]->getFirstSpeciesMotions()[i] << endl;
-        // cout << "parts[2] : " << parts[2]->getFirstSpeciesMotions()[i] << endl;
-        // cout << "parts[3] : " << parts[3]->getFirstSpeciesMotions()[i] << endl;
         rel(home, expr(home, parts[0]->getFirstSpeciesMotions()[i]==2 && parts[1]->getFirstSpeciesMotions()[i]==2), BOT_AND, expr(home, parts[2]->getFirstSpeciesMotions()[i]==2), 0);
     }
 }

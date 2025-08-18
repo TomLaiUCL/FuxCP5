@@ -25,11 +25,12 @@ Stratum::Stratum(Home home, int nMes, int lb, int ub, IntVarArray lowestNotes, i
         dom(home, expr(home, abs(h_intervals[h_intervals.size()-1])), IntSet(IntArgs(TRIAD)));
     }
 
-    //H10 No tenths in last chord
-    if (activeConstraints[STRATUM_UPPER_1H10]) {
-        rel(home, ((notes[notes.size()-1]-lowestNotes[lowestNotes.size()-1])>12) >> (expr(home, abs(h_intervals[h_intervals.size()-1]))!=MINOR_THIRD && 
-            expr(home, abs(h_intervals[h_intervals.size()-1]))!=MAJOR_THIRD));
-    }
+    //REMOVED
+    // //H10 No tenths in last chord
+    // if (activeConstraints[STRATUM_UPPER_1H10]) {
+    //     rel(home, ((notes[notes.size()-1]-lowestNotes[lowestNotes.size()-1])>12) >> (expr(home, abs(h_intervals[h_intervals.size()-1]))!=MINOR_THIRD && 
+    //         expr(home, abs(h_intervals[h_intervals.size()-1]))!=MAJOR_THIRD));
+    // }
     
     //H12 Last chord cannot include a minor third
     if (activeConstraints[STRATUM_UPPER_1H12]) {

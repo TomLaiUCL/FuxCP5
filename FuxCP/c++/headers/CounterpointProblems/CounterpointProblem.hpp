@@ -44,6 +44,7 @@ protected:
     IntVarArray orderedFactors;
     IntVarArray finalCosts;
     vector<IntVarArray> sorted_voices;
+    vector<IntVarArray> measures_order;
     unordered_map<string, int> prefs;
     vector<vector<string>> costLevels;
 
@@ -110,6 +111,15 @@ public:
     int* get_species_array_5sp(int ctp_index);
     int* get_extended_cp_domain(int ctp_index);
     int  get_ext_cp_domain_size(int ctp_index);
+    
+    vector<IntVarArray> getMeasuresOrder() {
+        return measures_order;
+    }
+    // Helper functions for setStrata
+    void setVoiceNote(IntVarArray& voices, int voiceIndex, Part* part, int measureIndex);
+    void setStrataAtPosition(int measureIndex, int position, int nVoices, IntVarArray& );
+    void setVoiceLowestFlags(int measureIndex, int nVoices, int size);
+    void setMelodicIntervalConstraints(int measureIndex, int nVoices);
 
     void setStrata();
 

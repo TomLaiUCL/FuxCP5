@@ -35,6 +35,11 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     
     sol = IntVarArray(home, fourthSpeciesNotesCp.slice(0,1,fourthSpeciesNotesCp.size()));
 
+    //Harmonic intervals
+    for (int i = 0; i < h_intervals.size(); i++) {
+        rel(home, (h_intervals[i])==(notes[i]-low->getNotes()[i])%12);
+    }
+
     fourthSpeciesHIntervals = IntVarArray(home, ((nMeasures*notesPerMeasure.at(FOURTH_SPECIES))-1)-1, -PERFECT_OCTAVE, PERFECT_OCTAVE);
 
     for(int i = 0; i < fourthSpeciesHIntervals.size(); i++){
@@ -172,7 +177,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     //link them
     rel(home, fourthSpeciesNotesCp, IRT_EQ, notes.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), notes.size()));
     rel(home, fourthSpeciesMelodicIntervals, IRT_EQ, m_intervals_brut.slice(2,4/notesPerMeasure.at(FOURTH_SPECIES),m_intervals_brut.size()));
-    rel(home, fourthSpeciesHIntervals, IRT_EQ, h_intervals.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), h_intervals.size()));
+    // rel(home, fourthSpeciesHIntervals, IRT_EQ, h_intervals.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), h_intervals.size()));
 
     // H6 from Thibault : Imperfect consonances are preferred
     if (activeConstraints[SP4_1H6]) {
@@ -190,8 +195,8 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 
     //4.H1 : arsis harmonies must be consonant (could be the reason for 3 / 4 voice bugs)
     if (activeConstraints[SP4_4H1]) {
-        for(int i = 0; i < fourthSpeciesHIntervals.size(); i+=2){
-            dom(home, expr(home, abs(fourthSpeciesHIntervals[i])), IntSet(CONSONANCES));
+        for(int i = 2; i < h_intervals.size(); i+=4){
+            dom(home, expr(home, abs(h_intervals[i])), IntSet(CONSONANCES));
         }
     }
     
@@ -238,23 +243,24 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
             MAJOR_THIRD, MINOR_THIRD, MAJOR_SECOND, MINOR_SECOND}));
     }
     
-    //no chromatic motion between 3 consecutive notes
-    if (activeConstraints[SP4_U2]) {
-        for(int i = 1; i < fourthSpeciesMelodicIntervals.size()-1; i++){
-            BoolVar b1 = BoolVar(home, 0, 1);
-            BoolVar b2 = BoolVar(home, 0, 1);
-            BoolVar b3 = BoolVar(home, 0, 1);
-            BoolVar b4 = BoolVar(home, 0, 1);
+    //DISABELED
+    // //no chromatic motion between 3 consecutive notes
+    // if (activeConstraints[SP4_U2]) {
+    //     for(int i = 1; i < fourthSpeciesMelodicIntervals.size()-1; i++){
+    //         BoolVar b1 = BoolVar(home, 0, 1);
+    //         BoolVar b2 = BoolVar(home, 0, 1);
+    //         BoolVar b3 = BoolVar(home, 0, 1);
+    //         BoolVar b4 = BoolVar(home, 0, 1);
     
-            rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, 1, Reify(b1));
-            rel(home, m2IntervalsArray[i], IRT_EQ, 2, Reify(b2));
-            rel(home, b1, BOT_AND, b2, 0);
+    //         rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, 1, Reify(b1));
+    //         rel(home, m2IntervalsArray[i], IRT_EQ, 2, Reify(b2));
+    //         rel(home, b1, BOT_AND, b2, 0);
     
-            rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, -1, Reify(b3));
-            rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
-            rel(home, b3, BOT_AND, b4, 0);
-        }
-    }
+    //         rel(home, fourthSpeciesMelodicIntervals[i+1], IRT_EQ, -1, Reify(b3));
+    //         rel(home, m2IntervalsArray[i], IRT_EQ, -2, Reify(b4));
+    //         rel(home, b3, BOT_AND, b4, 0);
+    //     }
+    // }
 }   
 
 /**
@@ -275,8 +281,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
 
     //4.H3 Penult note condition
     if (activeConstraints[SP4_4H3_2V]) {
-        rel(home,(isNotLowest[isNotLowest.size()-2]==1) >> (expr(home, abs(fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-3]))==MINOR_SEVENTH ||
-            expr(home, abs(fourthSpeciesHIntervals[fourthSpeciesHIntervals.size()-3]))==MAJOR_SEVENTH));
+        rel(home,(isNotLowest[isNotLowest.size()-2]==1) >> (expr(home, abs(h_intervals[h_intervals.size()-3]))==MAJOR_SIXTH));
     }
     
     //Must start with a perfect consonance (since 1.H2 applies to the first note, which is most likely a rest in 4th species)

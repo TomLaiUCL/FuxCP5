@@ -18,10 +18,10 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     rel(home, thirdSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(THIRD_SPECIES),(notes.size())));
 
     thirdSpeciesHarmonicIntervals = IntVarArray(home, h_intervals.size(), -PERFECT_OCTAVE, PERFECT_OCTAVE);
-    rel(home, thirdSpeciesHarmonicIntervals, IRT_EQ, h_intervals);
-    for(int i = 0; i < thirdSpeciesHarmonicIntervals.size(); i++){
-        rel(home, (thirdSpeciesHarmonicIntervals[i])==((thirdSpeciesNotesCp[i]-low->getNotes()[floor(i/4)*4])%12));
-    }
+    // rel(home, thirdSpeciesHarmonicIntervals, IRT_EQ, h_intervals);
+    // for(int i = 0; i < thirdSpeciesHarmonicIntervals.size(); i++){
+    //     rel(home, (thirdSpeciesHarmonicIntervals[i])==((thirdSpeciesNotesCp[i]-low->getNotes()[floor(i/4)*4])%12));
+    // }
     
     
     thirdSpeciesMelodicIntervals = IntVarArray(home, m_intervals_brut.size(), -MAX_STEP, MAX_STEP);
@@ -139,11 +139,12 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     cambiataCostArray = IntVarArray(home, nMeasures-1, IntSet({0, cambiataCost}));
 
     m2ZeroArray = IntVarArray(home, thirdSpeciesMelodicIntervals.size()-2, IntSet({0, m2ZeroCost}));
-  
-    //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
-    if (activeConstraints[SP3_3H1]) {
-        H1_3_fiveConsecutiveNotesByJointDegree(home, this);
-    }
+    
+    //DISABELED
+    // //3.H1 : five consecutive notes by joint degree implies that the first and the third note are consonants
+    // if (activeConstraints[SP3_3H1]) {
+    //     H1_3_fiveConsecutiveNotesByJointDegree(home, this);
+    // }
 
     //3.H2 : any dissonant note implies that it is surrounded by consonant notes
     if (activeConstraints[SP3_3H2]) {
@@ -189,15 +190,23 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     //no melodic interval between 9 and 11
     if (activeConstraints[SP3_U1]) {
         for(int i = 0; i < nMeasures-1; i++){
-            rel(home, abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SIXTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MINOR_SEVENTH && abs(thirdSpeciesMelodicIntervals[(i*4)+3])!=MAJOR_SEVENTH);
+            for (size_t j = 0; j < 4; j++)
+            {
+                rel(home, abs(thirdSpeciesMelodicIntervals[(i*4)+j])!=MAJOR_SIXTH && abs(thirdSpeciesMelodicIntervals[(i*4)+j])!=MINOR_SEVENTH && abs(thirdSpeciesMelodicIntervals[(i*4)+j])!=MAJOR_SEVENTH);
+            }
+            
+            
         }
     }
-    
-    // 3.M3
-    //third note of the penultimate measure must be below the fourth one
-    if (activeConstraints[SP3_U2]) {
-        rel(home, thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2], IRT_GR, 0);
-    }
+
+    // REMOVED UNDOCUMENTED RULE
+    // //third note of the penultimate measure must be below the fourth one
+    // if (activeConstraints[SP3_U2]) {
+    //     BoolVar isLowest(home, 0, 1);
+    //     rel(home, isNotLowest[isNotLowest.size()-2], IRT_EQ, 0, Reify(isLowest));
+    //     //third note of the penultimate measure must be more distant than a semi tone from the last note of the penultimate measure
+    //     rel(home, (!isLowest) >> (thirdSpeciesMelodicIntervals[thirdSpeciesMelodicIntervals.size()-2] > 0));
+    // }
 
     // 3.M4
     //second one must also be more distant than a semi tone from the last note of the penultimate measure
@@ -220,10 +229,11 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
     ThirdSpeciesCounterpoint(home, size, cf, lb, ub, THIRD_SPECIES, low, c, v_type, m_costs,g_costs, s_costs, bm, nV)
 {
-    // //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
+    //3.H4 : in the penultimate measure, if the cantusFirmus is in the upper part, then the h_interval of the first note should be a minor third
+    // REPLACED in twoVoiceCounterpoint.cpp 
     // if (activeConstraints[SP3_3H4_2V]) {
     //     rel(home, (getIsNotLowest()[getIsNotLowest().size()-2]==0) >> 
-    //     (expr(home, abs(thirdSpeciesHarmonicIntervals[thirdSpeciesHarmonicIntervals.size()-5]))==MINOR_THIRD));
+    //     (expr(home, abs(h_intervals[h_intervals.size()-5]))==MINOR_THIRD));
     // }
     costs = IntVarArray(home, 7, 0, 10000);
     cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2"};

@@ -60,6 +60,11 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
         H5_1_differentNotes(*this, parts); //this function modified by Tom Lai
     }    
 
+    //H13 
+    if (activeConstraints[V4_U2]) {
+        noMinorSecondBetweenUpper(*this, vector<Stratum*>{upper_1, upper_2});
+    }
+
     //H8 : the triad should be used as much as possible
     if (activeConstraints[V3_1H8]) {
         H8_3v_preferHarmonicTriad(*this, counterpoint_1, triadCostArray, upper_1, upper_2);
@@ -91,6 +96,11 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     //2.M2, have to write it here since it has a weird interaction with the third species
     if (activeConstraints[V3_2M2]) {
         M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
+    }
+
+    // 1.H13 no minor second interval between upper
+    if (activeConstraints[V4_U2]) {
+        noMinorSecondBetweenUpper(*this, vector<Stratum*>{upper_1, upper_2});
     }
     
     //5.R9 two  fifth species counterpoints should be as different as possible

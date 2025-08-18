@@ -52,7 +52,7 @@ IntVarArray Voice::getMelodicIntervals(){
     return m_intervals_brut;
 }
 
-IntVarArray Voice::getHInterval(){
+IntVarArray Voice::getHIntervals(){
     return h_intervals;
 }
 

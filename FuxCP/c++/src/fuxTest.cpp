@@ -178,10 +178,13 @@ void FuxTest::test_1H1() {
 
 void FuxTest::test_1H1_2v_1sp() {
     cout << "Start test 1H1_2v_1sp..." << endl;
-    int dis[] = {1, 2, 5, 6, 10, 11}; // dissonant intervals
-    int cons[] = {3, 4, 7, 8, 9}; // conssonant intervals without 0 because 1H5
+    // define dissonant intervals
+    int dis[] = {1, 2, 5, 6, 10, 11}; 
+    // define the species
     spList = {FIRST_SPECIES};
-    v_type = {3}; // lower bound and upper bound = {(6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0]}
+    // define the voice types (=pitch range):
+    // {(6 * v_type - 6) + cf[0], (6 * v_type + 12) + cf[0]}
+    v_type = {3};
     // Test that dissonant notes are forbidden
     for (int interval : dis) {
         for (size_t i = 0; i < cfSize; i++) {

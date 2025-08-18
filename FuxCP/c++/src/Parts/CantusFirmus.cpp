@@ -94,7 +94,9 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
         
         //H7,H8 cf version
         if (activeConstraints[CF_1H7_2V]) {
-            rel(home, h_intervals[h_intervals.size()-2], IRT_EQ, MINOR_THIRD, Reify(isNotLowest[isNotLowest.size()-2], RM_IMP));
+            // rel(home, expr(home, notes[notes.size()-2] - low->getNotes()[low->getNotes().size()-2]), IRT_EQ, MINOR_THIRD, Reify(isNotLowest[isNotLowest.size()-2], RM_IMP));
+            LinIntExpr penultInterval = expr(home, notes[notes.size()-2] - low->getNotes()[low->getNotes().size()-2]);
+            rel(home, (isNotLowest[isNotLowest.size()-2]==1) >> (penultInterval==MINOR_THIRD || penultInterval==MAJOR_THIRD));
         } 
         
 
@@ -109,8 +111,8 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
     } else {
         //H7,H8 cf version, 3v adapted
         if (activeConstraints[CF_1H7_3V]) {
-            rel(home, expr(home, abs(h_intervals[h_intervals.size()-2]))==UNISSON||expr(home, abs(h_intervals[h_intervals.size()-2]))==MINOR_THIRD
-                ||expr(home, abs(h_intervals[h_intervals.size()-2]))==PERFECT_FIFTH||expr(home, abs(h_intervals[h_intervals.size()-2]))==MAJOR_SIXTH);
+            LinIntExpr penultInterval = (notes[notes.size()-2] - low->getNotes()[low->getNotes().size()-2])%12;
+            rel(home, penultInterval==UNISSON || penultInterval==MINOR_THIRD || penultInterval==PERFECT_FIFTH || penultInterval==MAJOR_SIXTH);
         }
     }
 
