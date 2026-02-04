@@ -242,6 +242,25 @@ public:
     void test_4v_2sp_fig176_setter(int i);
 
     void test_configuration();
+
+    void test_bryce_2v_1sp();
+    void test_bryce_2v_2sp();
+    void test_bryce_2v_3sp();
+    void test_bryce_2v_4sp();
+    void test_bryce_3v_1sp();
+    void test_bryce_3v_2sp();
+    void test_bryce_3v_2sp_2sp();
+    void test_bryce_3v_3sp();
+    void test_bryce_3v_3sp_3sp();
+    void test_bryce_4v_1sp();
+    void test_bryce_4v_2sp();
+    void test_bryce_4v_2sp_2sp_2sp();
+    
+    void test_bryce();
+    void test_bryce_2();
+    void test_bryce_classic();
+    void test_bryce_fullsp();
+    void test_bryce_all();
 };
 
 void printVector(const std::vector<int>& array);

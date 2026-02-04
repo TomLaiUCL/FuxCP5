@@ -28,34 +28,51 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string arg1 = argv[1];
-    if (arg1 == "figs") {
-        FigureTests figureTests;
-        if (argc > 2) {
-            string arg2 = argv[2];
-            if (arg2 == "2v") {
-                figureTests.run_twoVoice_tests();
-            } else if (arg2 == "3v") {
-                figureTests.run_threeVoice_tests();
-            } else if (arg2 == "4v") {
-                figureTests.run_fourVoice_tests();
-            } else if (arg2 == "4sp") {
-                figureTests.run_fourthSpecies_tests();
-            } else if (arg2 == "5sp") {
-                figureTests.run_fifthSpecies_tests();
-            } else if (arg2 == "MUS") {
-                figureTests.MUSTest();
-            } else if (arg2 == "quick") {
-                figureTests.quickTest();
+    if (argc > 1) {
+        string arg1 = argv[1];
+        if (arg1 == "figs") {
+            FigureTests figureTests;
+            if (argc > 2) {
+                string arg2 = argv[2];
+                if (arg2 == "2v") {
+                    figureTests.run_twoVoice_tests();
+                } else if (arg2 == "3v") {
+                    figureTests.run_threeVoice_tests();
+                } else if (arg2 == "4v") {
+                    figureTests.run_fourVoice_tests();
+                } else if (arg2 == "4sp") {
+                    figureTests.run_fourthSpecies_tests();
+                } else if (arg2 == "5sp") {
+                    figureTests.run_fifthSpecies_tests();
+                } else if (arg2 == "MUS") {
+                    figureTests.MUSTest();
+                } else if (arg2 == "quick") {
+                    figureTests.quickTest();
+                }
+                else {
+                    std::cout << "Invalid argument: " << arg2 << std::endl;
+                    return 1;
+                }
+            } else {
+                figureTests.run_all_tests();
             }
-            else {
-                std::cout << "Invalid argument: " << arg2 << std::endl;
-                return 1;
-            }
-        } else {
-            figureTests.run_all_tests();
+            return 0;
         }
-        return 0;
+        else if (arg1 == "bryce"){
+            if (argc > 2) {
+                string arg2 = argv[2];
+                const vector<std::string> cases = {"2", "all", "classic", "fullsp"};
+                if (std::find(cases.begin(), cases.end(), arg2) == cases.end()){
+                    std::cout << "=== Invalid argument : " << arg2 << "\n=== Only valid cases are : 2, all, classic, fullsp" << std::endl;
+                    return 1;
+                }
+                char underscore[2] = "_";
+                FuxTest fuxTests(strcat(argv[1], strcat(underscore, argv[2])));
+            }
+            else { 
+                FuxTest fuxTests(argv[1]);
+            }
+        }
     }
 
     if(argc==1){
@@ -89,6 +106,7 @@ int main(int argc, char* argv[]) {
             importance, borrowMode);
         
         //solution from illustration 8.4
+        // (do) mi fa sol fa    (re) re mi si! do    (fa) re do re do    (mi) sol do re mi     (sol) la! fa sol si    (fa) la
         //vector<int> sol = {76,77,79,77,74,76,83,72,74,72,74,72,79,72,74,76,81,77,79,83,81,76,77,79,81,74,76,83,81,79,77,79,76,67,65,62,60,60,62,60,65,67,48,50,50,48,48,50,48,50,48};
         //for(int i = 0; i < problem->getSize(); i++){
         //    rel(problem->getHome(), problem->getSolutionArray()[i], IRT_EQ, sol[i]);

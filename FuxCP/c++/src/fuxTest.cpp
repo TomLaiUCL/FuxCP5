@@ -96,6 +96,16 @@ FuxTest::FuxTest(char* test){
         test_3v_3sp_fig132();
         test_3v_3sp_fig133();
         test_4v_2sp_fig176();
+    } else if(strcmp(test, "bryce")==0){
+        test_bryce();
+    } else if(strcmp(test, "bryce_2")==0){
+        test_bryce_2();
+    } else if(strcmp(test, "bryce_all")==0){
+        test_bryce_all();
+    } else if(strcmp(test, "bryce_classic")==0){
+        test_bryce_classic();
+    } else if(strcmp(test, "bryce_fullsp")==0){
+        test_bryce_fullsp();
     } else {
         std::invalid_argument("Test for constraint not found!");
     }
@@ -4316,3 +4326,518 @@ void FuxTest::test_4v_2sp_fig176_setter(int i){
     idx = i;
     borrowMode = 1;
 }
+
+
+//=======================================================================================
+//=======================================================================================
+
+void FuxTest::test_bryce_2v_1sp(){
+    cout << "===== test_bryce 2v 1sp =====" << endl;
+    spList = {FIRST_SPECIES};
+    v_type = {0};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_2v_2sp(){
+    cout << "===== test_bryce 2v 2sp =====" << endl;
+    spList = {SECOND_SPECIES};
+    v_type = {1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+    
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%10 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+    
+    delete problem;
+}
+
+void FuxTest::test_bryce_2v_3sp(){
+    cout << "===== test_bryce 2v 3sp =====" << endl;
+    spList = {THIRD_SPECIES};
+    v_type = {1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+    
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%10 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+    
+    delete problem;
+}
+
+void FuxTest::test_bryce_2v_4sp(){
+    cout << "===== test_bryce 2v 4sp =====" << endl;
+    spList = {FOURTH_SPECIES};
+    v_type = {1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+    
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%10 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+    
+    delete problem;
+}
+
+void FuxTest::test_bryce_3v_1sp(){
+    cout << "===== test_bryce 3v 1sp =====" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES};
+    v_type = {0, 1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%100 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_3v_2sp(){
+    cout << "===== test_bryce 3v 2sp =====" << endl;
+    spList = {FIRST_SPECIES, SECOND_SPECIES};
+    v_type = {0, 1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%100 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_3v_2sp_2sp(){
+    cout << "===== test_bryce 3v 2sp 2sp =====" << endl;
+    spList = {SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {0, 1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%100 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_3v_3sp(){
+    cout << "===== test_bryce 3v 3sp =====" << endl;
+    spList = {FIRST_SPECIES, THIRD_SPECIES};
+    v_type = {0, 1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%1000 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_3v_3sp_3sp(){
+    cout << "===== test_bryce 3v 3sp 3sp =====" << endl;
+    spList = {THIRD_SPECIES, THIRD_SPECIES};
+    v_type = {0, 1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%100 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }   
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_4v_1sp(){
+    cout << "===== test_bryce 4v 1sp =====" << endl; 
+    spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
+    v_type = {0, 1, 2};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%1000 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_4v_2sp(){
+    cout << "===== test_bryce 4v 2sp =====" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES, SECOND_SPECIES};
+    v_type = {0, 1, 2};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%10000== 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_4v_2sp_2sp_2sp(){
+    cout << "===== test_bryce 4v 2sp =====" << endl;
+    spList = {SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES};
+    v_type = {0, 1, 2};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%1000 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }   
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+//=======================================================================================
+
+void FuxTest::test_bryce(){
+    cout << "===== test_bryce =====" << endl; 
+    cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
+    cfSize = cantusFirmus.size();
+    melodic_params = {0, 1, 2, 576, 5, 10, 25, 40};
+    general_params = {4, 1, 1, 2, 2, 2, 8, 1};
+    specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
+    importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+    borrowMode = 1;
+
+    spList = {FIRST_SPECIES};
+    v_type = {1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    //activeConstraints[SP1_1H6] = true;    
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    cout << "=== Problem defined" << endl;
+
+    // ===== Additional and necessary Constrains =====
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    // rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 54);
+
+    auto home = problem->getHome();
+    //branch(home, problem->cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
+    
+    cout << "=== Getting solutions" << endl;
+
+    // Run a short DFS on randomized branches to get fast a first "decent" solution, and bound globalCost to it, to fasten BAB ?
+    /*
+    DFS<CounterpointProblem> e(problem);
+    int nb_sol = 0;
+    int max_solutions = 100;
+    
+    while(CounterpointProblem* pb = e.next()){
+          
+        nb_sol++;
+        if (nb_sol % 100 == 0) {
+            cout << "Solution " << nb_sol << ": " << endl;
+            cout << pb->to_string() << endl;
+            cout << pb->getSize() << endl;
+            // cout << int_vector_to_string(cantusFirmus) << endl;
+        }
+
+        delete pb;
+        if (nb_sol > max_solutions) {
+            cout << "Found " << max_solutions << " solutions. Stopping search." << endl;
+            break;
+        }
+        
+        cout << "OK" << endl;
+    }*/
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%10000 == 0){
+            std::cout << "==========\nTEST NUMBER " << myCount << std::endl;
+            std::cout << "=== BAB:\n" << s->to_string() << std::endl;
+            std::cout << "=== END TEST " << myCount << std::endl;
+            //std::cout << "H INTERVALS:\n" << s->getCounterpoint_1()->getHIntervals() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+    
+    delete problem;
+
+}
+
+void FuxTest::test_bryce_2(){ // To target specific tests if needed
+    test_bryce_3v_2sp();
+}
+
+void FuxTest::test_bryce_classic(){
+    cout << "===== test_bryce classic =====" << endl; 
+    test_bryce_2v_1sp();
+    test_bryce_2v_2sp(); // super long à partir de ~30 itérations
+    test_bryce_2v_3sp(); // super long à partir de ~30 itérations
+    //test_bryce_2v_4sp(); // doesn't work yet
+    test_bryce_3v_1sp(); // super long à partir de ~100 itérations
+    test_bryce_3v_2sp(); // super long à partir de ~700 itérations (700 autour de 1:30, jusqu'à au moins 
+    test_bryce_3v_3sp(); // super long à partir de ~5000 itérations
+    test_bryce_4v_1sp(); // super long à partir de ~15000 itérations
+    test_bryce_4v_2sp(); // super long à partir de ~50000 itérations
+}
+
+void FuxTest::test_bryce_fullsp(){
+    cout << "===== test_bryce full sp =====" << endl; 
+    test_bryce_3v_2sp_2sp(); // super long à partir de ~1200 itérations
+    test_bryce_3v_3sp_3sp(); // super long à partir de ~5500 itérations
+    test_bryce_4v_2sp_2sp_2sp(); // super long à partir de ~20000 itérations
+}
+
+void FuxTest::test_bryce_all(){
+    cout << "===== test_bryce all =====" << endl; 
+    test_bryce_classic();
+    test_bryce_fullsp();
+}
+
