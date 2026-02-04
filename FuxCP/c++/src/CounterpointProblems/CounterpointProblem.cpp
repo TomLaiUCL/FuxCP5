@@ -133,7 +133,8 @@ IntLexMinimizeSpace* CounterpointProblem::copy(){
 
 void CounterpointProblem::constrain(const IntLexMinimizeSpace& _b){
 
-    const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
+    //const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
+    IntLexMinimizeSpace::constrain(_b); // Faster, default one (the previous one was empty ?!?)
     
 }
 
@@ -247,6 +248,16 @@ void CounterpointProblem::setStrata(){
         measures_order.push_back(IntVarArray(*this, nVoices, 0, nVoices-1));
         sorted_voices.push_back(IntVarArray(*this, nVoices, 0, 127));
         sorted(*this, voices, sorted_voices[i], measures_order[i]);
+
+        // ---- Tie-breaker: if two voices have same pitch, enforce deterministic order
+        for (int a = 0; a < nVoices; ++a) {
+            for (int b = a + 1; b < nVoices; ++b) {
+                BoolVar eq(*this, 0, 1);
+                rel(*this, voices[a], IRT_EQ, voices[b], Reify(eq, RM_EQV));
+                // If equal pitch, force order[a] < order[b] (priority: smaller index wins)
+                rel(*this, eq >> (measures_order[i][a] < measures_order[i][b]));
+            }
+        }
 
         // Set stratum constraints for each position in the measure
         int maxPos = (i == size-1) ? 1 : 4;  // Only set first position for last measure

@@ -156,6 +156,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     }
     
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
     // cout << "HERE" << endl;
 }
 

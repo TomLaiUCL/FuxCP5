@@ -130,7 +130,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     if (activeConstraints[SP1_1M2_2V]) {
         for (size_t i = 0; i < secondSpeciesMelodicIntervals.size(); i++)
         {
-            rel(home, (secondSpeciesMelodicIntervals[i] <= 8) || (secondSpeciesMelodicIntervals[i] == 12));
+            rel(home, (abs(secondSpeciesMelodicIntervals[i]) <= 8) || (abs(secondSpeciesMelodicIntervals[i]) == 12)); // can be negative !!
         }
         
     }

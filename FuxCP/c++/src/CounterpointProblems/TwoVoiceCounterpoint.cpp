@@ -101,8 +101,12 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     if(species==FOURTH_SPECIES || species==FIFTH_SPECIES){
         branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
-    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
-    
+    //branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    //branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_RND(1U)); // More efficient when random
+    branch(*this, solutionArray, INT_VAR_AFC_MAX(), INT_VAL_RND(1U)); // AFC to focus a bit more on variables involved in failures
+    //branch(*this, solutionArray, INT_VAR_AFC_MAX(), INT_VAL_MIN()); // Better --> NO, too slow
+
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
 
 }
 // COPY CONSTRUCTOR

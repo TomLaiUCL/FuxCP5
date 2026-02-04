@@ -152,6 +152,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     }
     
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
 
     writeToLogFile(("solution array size : " + std::to_string(solutionArray.size())).c_str());
 

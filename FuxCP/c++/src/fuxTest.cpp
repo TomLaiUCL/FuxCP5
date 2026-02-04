@@ -14,7 +14,7 @@
 FuxTest::FuxTest(char* test){
     cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
     cfSize = cantusFirmus.size();
-    melodic_params = {0, 1, 1, 576, 2, 2, 2, 1};
+    melodic_params = {0, 1, 2, 576, 5, 10, 25, 40}; // Last ones augmented to avoid crazy leaps
     general_params = {4, 1, 1, 2, 2, 2, 8, 1};
     specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
     importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
