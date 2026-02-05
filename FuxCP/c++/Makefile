@@ -178,3 +178,26 @@ diag_screen: compile_diag
 # Diagnostic d'une combinaison spécifique (usage: make diag COMBO=3_3_3)
 diag: compile_diag
 	./DiagnosticTest $(COMBO)
+
+# === ADAPTIVE SOLVER ===
+
+# Sources pour le solveur adaptatif
+ADAPTIVE_SOLVER_SOURCES = src/AdaptiveSolver.cpp src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
+        src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
+        src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp \
+        src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp \
+        src/CounterpointProblems/ThreeVoiceCounterpoint.cpp src/CounterpointProblems/FourVoiceCounterpoint.cpp \
+        src/constraints.cpp
+
+# Compiler le solveur adaptatif
+compile_adaptive:
+	g++ -g -std=c++11 $(ADAPTIVE_SOLVER_SOURCES) -o AdaptiveSolver \
+		-lgecodekernel -lgecodesearch -lgecodeint -lgecodedriver -lgecodeminimodel -lgecodesupport
+
+# Lancer le solveur adaptatif sur toutes les combinaisons
+adaptive_all: compile_adaptive
+	./AdaptiveSolver all
+
+# Lancer le solveur adaptatif sur une combinaison spécifique (usage: make adaptive COMBO=3_3_3)
+adaptive: compile_adaptive
+	./AdaptiveSolver $(COMBO)

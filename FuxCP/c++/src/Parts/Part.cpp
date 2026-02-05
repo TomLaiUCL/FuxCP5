@@ -149,6 +149,8 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     speciesArray.update(home, s.speciesArray);
 
     toCombineCosts.update(home, s.toCombineCosts);
+
+    relaxationCostArray.update(home, s.relaxationCostArray);
 }
 
 // Virtual clone function
@@ -253,6 +255,14 @@ void Part::add_toCombineCost(Home home, int idx, IntVarArray to_be_added, IntVar
         args[i] = to_be_added[i];
     }
     rel(home, costs[idx], IRT_EQ, expr(home, sum(args)));
+}
+
+IntVarArray Part::getRelaxationCostArray(){
+    return relaxationCostArray;
+}
+
+void Part::initRelaxationCostArray(Home home, int size){
+    relaxationCostArray = IntVarArray(home, size, 0, 1);
 }
 
 BoolVarArray Part::getIsNotLowest(){

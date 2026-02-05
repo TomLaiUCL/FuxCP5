@@ -54,8 +54,21 @@ CantusFirmus::CantusFirmus(Home home, int size, vector<int> cf, Stratum* low, in
 
     // 1.H1 cf version (commented by Tom Lai)
     if (activeConstraints[CF_1H1]) {
-        dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
-            -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
+        if (softConstraints[CF_1H1]) {
+            // Soft version: count violations for each non-consonant interval
+            IntSet consonantSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+                -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE});
+            initRelaxationCostArray(home, h_intervals.size());
+            for(int i = 0; i < h_intervals.size(); i++){
+                BoolVar inSet(home, 0, 1);
+                dom(home, h_intervals[i], consonantSet, inSet);
+                rel(home, (inSet == 1) >> (relaxationCostArray[i] == 0));
+                rel(home, (inSet == 0) >> (relaxationCostArray[i] == 1));
+            }
+        } else {
+            dom(home, h_intervals, IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE, 
+                -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}));
+        }
         
         // disArray = IntVarArray(home, notes.size(), IntSet{0, 1});
         // // Define the set of consonant intervals

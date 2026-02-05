@@ -80,6 +80,8 @@ class Part : public Voice {
         int syncopationCost;
         int prefSlider;
 
+        IntVarArray relaxationCostArray;
+
         int directCost;
         int obliqueCost;
         int contraryCost;
@@ -231,6 +233,9 @@ class Part : public Voice {
         vector<string> getToCombineCostNames();
 
         void add_toCombineCost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
+
+        IntVarArray getRelaxationCostArray();
+        void initRelaxationCostArray(Home home, int size);
 };
 
 

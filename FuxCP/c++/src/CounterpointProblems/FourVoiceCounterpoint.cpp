@@ -50,7 +50,12 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 
     // 1.H4 (G9) last chord must have the same fundamental as the cf (used throughout the composition)
     if (activeConstraints[V4_1H4]) {
-        G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+        if (softConstraints[V4_1H4]) {
+            problemRelaxationCosts = IntVarArray(*this, 2, 0, 1);
+            G9_lastChordSameAsFundamental_soft(*this, lowest, cantusFirmus, problemRelaxationCosts, 0);
+        } else {
+            G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+        }
     }
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
@@ -84,7 +89,11 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 
     //2.M2, have to write it here since it has a weird interaction with the third species
     if (activeConstraints[V4_2M2]) {
-        M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
+        if (softConstraints[V4_2M2]) {
+            M2_2_3v_melodicIntervalsNotExceedMinorSixth_soft(*this, parts, containsThirdSpecies);
+        } else {
+            M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
+        }
     }
 
     //two fifth species counterpoints should be as different as possible
@@ -105,6 +114,9 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     
     uniteCounterpoints();
     uniteCosts();
+
+    // Collect relaxation costs from all parts and sum them
+    uniteRelaxationCosts();
 
     // compute combined costs
     computeCombinedCosts();

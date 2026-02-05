@@ -53,6 +53,10 @@ protected:
 
     IntVarArray combinedCosts;
 
+    IntVarArray problemRelaxationCosts;
+    IntVar totalRelaxationCost;
+    bool hasRelaxation = false;
+
 public:
     /**
      * Constructor of the class.
@@ -125,6 +129,9 @@ public:
 
     IntVarArray get_combinedCosts(){ return combinedCosts; }
     void computeCombinedCosts();
+
+    void uniteRelaxationCosts();
+    IntVarArray getProblemRelaxationCosts(){ return problemRelaxationCosts; }
 };
 
 
