@@ -261,6 +261,7 @@ public:
     void test_bryce_classic();
     void test_bryce_fullsp();
     void test_bryce_all();
+    void test_sacha();
 };
 
 void printVector(const std::vector<int>& array);

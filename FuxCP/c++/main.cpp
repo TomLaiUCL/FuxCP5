@@ -72,8 +72,12 @@ int main(int argc, char* argv[]) {
             else { 
                 FuxTest fuxTests(argv[1]);
             }
+            FuxTest fuxTests(argv[1]); 
         }
-    }
+
+        else if (arg1 == "sacha"){
+            FuxTest fuxTests(argv[1]);
+    }}
 
     if(argc==1){
         cout << argv[0] << endl;

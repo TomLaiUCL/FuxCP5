@@ -8,6 +8,7 @@
 #include <cmath>
 #include "../headers/fuxTest.hpp"
 #include <gecode/int.hh> // Ensure you include the necessary Gecode headers
+#include "../headers/Parts/Midi.hpp"
 
 // ========== Modified by Tom ====================
 
@@ -106,7 +107,11 @@ FuxTest::FuxTest(char* test){
         test_bryce_classic();
     } else if(strcmp(test, "bryce_fullsp")==0){
         test_bryce_fullsp();
-    } else {
+    } 
+    else if(strcmp(test, "sacha")==0){
+        test_sacha();
+    }
+    else {
         std::invalid_argument("Test for constraint not found!");
     }
     //     CounterpointProblem* problem;
@@ -4809,6 +4814,58 @@ void FuxTest::test_bryce(){
     
     delete problem;
 
+}
+
+
+
+void FuxTest::test_sacha(){
+    cout << "===== test_bryce 1v 1sp =====" << endl; 
+    cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
+    cfSize = cantusFirmus.size();
+    melodic_params = {0, 1, 2, 576, 5, 10, 25, 40};
+    general_params = {4, 1, 1, 2, 2, 2, 8, 1};
+    specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
+    importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
+    borrowMode = 1;
+
+    spList = {FIRST_SPECIES};
+    v_type = {0};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    cout << "- Problem defined" << endl; 
+
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+
+    cout << "- Getting solutions" << endl; 
+
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    while (CounterpointProblem* s = e.next()) {
+        delete best;      // keep only the best-so-far
+        best = s;
+    }
+
+    if (best) {
+        auto solutionArray = best->getSolutionArray();
+        std::vector<int> solVec;
+        for (int i = 0; i < solutionArray.size(); ++i) {
+        solVec.push_back(solutionArray[i].val()); } 
+        std::vector<int> cfVec;
+        for (int i = 0; i < cantusFirmus.size(); ++i) {
+    
+
+    cfVec.push_back(cantusFirmus[i]);
+}
+
+// 4. Appeler saveMidi avec les vecteurs
+saveMidi("test_sacha.mid", cfVec, solVec, FIRST_SPECIES);
+        std::cout << "BEST:\n" << best->to_string() << std::endl;
+        delete best;
+    }
+
+    delete problem;
 }
 
 void FuxTest::test_bryce_2(){ // To target specific tests if needed
