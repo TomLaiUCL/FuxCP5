@@ -105,20 +105,10 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     }
     
     is_off = BoolVarArray(home, notes.size(), 0, 1);
-    for(int i = 0; i < is_off.size(); i++){
-        IntVarArray res = IntVarArray(home, off_domain.size(), 0, 1);
-        IntVar sm = IntVar(home, 0, off_domain.size());
-        for(int l = 0; l < off_domain.size(); l++){      
-            BoolVar b1 = BoolVar(home, 0, 1);
-            rel(home, notes[i], IRT_EQ, off_domain[l], Reify(b1));   
-            ite(home, b1, IntVar(home, 1, 1), IntVar(home, 0, 0), res[l]);
-        }
-        IntVarArgs x(res.size());
-        for(int t = 0; t < off_domain.size(); t++){
-            x[t] = res[t];
-        }
-        rel(home, sm, IRT_EQ, expr(home, sum(x)));
-        rel(home, sm, IRT_GR, 0, Reify(is_off[i]));  
+    for(int i = 0; i < is_off.size(); i++){ // Using Reify domain membership
+        BoolVar inOff(home, 0, 1);
+        dom(home, notes[i], IntSet(IntArgs(off_domain)), Reify(inOff, RM_EQV));
+        rel(home, is_off[i] == inOff);
     }
 
     //create off_cost array
@@ -316,7 +306,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
 
     //4.P5 -- after careful testing, Fux does not seem to follow this rule in many of his examples. Suspended for now, but implementation left in case the decision is taken to reactivate it. 
-    if (activeConstraints[SP4_4P5_3V]) {
+    if (activeConstraints[SP4_4P5_3V] && false) {
         for(int j = 1; j < nMeasures-1; j++){
             rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
                 || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||
@@ -354,7 +344,7 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
 
     //4.P5 -- after careful testing, Fux does not seem to follow this rule in many of his examples. Suspended for now, but implementation left in case the decision is taken to reactivate it. 
-    if (activeConstraints[SP4_4P5_4V]) {
+    if (activeConstraints[SP4_4P5_4V] && false) {
         for(int j = 1; j < nMeasures-1; j++){
             rel(home, (low->getMelodicIntervals()[j]==0)>>(expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MINOR_SECOND || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==MAJOR_SECOND
                 || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==PERFECT_FOURTH || expr(home, abs(fourthSpeciesHIntervals[(j*2)+1]))==AUGMENTED_FOURTH ||

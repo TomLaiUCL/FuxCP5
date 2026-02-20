@@ -6,9 +6,12 @@
 #include <iostream>
 #include <fstream>  // For file operations
 #include <cmath>
+#include <ctime>
+#include <signal.h> // For testing blocking constrains in generations
 #include "../headers/fuxTest.hpp"
-#include <gecode/int.hh> // Ensure you include the necessary Gecode headers
 #include "../headers/Parts/Midi.hpp"
+#include <gecode/int.hh> // Ensure you include the necessary Gecode headers
+
 
 // ========== Modified by Tom ====================
 
@@ -4434,13 +4437,12 @@ void FuxTest::test_bryce_2v_3sp(){
 void FuxTest::test_bryce_2v_4sp(){
     cout << "===== test_bryce 2v 4sp =====" << endl;
     spList = {FOURTH_SPECIES};
-    v_type = {1};
+    v_type = {0};
 
     std::fill(activeConstraints.begin(), activeConstraints.end(), true);
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
 
     // Additional and necessary Constrains
-    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
     auto home = problem->getHome();
     
 
@@ -4752,7 +4754,7 @@ void FuxTest::test_bryce(){
     v_type = {1};
 
     std::fill(activeConstraints.begin(), activeConstraints.end(), true);
-    //activeConstraints[SP1_1H6] = true;    
+    //activeConstraints[SP1_1H6] = true;
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
 
     cout << "=== Problem defined" << endl;
@@ -4761,7 +4763,7 @@ void FuxTest::test_bryce(){
     rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
     // rel(problem->getHome(), problem->getSolutionArray()[1], IRT_EQ, 54);
 
-    auto home = problem->getHome();
+    //auto home = problem->getHome();
     //branch(home, problem->cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
     
     cout << "=== Getting solutions" << endl;
@@ -4817,9 +4819,166 @@ void FuxTest::test_bryce(){
 }
 
 
+void FuxTest::test_bryce_2v_4sp_constrains_check(){
+    cout << "===== test_bryce 2v 4sp constrains check =====" << endl;
+    spList = {FOURTH_SPECIES};
+    v_type = {3};
+    cout << "===== Testing v_type = " << 3 << endl;
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+    
+    Search::Options opt;
+    Search::TimeStop ts(300000);  // ms --> 5min
+    opt.stop = &ts;
+    BAB<CounterpointProblem> e(problem, opt);
+    CounterpointProblem* best = nullptr;
+
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%5 == 0){
+            cout << "BAB ok" << std::endl;
+        }
+        
+        delete best;      // keep only the best-so-far
+        best = s;
+
+        myCount++;
+    }
+
+    if (best){
+        auto solutionArray = best->getSolutionArray();
+        std::vector<int> solVec;
+        for (int i = 0; i < solutionArray.size(); ++i) {
+            solVec.push_back(solutionArray[i].val());
+        } 
+        std::vector<int> cfVec;
+        for (int i = 0; i < cantusFirmus.size(); ++i) {
+            cfVec.push_back(cantusFirmus[i]);
+        }
+        saveMidi("midi/test_bryce_2v_4sp_vtype_3.mid", cfVec, solVec, FOURTH_SPECIES);
+        std::cout << "BEST YAY : " << solutionArray << std::endl;
+        delete problem;
+    }
+
+    e.operator delete;
+}
+
+void FuxTest::test_bryce_3v_4sp_constrains_check(){
+    cout << "===== test_bryce 3v 4sp constrains check =====" << endl;
+    spList = {FIRST_SPECIES, FOURTH_SPECIES};
+    vector<int> v_cases = {1,2,3};
+    vector<string> v_cases_name = {"1","2","3"};
+    for (int vidx1 = 0; vidx1 < v_cases.size(); vidx1++){
+        for (int vidx2 = 0; vidx2 < v_cases.size(); vidx2++){
+            v_type = {v_cases.at(vidx1), v_cases.at(vidx2)};
+            cout << "===== Testing v_type = " << v_cases.at(vidx1) << ", " << v_cases.at(vidx2) << endl;
+
+            std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+            cout << "=== Testing with all constrains " << endl;
+            
+            auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+            
+            Search::Options opt;
+            Search::TimeStop ts(300000);  // ms --> 5min
+            opt.stop = &ts;
+            BAB<CounterpointProblem> e(problem, opt);
+            CounterpointProblem* best = nullptr;
+
+            while (CounterpointProblem* s = e.next()) {
+                cout << "BAB ok" << std::endl;
+                
+                delete best;      // keep only the best-so-far
+                best = s;
+            }
+
+            if (best){
+                auto solutionArray = best->getSolutionArray();
+                std::vector<int> solVec;
+                for (int i = cantusFirmus.size(); i < solutionArray.size(); ++i) {
+                    solVec.push_back(solutionArray[i].val());
+                } 
+                std::vector<int> cfVec;
+                for (int i = 0; i < cantusFirmus.size(); ++i) {
+                    cfVec.push_back(cantusFirmus[i]);
+                }
+                string name = "midi/test_bryce_3v_4sp_vtype_" + v_cases_name.at(vidx1) + "_" + v_cases_name.at(vidx2) +".mid";
+                saveMidi(name, cfVec, solVec, FOURTH_SPECIES);
+                std::cout << "BEST YAY : " << solutionArray << std::endl;
+                delete problem;
+            }
+
+            e.operator delete;
+            delete problem;
+        }
+    }
+}
+
+void FuxTest::test_bryce_4v_4sp_constrains_check(){
+    cout << "===== test_bryce 4v 4sp constrains check =====" << endl;
+    spList = {FIRST_SPECIES, FIRST_SPECIES, FOURTH_SPECIES};
+    vector<int> v_cases = {-2,-1,0,1,2};
+    for (int vidx1 = 0; vidx1 < v_cases.size(); vidx1++){
+        for (int vidx2 = 0; vidx2 < v_cases.size(); vidx2++){
+            for (int vidx3 = 0; vidx3 < v_cases.size(); vidx3++){
+                if (vidx1 == vidx3 || vidx2 == vidx3){ continue; }
+                v_type = {v_cases.at(vidx1), v_cases.at(vidx2), v_cases.at(vidx3)};
+                cout << "===== Testing v_type = " << v_cases.at(vidx1) << ", " << v_cases.at(vidx2) << ", " << v_cases.at(vidx3) << endl;
+
+                std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+                cout << "=== Testing with all constrains" << endl;
+                
+                auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+                
+                Search::Options opt;
+                Search::TimeStop ts(300000);  // ms --> 5min
+                opt.stop = &ts;
+                BAB<CounterpointProblem> e(problem, opt);
+                CounterpointProblem* best = nullptr;
+
+                while (CounterpointProblem* s = e.next()) {
+                    cout << "BAB ok" << std::endl;
+                    
+                    delete best;      // keep only the best-so-far
+                    best = s;
+
+                    break;
+                }
+
+                e.operator delete;
+                delete problem;
+                for(int constrain=77; constrain<92; constrain++){
+                    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+                    activeConstraints[constrain] = false; // 77 --> 91
+                    cout << "=== Testing without constrain " << constrain << endl;
+                    
+                    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+                    
+                    Search::Options opt;
+                    Search::TimeStop ts(300000);  // ms --> 5min
+                    opt.stop = &ts;
+                    BAB<CounterpointProblem> e(problem, opt);
+                    CounterpointProblem* best = nullptr;
+
+                    while (CounterpointProblem* s = e.next()) {
+                        cout << "BAB ok" << std::endl;
+                        
+                        delete best;      // keep only the best-so-far
+                        best = s;
+
+                        break;
+                    }
+
+                    delete problem;
+                    e.operator delete;
+                }
+            }
+        }
+    }
+}
 
 void FuxTest::test_sacha(){
-    cout << "===== test_bryce 1v 1sp =====" << endl; 
+    cout << "===== sacha 1v 1sp =====" << endl; 
     cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
     cfSize = cantusFirmus.size();
     melodic_params = {0, 1, 2, 576, 5, 10, 25, 40};
@@ -4829,7 +4988,7 @@ void FuxTest::test_sacha(){
     borrowMode = 1;
 
     spList = {FIRST_SPECIES};
-    v_type = {0};
+    v_type = {1};
 
     std::fill(activeConstraints.begin(), activeConstraints.end(), true);
     auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
@@ -4851,16 +5010,15 @@ void FuxTest::test_sacha(){
         auto solutionArray = best->getSolutionArray();
         std::vector<int> solVec;
         for (int i = 0; i < solutionArray.size(); ++i) {
-        solVec.push_back(solutionArray[i].val()); } 
+            solVec.push_back(solutionArray[i].val());
+        } 
         std::vector<int> cfVec;
         for (int i = 0; i < cantusFirmus.size(); ++i) {
-    
+            cfVec.push_back(cantusFirmus[i]);
+        }
 
-    cfVec.push_back(cantusFirmus[i]);
-}
-
-// 4. Appeler saveMidi avec les vecteurs
-saveMidi("test_sacha.mid", cfVec, solVec, FIRST_SPECIES);
+        // 4. Appeler saveMidi avec les vecteurs
+        saveMidi("test_sacha.mid", cfVec, solVec, FIRST_SPECIES);
         std::cout << "BEST:\n" << best->to_string() << std::endl;
         delete best;
     }
@@ -4869,7 +5027,8 @@ saveMidi("test_sacha.mid", cfVec, solVec, FIRST_SPECIES);
 }
 
 void FuxTest::test_bryce_2(){ // To target specific tests if needed
-    test_bryce_3v_2sp();
+    test_bryce_2v_4sp_constrains_check();
+    test_bryce_3v_4sp_constrains_check();
 }
 
 void FuxTest::test_bryce_classic(){
@@ -4879,14 +5038,14 @@ void FuxTest::test_bryce_classic(){
     test_bryce_2v_3sp(); // super long à partir de ~30 itérations
     //test_bryce_2v_4sp(); // doesn't work yet
     test_bryce_3v_1sp(); // super long à partir de ~100 itérations
-    test_bryce_3v_2sp(); // super long à partir de ~700 itérations (700 autour de 1:30, jusqu'à au moins 
+    test_bryce_3v_2sp(); // super long à partir de ~700 itérations
     test_bryce_3v_3sp(); // super long à partir de ~5000 itérations
     test_bryce_4v_1sp(); // super long à partir de ~15000 itérations
     test_bryce_4v_2sp(); // super long à partir de ~50000 itérations
 }
 
 void FuxTest::test_bryce_fullsp(){
-    cout << "===== test_bryce full sp =====" << endl; 
+    cout << "===== test_bryce full sp =====" << endl;
     test_bryce_3v_2sp_2sp(); // super long à partir de ~1200 itérations
     test_bryce_3v_3sp_3sp(); // super long à partir de ~5500 itérations
     test_bryce_4v_2sp_2sp_2sp(); // super long à partir de ~20000 itérations
@@ -4897,4 +5056,3 @@ void FuxTest::test_bryce_all(){
     test_bryce_classic();
     test_bryce_fullsp();
 }
-

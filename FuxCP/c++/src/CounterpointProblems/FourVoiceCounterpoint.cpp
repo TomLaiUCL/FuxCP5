@@ -156,7 +156,7 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     }
     
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
-    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MIN()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
     // cout << "HERE" << endl;
 }
 
@@ -241,9 +241,10 @@ void FourVoiceCounterpoint::uniteCosts(){
                     sz++;
                 }
             }
-            //if it is not present in any counterpoint -> leave it empty
+            //if it is not present in any counterpoint -> DONT leave it empty
             if(!cp1_contains && !cp2_contains && !cp3_contains){
-                unitedCostNames.push_back("NOT ADDED");
+                rel(*this, unitedCosts[i], IRT_EQ, 0);
+                //unitedCostNames.push_back("NOT ADDED");
             } else { //else -> add the costs together for that entry
                 unitedCostNames.push_back(name);
                 //adds the cost to the IntVarArgs

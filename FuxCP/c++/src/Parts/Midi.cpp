@@ -32,11 +32,27 @@ void writeVLQ(std::vector<uint8_t>& buffer, uint32_t value) {
     }
 }
 
+static std::vector<int> deduplicatePairs(const std::vector<int>& sol) {
+    std::vector<int> out;
+    out.reserve((sol.size() + 1) / 2);
+
+    for (size_t i = 0; i < sol.size(); ) {
+        int v = sol[i];
+        out.push_back(v);
+        i += 1;
+        // skip one if duplicated
+        if (i < sol.size() && sol[i] == v) i += 1;
+    }
+    return out;
+}
+
+
 void saveMidi(const std::string& filename, 
               const std::vector<int>& cantusFirmus, 
-              const std::vector<int>& solution, 
+              const std::vector<int>& raw_solution, 
               Species species) {
     
+    std::vector<int> solution = raw_solution;
     const uint32_t PPQ = 480; // Pulses Per Quarter Note
     uint32_t rondeDur = PPQ * 4;
     uint32_t cpDur;
@@ -44,6 +60,10 @@ void saveMidi(const std::string& filename,
     switch(species) {
         case SECOND_SPECIES: cpDur = rondeDur / 2; break;
         case THIRD_SPECIES:  cpDur = rondeDur / 4; break;
+        case FOURTH_SPECIES: 
+            cpDur = rondeDur;
+            solution = deduplicatePairs(raw_solution); 
+            break;
         default:             cpDur = rondeDur;     break;
     }
 
@@ -55,10 +75,24 @@ void saveMidi(const std::string& filename,
         events.push_back({start + rondeDur, 0x80, (uint8_t)cantusFirmus[i], 0}); 
     }
 
-    for (size_t i = 0; i < solution.size(); ++i) {
+    if (species == FOURTH_SPECIES) {
+        size_t i;
+        for (i = 0; i < solution.size()-1; ++i) {
+            uint32_t start = i * cpDur + cpDur/2;
+            events.push_back({start, 0x90, (uint8_t)solution[i], 80}); 
+            events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
+        }
+        // last note
         uint32_t start = i * cpDur;
         events.push_back({start, 0x90, (uint8_t)solution[i], 80}); 
         events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
+    }
+    else {
+        for (size_t i = 0; i < solution.size(); ++i) {
+            uint32_t start = i * cpDur;
+            events.push_back({start, 0x90, (uint8_t)solution[i], 80}); 
+            events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
+        }
     }
 
     std::sort(events.begin(), events.end());

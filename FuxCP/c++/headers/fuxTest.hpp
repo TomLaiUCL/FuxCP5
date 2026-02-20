@@ -258,6 +258,10 @@ public:
     
     void test_bryce();
     void test_bryce_2();
+    void test_bryce_2v_4sp_constrains_check();
+    void test_bryce_3v_4sp_constrains_check();
+    void test_bryce_4v_4sp_constrains_check();
+
     void test_bryce_classic();
     void test_bryce_fullsp();
     void test_bryce_all();
