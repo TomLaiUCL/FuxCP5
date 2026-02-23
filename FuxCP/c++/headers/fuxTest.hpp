@@ -258,9 +258,9 @@ public:
     
     void test_bryce();
     void test_bryce_2();
-    void test_bryce_2v_4sp_constrains_check();
-    void test_bryce_3v_4sp_constrains_check();
-    void test_bryce_4v_4sp_constrains_check();
+    void test_bryce_midi_gen(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp);
+    void test_bryce_midi_gen(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp, int timeout_s);
+    void test_bryce_constrains_check(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp);
 
     void test_bryce_classic();
     void test_bryce_fullsp();

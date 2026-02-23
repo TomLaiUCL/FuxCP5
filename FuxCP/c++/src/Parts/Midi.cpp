@@ -32,6 +32,7 @@ void writeVLQ(std::vector<uint8_t>& buffer, uint32_t value) {
     }
 }
 
+// To get smoother 4sp
 static std::vector<int> deduplicatePairs(const std::vector<int>& sol) {
     std::vector<int> out;
     out.reserve((sol.size() + 1) / 2);
@@ -49,7 +50,7 @@ static std::vector<int> deduplicatePairs(const std::vector<int>& sol) {
 
 void saveMidi(const std::string& filename, 
               const std::vector<int>& cantusFirmus, 
-              const std::vector<int>& raw_solution, 
+              const std::vector<int>& raw_solution,
               Species species) {
     
     std::vector<int> solution = raw_solution;
@@ -62,8 +63,9 @@ void saveMidi(const std::string& filename,
         case THIRD_SPECIES:  cpDur = rondeDur / 4; break;
         case FOURTH_SPECIES: 
             cpDur = rondeDur;
-            solution = deduplicatePairs(raw_solution); 
+            solution = deduplicatePairs(raw_solution);
             break;
+        case FIFTH_SPECIES:  cpDur = rondeDur / 4; break;
         default:             cpDur = rondeDur;     break;
     }
 
@@ -71,26 +73,26 @@ void saveMidi(const std::string& filename,
 
     for (size_t i = 0; i < cantusFirmus.size(); ++i) {
         uint32_t start = i * rondeDur;
-        events.push_back({start, 0x90, (uint8_t)cantusFirmus[i], 64});   
-        events.push_back({start + rondeDur, 0x80, (uint8_t)cantusFirmus[i], 0}); 
+        events.push_back({start, 0x90, (uint8_t)cantusFirmus[i], 64});
+        events.push_back({start + rondeDur, 0x80, (uint8_t)cantusFirmus[i], 0});
     }
 
     if (species == FOURTH_SPECIES) {
         size_t i;
         for (i = 0; i < solution.size()-1; ++i) {
             uint32_t start = i * cpDur + cpDur/2;
-            events.push_back({start, 0x90, (uint8_t)solution[i], 80}); 
+            events.push_back({start, 0x90, (uint8_t)solution[i], 80});
             events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
         }
         // last note
         uint32_t start = i * cpDur;
-        events.push_back({start, 0x90, (uint8_t)solution[i], 80}); 
+        events.push_back({start, 0x90, (uint8_t)solution[i], 80});
         events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
     }
     else {
         for (size_t i = 0; i < solution.size(); ++i) {
             uint32_t start = i * cpDur;
-            events.push_back({start, 0x90, (uint8_t)solution[i], 80}); 
+            events.push_back({start, 0x90, (uint8_t)solution[i], 80});
             events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
         }
     }
@@ -108,7 +110,7 @@ void saveMidi(const std::string& filename,
         lastTick = e.tick;
     }
 
-    trackData.push_back(0x00); 
+    trackData.push_back(0x00);
     trackData.push_back(0xFF); trackData.push_back(0x2F); trackData.push_back(0x00);
 
     std::ofstream file(filename, std::ios::binary);
@@ -116,7 +118,7 @@ void saveMidi(const std::string& filename,
     file << "MThd";
     uint32_t hLen = __builtin_bswap32(6);
     file.write((char*)&hLen, 4);
-    uint16_t format = __builtin_bswap16(0); 
+    uint16_t format = __builtin_bswap16(0);
     file.write((char*)&format, 2);
     uint16_t ntrks = __builtin_bswap16(1);
     file.write((char*)&ntrks, 2);

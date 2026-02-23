@@ -6,12 +6,20 @@ BAB<CounterpointProblem> e(problem, opt);
 
 
 2v_4sp :
-- v_type=-3 --> NOP
 - v_type=-2 --> NOP
 - v_type=-1 --> ok \88
 - v_type=0 --> ok
 - v_type=1 --> ok \88
 - v_type=2 --> fast
+- v_type=3 --> ok
+
+2v_5sp :
+- v_type=-3 --> NOP
+- v_type=-2 --> ok
+- v_type=-1 --> ok
+- v_type=0 --> ok
+- v_type=1 --> ok
+- v_type=2 --> ok
 - v_type=3 --> ok
 
 3v_4sp :
