@@ -118,3 +118,63 @@ SOURCES = main.cpp src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/Counterpo
         src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp \
         src/CounterpointProblems/ThreeVoiceCounterpoint.cpp src/CounterpointProblems/FourVoiceCounterpoint.cpp \
         src/fuxTest.cpp src/constraints.cpp src/figureTests.cpp
+
+# Sources pour le test de la 3ème espèce (sans main.cpp)
+THIRD_SPECIES_TEST_SOURCES = src/ThirdSpeciesTest.cpp src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
+        src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
+        src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp \
+        src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp \
+        src/CounterpointProblems/ThreeVoiceCounterpoint.cpp src/CounterpointProblems/FourVoiceCounterpoint.cpp \
+        src/constraints.cpp
+
+# Compiler le test de performance de la 3ème espèce
+compile_3sp_test:
+	g++ -g -std=c++11 $(THIRD_SPECIES_TEST_SOURCES) -o ThirdSpeciesTest \
+		-lgecodekernel -lgecodesearch -lgecodeint -lgecodedriver -lgecodeminimodel -lgecodesupport
+
+# Lancer tous les tests 3sp
+test_3sp_all: compile_3sp_test
+	./ThirdSpeciesTest all
+
+# Tests rapides 3sp
+test_3sp_quick: compile_3sp_test
+	./ThirdSpeciesTest quick
+
+# Tests avec uniquement 3sp
+test_3sp_full: compile_3sp_test
+	./ThirdSpeciesTest full3sp
+
+# Tests mixtes
+test_3sp_mixed: compile_3sp_test
+	./ThirdSpeciesTest mixed
+
+# Test spécifique (usage: make test_3sp_specific COMBO=3_3_3)
+test_3sp_specific: compile_3sp_test
+	./ThirdSpeciesTest $(COMBO)
+
+# === DIAGNOSTIC TEST ===
+
+# Sources pour le test diagnostic
+DIAGNOSTIC_TEST_SOURCES = src/DiagnosticTest.cpp src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
+        src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
+        src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp \
+        src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp \
+        src/CounterpointProblems/ThreeVoiceCounterpoint.cpp src/CounterpointProblems/FourVoiceCounterpoint.cpp \
+        src/constraints.cpp
+
+# Compiler le test diagnostic
+compile_diag:
+	g++ -g -std=c++11 $(DIAGNOSTIC_TEST_SOURCES) -o DiagnosticTest 
+		-lgecodekernel -lgecodesearch -lgecodeint -lgecodedriver -lgecodeminimodel -lgecodesupport
+
+# Lancer le diagnostic complet (screen + diagnose tous les timeouts)
+diag_all: compile_diag
+	./DiagnosticTest all
+
+# Screen seulement (confirmer quels cas timeout)
+diag_screen: compile_diag
+	./DiagnosticTest screen
+
+# Diagnostic d'une combinaison spécifique (usage: make diag COMBO=3_3_3)
+diag: compile_diag
+	./DiagnosticTest $(COMBO)

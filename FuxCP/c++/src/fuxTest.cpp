@@ -4,6 +4,7 @@
 // This file contains the testing framework implementation.  
 //
 #include <iostream>
+#include <chrono>
 #include <fstream>  // For file operations
 #include <cmath>
 #include "../headers/fuxTest.hpp"
@@ -109,6 +110,7 @@ FuxTest::FuxTest(char* test){
         test_bryce_fullsp();
     } 
     else if(strcmp(test, "sacha")==0){
+        cout << "Running sacha's test..." << endl;
         test_sacha();
     }
     else {
@@ -4736,6 +4738,13 @@ void FuxTest::test_bryce_4v_2sp_2sp_2sp(){
     delete problem;
 }
 
+void FuxTest::test_sacha_4v_3sp(){
+
+    cout << "===== DEBUG 4v 3sp =====" << endl;
+    
+    
+}
+
 //=======================================================================================
 
 void FuxTest::test_bryce(){
@@ -4819,7 +4828,8 @@ void FuxTest::test_bryce(){
 
 
 void FuxTest::test_sacha(){
-    cout << "===== test_bryce 1v 1sp =====" << endl; 
+    /*
+    ""cout << "===== test_bryce 1v 1sp =====" << endl; 
     cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
     cfSize = cantusFirmus.size();
     melodic_params = {0, 1, 2, 576, 5, 10, 25, 40};
@@ -4857,20 +4867,29 @@ void FuxTest::test_sacha(){
     
 
     cfVec.push_back(cantusFirmus[i]);
+
+    
 }
 
-// 4. Appeler saveMidi avec les vecteurs
-saveMidi("test_sacha.mid", cfVec, solVec, FIRST_SPECIES);
+    saveMidi("test_sacha.mid", cfVec, solVec, FIRST_SPECIES);
         std::cout << "BEST:\n" << best->to_string() << std::endl;
         delete best;
     }
 
     delete problem;
+
+    */
+   cout << "===== test_sacha 4v 3sp =====" << endl;
+   test_sacha_4v_3sp();
+
+   // test_bryce_4v_3sp();
 }
 
 void FuxTest::test_bryce_2(){ // To target specific tests if needed
     test_bryce_3v_2sp();
 }
+
+
 
 void FuxTest::test_bryce_classic(){
     cout << "===== test_bryce classic =====" << endl; 

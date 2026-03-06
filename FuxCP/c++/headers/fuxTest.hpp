@@ -255,6 +255,7 @@ public:
     void test_bryce_4v_1sp();
     void test_bryce_4v_2sp();
     void test_bryce_4v_2sp_2sp_2sp();
+    void test_sacha_4v_3sp();
     
     void test_bryce();
     void test_bryce_2();

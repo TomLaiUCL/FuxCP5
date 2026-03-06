@@ -13,7 +13,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
      int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
         Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm) { /// super constructor
     
-    motherSpecies =         mSpecies;
+    motherSpecies = mSpecies;
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
