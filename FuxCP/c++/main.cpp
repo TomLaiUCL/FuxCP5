@@ -11,6 +11,7 @@
 #include "headers/CounterpointProblems/TwoVoiceCounterpoint.hpp"
 #include "headers/CounterpointProblems/CounterpointProblem.hpp"
 #include "headers/fuxTest.hpp"
+#include "headers/generations.hpp"
 #include "headers/figureTests.hpp"
 
 using namespace Gecode;
@@ -58,14 +59,24 @@ int main(int argc, char* argv[]) {
             }
             return 0;
         }
+        else if (arg1 == "gen"){
+            if (argc > 2) {
+                string arg2 = argv[2];
+                if (arg2.length() <= 2){
+                    std::cout << "=== Invalid argument : " << arg2 << "\n=== Shall be of length >= 3" << std::endl;
+                    return 1;
+                }
+                char underscore[2] = "_";
+                Generations generations(argv[2]);
+            }
+            else { 
+                Generations generations(argv[1]);
+            }
+            return 0;
+        }
         else if (arg1 == "bryce"){
             if (argc > 2) {
                 string arg2 = argv[2];
-                const vector<std::string> cases = {"2", "all", "classic", "fullsp"};
-                if (std::find(cases.begin(), cases.end(), arg2) == cases.end()){
-                    std::cout << "=== Invalid argument : " << arg2 << "\n=== Only valid cases are : 2, all, classic, fullsp" << std::endl;
-                    return 1;
-                }
                 char underscore[2] = "_";
                 FuxTest fuxTests(strcat(argv[1], strcat(underscore, argv[2])));
             }

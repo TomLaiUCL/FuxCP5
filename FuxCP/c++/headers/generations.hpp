@@ -1,0 +1,109 @@
+// 
+// Created by Bryce Burignat. 
+// This file is the header file of the generation framework implementation.
+// It is based on the testing framework.
+// 
+
+#ifndef FUX_GEN_HPP
+#define FUX_GEN_HPP
+
+#include "Utilities.hpp"
+#include "Midi.hpp"
+#include "Parts/Part.hpp"
+#include "CounterpointUtils.hpp"
+#include "CounterpointProblems/CounterpointProblem.hpp"
+#include "Parts/CantusFirmus.hpp"
+
+using namespace Gecode;
+using namespace std;
+
+// -----------------------------
+
+struct GenerationCase {
+    vector<Species> spList;
+    vector<int> v_type;
+    int n_voices;
+    int timeout_ms;
+
+    // In case of multiple_vtypes
+    bool multiple_vtypes;
+    vector<int> v_types;            
+    vector<int> v_types_1sp;
+
+    // For logging purpose
+    vector<int> checkpoints;
+    string midi_file_path;
+    string log_file_path;
+};
+
+struct BenchResult {
+    int solutions;
+    int improvements;
+    bool timed_out;
+    double ms_first;
+    double ms_total;
+    vector<pair<int,double>> checkpoint_times;
+    string best_cost;
+    IntVarArray solution;
+};
+
+struct MusicalStats {
+    int min_note;
+    int max_note;
+    int largest_leap;
+    int repeated;
+    int steps;
+    int skips;
+};
+
+// -------------------------------
+class Generations{
+
+protected:
+    vector<int> cantusFirmus;
+    vector<int> cp;
+    int idx;
+    int cfSize;
+    vector<int> melodic_params;
+    vector<int> general_params;
+    vector<int> specific_params;
+    vector<int> importance;
+    int borrowMode;
+    string log_folder;
+    string midi_folder;
+    string cf_name;
+
+public:
+
+// ===============================================
+
+    Generations(char* gen);
+
+    vector<Species> getSpList();
+    vector<int> getCf();
+    vector<int> getVType();
+    int getBMode();
+    vector<int> getCp();
+    int getIdx();
+
+    void generate_classic_counterpoints(
+        Species species, int n_voices,
+        const std::vector<int>& v_types,
+        const std::vector<int>& v_types_1sp,
+        int timeout_ms,
+        bool midi,
+        bool log);
+    void generate_classic_counterpoints(Species species, int n_voices, vector<int> v_type, int timeout_ms, bool midi, bool log);
+    void generate_counterpoints(GenerationCase& gen_case, bool midi, bool log);
+
+    void generation_BAB_bench(
+        CounterpointProblem* problem,
+        GenerationCase& gen_case,
+        bool midi,
+        bool log);
+
+    void gen_bryce();
+    void gen_bryce_2();
+};
+
+#endif

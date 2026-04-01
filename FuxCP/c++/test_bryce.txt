@@ -4,6 +4,11 @@ Search::TimeStop ts(300000);  // ms --> 5min
 opt.stop = &ts;
 BAB<CounterpointProblem> e(problem, opt);
 
+2v_3sp :
+- v_type=-2 --> ok
+- v_type=0 --> ok
+- v_type=1 --> ok
+- v_type=2 --> fast
 
 2v_4sp :
 - v_type=-2 --> NOP
@@ -15,7 +20,7 @@ BAB<CounterpointProblem> e(problem, opt);
 
 2v_5sp :
 - v_type=-3 --> NOP
-- v_type=-2 --> ok
+- v_type=-2 --> ok / NOP
 - v_type=-1 --> ok
 - v_type=0 --> ok
 - v_type=1 --> ok
@@ -158,7 +163,7 @@ BAB<CounterpointProblem> e(problem, opt);
 
 
 
-
 - Branching sur coûts : avec MIN ou MAX ?
 - Branching direct sur "tie intervals" pour 4sp : plus rapide (passe de ~9:30 à ~6:30 pour 1ère solution à 2 voix avec v_type=0)
+    => TODO for 3v and 4v !!
 - 4th species : h_intervals est défini avec %12, mais le test de consonnance vérifie l'octave (enlever la comparaison à l'octave ?)

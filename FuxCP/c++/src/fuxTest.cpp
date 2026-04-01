@@ -9,7 +9,6 @@
 #include <chrono>
 #include <signal.h> // For testing blocking constrains in generations
 #include "../headers/fuxTest.hpp"
-#include "../headers/Parts/Midi.hpp"
 #include <gecode/int.hh> // Ensure you include the necessary Gecode headers
 
 
@@ -4451,7 +4450,7 @@ void FuxTest::test_bryce_2v_4sp(){
     CounterpointProblem* best = nullptr;
     int myCount = 0;
     while (CounterpointProblem* s = e.next()) {
-        if (myCount%10 == 0){
+        if (myCount%5 == 0){
             std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
         }
         delete best;      // keep only the best-so-far
@@ -4636,6 +4635,40 @@ void FuxTest::test_bryce_3v_3sp_3sp(){
     delete problem;
 }
 
+void FuxTest::test_bryce_3v_4sp(){
+    cout << "===== test_bryce 3v 4sp =====" << endl;
+    spList = {FIRST_SPECIES, FOURTH_SPECIES};
+    v_type = {0, 1};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%10 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
 void FuxTest::test_bryce_4v_1sp(){
     cout << "===== test_bryce 4v 1sp =====" << endl; 
     spList = {FIRST_SPECIES, FIRST_SPECIES, FIRST_SPECIES};
@@ -4705,7 +4738,7 @@ void FuxTest::test_bryce_4v_2sp(){
 }
 
 void FuxTest::test_bryce_4v_2sp_2sp_2sp(){
-    cout << "===== test_bryce 4v 2sp =====" << endl;
+    cout << "===== test_bryce 4v 2sp full =====" << endl;
     spList = {SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES};
     v_type = {0, 1, 2};
 
@@ -4738,10 +4771,78 @@ void FuxTest::test_bryce_4v_2sp_2sp_2sp(){
     delete problem;
 }
 
+void FuxTest::test_bryce_4v_3sp(){
+    cout << "===== test_bryce 4v 3sp =====" << endl;
+    spList = {SECOND_SPECIES, SECOND_SPECIES, THIRD_SPECIES};
+    v_type = {0, 1, 2};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%100 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }   
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
+void FuxTest::test_bryce_4v_4sp(){
+    cout << "===== test_bryce 4v 4sp =====" << endl;
+    spList = {SECOND_SPECIES, SECOND_SPECIES, FOURTH_SPECIES};
+    v_type = {0, 1, 2};
+
+    std::fill(activeConstraints.begin(), activeConstraints.end(), true);
+    auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
+
+    // Additional and necessary Constrains
+    rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
+    auto home = problem->getHome();
+ 
+
+    // BAB
+    BAB<CounterpointProblem> e(problem);
+    CounterpointProblem* best = nullptr;
+    int myCount = 0;
+    while (CounterpointProblem* s = e.next()) {
+        if (myCount%100 == 0){
+            std::cout << "BAB " << myCount << " : " << s->getSolutionArray() << std::endl;
+        }   
+        delete best;      // keep only the best-so-far
+        best = s;
+        myCount++;
+    }
+
+    if (best) {
+        std::cout << "BEST (" << myCount << "): " << best->getSolutionArray() << std::endl;
+        delete best;
+    }
+
+    delete problem;
+}
+
 //=======================================================================================
 
-void FuxTest::test_bryce(){
-    cout << "===== test_bryce =====" << endl; 
+void FuxTest::test_bryce_2(){
+    cout << "===== test_bryce 2 =====" << endl; 
     cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
     cfSize = cantusFirmus.size();
     melodic_params = {0, 1, 2, 576, 5, 10, 25, 40};
@@ -4833,167 +4934,20 @@ static std::vector<int> extract_voice_notes(CounterpointProblem* best,
     return out;
 }
 
-void test_bryce_gen_BAB_bench(CounterpointProblem *problem, std::vector<int> v_type, Species species, int n_voices, std::vector<int> cantusFirmus, int timeout_value){
-    Search::Options opt;
-    Search::TimeStop ts(timeout_value);
-    opt.stop = &ts;
-
-    auto t0 = std::chrono::steady_clock::now();
-    auto t_first = t0;
-    auto t_last = t0;
-    double ms_first = 0.0;
-    double ms_last = 0.0;
-
-    BAB<CounterpointProblem> e(problem, opt);
-    CounterpointProblem* best = nullptr;
-    int myCount = 0;
-    while (CounterpointProblem* s = e.next()) {
-        if (myCount == 0) {
-            t_first = std::chrono::steady_clock::now();
-            ms_first = std::chrono::duration<double, std::milli>(t_first - t0).count();
-        }
-        else if (myCount % 100000 == 0){
-            cout << best->getSolutionArray() << std::endl;
-        }
-        
-        delete best; // keep only the best-so-far
-        best = s;
-
-        myCount++;
-    }
-    t_last = std::chrono::steady_clock::now();
-    ms_last = std::chrono::duration<double, std::milli>(t_last - t0).count();
-
-    if (best) { // there is a solution !
-        auto solutionArray = best->getSolutionArray();
-        std::vector<int> solVec;
-        int cfSize = cantusFirmus.size();
-        switch(n_voices) {
-            case 4:
-                for (int i = 2*cfSize; i < solutionArray.size(); ++i) {
-                    solVec.push_back(solutionArray[i].val());
-                }
-                break;
-            case 3:
-                for (int i = cfSize; i < solutionArray.size(); ++i) {
-                    solVec.push_back(solutionArray[i].val());
-                }
-                break;
-            default: // 2 voices
-                for (int i = 0; i < solutionArray.size(); ++i) {
-                    solVec.push_back(solutionArray[i].val());
-                }
-                break;;
-        }
-        std::vector<int> cfVec;
-        for (int i = 0; i < cfSize; ++i) {
-            cfVec.push_back(cantusFirmus[i]);
-        }
-        
-        std::string filename = "midi/bryce_"
-            + std::to_string(n_voices) + "v_"
-            + std::to_string((int)species+1) + "sp_";
-        for (int vt : v_type) {
-            filename += std::to_string(vt) + "_";
-        }
-        filename += ".mid";
-        saveMidi(filename, cfVec, extract_voice_notes(best, n_voices, cfSize), species);
-        // std::cout << "BEST (" << myCount << "): " << solutionArray << std::endl;
-        delete best;
-
-        std::cout
-            << "best found = " << !e.stopped()
-            << ",  stored in = " << filename
-            << "\nbest solution = " << solutionArray
-            << "\nfirst_ms = " << ms_first
-            << ",  total_ms = " << ms_last
-            << "\n";
-    }
-    else {
-        std::cout
-            << "  no solution found !!"
-            << "  Time wasted =" << ms_last
-            << "\n";
-
-    }
-}
-
-void FuxTest::test_bryce_midi_gen(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp){
-    test_bryce_midi_gen(species, n_voices, v_cases, v_cases_1sp, 600); // 10min
-}
-
-void FuxTest::test_bryce_midi_gen(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp, int timeout_s){
-    cout << "===== test_bryce midi gen " << n_voices << "v " << species+1 << "sp " << " =====" << endl;
-    cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
-    cfSize = cantusFirmus.size();
-    melodic_params = {0, 1, 2, 576, 5, 10, 25, 40};
-    general_params = {4, 1, 1, 2, 2, 2, 8, 1};
-    specific_params = {8 , 4 , 0 , 2 , 1 , 8 , 50};
-    importance = {8,7,5,2,9,3,14,12,6,11,4,10,1,13};
-    borrowMode = 1;
-
-    // Voices & Constrains definition
-    spList = {species};
-    int n_cases_4v = 1;
-    int n_cases_3v = 1;
-    if (n_voices == 4) {
-        spList = {FIRST_SPECIES, FIRST_SPECIES, species};
-        n_cases_3v = v_cases_1sp.size();
-        n_cases_4v = v_cases_1sp.size();
-    }
-    if (n_voices == 3) {
-            spList = {FIRST_SPECIES, species};
-            n_cases_3v = v_cases_1sp.size();
-    }
-
-    int timeout_value = timeout_s*1000; // ms
-    for (int vidx_1sp_2 = 0; vidx_1sp_2 < n_cases_4v; vidx_1sp_2++){
-        for (int vidx_1sp_1 = 0; vidx_1sp_1 < n_cases_3v; vidx_1sp_1++){
-            for (int vidx_species = 0; vidx_species < v_cases.size(); vidx_species++){
-                switch(n_voices) {
-                    case 4:
-                        v_type = {v_cases_1sp.at(vidx_1sp_2), v_cases_1sp.at(vidx_1sp_1), v_cases.at(vidx_species)};
-                        break;
-                    case 3:
-                        v_type = {v_cases_1sp.at(vidx_1sp_1), v_cases.at(vidx_species)};
-                        break;
-                    default: // 2 voices
-                        v_type = {v_cases.at(vidx_species)};
-                        break;;
-                }
-                string v_type_str = "\n=== v_type = ";
-                for (size_t k = 0; k < v_type.size(); ++k) {
-                    v_type_str += v_type[k];
-                    v_type_str += (k+1<v_type.size()? ",":"");
-                }
-                std::cout << v_type_str << " ===\n";
-
-
-                std::fill(activeConstraints.begin(), activeConstraints.end(), true);
-                cout << "=== Testing with all constrains" << endl;
-                
-                auto* problem = create_problem(cantusFirmus, spList, v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-                test_bryce_gen_BAB_bench(problem, v_type, species, n_voices, cantusFirmus, timeout_value);
-                delete problem;
-            }
-        }
-    }
-}
-
-void FuxTest::test_bryce_constrains_check(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp){
+void FuxTest::test_bryce_constrains_check(Species species, int n_voices, vector<int> v_types, vector<int> v_types_1sp){
     cout << "===== test_bryce constrains check " << n_voices << "v " << species+1 << "sp " << " =====" << endl;
     spList = {species};
-    int n_cases_4v = 1;
-    int n_cases_3v = 1;
+    int n_types_4v = 1;
+    int n_types_3v = 1;
     switch(n_voices) {
         case 4:
             spList = {FIRST_SPECIES, FIRST_SPECIES, species};
-            n_cases_3v = v_cases_1sp.size();
-            n_cases_4v = v_cases_1sp.size();
+            n_types_3v = v_types_1sp.size();
+            n_types_4v = v_types_1sp.size();
             break;
         case 3:
             spList = {FIRST_SPECIES, species};
-            n_cases_3v = v_cases_1sp.size();
+            n_types_3v = v_types_1sp.size();
             break;
         default: // 2 voices
             break;;
@@ -5019,21 +4973,21 @@ void FuxTest::test_bryce_constrains_check(Species species, int n_voices, vector<
     }
 
     int timeout_value = 300000; // ms --> 5min
-    for (int vidx_1sp_2 = 0; vidx_1sp_2 < n_cases_4v; vidx_1sp_2++){
-        for (int vidx_1sp_1 = 0; vidx_1sp_1 < n_cases_3v; vidx_1sp_1++){
-            for (int vidx_species = 0; vidx_species < v_cases.size(); vidx_species++){
+    for (int vidx_1sp_2 = 0; vidx_1sp_2 < n_types_4v; vidx_1sp_2++){
+        for (int vidx_1sp_1 = 0; vidx_1sp_1 < n_types_3v; vidx_1sp_1++){
+            for (int vidx_species = 0; vidx_species < v_types.size(); vidx_species++){
                 switch(n_voices) {
                     case 4:
-                        v_type = {v_cases_1sp.at(vidx_1sp_2), v_cases_1sp.at(vidx_1sp_1), v_cases.at(vidx_species)};
-                        cout << "===== Testing v_type = " << v_cases_1sp.at(vidx_1sp_2) << "," << v_cases_1sp.at(vidx_1sp_1) << "," << v_cases.at(vidx_species) << endl;
+                        v_type = {v_types_1sp.at(vidx_1sp_2), v_types_1sp.at(vidx_1sp_1), v_types.at(vidx_species)};
+                        cout << "===== Testing v_type = " << v_types_1sp.at(vidx_1sp_2) << "," << v_types_1sp.at(vidx_1sp_1) << "," << v_types.at(vidx_species) << endl;
                         break;
                     case 3:
-                        v_type = {v_cases_1sp.at(vidx_1sp_1), v_cases.at(vidx_species)};
-                        cout << "===== Testing v_type = " << v_cases_1sp.at(vidx_1sp_1) << "," << v_cases.at(vidx_species) << endl;
+                        v_type = {v_types_1sp.at(vidx_1sp_1), v_types.at(vidx_species)};
+                        cout << "===== Testing v_type = " << v_types_1sp.at(vidx_1sp_1) << "," << v_types.at(vidx_species) << endl;
                         break;
                     default: // 2 voices
-                        v_type = {v_cases.at(vidx_species)};
-                        cout << "===== Testing v_type = " << v_cases.at(vidx_species) << endl;
+                        v_type = {v_types.at(vidx_species)};
+                        cout << "===== Testing v_type = " << v_types.at(vidx_species) << endl;
                         break;;
                 }
 
@@ -5088,18 +5042,11 @@ void FuxTest::test_bryce_constrains_check(Species species, int n_voices, vector<
     }
 }
 
-void FuxTest::test_bryce_2(){ // To target specific tests if needed
-    test_bryce_midi_gen(THIRD_SPECIES, 2, {-2,0,2}, {});
-    test_bryce_midi_gen(FOURTH_SPECIES, 2, {-2,0,2}, {});
-    test_bryce_midi_gen(FIFTH_SPECIES, 2, {-2,0,2}, {});
-    test_bryce_midi_gen(THIRD_SPECIES, 3, {-2,0,2}, {});
-    test_bryce_midi_gen(FOURTH_SPECIES, 3, {-2,0,2}, {});
-    test_bryce_midi_gen(FIFTH_SPECIES, 3, {-2,0,2}, {});
-    test_bryce_midi_gen(THIRD_SPECIES, 4, {-2,0,2}, {});
-    test_bryce_midi_gen(FOURTH_SPECIES, 4, {-2,0,2}, {});
-    test_bryce_midi_gen(FIFTH_SPECIES, 4, {-2,0,2}, {});
+void FuxTest::test_bryce(){ // Generic tests
     //test_bryce_constrains_check(FIFTH_SPECIES, 3, {-2,0,2}, {-2,0,2});
     //test_bryce_constrains_check(FOURTH_SPECIES, 3, {-2,0,2}, {-2,0,2});
+    //test_bryce_3v_4sp();
+    // test_bryce_4v_4sp();
 }
 
 void FuxTest::test_bryce_classic(){
@@ -5107,12 +5054,15 @@ void FuxTest::test_bryce_classic(){
     test_bryce_2v_1sp();
     test_bryce_2v_2sp(); // super long à partir de ~30 itérations
     test_bryce_2v_3sp(); // super long à partir de ~30 itérations
-    test_bryce_2v_4sp(); // 
+    // test_bryce_2v_4sp(); // super long à partir de ~20 itérations
     test_bryce_3v_1sp(); // super long à partir de ~100 itérations
     test_bryce_3v_2sp(); // super long à partir de ~700 itérations
     test_bryce_3v_3sp(); // super long à partir de ~5000 itérations
+    // test_bryce_3v_4sp(); // super long à partir de ??
     test_bryce_4v_1sp(); // super long à partir de ~15000 itérations
     test_bryce_4v_2sp(); // super long à partir de ~50000 itérations
+    // test_bryce_4v_3sp(); // super long à partir de ~2000 itérations
+    // test_bryce_4v_4sp(); // super long à partir de ??
 }
 
 void FuxTest::test_bryce_fullsp(){

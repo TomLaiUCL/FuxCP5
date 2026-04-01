@@ -40,4 +40,8 @@ Main
 .gitignore
 
 # VS Code
-.json
+*.json
+
+# Output files
+*.mid
+*.csv

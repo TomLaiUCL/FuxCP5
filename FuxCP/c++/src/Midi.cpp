@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 #include <algorithm>
-#include "../../headers/Parts/Midi.hpp"
+#include "../headers/Midi.hpp"
 
 
 struct MidiEvent {
@@ -32,8 +32,8 @@ void writeVLQ(std::vector<uint8_t>& buffer, uint32_t value) {
     }
 }
 
-// To get smoother 4sp
-static std::vector<int> deduplicatePairs(const std::vector<int>& sol) {
+static std::vector<int> smoothen4th(const std::vector<int>& sol) {
+    // Deduplicate pairs
     std::vector<int> out;
     out.reserve((sol.size() + 1) / 2);
 
@@ -47,6 +47,22 @@ static std::vector<int> deduplicatePairs(const std::vector<int>& sol) {
     return out;
 }
 
+std::vector<int> extract_last_voice_notes(CounterpointProblem* best,
+                                            vector<Species> spList,
+                                            size_t cfSize) {
+    auto arr = best->getSolutionArray();
+    std::vector<int> out;
+    int n_voices = spList.size();
+    vector<size_t> voiceSize = {cfSize, cfSize*2, cfSize*4, cfSize, cfSize*4};
+
+    int start = 0;
+    if (n_voices == 3) start = voiceSize.at(spList.at(0));
+    else if (n_voices == 4) start = voiceSize.at(spList.at(0)) + voiceSize.at(spList.at(1));
+
+    out.reserve(arr.size() - start);
+    for (int i = start; i < arr.size(); ++i) out.push_back(arr[i].val());
+    return out;
+}
 
 void saveMidi(const std::string& filename, 
               const std::vector<int>& cantusFirmus, 
@@ -63,7 +79,7 @@ void saveMidi(const std::string& filename,
         case THIRD_SPECIES:  cpDur = rondeDur / 4; break;
         case FOURTH_SPECIES: 
             cpDur = rondeDur;
-            solution = deduplicatePairs(raw_solution);
+            solution = smoothen4th(raw_solution);
             break;
         case FIFTH_SPECIES:  cpDur = rondeDur / 4; break;
         default:             cpDur = rondeDur;     break;

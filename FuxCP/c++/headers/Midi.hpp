@@ -3,9 +3,13 @@
 
 #include <vector>
 #include <string>
-#include "../Utilities.hpp"
+#include "Utilities.hpp"
+#include "CounterpointProblems/CounterpointProblem.hpp"
 
-// Définition des espèces pour le contrepoint
+// Utils
+std::vector<int> extract_last_voice_notes(CounterpointProblem* best,
+        vector<Species> spList,
+        size_t cfSize);
 
 
 /**

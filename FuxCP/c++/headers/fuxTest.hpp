@@ -7,6 +7,7 @@
 #define FUX_TESTS_HPP
 
 #include "Utilities.hpp"
+#include "Midi.hpp"
 #include "Parts/Part.hpp"
 #include "CounterpointUtils.hpp"
 #include "CounterpointProblems/CounterpointProblem.hpp"
@@ -252,14 +253,15 @@ public:
     void test_bryce_3v_2sp_2sp();
     void test_bryce_3v_3sp();
     void test_bryce_3v_3sp_3sp();
+    void test_bryce_3v_4sp();
     void test_bryce_4v_1sp();
     void test_bryce_4v_2sp();
     void test_bryce_4v_2sp_2sp_2sp();
+    void test_bryce_4v_3sp();
+    void test_bryce_4v_4sp();
     
     void test_bryce();
     void test_bryce_2();
-    void test_bryce_midi_gen(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp);
-    void test_bryce_midi_gen(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp, int timeout_s);
     void test_bryce_constrains_check(Species species, int n_voices, vector<int> v_cases, vector<int> v_cases_1sp);
 
     void test_bryce_classic();
