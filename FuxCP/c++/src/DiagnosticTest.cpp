@@ -147,7 +147,7 @@ struct QuickResult {
     int bestCost;
 };
 
-QuickResult quickDFS(const vector<Species>& spList, const vector<int>& v_type, int timeoutSec, bool fixFirstNote = false) {
+QuickResult quickDFS(const vector<Species>& spList, const vector<int>& v_type, int timeoutSec) {
     QuickResult qr = {0, 0.0, false, false, -1};
     
     auto* problem = create_problem(cantusFirmus, spList, v_type,
@@ -162,11 +162,6 @@ QuickResult quickDFS(const vector<Species>& spList, const vector<int>& v_type, i
         qr.failed = true;
         delete problem;
         return qr;
-    }
-    
-    // Fix first note like ThirdSpeciesTest does
-    if (fixFirstNote) {
-        rel(problem->getHome(), problem->getSolutionArray()[0], IRT_EQ, 60);
     }
     
     Search::Options opts;
@@ -256,10 +251,10 @@ void runDiagnostic(const string& testName, const vector<Species>& spList, const 
     outputFile << "Timeout per sub-test: " << DIAG_TIMEOUT_SECONDS << "s" << endl;
     outputFile << endl;
     
-    // First: run with ALL constraints to confirm timeout (with fixFirstNote like ThirdSpeciesTest)
-    cout << "[0/" << relevantConstraints.size() << "] Baseline (all constraints ON, fixedNote=60)... " << flush;
+    // First: run with ALL constraints to confirm timeout
+    cout << "[0/" << relevantConstraints.size() << "] Baseline (toutes les contraintes actives)... " << flush;
     fill(activeConstraints.begin(), activeConstraints.end(), true);
-    QuickResult baseline = quickDFS(spList, v_type, DIAG_TIMEOUT_SECONDS, true);
+    QuickResult baseline = quickDFS(spList, v_type, DIAG_TIMEOUT_SECONDS);
     
     string baselineStatus;
     if (baseline.failed) baselineStatus = "FAILED";
@@ -298,7 +293,7 @@ void runDiagnostic(const string& testName, const vector<Species>& spList, const 
         fill(activeConstraints.begin(), activeConstraints.end(), true);
         activeConstraints[cons.id] = false;
         
-        QuickResult qr = quickDFS(spList, v_type, DIAG_TIMEOUT_SECONDS, true);
+        QuickResult qr = quickDFS(spList, v_type, DIAG_TIMEOUT_SECONDS);
         
         diagResults.push_back({cons, qr});
         
@@ -442,40 +437,26 @@ vector<ScreenResult> screenTimeouts() {
     outputFile << "Timeout: " << SCREEN_TIMEOUT_SECONDS << "s" << endl << endl;
     
     for (const auto& test : toScreen) {
-        cout << "Screening " << test.first << " " << spListToString(test.second) << "..." << endl;
+        cout << "Screening " << test.first << " " << spListToString(test.second) << "... " << flush;
         
         fill(activeConstraints.begin(), activeConstraints.end(), true);
         
-        // Test without fixing first note
-        QuickResult qr1 = quickDFS(test.second, {0, 1, 2}, SCREEN_TIMEOUT_SECONDS, false);
-        string status1;
-        if (qr1.failed) status1 = "FAILED";
-        else if (qr1.timedOut && qr1.solutionsFound == 0) status1 = "TIMEOUT";
-        else status1 = "OK (" + to_string(qr1.solutionsFound) + " sol in " + to_string(qr1.elapsedSeconds).substr(0,5) + "s)";
-        
-        // Re-enable constraints for second test
-        fill(activeConstraints.begin(), activeConstraints.end(), true);
-        
-        // Test with fixing first note (like ThirdSpeciesTest)
-        QuickResult qr2 = quickDFS(test.second, {0, 1, 2}, SCREEN_TIMEOUT_SECONDS, true);
-        string status2;
-        if (qr2.failed) status2 = "FAILED";
-        else if (qr2.timedOut && qr2.solutionsFound == 0) status2 = "TIMEOUT";
-        else status2 = "OK (" + to_string(qr2.solutionsFound) + " sol in " + to_string(qr2.elapsedSeconds).substr(0,5) + "s)";
+        QuickResult qr = quickDFS(test.second, {0, 1, 2}, SCREEN_TIMEOUT_SECONDS);
+        string status;
+        if (qr.failed) status = "FAILED";
+        else if (qr.timedOut && qr.solutionsFound == 0) status = "TIMEOUT";
+        else status = "OK (" + to_string(qr.solutionsFound) + " sol in " + to_string(qr.elapsedSeconds).substr(0,5) + "s)";
         
         ScreenResult sr;
         sr.name = test.first;
         sr.spList = test.second;
-        sr.needsDiag = (qr1.timedOut && qr1.solutionsFound == 0) || (qr2.timedOut && qr2.solutionsFound == 0);
-        sr.baselineStatus = "free=" + status1 + " | fixed=" + status2;
+        sr.needsDiag = (qr.timedOut && qr.solutionsFound == 0) || qr.failed;
+        sr.baselineStatus = status;
         
         results.push_back(sr);
         
-        cout << "  free:  " << status1 << endl;
-        cout << "  fixed: " << status2 << endl;
-        outputFile << test.first << " " << spListToString(test.second) << ":" << endl;
-        outputFile << "  free:  " << status1 << endl;
-        outputFile << "  fixed: " << status2 << endl;
+        cout << status << endl;
+        outputFile << test.first << " " << spListToString(test.second) << ": " << status << endl;
     }
     
     return results;
@@ -491,7 +472,7 @@ int main(int argc, char* argv[]) {
     cout << "================================================================" << endl;
     cout << endl;
     
-    string filename = "diagnostic_results.txt";
+    string filename = "../results/diagnostic_troisieme_espece.txt";
     
     // Get date
     time_t now = time(0);

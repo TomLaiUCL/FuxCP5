@@ -72,6 +72,9 @@ public:
 
     virtual string to_string() const;  
 
+    double getCost() const;
+
+
     /**
      * Constrain method for bab search
      * @todo modify this function if you want to use branch and bound

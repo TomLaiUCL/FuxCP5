@@ -178,6 +178,15 @@ void CounterpointProblem::setPreferenceMap(vector<string> importance_names){
     }
 }
 
+double CounterpointProblem::getCost() const {
+    double total = 0;
+    IntVarArgs costs = cost();
+    for (int i = 0; i < costs.size(); ++i) {
+        total += costs[i].val();
+    }
+    return total;
+}
+
 void CounterpointProblem::orderCosts(){
     for(int i = 0; i < 14; i++){
         if(!costLevels[i].empty()){

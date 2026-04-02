@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+
+
+FuxCP/compiled/
+FUXCP/results/
+Latex/
