@@ -1,0 +1,383 @@
+================================================================
+ CONSTRAINT DIAGNOSTIC TEST - 4 Voice + 3rd Species
+================================================================
+Date: Mon Mar  9 11:52:02 2026
+Diagnostic timeout: 10s per constraint test
+Screening timeout: 30s
+Max solutions to find: 3
+
+
+=== SCREENING PHASE ===
+Timeout: 30s
+
+4v_1sp_3sp_3sp {1sp, 3sp, 3sp}:
+  free:  OK (3 sol in 0.030s)
+  fixed: TIMEOUT
+4v_2sp_3sp_3sp {2sp, 3sp, 3sp}:
+  free:  OK (3 sol in 0.024s)
+  fixed: TIMEOUT
+4v_3sp_1sp_3sp {3sp, 1sp, 3sp}:
+  free:  OK (3 sol in 0.025s)
+  fixed: TIMEOUT
+4v_3sp_2sp_3sp {3sp, 2sp, 3sp}:
+  free:  OK (3 sol in 0.027s)
+  fixed: TIMEOUT
+4v_3sp_3sp_2sp {3sp, 3sp, 2sp}:
+  free:  OK (3 sol in 0.019s)
+  fixed: TIMEOUT
+4v_3sp_3sp_3sp {3sp, 3sp, 3sp}:
+  free:  OK (3 sol in 0.023s)
+  fixed: TIMEOUT
+
+6 combinations need diagnosis.
+
+================================================================
+DIAGNOSTIC: 4v_1sp_3sp_3sp {1sp, 3sp, 3sp}
+================================================================
+Relevant constraints to test: 34
+Timeout per sub-test: 10s
+
+BASELINE (all ON): TIMEOUT in 10.00s
+
+Constraint            Description                                       Solutions   Time(s)   Cost      Status      
+--------------------------------------------------------------------------------------------------------------------
+CF_1H1                CF: harmonic intervals consonances                0           10.00     N/A       TIMEOUT     
+CF_1P1                CF: perfect consonances motion rule               0           10.00     N/A       TIMEOUT     
+CF_1P3                CF: no battuta                                    0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H3     Stratum: upper voice H3 rule                      0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H10    Stratum: upper voice H10 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H12    Stratum: upper voice H12 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_1H3           Stratum: H3 rule                                  0           10.00     N/A       TIMEOUT     
+STRATUM_1H12          Stratum: H12 rule                                 0           10.00     N/A       TIMEOUT     
+V4_G6                 4V: G6 no chromatic melodies                      0           10.00     N/A       TIMEOUT     
+V4_1H4                4V: H4/G9 last chord same as CF fundamental       3           0.02      556       OK          
+V4_1H8                4V: H8 prefer harmonic triads                     0           10.00     N/A       TIMEOUT     
+V4_1M4                4V: M4 variety cost (diverse notes)               0           10.00     N/A       TIMEOUT     
+V4_1P4                4V: P4 avoid successive perfect consonances       0           10.00     N/A       TIMEOUT     
+V4_1P6                4V: P6 no move in same direction (all 4 voices)   0           10.00     N/A       TIMEOUT     
+V4_1P7                4V: P7 no successive ascending sixths             0           10.00     N/A       TIMEOUT     
+V4_2M2                4V: 2M2 melodic intervals <= minor sixth          0           10.00     N/A       TIMEOUT     
+V4_5R9                4V: 5R9 two 5sp diversity                         0           10.00     N/A       TIMEOUT     
+V4_U2                 4V: U2 no minor second between upper voices       0           10.00     N/A       TIMEOUT     
+SP1_G4                1SP: G4 counterpoint in same key                  0           10.00     N/A       TIMEOUT     
+SP1_G7                1SP: G7 melodic intervals should be small         0           10.00     N/A       TIMEOUT     
+SP1_1H1               1SP: 1H1 harmonic intervals are consonances       0           10.00     N/A       TIMEOUT     
+SP1_1H6               1SP: 1H6 prefer imperfect consonances             0           10.00     N/A       TIMEOUT     
+SP1_1M2_4V            1SP: 1M2 melodic intervals <= minor sixth (4V)    0           10.00     N/A       TIMEOUT     
+SP1_1P1_4V            1SP: 1P1 no direct motion to perf cons (4V)       0           10.00     N/A       TIMEOUT     
+SP1_1P3_4V            1SP: 1P3 no battuta (4V)                          0           10.00     N/A       TIMEOUT     
+SP3_3H2               3SP: 3H2 dissonance implies diminution            3           0.02      1118      OK          
+SP3_3H3               3SP: 3H3 cambiata cost                            0           10.00     N/A       TIMEOUT     
+SP3_3M1               3SP: 3M1 avoid return to same note (m2 zero)      0           10.00     N/A       TIMEOUT     
+SP3_1P3               3SP: 1P3 no battuta (adapted for 3sp)             0           10.00     N/A       TIMEOUT     
+SP3_U1                3SP: U1 no melodic interval 9-11 semitones        0           10.00     N/A       TIMEOUT     
+SP3_U3                3SP: U3/3M4 penultimate measure constraint        0           10.00     N/A       TIMEOUT     
+SP3_1H7_4V            3SP: 1H7 last interval constraint (4V)            0           10.00     N/A       TIMEOUT     
+SP3_3H6_4V            3SP: 3H6 harmonic triad on beat 2/3 (4V)          0           10.00     N/A       TIMEOUT     
+SP3_1P1_4V            3SP: 1P1 direct motion cost (4V)                  0           10.00     N/A       TIMEOUT     
+
+--- DIAGNOSTIC SUMMARY ---
+UNBLOCKING constraints (disabling solves the problem):
+  * SP3_3H2 (3SP: 3H2 dissonance implies diminution) => 3 solutions in 0.016s, cost=1118
+  * V4_1H4 (4V: H4/G9 last chord same as CF fundamental) => 3 solutions in 0.020s, cost=556
+NO EFFECT constraints (still timeout when disabled):
+  - CF_1H1
+  - CF_1P1
+  - CF_1P3
+  - STRATUM_UPPER_1H3
+  - STRATUM_UPPER_1H10
+  - STRATUM_UPPER_1H12
+  - STRATUM_1H3
+  - STRATUM_1H12
+  - V4_G6
+  - V4_1H8
+  - V4_1M4
+  - V4_1P4
+  - V4_1P6
+  - V4_1P7
+  - V4_2M2
+  - V4_5R9
+  - V4_U2
+  - SP1_G4
+  - SP1_G7
+  - SP1_1H1
+  - SP1_1H6
+  - SP1_1M2_4V
+  - SP1_1P1_4V
+  - SP1_1P3_4V
+  - SP3_3H3
+  - SP3_3M1
+  - SP3_1P3
+  - SP3_U1
+  - SP3_U3
+  - SP3_1H7_4V
+  - SP3_3H6_4V
+  - SP3_1P1_4V
+
+
+================================================================
+DIAGNOSTIC: 4v_2sp_3sp_3sp {2sp, 3sp, 3sp}
+================================================================
+Relevant constraints to test: 32
+Timeout per sub-test: 10s
+
+BASELINE (all ON): TIMEOUT in 10.00s
+
+Constraint            Description                                       Solutions   Time(s)   Cost      Status      
+--------------------------------------------------------------------------------------------------------------------
+CF_1H1                CF: harmonic intervals consonances                0           10.00     N/A       TIMEOUT     
+CF_1P1                CF: perfect consonances motion rule               0           10.00     N/A       TIMEOUT     
+CF_1P3                CF: no battuta                                    0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H3     Stratum: upper voice H3 rule                      0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H10    Stratum: upper voice H10 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H12    Stratum: upper voice H12 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_1H3           Stratum: H3 rule                                  0           10.00     N/A       TIMEOUT     
+STRATUM_1H12          Stratum: H12 rule                                 0           10.00     N/A       TIMEOUT     
+V4_G6                 4V: G6 no chromatic melodies                      0           10.00     N/A       TIMEOUT     
+V4_1H4                4V: H4/G9 last chord same as CF fundamental       3           0.03      622       OK          
+V4_1H8                4V: H8 prefer harmonic triads                     0           10.00     N/A       TIMEOUT     
+V4_1M4                4V: M4 variety cost (diverse notes)               0           10.00     N/A       TIMEOUT     
+V4_1P4                4V: P4 avoid successive perfect consonances       0           10.00     N/A       TIMEOUT     
+V4_1P6                4V: P6 no move in same direction (all 4 voices)   0           10.00     N/A       TIMEOUT     
+V4_1P7                4V: P7 no successive ascending sixths             0           10.00     N/A       TIMEOUT     
+V4_2M2                4V: 2M2 melodic intervals <= minor sixth          0           10.00     N/A       TIMEOUT     
+V4_5R9                4V: 5R9 two 5sp diversity                         0           10.00     N/A       TIMEOUT     
+V4_U2                 4V: U2 no minor second between upper voices       0           10.00     N/A       TIMEOUT     
+SP2_2H2               2SP: 2H2 arsis harmonies not dissonant            0           10.00     N/A       TIMEOUT     
+SP2_2M1               2SP: 2M1 octave leap rule                         0           10.00     N/A       TIMEOUT     
+SP2_2P3               2SP: 2P3 no battuta (adapted)                     0           10.00     N/A       TIMEOUT     
+SP2_2H3_4V            2SP: 2H3 penultimate rule (4V)                    0           10.00     N/A       TIMEOUT     
+SP2_1P1_4V            2SP: 1P1 no direct motion to perf cons (4V)       0           10.00     N/A       TIMEOUT     
+SP3_3H2               3SP: 3H2 dissonance implies diminution            3           0.02      563       OK          
+SP3_3H3               3SP: 3H3 cambiata cost                            0           10.00     N/A       TIMEOUT     
+SP3_3M1               3SP: 3M1 avoid return to same note (m2 zero)      0           10.00     N/A       TIMEOUT     
+SP3_1P3               3SP: 1P3 no battuta (adapted for 3sp)             0           10.00     N/A       TIMEOUT     
+SP3_U1                3SP: U1 no melodic interval 9-11 semitones        0           10.00     N/A       TIMEOUT     
+SP3_U3                3SP: U3/3M4 penultimate measure constraint        0           10.00     N/A       TIMEOUT     
+SP3_1H7_4V            3SP: 1H7 last interval constraint (4V)            0           10.00     N/A       TIMEOUT     
+SP3_3H6_4V            3SP: 3H6 harmonic triad on beat 2/3 (4V)          0           10.00     N/A       TIMEOUT     
+SP3_1P1_4V            3SP: 1P1 direct motion cost (4V)                  0           10.00     N/A       TIMEOUT     
+
+--- DIAGNOSTIC SUMMARY ---
+UNBLOCKING constraints (disabling solves the problem):
+  * SP3_3H2 (3SP: 3H2 dissonance implies diminution) => 3 solutions in 0.020s, cost=563
+  * V4_1H4 (4V: H4/G9 last chord same as CF fundamental) => 3 solutions in 0.029s, cost=622
+NO EFFECT constraints (still timeout when disabled):
+  - CF_1H1
+  - CF_1P1
+  - CF_1P3
+  - STRATUM_UPPER_1H3
+  - STRATUM_UPPER_1H10
+  - STRATUM_UPPER_1H12
+  - STRATUM_1H3
+  - STRATUM_1H12
+  - V4_G6
+  - V4_1H8
+  - V4_1M4
+  - V4_1P4
+  - V4_1P6
+  - V4_1P7
+  - V4_2M2
+  - V4_5R9
+  - V4_U2
+  - SP2_2H2
+  - SP2_2M1
+  - SP2_2P3
+  - SP2_2H3_4V
+  - SP2_1P1_4V
+  - SP3_3H3
+  - SP3_3M1
+  - SP3_1P3
+  - SP3_U1
+  - SP3_U3
+  - SP3_1H7_4V
+  - SP3_3H6_4V
+  - SP3_1P1_4V
+
+
+================================================================
+DIAGNOSTIC: 4v_3sp_1sp_3sp {3sp, 1sp, 3sp}
+================================================================
+Relevant constraints to test: 34
+Timeout per sub-test: 10s
+
+BASELINE (all ON): TIMEOUT in 10.00s
+
+Constraint            Description                                       Solutions   Time(s)   Cost      Status      
+--------------------------------------------------------------------------------------------------------------------
+CF_1H1                CF: harmonic intervals consonances                3           0.03      714       OK          
+CF_1P1                CF: perfect consonances motion rule               0           10.00     N/A       TIMEOUT     
+CF_1P3                CF: no battuta                                    0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H3     Stratum: upper voice H3 rule                      0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H10    Stratum: upper voice H10 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H12    Stratum: upper voice H12 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_1H3           Stratum: H3 rule                                  0           10.00     N/A       TIMEOUT     
+STRATUM_1H12          Stratum: H12 rule                                 0           10.00     N/A       TIMEOUT     
+V4_G6                 4V: G6 no chromatic melodies                      0           10.00     N/A       TIMEOUT     
+V4_1H4                4V: H4/G9 last chord same as CF fundamental       3           0.03      615       OK          
+V4_1H8                4V: H8 prefer harmonic triads                     0           10.00     N/A       TIMEOUT     
+V4_1M4                4V: M4 variety cost (diverse notes)               0           10.00     N/A       TIMEOUT     
+V4_1P4                4V: P4 avoid successive perfect consonances       0           10.00     N/A       TIMEOUT     
+V4_1P6                4V: P6 no move in same direction (all 4 voices)   0           10.00     N/A       TIMEOUT     
+V4_1P7                4V: P7 no successive ascending sixths             0           10.00     N/A       TIMEOUT     
+V4_2M2                4V: 2M2 melodic intervals <= minor sixth          0           10.00     N/A       TIMEOUT     
+V4_5R9                4V: 5R9 two 5sp diversity                         0           10.00     N/A       TIMEOUT     
+V4_U2                 4V: U2 no minor second between upper voices       0           10.00     N/A       TIMEOUT     
+SP1_G4                1SP: G4 counterpoint in same key                  0           10.00     N/A       TIMEOUT     
+SP1_G7                1SP: G7 melodic intervals should be small         0           10.00     N/A       TIMEOUT     
+SP1_1H1               1SP: 1H1 harmonic intervals are consonances       0           10.00     N/A       TIMEOUT     
+SP1_1H6               1SP: 1H6 prefer imperfect consonances             0           10.00     N/A       TIMEOUT     
+SP1_1M2_4V            1SP: 1M2 melodic intervals <= minor sixth (4V)    0           10.00     N/A       TIMEOUT     
+SP1_1P1_4V            1SP: 1P1 no direct motion to perf cons (4V)       0           10.00     N/A       TIMEOUT     
+SP1_1P3_4V            1SP: 1P3 no battuta (4V)                          0           10.00     N/A       TIMEOUT     
+SP3_3H2               3SP: 3H2 dissonance implies diminution            3           0.03      1147      OK          
+SP3_3H3               3SP: 3H3 cambiata cost                            0           10.00     N/A       TIMEOUT     
+SP3_3M1               3SP: 3M1 avoid return to same note (m2 zero)      0           10.00     N/A       TIMEOUT     
+SP3_1P3               3SP: 1P3 no battuta (adapted for 3sp)             0           10.00     N/A       TIMEOUT     
+SP3_U1                3SP: U1 no melodic interval 9-11 semitones        0           10.00     N/A       TIMEOUT     
+SP3_U3                3SP: U3/3M4 penultimate measure constraint        0           10.00     N/A       TIMEOUT     
+SP3_1H7_4V            3SP: 1H7 last interval constraint (4V)            0           10.00     N/A       TIMEOUT     
+SP3_3H6_4V            3SP: 3H6 harmonic triad on beat 2/3 (4V)          0           10.00     N/A       TIMEOUT     
+SP3_1P1_4V            3SP: 1P1 direct motion cost (4V)                  0           10.00     N/A       TIMEOUT     
+
+--- DIAGNOSTIC SUMMARY ---
+UNBLOCKING constraints (disabling solves the problem):
+  * CF_1H1 (CF: harmonic intervals consonances) => 3 solutions in 0.026s, cost=714
+  * SP3_3H2 (3SP: 3H2 dissonance implies diminution) => 3 solutions in 0.027s, cost=1147
+  * V4_1H4 (4V: H4/G9 last chord same as CF fundamental) => 3 solutions in 0.030s, cost=615
+NO EFFECT constraints (still timeout when disabled):
+  - CF_1P1
+  - CF_1P3
+  - STRATUM_UPPER_1H3
+  - STRATUM_UPPER_1H10
+  - STRATUM_UPPER_1H12
+  - STRATUM_1H3
+  - STRATUM_1H12
+  - V4_G6
+  - V4_1H8
+  - V4_1M4
+  - V4_1P4
+  - V4_1P6
+  - V4_1P7
+  - V4_2M2
+  - V4_5R9
+  - V4_U2
+  - SP1_G4
+  - SP1_G7
+  - SP1_1H1
+  - SP1_1H6
+  - SP1_1M2_4V
+  - SP1_1P1_4V
+  - SP1_1P3_4V
+  - SP3_3H3
+  - SP3_3M1
+  - SP3_1P3
+  - SP3_U1
+  - SP3_U3
+  - SP3_1H7_4V
+  - SP3_3H6_4V
+  - SP3_1P1_4V
+
+
+================================================================
+DIAGNOSTIC: 4v_3sp_2sp_3sp {3sp, 2sp, 3sp}
+================================================================
+Relevant constraints to test: 32
+Timeout per sub-test: 10s
+
+BASELINE (all ON): TIMEOUT in 10.00s
+
+Constraint            Description                                       Solutions   Time(s)   Cost      Status      
+--------------------------------------------------------------------------------------------------------------------
+CF_1H1                CF: harmonic intervals consonances                3           0.03      1307      OK          
+CF_1P1                CF: perfect consonances motion rule               0           10.00     N/A       TIMEOUT     
+CF_1P3                CF: no battuta                                    0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H3     Stratum: upper voice H3 rule                      0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H10    Stratum: upper voice H10 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H12    Stratum: upper voice H12 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_1H3           Stratum: H3 rule                                  0           9.99      N/A       TIMEOUT     
+STRATUM_1H12          Stratum: H12 rule                                 0           10.00     N/A       TIMEOUT     
+V4_G6                 4V: G6 no chromatic melodies                      0           10.00     N/A       TIMEOUT     
+V4_1H4                4V: H4/G9 last chord same as CF fundamental       3           0.02      639       OK          
+V4_1H8                4V: H8 prefer harmonic triads                     0           10.00     N/A       TIMEOUT     
+V4_1M4                4V: M4 variety cost (diverse notes)               0           10.00     N/A       TIMEOUT     
+V4_1P4                4V: P4 avoid successive perfect consonances       0           10.00     N/A       TIMEOUT     
+V4_1P6                4V: P6 no move in same direction (all 4 voices)   0           10.00     N/A       TIMEOUT     
+V4_1P7                4V: P7 no successive ascending sixths             0           10.00     N/A       TIMEOUT     
+V4_2M2                4V: 2M2 melodic intervals <= minor sixth          0           10.00     N/A       TIMEOUT     
+V4_5R9                4V: 5R9 two 5sp diversity                         0           10.00     N/A       TIMEOUT     
+V4_U2                 4V: U2 no minor second between upper voices       0           10.00     N/A       TIMEOUT     
+SP2_2H2               2SP: 2H2 arsis harmonies not dissonant            0           10.00     N/A       TIMEOUT     
+SP2_2M1               2SP: 2M1 octave leap rule                         0           10.00     N/A       TIMEOUT     
+SP2_2P3               2SP: 2P3 no battuta (adapted)                     0           10.00     N/A       TIMEOUT     
+SP2_2H3_4V            2SP: 2H3 penultimate rule (4V)                    0           10.00     N/A       TIMEOUT     
+SP2_1P1_4V            2SP: 1P1 no direct motion to perf cons (4V)       0           10.00     N/A       TIMEOUT     
+SP3_3H2               3SP: 3H2 dissonance implies diminution            3           0.02      625       OK          
+SP3_3H3               3SP: 3H3 cambiata cost                            0           10.00     N/A       TIMEOUT     
+SP3_3M1               3SP: 3M1 avoid return to same note (m2 zero)      0           10.00     N/A       TIMEOUT     
+SP3_1P3               3SP: 1P3 no battuta (adapted for 3sp)             0           10.00     N/A       TIMEOUT     
+SP3_U1                3SP: U1 no melodic interval 9-11 semitones        0           10.00     N/A       TIMEOUT     
+SP3_U3                3SP: U3/3M4 penultimate measure constraint        0           10.00     N/A       TIMEOUT     
+SP3_1H7_4V            3SP: 1H7 last interval constraint (4V)            0           10.00     N/A       TIMEOUT     
+SP3_3H6_4V            3SP: 3H6 harmonic triad on beat 2/3 (4V)          0           10.00     N/A       TIMEOUT     
+SP3_1P1_4V            3SP: 1P1 direct motion cost (4V)                  0           10.00     N/A       TIMEOUT     
+
+--- DIAGNOSTIC SUMMARY ---
+UNBLOCKING constraints (disabling solves the problem):
+  * V4_1H4 (4V: H4/G9 last chord same as CF fundamental) => 3 solutions in 0.021s, cost=639
+  * SP3_3H2 (3SP: 3H2 dissonance implies diminution) => 3 solutions in 0.023s, cost=625
+  * CF_1H1 (CF: harmonic intervals consonances) => 3 solutions in 0.028s, cost=1307
+NO EFFECT constraints (still timeout when disabled):
+  - CF_1P1
+  - CF_1P3
+  - STRATUM_UPPER_1H3
+  - STRATUM_UPPER_1H10
+  - STRATUM_UPPER_1H12
+  - STRATUM_1H3
+  - STRATUM_1H12
+  - V4_G6
+  - V4_1H8
+  - V4_1M4
+  - V4_1P4
+  - V4_1P6
+  - V4_1P7
+  - V4_2M2
+  - V4_5R9
+  - V4_U2
+  - SP2_2H2
+  - SP2_2M1
+  - SP2_2P3
+  - SP2_2H3_4V
+  - SP2_1P1_4V
+  - SP3_3H3
+  - SP3_3M1
+  - SP3_1P3
+  - SP3_U1
+  - SP3_U3
+  - SP3_1H7_4V
+  - SP3_3H6_4V
+  - SP3_1P1_4V
+
+
+================================================================
+DIAGNOSTIC: 4v_3sp_3sp_2sp {3sp, 3sp, 2sp}
+================================================================
+Relevant constraints to test: 32
+Timeout per sub-test: 10s
+
+BASELINE (all ON): TIMEOUT in 10.00s
+
+Constraint            Description                                       Solutions   Time(s)   Cost      Status      
+--------------------------------------------------------------------------------------------------------------------
+CF_1H1                CF: harmonic intervals consonances                0           10.00     N/A       TIMEOUT     
+CF_1P1                CF: perfect consonances motion rule               0           10.00     N/A       TIMEOUT     
+CF_1P3                CF: no battuta                                    0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H3     Stratum: upper voice H3 rule                      0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H10    Stratum: upper voice H10 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_UPPER_1H12    Stratum: upper voice H12 rule                     0           10.00     N/A       TIMEOUT     
+STRATUM_1H3           Stratum: H3 rule                                  0           10.00     N/A       TIMEOUT     
+STRATUM_1H12          Stratum: H12 rule                                 0           10.00     N/A       TIMEOUT     
+V4_G6                 4V: G6 no chromatic melodies                      0           10.00     N/A       TIMEOUT     
+V4_1H4                4V: H4/G9 last chord same as CF fundamental       3           0.02      1186      OK          
+V4_1H8                4V: H8 prefer harmonic triads                     0           10.00     N/A       TIMEOUT     
+V4_1M4                4V: M4 variety cost (diverse notes)               0           10.00     N/A       TIMEOUT     

@@ -125,6 +125,12 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
         sorted_voices[i].update(*this, s.sorted_voices[i]);
     }
     globalCost.update(*this, s.globalCost);
+
+    hasRelaxation = s.hasRelaxation;
+    problemRelaxationCosts.update(*this, s.problemRelaxationCosts);
+    if(hasRelaxation){
+        totalRelaxationCost.update(*this, s.totalRelaxationCost);
+    }
 }
 
 IntLexMinimizeSpace* CounterpointProblem::copy(){   
@@ -172,6 +178,15 @@ void CounterpointProblem::setPreferenceMap(vector<string> importance_names){
     }
 }
 
+double CounterpointProblem::getCost() const {
+    double total = 0;
+    IntVarArgs costs = cost();
+    for (int i = 0; i < costs.size(); ++i) {
+        total += costs[i].val();
+    }
+    return total;
+}
+
 void CounterpointProblem::orderCosts(){
     for(int i = 0; i < 14; i++){
         if(!costLevels[i].empty()){
@@ -214,6 +229,19 @@ void CounterpointProblem::orderCosts(){
         //(this eliminates all the <not assigned> values of the intvararray for costs which are not set)
         rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
     }
+
+    // If relaxation costs exist, prepend totalRelaxationCost as highest priority
+    if(hasRelaxation){
+        IntVarArray newFinalCosts(*this, n_unique_costs + 1, 0, 1000000);
+        // First element: relaxation cost (highest lex priority)
+        rel(*this, newFinalCosts[0], IRT_EQ, totalRelaxationCost);
+        // Rest: original costs
+        for(int i = 0; i < n_unique_costs; i++){
+            rel(*this, newFinalCosts[i+1], IRT_EQ, finalCosts[i]);
+        }
+        finalCosts = newFinalCosts;
+    }
+
     //globalCost is the sum of all the finalCosts
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
 }
@@ -1092,4 +1120,57 @@ void CounterpointProblem::computeCombinedCosts(){
         // sum the costs
         rel(*this, combinedCosts[i], IRT_EQ, expr(*this, sum(to_combined)));
     }
+}
+
+void CounterpointProblem::uniteRelaxationCosts(){
+    // Collect relaxation cost arrays from all parts
+    int totalSize = 0;
+    
+    if(cantusFirmus && cantusFirmus->getRelaxationCostArray().size() > 0)
+        totalSize += cantusFirmus->getRelaxationCostArray().size();
+    if(counterpoint_1 && counterpoint_1->getRelaxationCostArray().size() > 0)
+        totalSize += counterpoint_1->getRelaxationCostArray().size();
+    if(counterpoint_2 && counterpoint_2->getRelaxationCostArray().size() > 0)
+        totalSize += counterpoint_2->getRelaxationCostArray().size();
+    if(counterpoint_3 && counterpoint_3->getRelaxationCostArray().size() > 0)
+        totalSize += counterpoint_3->getRelaxationCostArray().size();
+    
+    // Add problem-level relaxation costs
+    totalSize += problemRelaxationCosts.size();
+
+    if(totalSize == 0){
+        // No relaxation costs — totalRelaxationCost stays uninitialized
+        return;
+    }
+    
+    IntVarArgs allRelax(totalSize);
+    int idx = 0;
+    
+    if(cantusFirmus && cantusFirmus->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < cantusFirmus->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = cantusFirmus->getRelaxationCostArray()[i];
+        }
+    }
+    if(counterpoint_1 && counterpoint_1->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < counterpoint_1->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = counterpoint_1->getRelaxationCostArray()[i];
+        }
+    }
+    if(counterpoint_2 && counterpoint_2->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < counterpoint_2->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = counterpoint_2->getRelaxationCostArray()[i];
+        }
+    }
+    if(counterpoint_3 && counterpoint_3->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < counterpoint_3->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = counterpoint_3->getRelaxationCostArray()[i];
+        }
+    }
+    for(int i = 0; i < problemRelaxationCosts.size(); i++){
+        allRelax[idx++] = problemRelaxationCosts[i];
+    }
+    
+    // Sum all relaxation costs into totalRelaxationCost
+    totalRelaxationCost = IntVar(*this, 0, totalSize);
+    rel(*this, totalRelaxationCost, IRT_EQ, expr(*this, sum(allRelax)));
 }

@@ -53,6 +53,10 @@ protected:
 
     IntVarArray combinedCosts;
 
+    IntVarArray problemRelaxationCosts;
+    IntVar totalRelaxationCost;
+    bool hasRelaxation = false;
+
 public:
     /**
      * Constructor of the class.
@@ -67,6 +71,9 @@ public:
     virtual IntLexMinimizeSpace* copy(); 
 
     virtual string to_string() const;  
+
+    double getCost() const;
+
 
     /**
      * Constrain method for bab search
@@ -125,6 +132,9 @@ public:
 
     IntVarArray get_combinedCosts(){ return combinedCosts; }
     void computeCombinedCosts();
+
+    void uniteRelaxationCosts();
+    IntVarArray getProblemRelaxationCosts(){ return problemRelaxationCosts; }
 };
 
 

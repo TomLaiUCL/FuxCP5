@@ -427,6 +427,7 @@ enum constraints{
 
 const int consSize = static_cast<int>(SP5_4V_2+1); // Number of constraints
 extern vector<bool> activeConstraints;
+extern vector<bool> softConstraints;
      
 enum toCombineConstraints{
     H1_1,

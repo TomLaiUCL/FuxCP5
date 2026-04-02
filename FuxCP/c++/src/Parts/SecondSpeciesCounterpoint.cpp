@@ -113,7 +113,11 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     // 2.H2 : Arsis harmonies cannot be dissonant except if there is a diminution.
     if (activeConstraints[SP2_2H2]) {
-        H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
+        if (softConstraints[SP2_2H2]) {
+            H2_2_arsisHarmoniesCannotBeDisonnant_soft(home, this);
+        } else {
+            H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
+        }
     }
     
     //2.M1

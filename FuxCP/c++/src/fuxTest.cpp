@@ -4,6 +4,7 @@
 // This file contains the testing framework implementation.  
 //
 #include <iostream>
+#include <chrono>
 #include <fstream>  // For file operations
 #include <cmath>
 #include <chrono>
@@ -111,6 +112,7 @@ FuxTest::FuxTest(char* test){
         test_bryce_fullsp();
     } 
     else if(strcmp(test, "sacha")==0){
+        cout << "Running sacha's test..." << endl;
         test_sacha();
     }
     else {
@@ -5125,6 +5127,12 @@ void FuxTest::test_sacha(){
     }
 
     delete problem;
+
+    */
+   cout << "===== test_sacha 4v 3sp =====" << endl;
+   test_sacha_4v_3sp();
+
+   // test_bryce_4v_3sp();
 }
 
 
