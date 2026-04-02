@@ -5128,7 +5128,7 @@ void FuxTest::test_sacha(){
 
     delete problem;
 
-    */
+
    cout << "===== test_sacha 4v 3sp =====" << endl;
    test_sacha_4v_3sp();
 
