@@ -92,6 +92,19 @@ string int_vector_to_string(vector<int> vector){
 }
 
 /**
+ * Transforms an IntVarArray into a string, with values separated by a space (for csv utilisation)
+ * @param array IntVarArray
+ * @return string the string representation of the vector
+ */
+string int_var_array_to_string(IntVarArray array){
+    string s;
+    for (IntVar c : array) {
+        s += to_string(c.val()) + " ";
+    }
+    return s;
+}
+
+/**
  * Transforms an int* into a vector<int>
  * @param ptr an int* pointer
  * @param size the size of the array

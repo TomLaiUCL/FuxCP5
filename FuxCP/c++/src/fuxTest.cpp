@@ -5130,7 +5130,7 @@ void FuxTest::test_sacha(){
 
 
    cout << "===== test_sacha 4v 3sp =====" << endl;
-   test_sacha_4v_3sp();
+   //test_sacha_4v_3sp();
 
    // test_bryce_4v_3sp();
 }

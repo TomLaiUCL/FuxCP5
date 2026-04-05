@@ -524,6 +524,13 @@ vector<int> vector_difference(vector<int> v1, int lb, int ub);
 string int_vector_to_string(vector<int> vector);
 
 /**
+ * Transforms an IntVarArray into a string, with values separated by a space (for csv utilisation)
+ * @param array IntVarArray
+ * @return string the string representation of the vector
+ */
+string int_var_array_to_string(IntVarArray array);
+
+/**
  * Prints the Search::Statistics object into a readable format
  * @param stats a Search::Statistics object representing the statistics of a search
  * @return The string representation of the statistics object

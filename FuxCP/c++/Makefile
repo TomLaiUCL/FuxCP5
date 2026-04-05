@@ -98,7 +98,7 @@ run_linux:
 
 # === DEBUG ===
 
-SOURCES = main.cpp src/Utilities.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
+SOURCES = main.cpp src/Utilities.cpp src/Midi.cpp src/generations.cpp  src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
 	    src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
 	    src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp \
 	    src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp \
@@ -114,9 +114,14 @@ compile_and_bryce:
 	$(CXX) $(CXXFLAGS_DEBUG) $(SOURCES) -o $(COMPILED_DIR)/Main $(LIBS_MINIMAL)
 	$(COMPILED_DIR)/Main bryce $(btest)
 
+compile_and_gen:
+	@mkdir -p $(COMPILED_DIR)
+	$(CXX) $(CXXFLAGS_DEBUG) $(SOURCES) -o $(COMPILED_DIR)/Main $(LIBS_MINIMAL)
+	$(COMPILED_DIR)/Main gen $(case)
+
 compile_and_sacha:
 	@mkdir -p $(COMPILED_DIR)
-	$(CXX) $(CXXFLAGS_DEBUG) main.cpp src/Utilities.cpp src/Parts/Midi.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
+	$(CXX) $(CXXFLAGS_DEBUG) main.cpp src/Utilities.cpp src/Midi.cpp src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
 	    src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
 	    src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp \
 	    src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp \
