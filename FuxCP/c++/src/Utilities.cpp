@@ -97,11 +97,10 @@ string int_vector_to_string(vector<int> vector){
  * @return string the string representation of the vector
  */
 string int_var_array_to_string(IntVarArray array){
-    string s;
-    for (IntVar c : array) {
-        s += to_string(c.val()) + " ";
-    }
-    return s;
+    ostringstream oss;
+    oss << array;
+    string my_str = oss.str();
+    return my_str.substr(1,my_str.size()-2);
 }
 
 /**

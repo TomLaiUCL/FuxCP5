@@ -9,7 +9,7 @@
 #include <cmath>
 #include <chrono>
 #include <signal.h> // For testing blocking constrains in generations
-#include "../headers/generations.hpp"
+#include "../headers/Generations.hpp"
 #include <gecode/int.hh> // Ensure you include the necessary Gecode headers
 
 
@@ -23,7 +23,7 @@ Generations::Generations(char* gen){
     borrowMode = 1;
     log_folder = "log/";
     midi_folder = "midi/";
-    cf_name = "undefined";
+    cf_name = "firstTestExample";
 
     fill(activeConstraints.begin(), activeConstraints.end(), true);
     
@@ -54,8 +54,7 @@ int Generations::getIdx(){
     return idx;
 }
 
-
-// ----- Initialisation functions -----
+//============================== Initialisation functions ================================
 // Default data for GenerationCase, BenchResult, MusicalStats and spList
 
 static GenerationCase generationCase(){
@@ -70,16 +69,91 @@ static GenerationCase generationCase(){
     gen_case.v_types = {};            
     gen_case.v_types_1sp = {};
 
-    gen_case.checkpoints = {};
-    gen_case.log_file_path = "default_log.csv"; // filename for the moment
+    gen_case.checkpoints = {1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
+                            150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000,
+                            1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000,
+                            2050, 2100, 2150, 2200, 2250, 2300, 2350, 2400, 2450, 2500, 2550, 2600, 2650, 2700, 2750, 2800, 2850, 2900, 2950, 3000,
+                            3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300, 4400, 4500, 4600, 4700, 4800, 4900, 5000,
+                            5100, 5200, 5300, 5400, 5500, 5600, 5700, 5800, 5900, 6000, 6100, 6200, 6300, 6400, 6500, 6600, 6700, 6800, 6900, 7000,
+                            7100, 7200, 7300, 7400, 7500, 7600, 7700, 7800, 7900, 8000, 8100, 8200, 8300, 8400, 8500, 8600, 8700, 8800, 8900, 9000,
+                            9100, 9200, 9300, 9400, 9500, 9600, 9700, 9800, 9900, 10000,
+                            11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000,
+                            22000, 24000, 26000, 28000, 30000, 32000, 34000, 36000, 38000, 40000, 42000, 44000, 46000, 48000, 50000, 52000, 54000,
+                            56000, 58000, 60000, 62000, 64000, 66000, 68000, 70000, 72000, 74000, 76000, 78000, 80000, 82000, 84000, 86000, 88000,
+                            90000, 92000, 94000, 96000, 98000, 100000};
+    gen_case.log_file_path = "default_log.csv"; // filename for the moment (default_log)
+    gen_case.stats_file_path = "default_stats.csv"; // filename for the moment (default_stats)
 
     return gen_case;
 }
 
+static vector<Species> classic_spList(Species species, int n_voices){
+    if (n_voices == 2){
+        return {species};
+    } else if (n_voices == 3){
+        return {FIRST_SPECIES, species};
+    } else {
+        return {FIRST_SPECIES, FIRST_SPECIES, species};
+    }
+}
+
+/*
+ *   Generator for classical counterpoints : definition for multiple vtype cases.
+ */
+static GenerationCase generate_classic_gen_case(Species species,
+                                         int n_voices,
+                                         const vector<int>& v_types,
+                                         const vector<int>& v_types_1sp = {},
+                                         int timeout_ms = 600000){
+    // Creating struct
+    GenerationCase gen_case = generationCase();
+    gen_case.n_voices = n_voices;
+    gen_case.v_types = v_types;
+    gen_case.v_types_1sp = v_types_1sp;
+    gen_case.timeout_ms = timeout_ms;
+    gen_case.multiple_vtypes = true;
+    gen_case.spList = classic_spList(species, n_voices);
+
+    return gen_case;
+}
+
+/*
+ *   Generator for classical counterpoints : normal definition.
+ */
+static GenerationCase generate_classic_gen_case(Species species,
+                                         int n_voices,
+                                         vector<int> v_type,
+                                         int timeout_ms = 600000){
+    // Creating struct
+    GenerationCase gen_case = generationCase();
+    gen_case.n_voices = n_voices;
+    gen_case.spList = classic_spList(species, n_voices);
+    gen_case.v_type = v_type;
+    gen_case.timeout_ms = timeout_ms;
+
+    return gen_case;
+}
+
+/*
+ *   Generator for counterpoints : normal definition.
+ */
+static GenerationCase generate_general_gen_case(vector<Species> spList,
+                                         vector<int> v_type,
+                                         int timeout_ms = 600000){
+    // Creating struct
+    GenerationCase gen_case = generationCase();
+    gen_case.n_voices = spList.size()+1;
+    gen_case.spList = spList;
+    gen_case.v_type = v_type;
+    gen_case.timeout_ms = timeout_ms;
+    
+    return gen_case;
+}
+
+
 static BenchResult benchResult(){
     BenchResult br;
     br.solutions = 0;
-    br.improvements = 0;
     br.timed_out = false;
     br.ms_first = -1.0;
     br.ms_total = -1.0;
@@ -100,17 +174,7 @@ static MusicalStats musicalStats(){
     return ms;
 }
 
-static vector<Species> default_spList(Species species, int n_voices){
-    if (n_voices == 2){
-        return {species};
-    } else if (n_voices == 3){
-        return {FIRST_SPECIES, species};
-    } else {
-        return {FIRST_SPECIES, FIRST_SPECIES, species};
-    }
-}
-
-// ----- Static util functions -----
+//============================== Static util functions ================================
 
 /**
  * Express vector of integers as a string 
@@ -161,35 +225,29 @@ static void log_gen_data_in_csv(
     ofstream out(gen_case.log_file_path, ios::app);
 
     if (!file_exists) {
-        out << "run_id,timestamp,cf_name,cf_notes,species,n_voices,v_type,sp_list,timeout_ms,timed_out,"
-               "solutions,improvements,first_ms,total_ms,best_cost,complete_solution,"
+        out << "timestamp,cf_name,cf_notes,n_voices,sp_list,v_type,timeout_ms,timed_out,"
+               "solutions,first_ms,total_ms,best_cost,complete_solution,"
                "ambitus,largest_leap,repeated,steps,skips,midi_file\n";
     }
 
     auto now = chrono::system_clock::now();
     auto now_t = chrono::system_clock::to_time_t(now);
 
-    static int run_id = 0;
-    run_id++;
-
-    out << run_id << ","
-        << csv_escape(string(ctime(&now_t)).substr(0, 24)) << ","
+    out << csv_escape(string(ctime(&now_t)).substr(0, 24)) << ","
         << csv_escape(cf_name) << ","
         << csv_escape(join_ints(cantusFirmus)) << ","
-        << (int)gen_case.spList.back() + 1 << ","
         << gen_case.n_voices << ","
-        << csv_escape(join_ints(gen_case.v_type)) << ","
         << csv_escape(join_ints(vector<int>(gen_case.spList.begin(), gen_case.spList.end()))) << ","
+        << csv_escape(join_ints(gen_case.v_type)) << ","
         << gen_case.timeout_ms << ","
         << (bench.timed_out ? 1 : 0) << ","
         << bench.solutions << ","
-        << bench.improvements << ","
         << bench.ms_first << ","
         << bench.ms_total << ","
         << csv_escape(bench.best_cost) << ","
-        << bench.solution << ",";
+        << csv_escape(int_var_array_to_string(bench.solution)) << ",";
 
-    if (music) {
+    if (bench.solutions > 0 && music) {
         out << (music->max_note - music->min_note) << ","
             << music->largest_leap << ","
             << music->repeated << ","
@@ -200,6 +258,34 @@ static void log_gen_data_in_csv(
     }
 
     out << csv_escape(gen_case.midi_file_path) << "\n";
+}
+
+/**
+ * log the current costs
+ * @param notes the notes of the voice
+ * @return MusicalStats object
+ */
+static void log_intermediate_data_in_csv(string stat_file_path, string filename, int iteration, int duration, string costs, IntVarArray solution) {
+    const bool file_exists = static_cast<bool>(ifstream(stat_file_path));
+    ofstream out(stat_file_path, ios::app);
+
+    if (!file_exists) {
+        out << "timestamp,iteration,duration(ms),costs,solution\n";
+    }
+
+    auto now = chrono::system_clock::now();
+    auto now_t = chrono::system_clock::to_time_t(now);
+
+    string timestamp = csv_escape(string(ctime(&now_t)).substr(0, 24));
+    //replace(timestamp.begin(), timestamp.end(), " ", "_");
+    out << timestamp << ","
+        << filename << ","
+        << iteration << ","
+        << duration << ","
+        << csv_escape(costs) << ","
+        << csv_escape(int_var_array_to_string(solution));
+    
+    out << "\n";
 }
 
 /**
@@ -252,14 +338,16 @@ static void log_gen_data_in_console(
     }
 }
 
-static string generate_midi_filename(GenerationCase gen_case, string cf_name){
+static string generate_descriptive_filename(GenerationCase gen_case, string cf_name){
     string midi_file_path = cf_name + "_"
-        + to_string(gen_case.n_voices) + "v_"
-        + to_string((int)gen_case.spList.back()+1) + "sp_vtype_";
+        + to_string(gen_case.n_voices) + "v_";
+    for (int sp : gen_case.spList) {
+        midi_file_path += to_string(sp+1) + "-";
+    }
+    midi_file_path +="sp_vtype_";
     for (int vt : gen_case.v_type) {
         midi_file_path += to_string(vt) + "_";
     }
-    midi_file_path += ".mid";
     return midi_file_path;
 }
 
@@ -301,7 +389,7 @@ static MusicalStats analyze_notes(const vector<int>& notes) {
 //=======================================================================================
 //============================== COUNTERPOINT GENERATION ================================
 
-void Generations::generate_counterpoints(GenerationCase& gen_case, bool midi=true, bool log=true){
+void Generations::generate_counterpoints(GenerationCase gen_case, bool midi=true, bool log=true, bool stats=false){
     // v_types has to be specified
     if (gen_case.multiple_vtypes){
         if (gen_case.v_types.empty() || gen_case.n_voices > 2 && gen_case.v_types_1sp.empty()){
@@ -323,39 +411,18 @@ void Generations::generate_counterpoints(GenerationCase& gen_case, bool midi=tru
         gen_case.log_file_path = "None";
     }
 
-    // Checkpoints
-    if (gen_case.checkpoints.empty()){
-        if (n_voices == 2) {
-            gen_case.checkpoints = {1, 2, 5, 10, 20, 50};
-        } else if (n_voices == 3) {
-            gen_case.checkpoints = {1, 10, 100, 1000, 5000};
-        } else {
-            gen_case.checkpoints = {1, 100, 1000, 10000, 20000};
-        }
-    }
-
     cout << "===== generate counterpoints " << n_voices << "v " << species+1 << "sp " << " =====" << endl;
-    
-    // Voices & Constrains definition
-    int n_types_4v;
-    int n_types_3v;
-    if (n_voices == 4) {
-        gen_case.spList = {FIRST_SPECIES, FIRST_SPECIES, species};
-        n_types_3v = gen_case.v_types_1sp.size();
-        n_types_4v = gen_case.v_types_1sp.size();
-    }
-    else if (n_voices == 3) {
-        gen_case.spList = {FIRST_SPECIES, species};
-        n_types_3v = gen_case.v_types_1sp.size();
-        n_types_4v = 1;
-    }
-    else { // 2v
-        gen_case.spList = {species};
-        n_types_3v = 1;
-        n_types_4v = 1;
-    }
 
     if (gen_case.multiple_vtypes){
+        int n_types_4v = 1;
+        int n_types_3v = 1;
+        if (n_voices >= 3) {
+            n_types_3v = gen_case.v_types_1sp.size();
+        }
+        if (n_voices >= 4) {
+            n_types_4v = gen_case.v_types_1sp.size();
+        }
+
         for (int vidx_1sp_2 = 0; vidx_1sp_2 < n_types_4v; vidx_1sp_2++){
             for (int vidx_1sp_1 = 0; vidx_1sp_1 < n_types_3v; vidx_1sp_1++){
                 for (int vidx_species = 0; vidx_species < gen_case.v_types.size(); vidx_species++){
@@ -372,7 +439,7 @@ void Generations::generate_counterpoints(GenerationCase& gen_case, bool midi=tru
                     }
                     
                     auto* problem = create_problem(cantusFirmus, gen_case.spList, gen_case.v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-                    generation_BAB_bench(problem, gen_case, midi, log);
+                    generation_BAB_bench(problem, gen_case, midi, log, stats);
                     delete problem;
                 }
             }
@@ -380,94 +447,57 @@ void Generations::generate_counterpoints(GenerationCase& gen_case, bool midi=tru
     }
     else {
         auto* problem = create_problem(cantusFirmus, gen_case.spList, gen_case.v_type, melodic_params, general_params, specific_params, importance, borrowMode);
-        generation_BAB_bench(problem, gen_case, midi, log);
+        generation_BAB_bench(problem, gen_case, midi, log, stats);
         delete problem;
     }
     
 }
 
-void Generations::generate_classic_counterpoints(Species species,
-                                         int n_voices,
-                                         const vector<int>& v_types,
-                                         const vector<int>& v_types_1sp = {},
-                                         int timeout_ms = 600000,
-                                         bool midi=true,
-                                         bool log=true){
-    // Creating struct
-    GenerationCase gen_case = generationCase();
-    gen_case.n_voices = n_voices;
-    gen_case.v_types = v_types;
-    gen_case.v_types_1sp = v_types_1sp;
-    gen_case.timeout_ms = timeout_ms;
-    gen_case.multiple_vtypes = true;
-    gen_case.spList = default_spList(species, n_voices);
-
-    generate_counterpoints(gen_case, midi, log);
-}
-
-void Generations::generate_classic_counterpoints(Species species,
-                                         int n_voices,
-                                         vector<int> v_type,
-                                         int timeout_ms = 600000,
-                                         bool midi=true,
-                                         bool log=true){
-    // Creating struct
-    GenerationCase gen_case = generationCase();
-    gen_case.n_voices = n_voices;
-    gen_case.spList = default_spList(species, n_voices);
-    gen_case.v_type = v_type;
-    gen_case.timeout_ms = timeout_ms;
-
-    generate_counterpoints(gen_case, midi, log);
-}
-
-
-void Generations::generation_BAB_bench(CounterpointProblem* problem,
-                          GenerationCase& gen_case,
-                          bool midi,
-                          bool log){
+void Generations::generation_BAB_bench(CounterpointProblem* problem, GenerationCase& gen_case, bool midi, bool log, bool stats){
     Search::Options opt;
     Search::TimeStop ts(gen_case.timeout_ms);
     opt.stop = &ts;
 
     auto t0 = chrono::steady_clock::now();
-
     auto ms_since_start = [&]() {
         auto now = chrono::steady_clock::now();
         return chrono::duration<double, milli>(now - t0).count();
     };
 
-    BAB<CounterpointProblem> e(problem, opt);
-    CounterpointProblem* best = nullptr;
-
     BenchResult bench = benchResult();
     size_t next_checkpoint = 0;
     string last_cost_str;
+    string descriptive_filename = generate_descriptive_filename(gen_case, cf_name);
+    gen_case.stats_file_path = log_folder + gen_case.stats_file_path;
 
+    BAB<CounterpointProblem> e(problem, opt);
+    CounterpointProblem* best = nullptr;
     while (CounterpointProblem* s = e.next()) {
         bench.solutions++;
+
+        delete best; // keep only the best-so-far
+        best = s;
 
         if (bench.solutions == 1) {
             bench.ms_first = ms_since_start();
         }
 
-        if (next_checkpoint < gen_case.checkpoints.size() &&
-            bench.solutions == gen_case.checkpoints[next_checkpoint]) {
-                bench.checkpoint_times.push_back({bench.solutions, ms_since_start()});
-                next_checkpoint++;
-                cout << "=== Iteration " << bench.solutions << " : " << s->getSolutionArray() << endl;
-        }
-        
-        delete best; // keep only the best-so-far
-        best = s;
-
-        ostringstream oss;
-        oss << best->cost();
-        string current_cost = oss.str();
+        string current_cost = intVarArgs_to_string(best->cost());
         if (current_cost != last_cost_str) {
             bench.improvements++;
             last_cost_str = current_cost;
             bench.best_cost = current_cost;
+        }
+
+        if (next_checkpoint < gen_case.checkpoints.size() && bench.solutions == gen_case.checkpoints[next_checkpoint]) {
+            bench.checkpoint_times.push_back({bench.solutions, ms_since_start()});
+
+            IntVarArray solution = s->getSolutionArray();
+            cout << "=== Iteration " << bench.solutions << " : " << solution << endl;
+            if (stats){ 
+                log_intermediate_data_in_csv(gen_case.stats_file_path, descriptive_filename, bench.solutions, ms_since_start(), current_cost, solution);
+            }
+            next_checkpoint++;
         }
     }
 
@@ -486,7 +516,7 @@ void Generations::generation_BAB_bench(CounterpointProblem* problem,
         music = analyze_notes(voice_notes);
 
         if (midi){
-            gen_case.midi_file_path = midi_folder + generate_midi_filename(gen_case, cf_name);
+            gen_case.midi_file_path = midi_folder + descriptive_filename + ".mid";
             saveMidi(gen_case.midi_file_path, cantusFirmus, voice_notes, species);
         }
         
@@ -500,26 +530,142 @@ void Generations::generation_BAB_bench(CounterpointProblem* problem,
         log_gen_data_in_csv(cantusFirmus, cf_name, gen_case, bench, &music);
     }
     log_gen_data_in_console(bench, &music, gen_case.midi_file_path, gen_case.log_file_path);
-    
 }
 
 //=======================================================================================
 //=======================================================================================
 
-void Generations::gen_bryce(){ // Generic tests
+/*
+ * Generic tests for classic counterpoints
+ * (default timeout 720000ms = 12min)
+ */
+void Generations::all_classic_counterpoints(int timeout_ms = 720000, bool midi = true, bool log = true, bool stats = false){
+    cf_name += "_classic";
+    
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 2, {2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 2, {1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 2, {0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 2, {-1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 2, {2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 2, {1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 2, {0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 2, {-1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 2, {2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 2, {1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 2, {0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 2, {-1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 2, {2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 2, {1}, timeout_ms), midi, log, stats);   // No result
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 2, {0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 2, {-1}, timeout_ms), midi, log, stats);  // No result
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 2, {2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 2, {1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 2, {0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 2, {-1}, timeout_ms), midi, log, stats);
+    
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 3, {4, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 3, {0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 3, {2, 0}, timeout_ms), midi, log, stats);     
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 3, {2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 3, {-2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 3, {4, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 3, {0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 3, {2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 3, {2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 3, {-2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 3, {4, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 3, {0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 3, {2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 3, {2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 3, {-2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 3, {4, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 3, {0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 3, {2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 3, {2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 3, {-2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 3, {4, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 3, {0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 3, {2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 3, {2, -1}, timeout_ms), midi, log, stats);    // No result
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 3, {-2, 0}, timeout_ms), midi, log, stats);
+    
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 4, {-2, 2, 1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 4, {-1, 2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 4, {-2, 1, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 4, {0, 2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 4, {-2, 0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 4, {-1, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIRST_SPECIES, 4, {-2, -1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 4, {-2, 2, 1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 4, {-1, 2, 0}, timeout_ms), midi, log, stats);     
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 4, {-2, 1, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 4, {0, 2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 4, {-2, 0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 4, {-1, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(SECOND_SPECIES, 4, {-2, -1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 4, {-2, 2, 1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 4, {-1, 2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 4, {-2, 1, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 4, {0, 2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 4, {-2, 0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 4, {-1, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(THIRD_SPECIES, 4, {-2, -1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 4, {-2, 2, 1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 4, {-1, 2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 4, {-2, 1, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 4, {0, 2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 4, {-2, 0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 4, {-1, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FOURTH_SPECIES, 4, {-2, -1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 4, {-2, 2, 1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 4, {-1, 2, 0}, timeout_ms), midi, log, stats); 
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 4, {-2, 1, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 4, {0, 2, -1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 4, {-2, 0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 4, {-1, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_classic_gen_case(FIFTH_SPECIES, 4, {-2, -1, 2}, timeout_ms), midi, log, stats);
+}
+
+/*
+ * First batch of generic tests for multi-species counterpoints
+ * (default timeout 720000ms = 12min)
+ */
+void Generations::multi_species_counterpoints_batch1(int timeout_ms = 720000, bool midi = true, bool log = true, bool stats = false){ // Generic tests
+    cf_name += "_multi";
+
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, SECOND_SPECIES}, {1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, SECOND_SPECIES, SECOND_SPECIES}, {0, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({THIRD_SPECIES, THIRD_SPECIES}, {1, 2}, timeout_ms), midi, log, stats);                       // No result
+    generate_counterpoints(generate_general_gen_case({THIRD_SPECIES, THIRD_SPECIES, THIRD_SPECIES}, {0, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({FOURTH_SPECIES, FOURTH_SPECIES}, {1, 2}, timeout_ms), midi, log, stats);                     // No result
+    generate_counterpoints(generate_general_gen_case({FOURTH_SPECIES,FOURTH_SPECIES, FOURTH_SPECIES}, {0, 1, 2}, timeout_ms), midi, log, stats);   // No result
+    generate_counterpoints(generate_general_gen_case({FIFTH_SPECIES, FIFTH_SPECIES}, {1, 2}, timeout_ms), midi, log, stats);                       // No result
+    generate_counterpoints(generate_general_gen_case({FIFTH_SPECIES, FIFTH_SPECIES, FIFTH_SPECIES}, {0, 1, 2}, timeout_ms), midi, log, stats);     // No result
+
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, THIRD_SPECIES}, {1, 2}, timeout_ms), midi, log, stats);
+
+    // No results
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, THIRD_SPECIES}, {0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, THIRD_SPECIES}, {2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({THIRD_SPECIES, FIFTH_SPECIES}, {0, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({THIRD_SPECIES, FIFTH_SPECIES}, {2, 0}, timeout_ms), midi, log, stats);
+    /*
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, THIRD_SPECIES, FIFTH_SPECIES}, {0, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, THIRD_SPECIES, FIFTH_SPECIES}, {2, 0, 1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({SECOND_SPECIES, THIRD_SPECIES, FIFTH_SPECIES}, {1, 2, 0}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({THIRD_SPECIES, FOURTH_SPECIES, FIFTH_SPECIES}, {0, 1, 2}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({THIRD_SPECIES, FOURTH_SPECIES, FIFTH_SPECIES}, {2, 0, 1}, timeout_ms), midi, log, stats);
+    generate_counterpoints(generate_general_gen_case({THIRD_SPECIES, FOURTH_SPECIES, FIFTH_SPECIES}, {1, 2, 0}, timeout_ms), midi, log, stats);*/
+}
+
+void Generations::gen_bryce(){ // Generic tests (Currently : ~24h for every test with stats)
     midi_folder = "midi_bryce/";
-    generate_classic_counterpoints(FOURTH_SPECIES, 2, {2}, 7200000);
-    generate_classic_counterpoints(THIRD_SPECIES, 2, {2}, 7200000);
-    generate_classic_counterpoints(FOURTH_SPECIES, 3, {4, 2}, 7200000);
-    generate_classic_counterpoints(FOURTH_SPECIES, 3, {1, 2}, 7200000);
-    generate_classic_counterpoints(FOURTH_SPECIES, 3, {2, 1}, 7200000);
-    generate_classic_counterpoints(THIRD_SPECIES, 3, {4, 2}, 7200000);
-    generate_classic_counterpoints(THIRD_SPECIES, 3, {1, 2}, 7200000);
-    generate_classic_counterpoints(THIRD_SPECIES, 3, {2, 1}, 7200000);
+    all_classic_counterpoints(1200000, true, true, true); // 20min
+    multi_species_counterpoints_batch1(1200000, true, true, true); // 20min
 }
 
 void Generations::gen_bryce_2(){
-    cout << "===== gen_bryce 2 =====" << endl; 
+    cout << "===== gen_bryce 2 =====" << endl;
     cantusFirmus = {60,   62,   65,   64,   67,   65,   64,   62,   60};
     cfSize = cantusFirmus.size();
     melodic_params = {0, 1, 2, 576, 5, 10, 25, 40};

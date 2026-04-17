@@ -110,7 +110,7 @@ run_linux:
 
 # === DEBUG ===
 
-SOURCES = main.cpp src/Utilities.cpp src/Midi.cpp src/generations.cpp  src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
+SOURCES = main.cpp src/Utilities.cpp src/Midi.cpp src/Generations.cpp  src/Voice.cpp src/Stratum.cpp src/CounterpointUtils.cpp \
 	    src/CounterpointProblems/CounterpointProblem.cpp src/Parts/Part.cpp src/Parts/FirstSpeciesCounterpoint.cpp \
 	    src/Parts/SecondSpeciesCounterpoint.cpp src/Parts/ThirdSpeciesCounterpoint.cpp src/Parts/FourthSpeciesCounterpoint.cpp \
 	    src/Parts/FifthSpeciesCounterpoint.cpp src/Parts/CantusFirmus.cpp src/CounterpointProblems/TwoVoiceCounterpoint.cpp \

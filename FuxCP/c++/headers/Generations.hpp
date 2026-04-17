@@ -34,6 +34,7 @@ struct GenerationCase {
     vector<int> checkpoints;
     string midi_file_path;
     string log_file_path;
+    string stats_file_path;
 };
 
 struct BenchResult {
@@ -86,22 +87,11 @@ public:
     vector<int> getCp();
     int getIdx();
 
-    void generate_classic_counterpoints(
-        Species species, int n_voices,
-        const std::vector<int>& v_types,
-        const std::vector<int>& v_types_1sp,
-        int timeout_ms,
-        bool midi,
-        bool log);
-    void generate_classic_counterpoints(Species species, int n_voices, vector<int> v_type, int timeout_ms, bool midi, bool log);
-    void generate_counterpoints(GenerationCase& gen_case, bool midi, bool log);
+    void generate_counterpoints(GenerationCase gen_case, bool midi, bool log, bool stats);
+    void generation_BAB_bench(CounterpointProblem* problem, GenerationCase& gen_case, bool midi, bool log, bool stats);
 
-    void generation_BAB_bench(
-        CounterpointProblem* problem,
-        GenerationCase& gen_case,
-        bool midi,
-        bool log);
-
+    void all_classic_counterpoints(int timeout_ms, bool midi, bool log, bool stats);
+    void multi_species_counterpoints_batch1(int timeout_ms, bool midi, bool log, bool stats);
     void gen_bryce();
     void gen_bryce_2();
 };

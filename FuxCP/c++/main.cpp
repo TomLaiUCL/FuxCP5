@@ -11,7 +11,7 @@
 #include "headers/CounterpointProblems/TwoVoiceCounterpoint.hpp"
 #include "headers/CounterpointProblems/CounterpointProblem.hpp"
 #include "headers/fuxTest.hpp"
-#include "headers/generations.hpp"
+#include "headers/Generations.hpp"
 #include "headers/figureTests.hpp"
 
 using namespace Gecode;
