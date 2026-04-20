@@ -3,7 +3,8 @@
 #include <vector>
 #include <cstdint>
 #include <algorithm>
-#include "../headers/Midi.hpp"
+#include <utility>
+#include "../headers/Parts/Midi.hpp"
 
 
 struct MidiEvent {
@@ -14,7 +15,9 @@ struct MidiEvent {
 
     bool operator<(const MidiEvent& other) const {
         if (tick != other.tick) return tick < other.tick;
-        return status < other.status; // NoteOff avant NoteOn au même tick
+        // NoteOff (0x8x) avant NoteOn (0x9x) au même tick
+        if ((status & 0xF0) != (other.status & 0xF0)) return (status & 0xF0) < (other.status & 0xF0);
+        return status < other.status;
     }
 };
 
@@ -64,55 +67,64 @@ std::vector<int> extract_last_voice_notes(CounterpointProblem* best,
     return out;
 }
 
-void saveMidi(const std::string& filename, 
-              const std::vector<int>& cantusFirmus, 
-              const std::vector<int>& raw_solution,
-              Species species) {
-    
-    std::vector<int> solution = raw_solution;
-    const uint32_t PPQ = 480; // Pulses Per Quarter Note
-    uint32_t rondeDur = PPQ * 4;
+int branchingNotesSize(Species sp, int cfSize) {
+    switch(sp) {
+        case FIRST_SPECIES:  return cfSize;
+        case SECOND_SPECIES: return 2 * cfSize - 1;
+        case THIRD_SPECIES:  return 4 * cfSize - 3;
+        case FOURTH_SPECIES: return 2 * cfSize - 2;
+        case FIFTH_SPECIES:  return 4 * cfSize - 3;
+        default:             return cfSize;
+    }
+}
+
+// Ajoute les événements MIDI d'une voix à la liste
+static void addVoiceEvents(std::vector<MidiEvent>& events,
+                           const std::vector<int>& raw_notes,
+                           Species species,
+                           uint8_t channel,
+                           uint8_t velocity,
+                           uint32_t rondeDur) {
+    std::vector<int> notes = raw_notes;
     uint32_t cpDur;
 
     switch(species) {
         case SECOND_SPECIES: cpDur = rondeDur / 2; break;
         case THIRD_SPECIES:  cpDur = rondeDur / 4; break;
-        case FOURTH_SPECIES: 
+        case FOURTH_SPECIES:
             cpDur = rondeDur;
-            solution = smoothen4th(raw_solution);
+            notes = smoothen4th(raw_notes);
             break;
         case FIFTH_SPECIES:  cpDur = rondeDur / 4; break;
-        default:             cpDur = rondeDur;     break;
+        case CANTUS_FIRMUS:  cpDur = rondeDur;     break;
+        default:             cpDur = rondeDur;     break; // FIRST_SPECIES
     }
 
-    std::vector<MidiEvent> events;
+    uint8_t noteOn  = 0x90 | (channel & 0x0F);
+    uint8_t noteOff = 0x80 | (channel & 0x0F);
 
-    for (size_t i = 0; i < cantusFirmus.size(); ++i) {
-        uint32_t start = i * rondeDur;
-        events.push_back({start, 0x90, (uint8_t)cantusFirmus[i], 64});
-        events.push_back({start + rondeDur, 0x80, (uint8_t)cantusFirmus[i], 0});
-    }
-
-    if (species == FOURTH_SPECIES) {
+    if (species == FOURTH_SPECIES && notes.size() > 1) {
         size_t i;
-        for (i = 0; i < solution.size()-1; ++i) {
-            uint32_t start = i * cpDur + cpDur/2;
-            events.push_back({start, 0x90, (uint8_t)solution[i], 80});
-            events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
+        for (i = 0; i < notes.size() - 1; ++i) {
+            uint32_t start = i * cpDur + cpDur / 2;
+            events.push_back({start, noteOn, (uint8_t)notes[i], velocity});
+            events.push_back({start + cpDur, noteOff, (uint8_t)notes[i], 0});
         }
-        // last note
+        // Dernière note sans décalage
         uint32_t start = i * cpDur;
-        events.push_back({start, 0x90, (uint8_t)solution[i], 80});
-        events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
-    }
-    else {
-        for (size_t i = 0; i < solution.size(); ++i) {
+        events.push_back({start, noteOn, (uint8_t)notes[i], velocity});
+        events.push_back({start + cpDur, noteOff, (uint8_t)notes[i], 0});
+    } else {
+        for (size_t i = 0; i < notes.size(); ++i) {
             uint32_t start = i * cpDur;
-            events.push_back({start, 0x90, (uint8_t)solution[i], 80});
-            events.push_back({start + cpDur, 0x80, (uint8_t)solution[i], 0});
+            events.push_back({start, noteOn, (uint8_t)notes[i], velocity});
+            events.push_back({start + cpDur, noteOff, (uint8_t)notes[i], 0});
         }
     }
+}
 
+// Construit les données binaires d'une piste MIDI à partir de ses événements
+static std::vector<uint8_t> buildTrackData(std::vector<MidiEvent>& events) {
     std::sort(events.begin(), events.end());
 
     std::vector<uint8_t> trackData;
@@ -126,25 +138,75 @@ void saveMidi(const std::string& filename,
         lastTick = e.tick;
     }
 
+    // End of Track
     trackData.push_back(0x00);
     trackData.push_back(0xFF); trackData.push_back(0x2F); trackData.push_back(0x00);
+    return trackData;
+}
 
+// Écrit un fichier MIDI Format 1 (une piste par voix)
+static void writeMidiFile(const std::string& filename,
+                          std::vector<std::vector<MidiEvent>>& tracks,
+                          uint16_t PPQ) {
     std::ofstream file(filename, std::ios::binary);
-    
+
     file << "MThd";
     uint32_t hLen = __builtin_bswap32(6);
     file.write((char*)&hLen, 4);
-    uint16_t format = __builtin_bswap16(0);
+    uint16_t format = __builtin_bswap16(1);  // Format 1 : pistes séparées
     file.write((char*)&format, 2);
-    uint16_t ntrks = __builtin_bswap16(1);
+    uint16_t ntrks = __builtin_bswap16((uint16_t)tracks.size());
     file.write((char*)&ntrks, 2);
     uint16_t division = __builtin_bswap16(PPQ);
     file.write((char*)&division, 2);
 
-    file << "MTrk";
-    uint32_t tLen = __builtin_bswap32(trackData.size());
-    file.write((char*)&tLen, 4);
-    file.write((char*)trackData.data(), trackData.size());
+    for (auto& track : tracks) {
+        auto data = buildTrackData(track);
+        file << "MTrk";
+        uint32_t tLen = __builtin_bswap32(data.size());
+        file.write((char*)&tLen, 4);
+        file.write((char*)data.data(), data.size());
+    }
 
     file.close();
+}
+
+void saveMidiMultiVoice(const std::string& filename,
+                        const std::vector<int>& cantusFirmus,
+                        const std::vector<std::pair<std::vector<int>, Species>>& voices) {
+    const uint32_t PPQ = 480;
+    uint32_t rondeDur = PPQ * 4;
+
+    // Une piste par voix : piste 0 = CF, pistes 1..n = contrepoint
+    std::vector<std::vector<MidiEvent>> tracks(1 + std::min(voices.size(), (size_t)3));
+
+    // Piste 0 : Cantus Firmus
+    addVoiceEvents(tracks[0], cantusFirmus, CANTUS_FIRMUS, 0, 64, rondeDur);
+
+    // Pistes 1, 2, 3 : voix de contrepoint
+    for (size_t v = 0; v < voices.size() && v < 3; ++v) {
+        addVoiceEvents(tracks[v + 1], voices[v].first, voices[v].second,
+                       (uint8_t)(v + 1), 80, rondeDur);
+    }
+
+    writeMidiFile(filename, tracks, PPQ);
+}
+
+void saveMidi(const std::string& filename, 
+              const std::vector<int>& cantusFirmus, 
+              const std::vector<int>& raw_solution,
+              Species species) {
+    
+    const uint32_t PPQ = 480;
+    uint32_t rondeDur = PPQ * 4;
+
+    std::vector<std::vector<MidiEvent>> tracks(2);
+
+    // Piste 0 : Cantus Firmus
+    addVoiceEvents(tracks[0], cantusFirmus, CANTUS_FIRMUS, 0, 64, rondeDur);
+
+    // Piste 1 : Contrepoint
+    addVoiceEvents(tracks[1], raw_solution, species, 1, 80, rondeDur);
+
+    writeMidiFile(filename, tracks, PPQ);
 }
