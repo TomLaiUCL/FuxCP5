@@ -5135,4 +5135,7 @@ void FuxTest::test_sacha(){
    // test_bryce_4v_3sp();
 }
 
+void FuxTest::test_sacha_4v_3sp(){
+    cout << "test_sacha_4v_3sp : pas encore implémenté" << endl;
+}
 

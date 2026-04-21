@@ -153,8 +153,10 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV) :
     SecondSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
-    costs = IntVarArray(home, 6, 0, 1000000);
-    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult"};
+    varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult", "variety"};
 
     // 2.H3 : penult cost
     if (activeConstraints[SP2_2H3_2V]) {
@@ -184,6 +186,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
     //set cost[5] to be penult sixth cost
     add_cost(home, 5, penultCostArray, costs);
+    //set cost[6] to be variety cost
+    add_cost(home, 6, varietyCostArray, costs);
 
 }
 

@@ -239,8 +239,10 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     //     rel(home, (getIsNotLowest()[getIsNotLowest().size()-2]==0) >> 
     //     (expr(home, abs(h_intervals[h_intervals.size()-5]))==MINOR_THIRD));
     // }
-    costs = IntVarArray(home, 7, 0, 10000);
-    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2"};
+    varietyCostArray = IntVarArray(home, 3*(thirdSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 8, 0, 10000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "cambiata", "m2", "variety"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), fifthCostArray.size())), costs);
@@ -254,8 +256,10 @@ ThirdSpeciesCounterpoint::ThirdSpeciesCounterpoint(Home home, int size, vector<i
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(THIRD_SPECIES), offCostArray.size())), costs);
     //need to set cost[5] to be cambiata cost
     add_cost(home, 5, cambiataCostArray, costs);
-    //need to set cost[5] to be cambiata cost
+    //need to set cost[6] to be m2Zero cost
     add_cost(home, 6, m2ZeroArray, costs);
+    //set cost[7] to be variety cost
+    add_cost(home, 7, varietyCostArray, costs);
 }
 
 /**

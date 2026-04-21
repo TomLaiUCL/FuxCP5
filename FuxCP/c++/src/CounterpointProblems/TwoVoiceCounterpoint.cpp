@@ -32,6 +32,12 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
         G6_noChromaticMelodies(*this, counterpoint_1, species);
     }
 
+    // M2_1 : variety cost (penalize repeated notes in 2-voice mode)
+    {
+        vector<Part*> parts = {cantusFirmus, counterpoint_1};
+        M2_1_varietyCost(*this, parts);
+    }
+
     // 1.H4 (G9)
     if (activeConstraints[V2_G9]) {
         G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);

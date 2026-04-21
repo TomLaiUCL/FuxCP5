@@ -201,8 +201,10 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         P3_1_noBattuta(home, this);
     }
 
-    costs = IntVarArray(home, 5, 0, 1000000);
-    cost_names = {"fifth", "octave", "motion", "melodic", "borrow"};
+    varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 6, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "variety"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
@@ -214,6 +216,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
     //set cost[4] to be off cost
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
+    //set cost[5] to be variety cost
+    add_cost(home, 5, varietyCostArray, costs);
 }
 
 /**

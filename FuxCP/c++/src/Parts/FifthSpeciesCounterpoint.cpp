@@ -616,8 +616,10 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     }
     
 
-    costs = IntVarArray(home, 8, 0, 1000000);
-    cost_names = {"fifth", "octave", "borrow", "melodic", "motion", "cambiata", "m2", "syncopation"};
+    varietyCostArray = IntVarArray(home, 3*(fifthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 9, 0, 1000000);
+    cost_names = {"fifth", "octave", "borrow", "melodic", "motion", "cambiata", "m2", "syncopation", "variety"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIFTH_SPECIES), fifthCostArray.size())), costs);
@@ -635,6 +637,8 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     add_cost(home, 6, m2ZeroCostArray, costs);
     //need to set cost[7] to be syncopation cost
     add_cost(home, 7, snycopeCostArray, costs);
+    //set cost[8] to be variety cost
+    add_cost(home, 8, varietyCostArray, costs);
 }
 
 /**

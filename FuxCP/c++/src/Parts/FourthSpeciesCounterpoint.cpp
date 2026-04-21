@@ -279,8 +279,10 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
         dom(home, fourthSpeciesHIntervals[0], IntSet({UNISSON, PERFECT_FIFTH, -PERFECT_FIFTH}));
     }
     
-    costs = IntVarArray(home, 6, 0, 1000000);
-    cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation"};
+    varietyCostArray = IntVarArray(home, 3*(getHIntervalSize()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"fifth", "octave", "melodic", "borrow", "m2", "syncopation", "variety"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(2, 4/notesPerMeasure.at(FOURTH_SPECIES), fifthCostArray.size())), costs);
@@ -294,6 +296,8 @@ FourthSpeciesCounterpoint::FourthSpeciesCounterpoint(Home home, int nMes, vector
     add_cost(home, 4, m2ZeroArray, costs);
     //need to set cost[5] to be syncopation cost
     add_cost(home, 5, snycopeCostArray, costs);
+    //set cost[6] to be variety cost
+    add_cost(home, 6, varietyCostArray, costs);
 }
 
 /**
