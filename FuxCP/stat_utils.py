@@ -1,7 +1,7 @@
 
 #%%
 
-# ================ FIGURE EXTRACTION ================
+# ================ FIGURE EXTRACTION (NO NEED TO RUN AGAIN) ================
 def extract_from_line(lines, lineIdx, sep):
     line = lines[lineIdx].strip(' {()\n;')
     return line.split(sep)[-1].strip()
@@ -152,10 +152,81 @@ def plot_costs_repartition():
     plt.plot(costs_list, [min(costs_values[cost], 1000) for cost in costs_list], linewidth='1.0', marker='.')
     plt.show()
 
-
+plot_costs_evolution()
 
 #analyze_stats()
 
 
+
 #%%
 
+import pandas as pd
+
+
+
+
+import mido
+from mido import MidiFile, MidiTrack, Message
+import os
+
+
+def species_to_ticks(length, ticks_per_beat):
+    if length == 0:
+        return ticks_per_beat * 4  # Whole note
+    elif length == 1:
+        return ticks_per_beat * 2  # Half note
+    elif length == 2:
+        return ticks_per_beat      # Quarter note
+    elif length == 3:
+        return ticks_per_beat * 2  # Eighth note
+    elif length == 4:
+        return ticks_per_beat      # Sixteenth note
+    return ticks_per_beat
+
+def generate_piano_midi(sequence, tempo, output_file="c++/midi_bryce/piano_piece.mid", instrument_program=0):
+    
+    midi = MidiFile()
+    track = MidiTrack()
+    midi.tracks.append(track)
+
+    track.append(Message('program_change', program=instrument_program))
+    microseconds_per_beat = 60 * 1000000 // tempo
+    track.append(mido.MetaMessage('set_tempo', tempo=microseconds_per_beat))
+
+    ticks_per_beat = 480
+    current_time = 0  # Start at time 0
+
+    for i in range(0, len(sequence)):
+        midi_note = sequence[i]  # Note name (e.g., 'A0')
+
+        duration = species_to_ticks(species, ticks_per_beat)
+
+        track.append(Message('note_on', note=midi_note, time=current_time))
+        track.append(Message('note_off', note=midi_note, time=duration))
+
+        current_time = 0
+
+    midi.save(output_file)
+    print(f"MIDI file '{output_file}' has been saved!")
+
+
+
+
+
+
+df = pd.read_csv("c++/log/default_logs.csv",sep=",")
+
+sub_df = df[df["n_voices"] > 2]
+for solution in sub_df["complete_solution"]:
+    if (type(solution) == float or solution.strip() == "{}"): continue
+    
+    notes = solution.strip("{}").split(",")
+    for i in range(len(notes)):
+        notes[i] = int(notes[i])
+    print(notes)
+    
+
+
+
+
+# %%

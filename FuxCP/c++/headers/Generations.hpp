@@ -8,7 +8,7 @@
 #define FUX_GEN_HPP
 
 #include "Utilities.hpp"
-#include "Parts/Midi.hpp"
+#include "Midi.hpp"
 #include "Parts/Part.hpp"
 #include "CounterpointUtils.hpp"
 #include "CounterpointProblems/CounterpointProblem.hpp"
@@ -24,6 +24,7 @@ struct GenerationCase {
     vector<int> v_type;
     int n_voices;
     int timeout_ms;
+    int stagnation_ms;
 
     // In case of multiple_vtypes
     bool multiple_vtypes;
@@ -39,22 +40,13 @@ struct GenerationCase {
 
 struct BenchResult {
     int solutions;
-    int improvements;
-    bool timed_out;
+    string termination;
     double ms_first;
     double ms_total;
     vector<pair<int,double>> checkpoint_times;
     string best_cost;
     IntVarArray solution;
-};
-
-struct MusicalStats {
-    int min_note;
-    int max_note;
-    int largest_leap;
-    int repeated;
-    int steps;
-    int skips;
+    Search::Statistics gecodeStats;
 };
 
 // -------------------------------
@@ -86,14 +78,16 @@ public:
     int getBMode();
     vector<int> getCp();
     int getIdx();
+    void reset_cf_name(bool undefined);
 
     void generate_counterpoints(GenerationCase gen_case, bool midi, bool log, bool stats);
     void generation_BAB_bench(CounterpointProblem* problem, GenerationCase& gen_case, bool midi, bool log, bool stats);
 
     void all_classic_counterpoints(int timeout_ms, bool midi, bool log, bool stats);
     void multi_species_counterpoints_batch1(int timeout_ms, bool midi, bool log, bool stats);
+    void reference_counterpoints_for_testing(int timeout_ms, bool midi, bool log, bool stats);
+    void gen_default();
     void gen_bryce();
-    void gen_bryce_2();
 };
 
 #endif

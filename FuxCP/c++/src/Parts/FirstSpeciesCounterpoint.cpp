@@ -22,19 +22,19 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     that he does like to borrow notes, so the borrow cost should just do the job and we should still allow borrowed notes, not outright forbid them
     */
     if(borrowMode==1){
-        extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
+        domain = cp_range;
     } else {
-        extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+        domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
     }
-    off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
+    off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);  // By default, always allow some specific notes of the major mode
 
     /// First species notes in the counterpoint
-    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(domain)));
 
     if(borrowMode==1 && motherSpecies==FIRST_SPECIES){
         firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     } else {
-        firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+        firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(domain)));
     }
 
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));

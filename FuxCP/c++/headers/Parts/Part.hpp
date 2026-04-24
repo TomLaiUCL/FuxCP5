@@ -49,7 +49,7 @@ class Part : public Voice {
 
         vector<int> cp_range;
 
-        vector<int> extended_domain;
+        vector<int> domain;
         vector<int> off_domain;
 
         vector<string> cost_names;
@@ -194,7 +194,7 @@ class Part : public Voice {
 
         vector<int> getOffDomain();
 
-        vector<int> getExtendedDomain();
+        vector<int> getDomain();
 
         IntVarArray getOffCostArray();
 

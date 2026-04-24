@@ -76,7 +76,7 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     
     cp_range = s.cp_range;
 
-    extended_domain = s.extended_domain;
+    domain = s.domain;
     off_domain = s.off_domain;
 
     secondCost = s.secondCost;
@@ -317,8 +317,8 @@ vector<int> Part::getOffDomain(){
     return off_domain;
 }
 
-vector<int> Part::getExtendedDomain(){
-    return extended_domain;
+vector<int> Part::getDomain(){
+    return domain;
 }
 
 IntVarArray Part::getOffCostArray(){

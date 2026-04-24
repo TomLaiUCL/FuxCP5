@@ -174,10 +174,23 @@ BAB<CounterpointProblem> e(problem, opt);
 
 Guidelines :
 -X Logiciel stable & merged
+-X Graphiques d'évolution de la qualité (+ répartition de la qualité dans la voix) en fonction de l'itération
+-X Importer le système de stagnation de sacha !
+-X Voir le système de restrictions des domaines (sur base de la gamme)
+- Trier les outputs midi dans des dossiers par voix
+- Adapter les critères des coûts --> Mettre la somme comme premier coût
+- Nom de cantus firmus = Note + gamme
+
+- Modifier la manière de run  (via .csv + pas comme FuxTest) --> Sacha
+- Lister les intervals des gammes + vérifier le cantusFirmus --> Sacha
+
+- Problème avec le chromatisme
+- Règles de Marcel Bitsch sur la répétition !!!
+- Règles de Marcel Bitsch sur les notes conjointes
+
 - Récupérer les cantus firmus de Marcel Bitsch (ou autres traités) et comparer les résultats
 - Trouver des idées musicales du Traité de Bitch (Suuurtout pour 2v, pour élaguer)
 - Trouver des sets de v_types qui fonctionnent pour chaque spList --> Se focus sur les exemples concrets de Fux et Bitsch
-- Graphiques d'évolution de la qualité (+ répartition de la qualité dans la voix) en fonction de l'itération
 
 Autres :
 - Faire un fichier de presets pour ne pas avoir à recompiler à chaque fois ? Ou une manière de passer en arguments

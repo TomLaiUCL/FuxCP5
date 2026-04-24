@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <utility>
-#include "../headers/Parts/Midi.hpp"
+#include "../headers/Midi.hpp"
 
 
 struct MidiEvent {
@@ -50,20 +50,13 @@ static std::vector<int> smoothen4th(const std::vector<int>& sol) {
     return out;
 }
 
-std::vector<int> extract_last_voice_notes(CounterpointProblem* best,
+std::vector<int> extract_notes(CounterpointProblem* best,
                                             vector<Species> spList,
                                             size_t cfSize) {
     auto arr = best->getSolutionArray();
     std::vector<int> out;
-    int n_voices = spList.size();
-    vector<size_t> voiceSize = {cfSize, cfSize*2, cfSize*4, cfSize, cfSize*4};
-
-    int start = 0;
-    if (n_voices == 3) start = voiceSize.at(spList.at(0));
-    else if (n_voices == 4) start = voiceSize.at(spList.at(0)) + voiceSize.at(spList.at(1));
-
-    out.reserve(arr.size() - start);
-    for (int i = start; i < arr.size(); ++i) out.push_back(arr[i].val());
+    out.reserve(arr.size());
+    for (int i = 0; i < arr.size(); ++i) out.push_back(arr[i].val());
     return out;
 }
 
@@ -209,4 +202,27 @@ void saveMidi(const std::string& filename,
     addVoiceEvents(tracks[1], raw_solution, species, 1, 80, rondeDur);
 
     writeMidiFile(filename, tracks, PPQ);
+}
+
+
+
+void saveMidiGeneral(const std::string& filename,
+                        const std::vector<int>& cantusFirmus,
+                        const std::vector<int>& raw_solution,
+                        const std::vector<Species>& spList){
+
+    vector<pair<vector<int>, Species>> voices;
+
+    int n_counterpoints = spList.size();
+    int cf_size = cantusFirmus.size();
+    int offset = 0;
+    for (int voice = 0; voice < n_counterpoints; ++voice) {
+        Species species = spList.at(voice);
+        int sz = branchingNotesSize(species, cf_size);
+        vector<int> voice_notes(raw_solution.begin() + offset, raw_solution.begin() + offset + sz);
+        voices.push_back({voice_notes, species});
+        offset += sz;
+    }
+
+    saveMidiMultiVoice(filename, cantusFirmus, voices);
 }

@@ -7,7 +7,7 @@
 #define FUX_TESTS_HPP
 
 #include "Utilities.hpp"
-#include "Parts/Midi.hpp"
+#include "Midi.hpp"
 #include "Parts/Part.hpp"
 #include "CounterpointUtils.hpp"
 #include "CounterpointProblems/CounterpointProblem.hpp"

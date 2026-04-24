@@ -962,9 +962,9 @@ int* CounterpointProblem::get_species_array_5sp(int ctp_index){
 
 int* CounterpointProblem::get_extended_cp_domain(int ctp_index){
     vector<int> ext_cp_dom;
-    if(ctp_index == 0) ext_cp_dom = counterpoint_1->getExtendedDomain();
-    else if(ctp_index == 1) ext_cp_dom = counterpoint_2->getExtendedDomain();
-    else if(ctp_index == 2) ext_cp_dom = counterpoint_3->getExtendedDomain();
+    if(ctp_index == 0) ext_cp_dom = counterpoint_1->getDomain();
+    else if(ctp_index == 1) ext_cp_dom = counterpoint_2->getDomain();
+    else if(ctp_index == 2) ext_cp_dom = counterpoint_3->getDomain();
     else{
         writeToLogFile("invalid value of ctp_index given as argument to get_extended_cp_domain");
         return nullptr;
@@ -982,9 +982,9 @@ int* CounterpointProblem::get_extended_cp_domain(int ctp_index){
 
 int CounterpointProblem::get_ext_cp_domain_size(int ctp_index){
     int cpDomSize;
-    if(ctp_index == 0) cpDomSize = counterpoint_1->getExtendedDomain().size();
-    else if(ctp_index == 1) cpDomSize = counterpoint_2->getExtendedDomain().size();
-    else if(ctp_index == 2) cpDomSize = counterpoint_3->getExtendedDomain().size();
+    if(ctp_index == 0) cpDomSize = counterpoint_1->getDomain().size();
+    else if(ctp_index == 1) cpDomSize = counterpoint_2->getDomain().size();
+    else if(ctp_index == 2) cpDomSize = counterpoint_3->getDomain().size();
     else{
         writeToLogFile("invalid value of ctp_index given as argument to get_extended_cp_domain");
         return -1;

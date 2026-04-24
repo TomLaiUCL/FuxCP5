@@ -18,13 +18,13 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     // cout << lowerBound << endl;
     // cout << upperBound << endl;
     /*
-    if borrowMode is enabled, the extended domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
+    if borrowMode is enabled, the domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
     that he does like to borrow notes, so the borrow cost should just do the job and still allow borrowed notes, not outright forbid them
     */
     if(borrowMode==1){
-        extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
+        domain = cp_range;
     } else {
-        extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+        domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale)); // By default, always allow some specific notes of the major mode
     }
 
     off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
@@ -41,7 +41,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */
     createSpeciesArrays(home);
 
-    fifthSpeciesNotesCp = IntVarArray(home, notes.size(), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+    fifthSpeciesNotesCp = IntVarArray(home, notes.size(), IntSet(IntArgs(domain)));
     if(borrowMode==1){
         fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     }

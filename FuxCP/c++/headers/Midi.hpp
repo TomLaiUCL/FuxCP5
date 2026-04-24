@@ -4,11 +4,11 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include "../Utilities.hpp"
-#include "../CounterpointProblems/CounterpointProblem.hpp"
+#include "Utilities.hpp"
+#include "CounterpointProblems/CounterpointProblem.hpp"
 
 // Utils
-std::vector<int> extract_last_voice_notes(CounterpointProblem* best,
+std::vector<int> extract_notes(CounterpointProblem* best,
         vector<Species> spList,
         size_t cfSize);
 
@@ -39,5 +39,11 @@ void saveMidi(const std::string& filename,
 void saveMidiMultiVoice(const std::string& filename,
                         const std::vector<int>& cantusFirmus,
                         const std::vector<std::pair<std::vector<int>, Species>>& voices);
+
+
+void saveMidiGeneral(const std::string& filename,
+                        const std::vector<int>& cantusFirmus,
+                        const std::vector<int>& raw_solution,
+                        const std::vector<Species>& spList);
 
 #endif
