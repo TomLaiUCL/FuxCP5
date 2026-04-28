@@ -256,6 +256,17 @@ const vector<int> BORROWED_SCALE = {PERFECT_FOURTH, MAJOR_THIRD, MAJOR_SECOND, M
 const vector<int> CHROMATIC_SCALE = {MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,MINOR_SECOND,
     MINOR_SECOND,MINOR_SECOND,MINOR_SECOND};
 
+/// Modes ecclésiastiques (gammes diatoniques). IONIAN_SCALE est identique à MAJOR_SCALE
+/// et AEOLIAN_SCALE est identique à NATURAL_MINOR_SCALE ; ils sont redéfinis ici pour
+/// permettre la détection automatique de la gamme à partir du cantus firmus.
+const vector<int> IONIAN_SCALE     = {MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND};
+const vector<int> DORIAN_SCALE     = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND};
+const vector<int> PHRYGIAN_SCALE   = {MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND};
+const vector<int> LYDIAN_SCALE     = {MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND};
+const vector<int> MIXOLYDIAN_SCALE = {MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND};
+const vector<int> AEOLIAN_SCALE    = {MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND};
+const vector<int> LOCRIAN_SCALE    = {MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MINOR_SECOND, MAJOR_SECOND, MAJOR_SECOND, MAJOR_SECOND};
+
 /** Part related */
 enum Species{
     FIRST_SPECIES,  //0
@@ -477,6 +488,26 @@ vector<int> get_all_notes_from_interval_loop(int n, vector<int> intervals);
  * @return vector<int> all the possible notes from that tonality
  */
 vector<int> get_all_notes_from_scale(int root, vector<int> scale);
+
+/**
+ * Détecte automatiquement la gamme musicale d'un cantus firmus.
+ *
+ * On suppose que la première note du cantus firmus donne la tonique. On teste alors,
+ * dans un ordre de priorité (du plus général au plus spécifique : Ionien, Aeolien,
+ * Dorien, Mixolydien, Lydien, Phrygien, Locrien, mineur harmonique, mineur mélodique),
+ * la première gamme dont l'ensemble des classes de hauteurs (mod 12) contient toutes
+ * les notes du cantus firmus. Si plusieurs gammes conviennent, la plus générale est
+ * retenue. Si aucune ne correspond exactement, on retombe sur la gamme majeure.
+ *
+ * @param cf le cantus firmus (notes MIDI)
+ * @return les intervalles de la gamme détectée (utilisable avec get_all_notes_from_scale)
+ */
+vector<int> detect_scale_for_cf(const vector<int>& cf);
+
+/**
+ * Renvoie le nom de la gamme détectée pour un cantus firmus (à des fins de log).
+ */
+string detect_scale_name_for_cf(const vector<int>& cf);
 
 /**
  * For a given chord (root + mode), returns all the possible notes

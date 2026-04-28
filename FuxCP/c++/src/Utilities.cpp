@@ -48,6 +48,73 @@ vector<int> get_all_notes_from_scale(int root, vector<int> scale)
     return get_all_notes_from_interval_loop(root, scale);
 }
 
+
+static const vector<pair<string, vector<int>>> SCALE_CANDIDATES = {
+    {"Ionien (majeur)",       IONIAN_SCALE},
+    {"Aeolien (mineur naturel)", AEOLIAN_SCALE},
+    {"Dorien",                DORIAN_SCALE},
+    {"Mixolydien",            MIXOLYDIAN_SCALE},
+    {"Lydien",                LYDIAN_SCALE},
+    {"Phrygien",              PHRYGIAN_SCALE},
+    {"Locrien",               LOCRIAN_SCALE},
+    {"Mineur harmonique",     HARMONIC_MINOR_SCALE},
+    {"Mineur mélodique",      MELODIC_MINOR_SCALE}
+};
+
+static pair<string, vector<int>> detect_scale_pair(const vector<int>& cf) {
+    if (cf.empty()) {
+        return {"Ionien (majeur) [fallback CF vide]", MAJOR_SCALE};
+    }
+    int root = ((cf[0] % 12) + 12) % 12;
+
+    // Classes de hauteurs présentes dans le CF
+    set<int> cf_pcs;
+    for (int n : cf) cf_pcs.insert(((n % 12) + 12) % 12);
+
+    // On cherche la gamme qui couvre le plus grand nombre de notes du CF.
+    // En cas d'égalité on garde la première candidate (= la plus générale).
+    int best_covered = -1;
+    int best_idx = -1;
+    for (size_t i = 0; i < SCALE_CANDIDATES.size(); ++i) {
+        set<int> scale_pcs;
+        int cur = root;
+        scale_pcs.insert(cur);
+        for (int step : SCALE_CANDIDATES[i].second) {
+            cur = (cur + step) % 12;
+            scale_pcs.insert(cur);
+        }
+        int covered = 0;
+        for (int pc : cf_pcs) {
+            if (scale_pcs.find(pc) != scale_pcs.end()) ++covered;
+        }
+        if (covered > best_covered) {
+            best_covered = covered;
+            best_idx = static_cast<int>(i);
+            if (covered == static_cast<int>(cf_pcs.size())) {
+                // couverture parfaite : on s'arrête (gamme la plus générale qui couvre tout)
+                break;
+            }
+        }
+    }
+    if (best_idx < 0) {
+        return {"Ionien (majeur) [fallback]", MAJOR_SCALE};
+    }
+    auto chosen = SCALE_CANDIDATES[best_idx];
+    if (best_covered < static_cast<int>(cf_pcs.size())) {
+        chosen.first += " [couverture partielle " + std::to_string(best_covered)
+                      + "/" + std::to_string(cf_pcs.size()) + "]";
+    }
+    return chosen;
+}
+
+vector<int> detect_scale_for_cf(const vector<int>& cf) {
+    return detect_scale_pair(cf).second;
+}
+
+string detect_scale_name_for_cf(const vector<int>& cf) {
+    return detect_scale_pair(cf).first;
+}
+
 /**
  * For a given chord (root + mode), returns all the possible notes
  * @param root the root of the chord

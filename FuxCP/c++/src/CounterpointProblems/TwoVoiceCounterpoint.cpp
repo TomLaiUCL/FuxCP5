@@ -15,8 +15,8 @@
  * @param ub the highest note possible for the counterpoint in MIDI
  */
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_type, vector<int> m_costs, vector<int> g_costs, 
-    vector<int> s_costs, vector<int> imp, int bm) : 
-    CounterpointProblem(cf, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES){
+    vector<int> s_costs, vector<int> imp, int bm, ObjectiveMode objMode) : 
+    CounterpointProblem(cf, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES, objMode){
     species = sp;
     upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes()); 
     upper_2 = nullptr;

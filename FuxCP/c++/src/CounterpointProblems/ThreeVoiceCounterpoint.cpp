@@ -14,8 +14,8 @@
  * @param ub the highest note possible for the counterpoint in MIDI
  */
 ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> sp, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
-    vector<int> s_costs, vector<int> imp, int bm) :
-    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
+    vector<int> s_costs, vector<int> imp, int bm, ObjectiveMode objMode) :
+    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES, objMode){
     species = sp;
     
     //initialize upper strata

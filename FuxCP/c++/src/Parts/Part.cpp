@@ -18,7 +18,16 @@ Part::Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int 
     isHighest          = BoolVarArray(home, nMeasures, 0, 1);
 
     borrowed_scale = get_all_notes_from_scale(cf[0]%12, BORROWED_SCALE);
-    scale = get_all_notes_from_scale(cf[0]%12, MAJOR_SCALE);
+    // Détection automatique de la gamme à partir du cantus firmus complet, plutôt
+    // que de toujours imposer MAJOR_SCALE. La première note donne la tonique et
+    // l'ensemble des notes du CF permet d'identifier le mode (Ionien, Dorien,
+    // Phrygien, Lydien, Mixolydien, Aeolien, Locrien, mineur harmonique, mineur
+    // mélodique). En cas d'ambiguïté on retient la gamme la plus générale.
+    vector<int> detected_scale = detect_scale_for_cf(cf);
+    scale = get_all_notes_from_scale(cf[0]%12, detected_scale);
+    cout << "[Part] Cantus firmus -> gamme détectée : "
+         << detect_scale_name_for_cf(cf) << " (tonique = "
+         << noteNames[((cf[0] % 12) + 12) % 12] << ")" << endl;
     chromatic_scale = get_all_notes_from_scale(cf[0]%12, CHROMATIC_SCALE);
     cp_range = {};
 

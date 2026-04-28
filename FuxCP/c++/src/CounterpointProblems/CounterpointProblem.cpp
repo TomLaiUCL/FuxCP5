@@ -13,11 +13,12 @@
  * @param ub the highest note possible for the counterpoint in MIDI
  */
 CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs,
-    vector<int> imp, int nV){
+    vector<int> imp, int nV, ObjectiveMode objMode){
     nMeasures = cf.size();
     lowest = new Stratum(*this, nMeasures, 0, 127);
     cantusFirmus = new CantusFirmus(*this, nMeasures, cf, lowest, v_type, m_costs, g_costs, s_costs, nV);
     importance = imp;
+    objectiveMode = objMode;
     n_unique_costs = 0;
     importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "direct", "motion", "penult", "cambiata", "triad3" ,"m2", "syncopation", "melodic"};
     
@@ -125,6 +126,7 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
         sorted_voices[i].update(*this, s.sorted_voices[i]);
     }
     globalCost.update(*this, s.globalCost);
+    objectiveMode = s.objectiveMode;
 
     hasRelaxation = s.hasRelaxation;
     problemRelaxationCosts.update(*this, s.problemRelaxationCosts);
@@ -230,13 +232,43 @@ void CounterpointProblem::orderCosts(){
         rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
     }
 
+    // Adapte l'objectif selon le mode demandé
+    if (objectiveMode == OBJECTIVE_TOTAL) {
+        IntVarArray totalCosts(*this, 1, 0, 2000000);
+        rel(*this, totalCosts[0], IRT_EQ, globalCost);
+        finalCosts = totalCosts;
+    } else if (objectiveMode == OBJECTIVE_MIXED) {
+        // Score lexicographique pondéré (priorités fortes avec poids plus élevés)
+        IntVarArgs lexArgs(n_unique_costs);
+        IntArgs weights(n_unique_costs);
+        for(int i = 0; i < n_unique_costs; i++){
+            lexArgs[i] = orderedFactors[i];
+            weights[i] = n_unique_costs - i;
+        }
+        IntVar lexScore(*this, 0, 2000000);
+        linear(*this, weights, lexArgs, IRT_EQ, lexScore);
+
+        IntVar mixCost(*this, 0, 4000000);
+        IntArgs mixWeights(2);
+        mixWeights[0] = 1;
+        mixWeights[1] = 1;
+        IntVarArgs mixVars(2);
+        mixVars[0] = globalCost;
+        mixVars[1] = lexScore;
+        linear(*this, mixWeights, mixVars, IRT_EQ, mixCost);
+
+        IntVarArray mixedCosts(*this, 1, 0, 4000000);
+        rel(*this, mixedCosts[0], IRT_EQ, mixCost);
+        finalCosts = mixedCosts;
+    }
+
     // If relaxation costs exist, prepend totalRelaxationCost as highest priority
     if(hasRelaxation){
-        IntVarArray newFinalCosts(*this, n_unique_costs + 1, 0, 1000000);
+        IntVarArray newFinalCosts(*this, finalCosts.size() + 1, 0, 1000000);
         // First element: relaxation cost (highest lex priority)
         rel(*this, newFinalCosts[0], IRT_EQ, totalRelaxationCost);
         // Rest: original costs
-        for(int i = 0; i < n_unique_costs; i++){
+        for(int i = 0; i < finalCosts.size(); i++){
             rel(*this, newFinalCosts[i+1], IRT_EQ, finalCosts[i]);
         }
         finalCosts = newFinalCosts;

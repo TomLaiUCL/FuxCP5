@@ -1,0 +1,319 @@
+#!/usr/bin/env bash
+# =============================================================
+# fuxcp — interface CLI interactive pour la génération de contrepoints.
+#
+# Usage : ./fuxcp                   (menu interactif)
+#         ./fuxcp campaign <id>     (lance une campagne directement)
+#         ./fuxcp generate <args>   (forward direct au binaire C++)
+#         ./fuxcp tail              (suit la dernière campagne en arrière-plan)
+#
+# Tous les paramètres (CF, presets, campagnes) sont lus depuis FuxCP/config/*.csv.
+# =============================================================
+
+set -uo pipefail
+
+# === Localisation ===
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$SCRIPT_DIR"
+CPP_DIR="$ROOT_DIR/c++"
+CONFIG_DIR="$ROOT_DIR/config"
+RESULTS_DIR="$ROOT_DIR/results"
+LOGS_DIR="$ROOT_DIR/results/cli_logs"
+BIN="$ROOT_DIR/compiled/GenerateCounterpoint"
+
+mkdir -p "$LOGS_DIR"
+
+# === Couleurs ===
+if [[ -t 1 ]]; then
+    C_BOLD=$'\e[1m'; C_DIM=$'\e[2m'; C_RED=$'\e[31m'; C_GRN=$'\e[32m'
+    C_YEL=$'\e[33m'; C_BLU=$'\e[34m'; C_MAG=$'\e[35m'; C_CYN=$'\e[36m'; C_OFF=$'\e[0m'
+else
+    C_BOLD=""; C_DIM=""; C_RED=""; C_GRN=""; C_YEL=""; C_BLU=""; C_MAG=""; C_CYN=""; C_OFF=""
+fi
+
+banner() {
+    echo "${C_BOLD}${C_CYN}=============================================${C_OFF}"
+    echo "${C_BOLD}${C_CYN}  $1${C_OFF}"
+    echo "${C_BOLD}${C_CYN}=============================================${C_OFF}"
+}
+
+err() { echo "${C_RED}[ERREUR]${C_OFF} $*" >&2; }
+ok()  { echo "${C_GRN}[OK]${C_OFF} $*"; }
+inf() { echo "${C_BLU}[INFO]${C_OFF} $*"; }
+
+# === Vérifications ===
+ensure_binary() {
+    if [[ ! -x "$BIN" ]]; then
+        err "Binaire absent : $BIN"
+        echo "  Compilation en cours..."
+        (cd "$CPP_DIR" && make compile_generate_counterpoint) || { err "Compilation échouée"; exit 1; }
+    fi
+}
+
+ensure_config() {
+    for f in cantus_firmus.csv presets.csv campaigns.csv; do
+        if [[ ! -f "$CONFIG_DIR/$f" ]]; then
+            err "Config manquante : $CONFIG_DIR/$f"; exit 1
+        fi
+    done
+}
+
+# === Lecture CSV (skip lignes commençant par # et le header) ===
+csv_data() {
+    # $1 = chemin du CSV
+    grep -v '^[[:space:]]*#' "$1" | grep -v '^[[:space:]]*$' | tail -n +2
+}
+
+# === Lister CF / presets / campagnes ===
+list_cf() {
+    banner "Cantus Firmus disponibles"
+    "$BIN" --list-cf
+}
+
+list_presets() {
+    banner "Presets disponibles"
+    "$BIN" --list-presets
+}
+
+list_campaigns() {
+    banner "Campagnes disponibles"
+    "$BIN" --list-campaigns
+}
+
+# === Génération précise (interactive) ===
+run_precise() {
+    banner "Génération précise"
+    "$BIN" --list-cf
+    echo
+    read -rp "ID du cantus firmus [1] : " cf_id
+    cf_id="${cf_id:-1}"
+
+    read -rp "Nombre de voix (2/3/4) [2] : " nv
+    nv="${nv:-2}"
+    if [[ "$nv" != "2" && "$nv" != "3" && "$nv" != "4" ]]; then
+        err "nb_voix invalide : $nv"; return 1
+    fi
+
+    n_sp=$((nv - 1))
+    echo "Espèces des $n_sp voix de contrepoint (1-5, séparées par espaces)."
+    echo "Convention 3v : '1 X' (1ère espèce + cible). Convention 4v : '1 1 X'."
+    read -rp "Espèces : " sp_input
+    sp_input="${sp_input:-1}"
+
+    "$BIN" --list-presets
+    read -rp "Preset [default] : " preset
+    preset="${preset:-default}"
+
+    read -rp "Timeout total ms [300000] : " tmo
+    tmo="${tmo:-300000}"
+    read -rp "Stagnation ms [120000] : " stg
+    stg="${stg:-120000}"
+    read -rp "Sous-dossier de sortie [precise] : " sub
+    sub="${sub:-precise}"
+
+    log_file="$LOGS_DIR/precise_$(date +%Y%m%d_%H%M%S).log"
+    inf "Log : $log_file"
+
+    cmd=("$BIN" "$nv" $sp_input -c "$cf_id" --preset "$preset" -t "$tmo" -s "$stg" --subdir "$sub")
+    echo "${C_DIM}Commande :${C_OFF} ${cmd[*]}"
+    "${cmd[@]}" 2>&1 | tee "$log_file"
+}
+
+# === Lancer une campagne ===
+run_campaign() {
+    local camp_id="${1:-}"
+    if [[ -z "$camp_id" ]]; then
+        list_campaigns
+        echo
+        read -rp "ID de campagne : " camp_id
+    fi
+    if [[ -z "$camp_id" ]]; then err "Aucun id fourni"; return 1; fi
+
+    log_file="$LOGS_DIR/campagne_${camp_id}_$(date +%Y%m%d_%H%M%S).log"
+    pid_file="$LOGS_DIR/campagne_${camp_id}.pid"
+    inf "Lancement campagne '$camp_id'"
+    inf "Log : $log_file"
+
+    read -rp "Lancer en arrière-plan ? [O/n] : " bg
+    bg="${bg:-O}"
+    if [[ "${bg^^}" == "O" ]]; then
+        nohup "$BIN" --campaign "$camp_id" > "$log_file" 2>&1 &
+        echo $! > "$pid_file"
+        ok "Lancée en arrière-plan, PID=$(cat "$pid_file")"
+        echo "  Suivi : tail -f $log_file"
+        echo "  Stop  : kill $(cat "$pid_file")"
+    else
+        "$BIN" --campaign "$camp_id" 2>&1 | tee "$log_file"
+    fi
+}
+
+# === Génération classique en masse (campaign_id "classique_2v" + autres) ===
+run_classical_mass() {
+    banner "Génération classique en masse"
+    echo "Choisir une campagne classique :"
+    echo "  1) classique_2v   (5 CF × 5 espèces, 2 voix)"
+    echo "  2) test_gammes    (5 CF × 5 espèces × 3 nb_voix)"
+    echo "  3) demo_rapide    (1 CF, 30s, démo)"
+    echo "  4) (autre id)"
+    read -rp "Choix [1] : " ch
+    ch="${ch:-1}"
+    case "$ch" in
+        1) run_campaign "classique_2v" ;;
+        2) run_campaign "test_gammes" ;;
+        3) run_campaign "demo_rapide" ;;
+        4) run_campaign "" ;;
+        *) err "Choix invalide" ;;
+    esac
+}
+
+# === Surveiller une campagne en cours ===
+monitor() {
+    banner "Surveillance des campagnes"
+    echo "${C_BOLD}Processus GenerateCounterpoint actifs :${C_OFF}"
+    if pgrep -af GenerateCounterpoint > /dev/null; then
+        pgrep -af GenerateCounterpoint
+    else
+        echo "  ${C_DIM}(aucun)${C_OFF}"
+    fi
+    echo
+    echo "${C_BOLD}Dernier log de campagne :${C_OFF}"
+    last_log="$(ls -1t "$LOGS_DIR"/campagne_*.log 2>/dev/null | head -n 1 || true)"
+    if [[ -z "$last_log" ]]; then
+        echo "  ${C_DIM}(aucun log dans $LOGS_DIR)${C_OFF}"
+        return 0
+    fi
+    echo "  $last_log"
+    echo
+    echo "Choix :"
+    echo "  1) tail -f en direct (Ctrl+C pour quitter)"
+    echo "  2) Voir les 30 dernières lignes"
+    echo "  3) Filtrer (STAGNATION/TIMEOUT/EXHAUSTIVE/Coût)"
+    echo "  4) Compter générations terminées"
+    echo "  0) Retour"
+    read -rp "Choix [1] : " m
+    m="${m:-1}"
+    case "$m" in
+        1) tail -f "$last_log" ;;
+        2) tail -n 30 "$last_log" ;;
+        3) grep -E "STAGNATION|TIMEOUT|EXHAUSTIVE|Coût=|Solutions=|Génération :" --color=always "$last_log" | tail -n 50 ;;
+        4) echo "Générations terminées : $(grep -c '^  -> ' "$last_log")"
+           echo "Avec solution         : $(grep -c '^  -> Solutions=' "$last_log")"
+           echo "Sans solution         : $(grep -c '^  -> AUCUNE SOLUTION' "$last_log")" ;;
+        *) ;;
+    esac
+}
+
+# === Explorer les résultats ===
+explore_results() {
+    banner "Exploration des résultats"
+    echo "Sous-dossiers de $RESULTS_DIR :"
+    mapfile -t subs < <(find "$RESULTS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+    if [[ "${#subs[@]}" -eq 0 ]]; then
+        echo "  ${C_DIM}(vide)${C_OFF}"; return 0
+    fi
+    for i in "${!subs[@]}"; do
+        d="${subs[$i]}"
+        n_txt=$(find "$d" -name '*.txt' ! -name 'cantus_firmus.txt' 2>/dev/null | wc -l)
+        n_err=$(find "$d" -name 'error_*.txt' 2>/dev/null | wc -l)
+        n_mid=$(find "$d" -name '*.mid' 2>/dev/null | wc -l)
+        printf "  %2d) %-30s  (txt=%d  erreurs=%d  midi=%d)\n" $((i+1)) "$(basename "$d")" "$n_txt" "$n_err" "$n_mid"
+    done
+    echo "  0) Retour"
+    read -rp "Choix : " ch
+    [[ "$ch" == "0" || -z "$ch" ]] && return 0
+    sel="${subs[$((ch-1))]}"
+    [[ -z "$sel" || ! -d "$sel" ]] && { err "Choix invalide"; return 1; }
+    echo "${C_BOLD}Contenu de $sel :${C_OFF}"
+    find "$sel" -name '*.txt' ! -name 'cantus_firmus.txt' | sort | head -n 40
+    echo
+    read -rp "Fichier txt à afficher (chemin complet, vide=skip) : " f
+    [[ -n "$f" && -f "$f" ]] && less "$f"
+}
+
+# === Inspecter logs ===
+inspect_logs() {
+    banner "Inspection des logs"
+    mapfile -t logs < <(ls -1t "$LOGS_DIR"/*.log 2>/dev/null)
+    if [[ "${#logs[@]}" -eq 0 ]]; then
+        echo "  ${C_DIM}(aucun log)${C_OFF}"; return 0
+    fi
+    for i in "${!logs[@]}"; do
+        size=$(du -h "${logs[$i]}" | cut -f1)
+        printf "  %2d) %-50s  %s\n" $((i+1)) "$(basename "${logs[$i]}")" "$size"
+    done
+    echo "  0) Retour"
+    read -rp "Choix : " ch
+    [[ "$ch" == "0" || -z "$ch" ]] && return 0
+    sel="${logs[$((ch-1))]}"
+    [[ -z "$sel" || ! -f "$sel" ]] && { err "Choix invalide"; return 1; }
+    echo "Action :"
+    echo "  1) less"
+    echo "  2) tail -f"
+    echo "  3) grep filtres clés"
+    read -rp "Choix [1] : " a
+    a="${a:-1}"
+    case "$a" in
+        1) less "$sel" ;;
+        2) tail -f "$sel" ;;
+        3) grep -E "STAGNATION|TIMEOUT|EXHAUSTIVE|Coût=|Solutions=|Génération :|AUCUNE" --color=always "$sel" | less -R ;;
+    esac
+}
+
+# === Menu principal ===
+main_menu() {
+    while true; do
+        clear
+        banner "FuxCP — interface CLI"
+        echo "Configuration : ${C_DIM}$CONFIG_DIR${C_OFF}"
+        echo "Résultats     : ${C_DIM}$RESULTS_DIR${C_OFF}"
+        echo "Binaire       : ${C_DIM}$BIN${C_OFF}"
+        echo
+        echo "  1) Génération précise (CF + voix + espèces + preset interactif)"
+        echo "  2) Lancer une campagne (sélection dans campaigns.csv)"
+        echo "  3) Génération classique en masse"
+        echo "  4) Surveiller une campagne en cours (tail/grep/processus)"
+        echo "  5) Explorer les résultats (txt/csv/midi)"
+        echo "  6) Inspecter les logs"
+        echo "  7) Lister CF disponibles"
+        echo "  8) Lister presets"
+        echo "  9) Lister campagnes"
+        echo " 10) Recompiler le binaire"
+        echo "  0) Quitter"
+        echo
+        read -rp "Choix : " ch
+        case "$ch" in
+            1)  run_precise ;;
+            2)  run_campaign "" ;;
+            3)  run_classical_mass ;;
+            4)  monitor ;;
+            5)  explore_results ;;
+            6)  inspect_logs ;;
+            7)  list_cf ;;
+            8)  list_presets ;;
+            9)  list_campaigns ;;
+            10) (cd "$CPP_DIR" && make compile_generate_counterpoint) ;;
+            0)  exit 0 ;;
+            *)  err "Choix invalide" ;;
+        esac
+        echo
+        read -rp "Appuyer sur Entrée pour revenir au menu..." _dummy
+    done
+}
+
+# === Entrée principale ===
+ensure_config
+
+case "${1:-}" in
+    "")           ensure_binary; main_menu ;;
+    campaign)     ensure_binary; run_campaign "${2:-}" ;;
+    generate)     ensure_binary; shift; "$BIN" "$@" ;;
+    tail)         last="$(ls -1t "$LOGS_DIR"/*.log 2>/dev/null | head -n1 || true)"
+                  [[ -n "$last" ]] && tail -f "$last" || err "Aucun log" ;;
+    list-cf)      ensure_binary; list_cf ;;
+    list-presets) ensure_binary; list_presets ;;
+    list-camps)   ensure_binary; list_campaigns ;;
+    -h|--help|help)
+        echo "Usage : $0 [campaign <id> | generate <args> | tail | list-cf | list-presets | list-camps]"
+        echo "        (sans argument = menu interactif)" ;;
+    *)            err "Commande inconnue : $1"; exit 1 ;;
+esac
