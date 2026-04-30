@@ -1,0 +1,21 @@
+# Presets de paramètres pour la génération de contrepoints.
+#
+# Chaque preset définit l'ensemble des poids/coûts utilisés par le solveur.
+# Les listes sont séparées par des espaces. Toutes les colonnes sont obligatoires.
+#
+# Colonnes :
+#   name             : identifiant texte du preset (utilisé via --preset NAME)
+#   melodic_params   : 8 entiers - [unisson, m2, M2, sauts, m3, M3, P4, sup4]
+#   general_params   : 8 entiers - [octave, P5, m6, M6, P8, mvtCommun, variete, triade]
+#   specific_params  : 7 entiers - [parfaite, faiblet, mvtDirect, syncope, cambiata, melodique, fux2]
+#   importance       : 14 entiers - ordre lexicographique des coûts
+#                      [borrow, fifth, octave, succ, variety, triad, direct, motion,
+#                       penult, cambiata, triad3, m2, syncopation, melodic]
+#   borrow_mode      : 0=interdit emprunts | 1=autorise emprunts (mode courant) | 2=mineur emprunté
+#   description      : texte libre (affichage uniquement, pas de virgule)
+name,melodic_params,general_params,specific_params,importance,borrow_mode,description
+default,0 1 1 576 2 2 2 1,4 1 1 2 2 2 8 1,8 4 0 2 1 8 50,8 7 5 2 9 3 14 12 6 11 4 10 1 13,1,Preset par defaut equilibre
+strict,0 1 2 576 5 10 25 40,4 1 1 2 2 2 8 1,8 4 0 2 1 8 50,8 7 5 2 9 3 14 12 6 11 4 10 1 13,0,Sans emprunts melodiques contraints
+musique,0 1 1 576 2 2 2 1,4 1 1 2 2 2 8 1,8 4 0 2 1 8 50,4 3 2 2 9 3 7 6 3 11 4 10 1 13,1,Importance accrue mvts/octaves/melodique
+variete_haute,0 1 1 576 2 2 2 1,4 1 1 2 2 2 16 1,8 4 0 2 1 8 50,8 7 5 2 9 3 14 12 6 11 4 10 1 13,1,Coût de variete double pour eviter repetitions
+bryce,0 1 2 576 5 10 25 40,4 1 1 2 2 2 8 1,8 4 0 2 1 8 50,8 7 5 2 9 3 14 12 6 11 4 10 1 13,0,Preset historique de Bryce (cf Generations.cpp)
