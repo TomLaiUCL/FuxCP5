@@ -12,9 +12,9 @@
 
 struct CFEntry {
     int id;
-    std::vector<int> notes;  // notes MIDI du cantus firmus (consolidées dans le CSV)
-    std::string mode;        // ionien|dorien|...|auto
-    std::string tonalite;
+    std::vector<int> notes;  // notes MIDI du cantus firmus
+    std::string name;        // libellé court (ex "Do Majeur (court)")
+    std::string scale;       // gamme indicative (informatif uniquement)
     std::string description;
 };
 

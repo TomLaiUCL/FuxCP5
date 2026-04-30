@@ -232,7 +232,14 @@ void CounterpointProblem::orderCosts(){
         rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
     }
 
-    // Adapte l'objectif selon le mode demandé
+    // globalCost = somme des coûts musicaux originaux (lexicographiques).
+    // Doit être posé AVANT toute réassignation de finalCosts pour TOTAL/MIXED,
+    // sinon on cree un cycle (mixCost = globalCost + lexScore puis
+    //  globalCost = sum(finalCosts) = mixCost => lexScore = 0).
+    rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
+
+    // Adapte l'objectif (la cible de minimisation BAB) selon le mode demandé.
+    // globalCost reste figé sur les coûts musicaux originaux pour le reporting.
     if (objectiveMode == OBJECTIVE_TOTAL) {
         IntVarArray totalCosts(*this, 1, 0, 2000000);
         rel(*this, totalCosts[0], IRT_EQ, globalCost);
@@ -273,9 +280,6 @@ void CounterpointProblem::orderCosts(){
         }
         finalCosts = newFinalCosts;
     }
-
-    //globalCost is the sum of all the finalCosts
-    rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
 }
 
 

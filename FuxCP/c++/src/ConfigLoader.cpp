@@ -96,8 +96,8 @@ map<int, CFEntry> ConfigLoader::load_cantus_firmus(const string& dir) {
         CFEntry e;
         e.id          = atoi(trim(r[0]).c_str());
         e.notes       = parse_int_list(r[1], ' ');
-        e.mode        = trim(r[2]);
-        e.tonalite    = trim(r[3]);
+        e.name        = trim(r[2]);
+        e.scale       = trim(r[3]);
         e.description = trim(r[4]);
         out[e.id] = e;
     }

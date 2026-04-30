@@ -114,7 +114,7 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     branch(*this, solutionArray, INT_VAR_AFC_MAX(), INT_VAL_RND(1U)); // AFC to focus a bit more on variables involved in failures
     //branch(*this, solutionArray, INT_VAR_AFC_MAX(), INT_VAL_MIN()); // Better --> NO, too slow
 
-    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MIN()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
 
 }
 // COPY CONSTRUCTOR

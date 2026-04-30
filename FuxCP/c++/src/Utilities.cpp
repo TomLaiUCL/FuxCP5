@@ -49,21 +49,28 @@ vector<int> get_all_notes_from_scale(int root, vector<int> scale)
 }
 
 
+// Liste des gammes candidates pour la détection automatique.
+// Les noms affichés utilisent "Majeur" / "Mineur" (au lieu d'Ionien/Aeolien)
+// pour la lisibilité utilisateur. Les pentatoniques et blues sont incluses.
 static const vector<pair<string, vector<int>>> SCALE_CANDIDATES = {
-    {"Ionien (majeur)",       IONIAN_SCALE},
-    {"Aeolien (mineur naturel)", AEOLIAN_SCALE},
+    {"Majeur",                MAJOR_SCALE},        // = Ionien
+    {"Mineur naturel",        AEOLIAN_SCALE},      // = mineur naturel
     {"Dorien",                DORIAN_SCALE},
     {"Mixolydien",            MIXOLYDIAN_SCALE},
     {"Lydien",                LYDIAN_SCALE},
     {"Phrygien",              PHRYGIAN_SCALE},
     {"Locrien",               LOCRIAN_SCALE},
     {"Mineur harmonique",     HARMONIC_MINOR_SCALE},
-    {"Mineur mélodique",      MELODIC_MINOR_SCALE}
+    {"Mineur mélodique",      MELODIC_MINOR_SCALE},
+    {"Pentatonique majeure",  PENTATONIC_MAJOR_SCALE},
+    {"Pentatonique mineure",  PENTATONIC_MINOR_SCALE},
+    {"Blues majeure",         BLUES_MAJOR_SCALE},
+    {"Blues mineure",         BLUES_MINOR_SCALE}
 };
 
 static pair<string, vector<int>> detect_scale_pair(const vector<int>& cf) {
     if (cf.empty()) {
-        return {"Ionien (majeur) [fallback CF vide]", MAJOR_SCALE};
+        return {"Majeur [fallback CF vide]", MAJOR_SCALE};
     }
     int root = ((cf[0] % 12) + 12) % 12;
 
@@ -97,7 +104,7 @@ static pair<string, vector<int>> detect_scale_pair(const vector<int>& cf) {
         }
     }
     if (best_idx < 0) {
-        return {"Ionien (majeur) [fallback]", MAJOR_SCALE};
+        return {"Majeur [fallback]", MAJOR_SCALE};
     }
     auto chosen = SCALE_CANDIDATES[best_idx];
     if (best_covered < static_cast<int>(cf_pcs.size())) {

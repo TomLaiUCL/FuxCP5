@@ -18,7 +18,7 @@
 
 # === DOSSIERS ===
 COMPILED_DIR = ../compiled
-RESULTS_DIR  = ../results
+RESULTS_DIR  = ../../results
 OUT_DIR      = ../sources
 
 # === CANTUS FIRMUS (défaut : 1) ===

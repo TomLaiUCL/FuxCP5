@@ -15,10 +15,11 @@ set -uo pipefail
 # === Localisation ===
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$SCRIPT_DIR"
+REPO_DIR="$(cd "$ROOT_DIR/.." && pwd)"
 CPP_DIR="$ROOT_DIR/c++"
 CONFIG_DIR="$ROOT_DIR/config"
-RESULTS_DIR="$ROOT_DIR/results"
-LOGS_DIR="$ROOT_DIR/results/cli_logs"
+RESULTS_DIR="$REPO_DIR/results"
+LOGS_DIR="$RESULTS_DIR/cli_logs"
 BIN="$ROOT_DIR/compiled/GenerateCounterpoint"
 
 mkdir -p "$LOGS_DIR"
@@ -111,10 +112,17 @@ run_precise() {
     read -rp "Sous-dossier de sortie [precise] : " sub
     sub="${sub:-precise}"
 
+    echo "Mode d'objectif :"
+    echo "  lex   = lexicographique par priorité (défaut, recommandé)"
+    echo "  total = somme globale (toutes contraintes au même poids)"
+    echo "  mixed = lex pondéré + somme globale"
+    read -rp "Mode (lex/total/mixed) [lex] : " obj
+    obj="${obj:-lex}"
+
     log_file="$LOGS_DIR/precise_$(date +%Y%m%d_%H%M%S).log"
     inf "Log : $log_file"
 
-    cmd=("$BIN" "$nv" $sp_input -c "$cf_id" --preset "$preset" -t "$tmo" -s "$stg" --subdir "$sub")
+    cmd=("$BIN" "$nv" $sp_input -c "$cf_id" --preset "$preset" -t "$tmo" -s "$stg" -m "$obj" --subdir "$sub")
     echo "${C_DIM}Commande :${C_OFF} ${cmd[*]}"
     "${cmd[@]}" 2>&1 | tee "$log_file"
 }
@@ -134,16 +142,23 @@ run_campaign() {
     inf "Lancement campagne '$camp_id'"
     inf "Log : $log_file"
 
+    echo "Mode d'objectif (override pour toute la campagne) :"
+    echo "  lex   = lexicographique par priorité (défaut, recommandé)"
+    echo "  total = somme globale (toutes contraintes au même poids)"
+    echo "  mixed = lex pondéré + somme globale"
+    read -rp "Mode (lex/total/mixed) [lex] : " obj
+    obj="${obj:-lex}"
+
     read -rp "Lancer en arrière-plan ? [O/n] : " bg
     bg="${bg:-O}"
     if [[ "${bg^^}" == "O" ]]; then
-        nohup "$BIN" --campaign "$camp_id" > "$log_file" 2>&1 &
+        nohup "$BIN" --campaign "$camp_id" -m "$obj" > "$log_file" 2>&1 &
         echo $! > "$pid_file"
         ok "Lancée en arrière-plan, PID=$(cat "$pid_file")"
         echo "  Suivi : tail -f $log_file"
         echo "  Stop  : kill $(cat "$pid_file")"
     else
-        "$BIN" --campaign "$camp_id" 2>&1 | tee "$log_file"
+        "$BIN" --campaign "$camp_id" -m "$obj" 2>&1 | tee "$log_file"
     fi
 }
 

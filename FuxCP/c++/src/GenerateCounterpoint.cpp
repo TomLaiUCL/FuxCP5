@@ -58,8 +58,8 @@ using namespace Gecode;
 struct GenCase {
     int cf_id;
     vector<int> cf;
-    string cf_tonalite;
-    string cf_mode_csv;      // ce que dit le CSV (peut être "auto")
+    string cf_name;          // libellé court (ex "Do Majeur (court)")
+    string cf_scale;         // gamme indicative (informatif)
 
     int n_voices;
     vector<Species> spList;  // espèces (sans le CF, dans l'ordre voix 1..n-1)
@@ -90,8 +90,11 @@ struct BenchOutcome {
     double ms_total          = 0;
     string termination       = "NONE";
     Search::Statistics stats;
-    vector<tuple<int,double,double>> improvements; // (sol#, ms, cost)
-    vector<tuple<int,double,double>> checkpoints;  // (sol#, ms, best_cost)
+    vector<tuple<int,double,double>> improvements; // (sol#, ms, cost scalaire)
+    vector<tuple<int,double,double>> checkpoints;  // (sol#, ms, best_cost scalaire)
+    // Évolution du vecteur de coûts lex (toutes les solutions BAB).
+    // Chaque entrée = (sol#, ms, scalaire, vecteur_lex_stringifié)
+    vector<tuple<int,double,double,string>> solutions_log;
     vector<int> solution;
 };
 
@@ -150,6 +153,28 @@ static string midi_to_french(int note) {
     return names[note % 12] + to_string(oct);
 }
 
+static const char* obj_mode_label(ObjectiveMode m) {
+    switch (m) {
+        case OBJECTIVE_TOTAL: return "total (somme globale)";
+        case OBJECTIVE_MIXED: return "mixed (somme + score lex pond\u00e9r\u00e9)";
+        default:              return "lex (lexicographique par priorit\u00e9)";
+    }
+}
+static const char* obj_mode_short(ObjectiveMode m) {
+    switch (m) {
+        case OBJECTIVE_TOTAL: return "total";
+        case OBJECTIVE_MIXED: return "mixed";
+        default:              return "lex";
+    }
+}
+static const char* cost_label(ObjectiveMode m) {
+    switch (m) {
+        case OBJECTIVE_TOTAL: return "Co\u00fbt total";
+        case OBJECTIVE_MIXED: return "Score mixte";
+        default:              return "Somme lex (indic.)";
+    }
+}
+
 static ObjectiveMode parse_obj_mode(const string& s) {
     if (s == "total") return OBJECTIVE_TOTAL;
     if (s == "mixed") return OBJECTIVE_MIXED;
@@ -174,12 +199,12 @@ static void mkdir_p(const string& path) {
 
 static void cmd_list_cf(const map<int, CFEntry>& cfs) {
     cout << "Cantus firmus disponibles :" << endl;
-    cout << "  ID  | Mode CSV     | Tonalité            | Description" << endl;
-    cout << "  ----+--------------+---------------------+-----------------------------" << endl;
+    cout << "  ID  | Nom                  | Gamme indicative   | Description" << endl;
+    cout << "  ----+----------------------+--------------------+-----------------------------" << endl;
     for (auto& kv : cfs) {
         cout << "  " << setw(3) << kv.first << " | "
-             << setw(12) << left << kv.second.mode << " | "
-             << setw(19) << left << kv.second.tonalite << " | "
+             << setw(20) << left << kv.second.name << " | "
+             << setw(18) << left << kv.second.scale << " | "
              << kv.second.description << endl;
     }
 }
@@ -224,8 +249,8 @@ static bool resolve_cf(GenCase& gc, const map<int, CFEntry>& cfs) {
         cerr << "CF id=" << gc.cf_id << " : aucune note dans cantus_firmus.csv" << endl;
         return false;
     }
-    gc.cf_tonalite = it->second.tonalite;
-    gc.cf_mode_csv = it->second.mode;
+    gc.cf_name  = it->second.name;
+    gc.cf_scale = it->second.scale;
     return true;
 }
 
@@ -256,10 +281,11 @@ static void write_txt_report(const string& path, const GenCase& gc,
       << "  RÉSULTATS : " << species_tag_for(gc.n_voices, sp_input) << "\n"
       << "========================================\n\n";
     r << "--- Configuration ---\n"
-      << "CF                : " << gc.cf_id << " (" << gc.cf_tonalite << ")\n"
-      << "CF mode (CSV)     : " << gc.cf_mode_csv << "\n"
+      << "CF                : " << gc.cf_id << " (" << gc.cf_name << ")\n"
+      << "Gamme indicative  : " << gc.cf_scale << "\n"
       << "Preset            : " << gc.preset_name << "\n"
       << "Borrow mode       : " << gc.borrow_mode << "\n"
+      << "Mode d'objectif   : " << obj_mode_label(gc.obj_mode) << "\n"
       << "Nombre de voix    : " << gc.n_voices << "\n"
       << "Espèces (incl CF) : 1";
     for (int s : sp_input) r << " " << s;
@@ -279,7 +305,7 @@ static void write_txt_report(const string& path, const GenCase& gc,
       << "Temps dernière amélio. (ms) : " << fixed << setprecision(1) << bo.ms_last_improve << "\n"
       << "Solutions trouvées          : " << bo.nb_solutions << "\n"
       << "Améliorations de coût       : " << bo.nb_improvements << "\n"
-      << "Coût final                  : " << bo.best_cost << "\n"
+      << cost_label(gc.obj_mode) << "           : " << bo.best_cost << "\n"
       << "Terminaison                 : " << bo.termination;
     if (bo.termination == "EXHAUSTIVE") r << " (optimal)";
     r << "\n\n";
@@ -311,6 +337,18 @@ static void write_txt_report(const string& path, const GenCase& gc,
         }
         r << "\n";
     }
+    if (!bo.solutions_log.empty()) {
+        r << "--- \u00c9volution du vecteur de co\u00fbts (toutes les solutions BAB) ---\n"
+          << setw(8) << "Sol#" << setw(14) << "Temps (ms)"
+          << setw(12) << "Cost" << "  Vecteur lex\n";
+        for (auto& t : bo.solutions_log) {
+            r << setw(8) << get<0>(t)
+              << setw(14) << fixed << setprecision(1) << get<1>(t)
+              << setw(12) << fixed << setprecision(1) << get<2>(t)
+              << "  " << get<3>(t) << "\n";
+        }
+        r << "\n";
+    }
     if (!bo.solution.empty()) {
         r << "--- Solution (notes MIDI) ---\n";
         for (int n : bo.solution) r << n << " ";
@@ -323,11 +361,11 @@ static void write_csv_report(const string& path, const GenCase& gc,
                              const vector<int>& sp_input,
                              const BenchOutcome& bo) {
     ofstream c(path);
-    c << "cf_id,cf_tonalite,preset,borrow_mode,nb_voix,especes,v_type,"
+    c << "cf_id,cf_name,preset,borrow_mode,nb_voix,especes,v_type,"
          "timeout_ms,stagnation_ms,temps_total_ms,temps_premiere_solution_ms,"
          "temps_derniere_amelioration_ms,nb_solutions,nb_ameliorations,cout_final,"
          "terminaison,noeuds,echecs,redemarrages,propagations,profondeur_max\n";
-    c << gc.cf_id << "," << gc.cf_tonalite << "," << gc.preset_name << ","
+    c << gc.cf_id << "," << gc.cf_name << "," << gc.preset_name << ","
       << gc.borrow_mode << "," << gc.n_voices << ",";
     c << "1";
     for (int s : sp_input) c << "-" << s;
@@ -362,6 +400,17 @@ static void write_csv_report(const string& path, const GenCase& gc,
             c << get<0>(t) << "," << fixed << setprecision(1) << get<1>(t)
               << "," << fixed << setprecision(1) << get<2>(t) << "\n";
     }
+    if (!bo.solutions_log.empty()) {
+        c << "\n# Evolution couts\nsolution_num,temps_ms,cout_scalaire,vecteur_lex\n";
+        for (auto& t : bo.solutions_log) {
+            string lex = get<3>(t);
+            // CSV-safe : remplacer virgules par points-virgules dans le vecteur lex
+            for (char& ch : lex) if (ch == ',') ch = ';';
+            c << get<0>(t) << "," << fixed << setprecision(1) << get<1>(t)
+              << "," << fixed << setprecision(1) << get<2>(t)
+              << ",\"" << lex << "\"\n";
+        }
+    }
     c.close();
 }
 
@@ -372,7 +421,7 @@ static void write_error_txt(const string& path, const GenCase& gc,
     e << "========================================\n"
       << "  AUCUNE SOLUTION : " << species_tag_for(gc.n_voices, sp_input) << "\n"
       << "========================================\n\n"
-      << "CF             : " << gc.cf_id << " (" << gc.cf_tonalite << ")\n"
+      << "CF             : " << gc.cf_id << " (" << gc.cf_name << ")\n"
       << "Preset         : " << gc.preset_name << "\n"
       << "Nb voix        : " << gc.n_voices << "\n"
       << "Espèces        : 1";
@@ -408,6 +457,23 @@ static BenchOutcome run_bench(CounterpointProblem* problem, GenCase& gc) {
         bo.nb_solutions++;
         double now = ms_since();
         double cost = s->getCost();
+        string lex = intVarArgs_to_string(s->cost());
+
+        // Trace live : on voit l'évolution des coûts en suivant le log.
+        // En mode lex on affiche le vecteur complet (le plus parlant) ;
+        // en mode total/mixed on affiche le scalaire optimisé directement.
+        if (gc.obj_mode == OBJECTIVE_LEX) {
+            cout << "  [Sol " << bo.nb_solutions
+                 << " | t=" << fixed << setprecision(0) << now << "ms"
+                 << " | somme=" << fixed << setprecision(1) << cost
+                 << " | lex=" << lex << "]" << endl;
+        } else {
+            cout << "  [Sol " << bo.nb_solutions
+                 << " | t=" << fixed << setprecision(0) << now << "ms"
+                 << " | " << cost_label(gc.obj_mode) << "="
+                 << fixed << setprecision(1) << cost << "]" << endl;
+        }
+        bo.solutions_log.emplace_back(bo.nb_solutions, now, cost, lex);
 
         if (bo.nb_solutions == 1) bo.ms_first_solution = now;
 
@@ -462,11 +528,12 @@ static int execute_gen_case(GenCase& gc, const vector<int>& sp_input) {
         for (size_t i = 0; i < gc.cf.size(); ++i) { if (i) f << " "; f << gc.cf[i]; }
         f << "\n";
         for (size_t i = 0; i < gc.cf.size(); ++i) { if (i) f << " "; f << midi_to_french(gc.cf[i]); }
-        f << "\n" << gc.cf_tonalite << " (mode CSV : " << gc.cf_mode_csv << ")\n";
+        f << "\n" << gc.cf_name << " (gamme indicative : " << gc.cf_scale << ")\n";
     }
 
-    cout << "\n=== Génération : cf" << gc.cf_id << " (" << gc.cf_tonalite << ") | "
+    cout << "\n=== Génération : cf" << gc.cf_id << " (" << gc.cf_name << ") | "
          << species_tag << " | preset=" << gc.preset_name
+         << " | obj=" << obj_mode_short(gc.obj_mode)
          << " | timeout=" << gc.timeout_ms << "ms | stagn=" << gc.stagnation_ms << "ms ===" << endl;
 
     // Activation des contraintes musicales (par défaut toutes actives)
@@ -500,7 +567,7 @@ static int execute_gen_case(GenCase& gc, const vector<int>& sp_input) {
 
         cout << "  -> Solutions=" << bo.nb_solutions
              << " Améliorations=" << bo.nb_improvements
-             << " Coût=" << bo.best_cost
+             << " " << cost_label(gc.obj_mode) << "=" << bo.best_cost
              << " Temps=" << fixed << setprecision(0) << bo.ms_total << "ms"
              << " (" << bo.termination << ")" << endl;
     } else {
@@ -522,7 +589,7 @@ struct CliArgs {
     string preset_name   = "default";
     int    timeout_ms    = 300000;
     int    stagnation_ms = 120000;
-    string output_root   = "../results";
+    string output_root   = "../../results";
     string output_subdir = "";
     ObjectiveMode obj_mode = OBJECTIVE_LEX;
     vector<int> v_types_override;
@@ -611,7 +678,8 @@ static GenCase build_gc_from_cli(const CliArgs& a) {
     return gc;
 }
 
-static GenCase build_gc_from_campaign(const CampaignRow& row, int cf_id, const string& output_root) {
+static GenCase build_gc_from_campaign(const CampaignRow& row, int cf_id, const string& output_root,
+                                      ObjectiveMode obj_override) {
     GenCase gc;
     gc.cf_id          = cf_id;
     gc.n_voices       = row.n_voices;
@@ -620,7 +688,7 @@ static GenCase build_gc_from_campaign(const CampaignRow& row, int cf_id, const s
     gc.stagnation_ms  = row.stagnation_ms;
     gc.output_root    = output_root;
     gc.output_subdir  = row.output_subdir;
-    gc.obj_mode       = OBJECTIVE_LEX;
+    gc.obj_mode       = obj_override;
     for (int s : row.species) gc.spList.push_back(int_to_species(s));
     if (!row.v_types.empty()) gc.v_type = row.v_types;
     else gc.v_type = vector<int>(row.n_voices - 1, 0);
@@ -660,7 +728,7 @@ int main(int argc, char* argv[]) {
             for (int cf_id : row.cf_ids) {
                 done++;
                 cout << "\n[" << done << "/" << total << "] " << row.description << endl;
-                GenCase gc = build_gc_from_campaign(row, cf_id, a.output_root);
+                GenCase gc = build_gc_from_campaign(row, cf_id, a.output_root, a.obj_mode);
                 if (!resolve_cf(gc, cfs))      { cerr << "  CF non résolu, skip." << endl; continue; }
                 if (!apply_preset(gc, presets)){ cerr << "  Preset non résolu, skip." << endl; continue; }
                 execute_gen_case(gc, row.species);
