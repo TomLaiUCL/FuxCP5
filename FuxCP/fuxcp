@@ -202,18 +202,22 @@ monitor() {
     echo "Choix :"
     echo "  1) tail -f en direct (Ctrl+C pour quitter)"
     echo "  2) Voir les 30 dernières lignes"
-    echo "  3) Filtrer (STAGNATION/TIMEOUT/EXHAUSTIVE/Coût)"
-    echo "  4) Compter générations terminées"
+    echo "  3) Filtrer solutions trouvées ([Sol ...])"
+    echo "  4) Filtrer itérations (Itération ...)"
+    echo "  5) Filtrer final (STAGNATION/TIMEOUT/EXHAUSTIVE)"
+    echo "  6) Compter générations terminées"
     echo "  0) Retour"
     read -rp "Choix [1] : " m
     m="${m:-1}"
     case "$m" in
         1) tail -f "$last_log" ;;
         2) tail -n 30 "$last_log" ;;
-        3) grep -E "STAGNATION|TIMEOUT|EXHAUSTIVE|Coût=|Solutions=|Génération :" --color=always "$last_log" | tail -n 50 ;;
-        4) echo "Générations terminées : $(grep -c '^  -> ' "$last_log")"
-           echo "Avec solution         : $(grep -c '^  -> Solutions=' "$last_log")"
-           echo "Sans solution         : $(grep -c '^  -> AUCUNE SOLUTION' "$last_log")" ;;
+        3) grep -E "\[Sol " --color=always "$last_log" | tail -n 30 ;;
+        4) grep -E "Itération [0-9]+ \|" --color=always "$last_log" | tail -n 50 ;;
+        5) grep -E "STAGNATION|TIMEOUT|EXHAUSTIVE|AUCUNE SOLUTION" --color=always "$last_log" | tail -n 50 ;;
+        6) echo "Solutions trouvées   : $(grep -c '\[Sol ' "$last_log")"
+           echo "Itérations loggées   : $(grep -c 'Itération [0-9]' "$last_log")"
+           echo "Terminaisons         : $(grep -cE 'STAGNATION|TIMEOUT|EXHAUSTIVE' "$last_log")" ;;
         *) ;;
     esac
 }
@@ -264,13 +268,17 @@ inspect_logs() {
     echo "Action :"
     echo "  1) less"
     echo "  2) tail -f"
-    echo "  3) grep filtres clés"
+    echo "  3) Solutions trouvées ([Sol ...])"
+    echo "  4) Itérations progressives (Itération ...)"
+    echo "  5) Terminaisons (STAGNATION/TIMEOUT/EXHAUSTIVE/AUCUNE)"
     read -rp "Choix [1] : " a
     a="${a:-1}"
     case "$a" in
         1) less "$sel" ;;
         2) tail -f "$sel" ;;
-        3) grep -E "STAGNATION|TIMEOUT|EXHAUSTIVE|Coût=|Solutions=|Génération :|AUCUNE" --color=always "$sel" | less -R ;;
+        3) grep -E "\[Sol " --color=always "$sel" | less -R ;;
+        4) grep -E "Itération [0-9]+ \|" --color=always "$sel" | less -R ;;
+        5) grep -E "STAGNATION|TIMEOUT|EXHAUSTIVE|AUCUNE|EXHAUSTIVE" --color=always "$sel" | less -R ;;
     esac
 }
 

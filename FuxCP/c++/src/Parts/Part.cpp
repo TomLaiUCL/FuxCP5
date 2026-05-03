@@ -25,9 +25,14 @@ Part::Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int 
     // mélodique). En cas d'ambiguïté on retient la gamme la plus générale.
     vector<int> detected_scale = detect_scale_for_cf(cf);
     scale = get_all_notes_from_scale(cf[0]%12, detected_scale);
-    cout << "[Part] Cantus firmus -> gamme détectée : "
-         << detect_scale_name_for_cf(cf) << " (tonique = "
-         << noteNames[((cf[0] % 12) + 12) % 12] << ")" << endl;
+    // Afficher la gamme une seule fois (pas une fois par Part créée)
+    static bool scale_printed = false;
+    if (!scale_printed) {
+        cout << "[Part] Cantus firmus -> gamme détectée : "
+             << detect_scale_name_for_cf(cf) << " (tonique = "
+             << noteNames[((cf[0] % 12) + 12) % 12] << ")" << endl;
+        scale_printed = true;
+    }
     chromatic_scale = get_all_notes_from_scale(cf[0]%12, CHROMATIC_SCALE);
     cp_range = {};
 

@@ -51,21 +51,17 @@ using namespace std;
 using namespace std::chrono;
 using namespace Gecode;
 
-// =============================================================
-// Structures de données (alignées sur Generations.hpp)
-// =============================================================
 
 struct GenCase {
     int cf_id;
     vector<int> cf;
-    string cf_name;          // libellé court (ex "Do Majeur (court)")
-    string cf_scale;         // gamme indicative (informatif)
+    string cf_name;          
+    string cf_scale;         
 
     int n_voices;
-    vector<Species> spList;  // espèces (sans le CF, dans l'ordre voix 1..n-1)
-    vector<int> v_type;      // taille = n_voices-1
+    vector<Species> spList;  
+    vector<int> v_type;      
 
-    // Paramètres (issus du preset)
     string preset_name;
     vector<int> melodic_params;
     vector<int> general_params;
@@ -77,8 +73,8 @@ struct GenCase {
     int timeout_ms;
     int stagnation_ms;
 
-    string output_root;       // racine, ex "../results"
-    string output_subdir;     // sous-dossier optionnel ex "test_gammes"
+    string output_root;       
+    string output_subdir;    
 };
 
 struct BenchOutcome {
@@ -92,15 +88,10 @@ struct BenchOutcome {
     Search::Statistics stats;
     vector<tuple<int,double,double>> improvements; // (sol#, ms, cost scalaire)
     vector<tuple<int,double,double>> checkpoints;  // (sol#, ms, best_cost scalaire)
-    // Évolution du vecteur de coûts lex (toutes les solutions BAB).
-    // Chaque entrée = (sol#, ms, scalaire, vecteur_lex_stringifié)
     vector<tuple<int,double,double,string>> solutions_log;
     vector<int> solution;
 };
 
-// =============================================================
-// Stop : timeout total + détection de stagnation
-// =============================================================
 
 class StagnationStop : public Search::Stop {
     Search::TimeStop maxStop;
@@ -108,6 +99,7 @@ class StagnationStop : public Search::Stop {
     int stagnation_ms;
     bool stagnation_triggered = false;
     bool max_triggered = false;
+    
 public:
     StagnationStop(int max_ms, int stag_ms)
         : maxStop(max_ms), stagnation_ms(stag_ms),
@@ -436,6 +428,19 @@ static void write_error_txt(const string& path, const GenCase& gc,
 }
 
 // =============================================================
+// Helper : retourne true si l'itération n doit afficher du logging progressif
+// Affiche à : 1, 5, 10, 20, 30, 40, 50, 100, 200, 500, 1000, 1500, ...
+// =============================================================
+static bool should_log_iteration(int n) {
+    if (n <= 50) {
+        return n == 1 || n == 5 || n == 10 || n == 20 || n == 30 || n == 40 || n == 50;
+    }
+    if (n <= 500) return n % 100 == 0;
+    if (n <= 2000) return n % 500 == 0;
+    return n % 1000 == 0;
+}
+
+// =============================================================
 // Bench BAB (équivalent generation_BAB_bench de Generations.cpp)
 // =============================================================
 
@@ -452,8 +457,10 @@ static BenchOutcome run_bench(CounterpointProblem* problem, GenCase& gc) {
 
     BAB<CounterpointProblem> e(problem, opt);
     CounterpointProblem* best = nullptr;
+    int iteration = 0;
 
     while (CounterpointProblem* s = e.next()) {
+        iteration++;
         bo.nb_solutions++;
         double now = ms_since();
         double cost = s->getCost();
@@ -473,6 +480,14 @@ static BenchOutcome run_bench(CounterpointProblem* problem, GenCase& gc) {
                  << " | " << cost_label(gc.obj_mode) << "="
                  << fixed << setprecision(1) << cost << "]" << endl;
         }
+        
+        // Logging progressif des itérations (affiche tous les 1, 5, 10, 20, 50, 100, 500, 1000...)
+        if (should_log_iteration(iteration)) {
+            cout << "    -> Itération " << iteration << " | t=" 
+                 << fixed << setprecision(0) << now << "ms | meilleur="
+                 << fixed << setprecision(1) << bo.best_cost << endl;
+        }
+        
         bo.solutions_log.emplace_back(bo.nb_solutions, now, cost, lex);
 
         if (bo.nb_solutions == 1) bo.ms_first_solution = now;

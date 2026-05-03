@@ -45,8 +45,12 @@ Main
 # Output files
 *.mid
 *.csv
+!FuxCP/config/
+!FuxCP/config/*.csv
+FuxCP/scripts/
 
 FuxCP/compiled/
 FuxCP/results/
 Latex/results/
 results/
+Latex/
