@@ -49,7 +49,7 @@ class Part : public Voice {
 
         vector<int> cp_range;
 
-        vector<int> extended_domain;
+        vector<int> domain;
         vector<int> off_domain;
 
         vector<string> cost_names;
@@ -79,6 +79,8 @@ class Part : public Voice {
         int m2ZeroCost;
         int syncopationCost;
         int prefSlider;
+
+        IntVarArray relaxationCostArray;
 
         int directCost;
         int obliqueCost;
@@ -192,7 +194,7 @@ class Part : public Voice {
 
         vector<int> getOffDomain();
 
-        vector<int> getExtendedDomain();
+        vector<int> getDomain();
 
         IntVarArray getOffCostArray();
 
@@ -231,6 +233,9 @@ class Part : public Voice {
         vector<string> getToCombineCostNames();
 
         void add_toCombineCost(Home home, int idx, IntVarArray to_be_added, IntVarArray costs);
+
+        IntVarArray getRelaxationCostArray();
+        void initRelaxationCostArray(Home home, int size);
 };
 
 

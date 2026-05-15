@@ -13,7 +13,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     FirstSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV) /// super constructor. Applies all rules for the first species to the 1st note of each measure
 {
     /// Second species notes in the counterpoint
-    secondSpeciesNotesCp = IntVarArray(home, (nMeasures*notesPerMeasure.at(SECOND_SPECIES))-1, IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+    secondSpeciesNotesCp = IntVarArray(home, (nMeasures*notesPerMeasure.at(SECOND_SPECIES))-1, IntSet(IntArgs(domain)));
     if(borrowMode==1){
         secondSpeciesNotesCp[secondSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     }
@@ -113,7 +113,11 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
 
     // 2.H2 : Arsis harmonies cannot be dissonant except if there is a diminution.
     if (activeConstraints[SP2_2H2]) {
-        H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
+        if (softConstraints[SP2_2H2]) {
+            H2_2_arsisHarmoniesCannotBeDisonnant_soft(home, this);
+        } else {
+            H2_2_arsisHarmoniesCannotBeDisonnant(home, this);
+        }
     }
     
     //2.M1
@@ -130,7 +134,7 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     if (activeConstraints[SP1_1M2_2V]) {
         for (size_t i = 0; i < secondSpeciesMelodicIntervals.size(); i++)
         {
-            rel(home, (secondSpeciesMelodicIntervals[i] <= 8) || (secondSpeciesMelodicIntervals[i] == 12));
+            rel(home, (abs(secondSpeciesMelodicIntervals[i]) <= 8) || (abs(secondSpeciesMelodicIntervals[i]) == 12)); // can be negative !!
         }
         
     }
@@ -149,8 +153,10 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     , vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV) :
     SecondSpeciesCounterpoint(home, size, cf, lb, ub, SECOND_SPECIES, low, c, v_type, m_costs, g_costs, s_costs, bm, nV)
 {
-    costs = IntVarArray(home, 6, 0, 1000000);
-    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult"};
+    varietyCostArray = IntVarArray(home, 3*(secondSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 7, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "penult", "variety"};
 
     // 2.H3 : penult cost
     if (activeConstraints[SP2_2H3_2V]) {
@@ -180,6 +186,8 @@ SecondSpeciesCounterpoint::SecondSpeciesCounterpoint(Home home, int size, vector
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(SECOND_SPECIES), offCostArray.size())), costs);
     //set cost[5] to be penult sixth cost
     add_cost(home, 5, penultCostArray, costs);
+    //set cost[6] to be variety cost
+    add_cost(home, 6, varietyCostArray, costs);
 
 }
 

@@ -669,3 +669,111 @@ void P1_1_3v_noDirectMotionFromPerfectConsonance(Home home, Part* part){
             (part->getDirectCostArray()[j]==0));
     }
 }
+
+/* ================================================
+ *         SOFT (RELAXED) CONSTRAINT VERSIONS
+ * ================================================
+ */
+
+void G9_lastChordSameAsFundamental_soft(Home home, Stratum* lowest, Part* cantusFirmus, IntVarArray relaxCosts, int startIdx){
+    // Soft version: instead of hard equality, create BoolVar for each violation
+    // relaxCosts[startIdx] = 1 if last note pitch class doesn't match
+    // relaxCosts[startIdx+1] = 1 if first note pitch class doesn't match
+    
+    BoolVar lastMatch(home, 0, 1);
+    rel(home, expr(home, lowest->getNotes()[lowest->getNotes().size()-1]%12), IRT_EQ, 
+        expr(home, cantusFirmus->getNotes()[cantusFirmus->getNotes().size()-1]%12), Reify(lastMatch, RM_EQV));
+    // violation = !match => cost = 1 - match
+    rel(home, (lastMatch == 1) >> (relaxCosts[startIdx] == 0));
+    rel(home, (lastMatch == 0) >> (relaxCosts[startIdx] == 1));
+    
+    BoolVar firstMatch(home, 0, 1);
+    rel(home, expr(home, lowest->getNotes()[0]%12), IRT_EQ, 
+        expr(home, cantusFirmus->getNotes()[0]%12), Reify(firstMatch, RM_EQV));
+    rel(home, (firstMatch == 1) >> (relaxCosts[startIdx+1] == 0));
+    rel(home, (firstMatch == 0) >> (relaxCosts[startIdx+1] == 1));
+}
+
+void M2_2_3v_melodicIntervalsNotExceedMinorSixth_soft(Home home, vector<Part*> parts, bool containsThirdSpecies){
+    // Soft version: instead of hard IRT_NQ 0, count violations
+    for(int i = 1; i < parts.size(); i++){
+        if(parts[i]->getSpecies()==THIRD_SPECIES){
+            containsThirdSpecies=1;
+            break;
+        }
+    }
+    for(int p1 = 1; p1 < parts.size(); p1++){
+        for(int p2 = 1; p2 < parts.size(); p2++){
+            if(p1!=p2 && parts[p1]->getSpecies()==SECOND_SPECIES){
+                int nConstraints = parts[p1]->getBranchingNotes().size()-4;
+                if(containsThirdSpecies) nConstraints += 1; // +1 for the last two notes
+                parts[p1]->initRelaxationCostArray(home, nConstraints);
+                
+                int relaxIdx = 0;
+                for(int i = 0; i < (int)parts[p1]->getBranchingNotes().size()-4; i++){
+                    BoolVar isZero(home, 0, 1);
+                    rel(home, parts[p1]->getMelodicIntervals().slice(0, notesPerMeasure.at(SECOND_SPECIES), parts[p1]->getMelodicIntervals().size())[i], 
+                        IRT_EQ, 0, Reify(isZero, RM_EQV));
+                    // violation when interval == 0
+                    rel(home, (isZero == 1) >> (parts[p1]->getRelaxationCostArray()[relaxIdx] == 1));
+                    rel(home, (isZero == 0) >> (parts[p1]->getRelaxationCostArray()[relaxIdx] == 0));
+                    relaxIdx++;
+                }
+                if(containsThirdSpecies){
+                    // soft version of: last two notes must be different
+                    BoolVar lastTwoSame(home, 0, 1);
+                    rel(home, parts[p1]->getBranchingNotes()[parts[p1]->getBranchingNotes().size()-2], IRT_EQ, 
+                        parts[p1]->getBranchingNotes()[parts[p1]->getBranchingNotes().size()-1], Reify(lastTwoSame, RM_EQV));
+                    rel(home, (lastTwoSame == 1) >> (parts[p1]->getRelaxationCostArray()[relaxIdx] == 1));
+                    rel(home, (lastTwoSame == 0) >> (parts[p1]->getRelaxationCostArray()[relaxIdx] == 0));
+                    relaxIdx++;
+                }
+            }
+        }
+    }
+}
+
+void H2_3_disonanceImpliesDiminution_soft(Home home, Part* part){
+    // Soft version: instead of hard BOT_OR = 1, count violations
+    int nConstraints = part->getIsDiminution().size();
+    part->initRelaxationCostArray(home, nConstraints);
+    
+    for(int i = 0; i < part->getIsDiminution().size(); i++){
+        // Original hard: consonance[(i*4)+2] OR isDiminution[i] == 1
+        // Soft: if neither consonant nor diminution => violation = 1
+        BoolVar ok(home, 0, 1);
+        rel(home, part->getConsonance()[(i*4)+2], BOT_OR, part->getIsDiminution()[i], ok);
+        rel(home, (ok == 1) >> (part->getRelaxationCostArray()[i] == 0));
+        rel(home, (ok == 0) >> (part->getRelaxationCostArray()[i] == 1));
+    }
+}
+
+void H2_2_arsisHarmoniesCannotBeDisonnant_soft(Home home, Part* part){
+    // Soft version: instead of hard reify RM_PMI, count violations when arsis is dissonant and not diminution
+    int nConstraints = 0;
+    for(int i = 0; i < part->getNMeasures()-1; i++){
+        if(i != part->getNMeasures()-2) nConstraints++;
+    }
+    part->initRelaxationCostArray(home, nConstraints);
+    
+    int relaxIdx = 0;
+    for(int i = 0; i < part->getNMeasures()-1; i++){
+        if(i != part->getNMeasures()-2){
+            // Original uses multiple rel() with RM_PMI per dissonance
+            // Soft: check if arsis is dissonant and not matched by diminution => violation
+            // We reify the original constraint: consonance at arsis OR isDiminution
+            // If not consonant at arsis AND not diminution => violation
+            BoolVar arsisConsonant(home, 0, 1);
+            dom(home, part->getHIntervals()[(i*4)+2], 
+                IntSet({UNISSON, MINOR_THIRD, MAJOR_THIRD, PERFECT_FIFTH, MINOR_SIXTH, MAJOR_SIXTH, PERFECT_OCTAVE,
+                    -MINOR_THIRD, -MAJOR_THIRD, -PERFECT_FIFTH, -MINOR_SIXTH, -MAJOR_SIXTH, -PERFECT_OCTAVE}), 
+                arsisConsonant);
+            // ok = consonant OR diminution
+            BoolVar ok(home, 0, 1);
+            rel(home, arsisConsonant, BOT_OR, part->getIsDiminution()[i], ok);
+            rel(home, (ok == 1) >> (part->getRelaxationCostArray()[relaxIdx] == 0));
+            rel(home, (ok == 0) >> (part->getRelaxationCostArray()[relaxIdx] == 1));
+            relaxIdx++;
+        }
+    }
+}

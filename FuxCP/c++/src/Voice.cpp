@@ -22,7 +22,7 @@ Voice::Voice(Home home, int nMes, int lb, int ub){
 
 string Voice::to_string() const {
     string text = "voice : ";
-    text += "VOICE TOSTRING NOT IMPLEMENTED YET";
+    text += "VOICE TO STRING NOT IMPLEMENTED YET";
     text += "\n";
     return text;
 }

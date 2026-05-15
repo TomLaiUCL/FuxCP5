@@ -30,7 +30,7 @@ public:
      * @param ub the highest note possible for the counterpoint in MIDI
      */
     ThreeVoiceCounterpoint(vector<int> cf, vector<Species> sp, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, 
-        vector<int> s_costs, vector<int> imp, int bm);
+        vector<int> s_costs, vector<int> imp, int bm, ObjectiveMode objMode = OBJECTIVE_LEX);
 
     ThreeVoiceCounterpoint(ThreeVoiceCounterpoint& s);
     IntLexMinimizeSpace* copy() override; 

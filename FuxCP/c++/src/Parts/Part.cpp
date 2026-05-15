@@ -18,7 +18,21 @@ Part::Part(Home home, int nMes, Species sp, vector<int> cf, int lb, int ub, int 
     isHighest          = BoolVarArray(home, nMeasures, 0, 1);
 
     borrowed_scale = get_all_notes_from_scale(cf[0]%12, BORROWED_SCALE);
-    scale = get_all_notes_from_scale(cf[0]%12, MAJOR_SCALE);
+    // Détection automatique de la gamme à partir du cantus firmus complet, plutôt
+    // que de toujours imposer MAJOR_SCALE. La première note donne la tonique et
+    // l'ensemble des notes du CF permet d'identifier le mode (Ionien, Dorien,
+    // Phrygien, Lydien, Mixolydien, Aeolien, Locrien, mineur harmonique, mineur
+    // mélodique). En cas d'ambiguïté on retient la gamme la plus générale.
+    vector<int> detected_scale = detect_scale_for_cf(cf);
+    scale = get_all_notes_from_scale(cf[0]%12, detected_scale);
+    // Afficher la gamme une seule fois (pas une fois par Part créée)
+    static bool scale_printed = false;
+    if (!scale_printed) {
+        cout << "[Part] Cantus firmus -> gamme détectée : "
+             << detect_scale_name_for_cf(cf) << " (tonique = "
+             << noteNames[((cf[0] % 12) + 12) % 12] << ")" << endl;
+        scale_printed = true;
+    }
     chromatic_scale = get_all_notes_from_scale(cf[0]%12, CHROMATIC_SCALE);
     cp_range = {};
 
@@ -76,7 +90,7 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     
     cp_range = s.cp_range;
 
-    extended_domain = s.extended_domain;
+    domain = s.domain;
     off_domain = s.off_domain;
 
     secondCost = s.secondCost;
@@ -149,6 +163,8 @@ Part::Part(Home home, Part& s) : Voice(home, s) {
     speciesArray.update(home, s.speciesArray);
 
     toCombineCosts.update(home, s.toCombineCosts);
+
+    relaxationCostArray.update(home, s.relaxationCostArray);
 }
 
 // Virtual clone function
@@ -255,6 +271,14 @@ void Part::add_toCombineCost(Home home, int idx, IntVarArray to_be_added, IntVar
     rel(home, costs[idx], IRT_EQ, expr(home, sum(args)));
 }
 
+IntVarArray Part::getRelaxationCostArray(){
+    return relaxationCostArray;
+}
+
+void Part::initRelaxationCostArray(Home home, int size){
+    relaxationCostArray = IntVarArray(home, size, 0, 1);
+}
+
 BoolVarArray Part::getIsNotLowest(){
     return isNotLowest;
 }
@@ -307,8 +331,8 @@ vector<int> Part::getOffDomain(){
     return off_domain;
 }
 
-vector<int> Part::getExtendedDomain(){
-    return extended_domain;
+vector<int> Part::getDomain(){
+    return domain;
 }
 
 IntVarArray Part::getOffCostArray(){

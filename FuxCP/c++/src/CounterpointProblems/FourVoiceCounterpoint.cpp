@@ -4,10 +4,11 @@
 
 #include "../../headers/CounterpointProblems/FourVoiceCounterpoint.hpp"
 #include "../../headers/CounterpointUtils.hpp"
+#include <algorithm>
 
 FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp, vector<int> v_type, vector<int> m_costs, vector<int> g_costs, 
-        vector<int> s_costs, vector<int> imp, int bm):
-    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, FOUR_VOICES)
+        vector<int> s_costs, vector<int> imp, int bm, ObjectiveMode objMode):
+    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, FOUR_VOICES, objMode)
 {
     species = sp;
 
@@ -49,7 +50,12 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 
     // 1.H4 (G9) last chord must have the same fundamental as the cf (used throughout the composition)
     if (activeConstraints[V4_1H4]) {
-        G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+        if (softConstraints[V4_1H4]) {
+            problemRelaxationCosts = IntVarArray(*this, 2, 0, 1);
+            G9_lastChordSameAsFundamental_soft(*this, lowest, cantusFirmus, problemRelaxationCosts, 0);
+        } else {
+            G9_lastChordSameAsFundamental(*this, lowest, cantusFirmus);
+        }
     }
 
     //H8 : harmonic triads are preferred, adapted for 4 voices
@@ -83,7 +89,11 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
 
     //2.M2, have to write it here since it has a weird interaction with the third species
     if (activeConstraints[V4_2M2]) {
-        M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
+        if (softConstraints[V4_2M2]) {
+            M2_2_3v_melodicIntervalsNotExceedMinorSixth_soft(*this, parts, containsThirdSpecies);
+        } else {
+            M2_2_3v_melodicIntervalsNotExceedMinorSixth(*this, parts, containsThirdSpecies);
+        }
     }
 
     //two fifth species counterpoints should be as different as possible
@@ -104,6 +114,9 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
     
     uniteCounterpoints();
     uniteCosts();
+
+    // Collect relaxation costs from all parts and sum them
+    uniteRelaxationCosts();
 
     // compute combined costs
     computeCombinedCosts();
@@ -155,7 +168,25 @@ FourVoiceCounterpoint::FourVoiceCounterpoint(vector<int> cf, vector<Species> sp,
         branch(*this, counterpoint_3->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
     
-    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    // Branch on counterpoints in order of increasing complexity (fewer notes first)
+    // This allows simpler voices to constrain the search space before complex ones
+    vector<pair<int, Part*>> voicesBySize = {
+        {counterpoint_1->getBranchingNotes().size(), counterpoint_1},
+        {counterpoint_2->getBranchingNotes().size(), counterpoint_2},
+        {counterpoint_3->getBranchingNotes().size(), counterpoint_3}
+    };
+    // Sort by size (ascending order - simplest first)
+    std::sort(voicesBySize.begin(), voicesBySize.end(), 
+        [](const pair<int, Part*>& a, const pair<int, Part*>& b) {
+            return a.first < b.first;
+        });
+    
+    // Branch on each voice in order of complexity
+    for(const auto& voice : voicesBySize) {
+        branch(*this, voice.second->getBranchingNotes(), INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    }
+    
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
     // cout << "HERE" << endl;
 }
 
@@ -240,9 +271,10 @@ void FourVoiceCounterpoint::uniteCosts(){
                     sz++;
                 }
             }
-            //if it is not present in any counterpoint -> leave it empty
+            //if it is not present in any counterpoint -> DONT leave it empty
             if(!cp1_contains && !cp2_contains && !cp3_contains){
-                unitedCostNames.push_back("NOT ADDED");
+                rel(*this, unitedCosts[i], IRT_EQ, 0);
+                //unitedCostNames.push_back("NOT ADDED");
             } else { //else -> add the costs together for that entry
                 unitedCostNames.push_back(name);
                 //adds the cost to the IntVarArgs

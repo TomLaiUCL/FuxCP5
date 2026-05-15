@@ -14,8 +14,8 @@
  * @param ub the highest note possible for the counterpoint in MIDI
  */
 ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> sp, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
-    vector<int> s_costs, vector<int> imp, int bm) :
-    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES){
+    vector<int> s_costs, vector<int> imp, int bm, ObjectiveMode objMode) :
+    CounterpointProblem(cf, -1, m_costs, g_costs, s_costs, imp, THREE_VOICES, objMode){
     species = sp;
     
     //initialize upper strata
@@ -152,6 +152,7 @@ ThreeVoiceCounterpoint::ThreeVoiceCounterpoint(vector<int> cf, vector<Species> s
     }
     
     branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MIN()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
 
     writeToLogFile(("solution array size : " + std::to_string(solutionArray.size())).c_str());
 
@@ -230,9 +231,10 @@ void ThreeVoiceCounterpoint::uniteCosts(){
                     sz++;
                 }
             }
-            //if the cost is present in no counterpoint -> add a specific name to the array containing all present cost names
+            //if the cost is present in no counterpoint -> DONT leave it empty
             if(!cp1_contains && !cp2_contains){
-                unitedCostNames.push_back("NOT ADDED");
+                //unitedCostNames.push_back("NOT ADDED");
+                rel(*this, unitedCosts[i], IRT_EQ, 0);
             } else {
                 //if it is in either counterpoint -> add the cost
                 unitedCostNames.push_back(name);

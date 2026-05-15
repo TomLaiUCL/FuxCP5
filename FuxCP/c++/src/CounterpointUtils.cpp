@@ -89,18 +89,18 @@ Part* create_counterpoint(Home home, int species, int nMeasures, vector<int> can
 
 
 CounterpointProblem* create_problem(vector<int> cf, vector<Species> spList, vector<int> v_type, vector<int> m_costs, vector<int> g_costs,
-    vector<int> s_costs, vector<int> imp, int bm){
+    vector<int> s_costs, vector<int> imp, int bm, ObjectiveMode objMode){
 
     switch (spList.size())
     {
     case 1:
-        return new TwoVoiceCounterpoint(cf, spList[0], v_type[0], m_costs, g_costs, s_costs, imp, bm);
+        return new TwoVoiceCounterpoint(cf, spList[0], v_type[0], m_costs, g_costs, s_costs, imp, bm, objMode);
         break;
     case 2: 
-        return new ThreeVoiceCounterpoint(cf, spList, v_type, m_costs, g_costs, s_costs, imp, bm); 
+        return new ThreeVoiceCounterpoint(cf, spList, v_type, m_costs, g_costs, s_costs, imp, bm, objMode); 
         break;
     case 3:
-        return new FourVoiceCounterpoint(cf, spList, v_type, m_costs, g_costs, s_costs, imp, bm); 
+        return new FourVoiceCounterpoint(cf, spList, v_type, m_costs, g_costs, s_costs, imp, bm, objMode); 
         break;
     default:
         throw std::invalid_argument("The number of voices you asked for is not implemented (yet).");

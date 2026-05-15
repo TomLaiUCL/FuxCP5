@@ -1,0 +1,25 @@
+# Registre des cantus firmus disponibles. Source unique de vérité.
+#
+# Colonnes :
+#   id          : identifiant entier (1..6)
+#   notes       : notes MIDI séparées par des espaces (toute la liste dans une seule cellule)
+#   name        : libellé court affiché dans la CLI et utilisé comme étiquette
+#   scale       : indicateur (informatif) de la gamme attendue
+#                 Note : la gamme effective est toujours détectée automatiquement
+#                 par le moteur (detect_scale_for_cf), cette colonne sert uniquement
+#                 d'aide au choix du CF dans la CLI.
+#   description : commentaire libre
+#
+# Sélection : 6 CF de référence couvrant les six modes principaux.
+# Convention de saisie utilisée :
+#   - sans suffixe = octave de base de la clé de sol (do=60, ré=62, ..., si=71)
+#   - suffixe 2    = octave en dessous (la2=57, si2=59, sol2=55)
+#   - suffixe 3    = meme octave que sans suffixe (do3=60, la3=69), notation alternative
+id,notes,name,scale,description
+1,62 65 64 62 67 65 69 67 65 64 62,Re Dorien,Dorien,CF 11 notes mode dorien sur re
+2,64 60 62 60 57 69 67 64 65 64,Mi Phrygien,Phrygien,CF 10 notes mode phrygien sur mi (cadence phrygienne fa vers mi)
+3,65 67 69 65 62 64 65 60 69 65 67 65,Fa Lydien,Lydien,CF 12 notes mode lydien sur fa (triton fa-si gestion musica ficta)
+4,55 60 59 55 60 64 62 67 64 60 62 59 57 55,Sol Mixolydien,Mixolydien,CF 14 notes mode mixolydien sur sol
+5,57 60 59 62 60 64 65 64 62 60 59 57,La Eolien,Mineur naturel,CF 12 notes mode eolien sur la (mineur naturel)
+6,60 64 65 67 64 69 67 64 65 64 62 60,Do Ionien,Majeur,CF 12 notes mode ionien sur do (majeur moderne)
+7,60 62 65 64 67 65 64 62 60,Do Reference Court,Majeur,CF 9 notes reference utilisateur (do re fa mi sol fa mi re do)

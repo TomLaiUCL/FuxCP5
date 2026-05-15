@@ -1,0 +1,36 @@
+# Campagnes de génération prédéfinies (référencent les CF 1..6 de cantus_firmus.csv).
+#
+# Chaque ligne = UNE configuration ; une campagne regroupe plusieurs lignes par campaign_id.
+#
+# Colonnes :
+#   campaign_id    : identifiant de la campagne
+#   cf_ids         : ids CF séparés par + (ex: 1+2+3)
+#   n_voices       : 2, 3 ou 4
+#   species        : espèces de contrepoint séparées par + (sans le CF, qui est en 1ère position)
+#                    Pour 2v : "X" (ex "5"). Pour 3v : "X+Y". Pour 4v : "X+Y+Z"
+#   v_types        : v_types des voix de contrepoint séparés par + (vide = défauts)
+#   preset         : nom du preset (cf presets.csv)
+#   timeout_ms     : timeout total maximal
+#   stagnation_ms  : timeout sans amélioration (0 = désactivé)
+#   output_subdir  : sous-dossier de FuxCP/results/ où ranger les sorties
+#   description    : texte libre (pas de virgule)
+campaign_id,cf_ids,n_voices,species,v_types,preset,timeout_ms,stagnation_ms,output_subdir,description
+demo_rapide,1,2,1,,default,30000,15000,demo,Demo rapide 30s sur CF1
+courts_2v,1+2+3,2,1,,default,180000,60000,courts/2v,CF courts 2v 1ere espece
+courts_2v,1+2+3,2,2,,default,180000,60000,courts/2v,CF courts 2v 2e espece
+courts_2v,1+2+3,2,3,,default,180000,60000,courts/2v,CF courts 2v 3e espece
+courts_2v,1+2+3,2,4,,default,180000,60000,courts/2v,CF courts 2v 4e espece
+courts_2v,1+2+3,2,5,,default,180000,60000,courts/2v,CF courts 2v 5e espece
+longs_2v,4+5+6,2,1,,default,300000,120000,longs/2v,CF longs 2v 1ere espece
+longs_2v,4+5+6,2,2,,default,300000,120000,longs/2v,CF longs 2v 2e espece
+longs_2v,4+5+6,2,3,,default,300000,120000,longs/2v,CF longs 2v 3e espece
+longs_2v,4+5+6,2,4,,default,300000,120000,longs/2v,CF longs 2v 4e espece
+longs_2v,4+5+6,2,5,,default,300000,120000,longs/2v,CF longs 2v 5e espece
+gammes_3v,1+2+3+4+5+6,3,1+1,,default,300000,120000,gammes/3v,Toutes gammes 3v cible 1
+gammes_3v,1+2+3+4+5+6,3,1+2,,default,300000,120000,gammes/3v,Toutes gammes 3v cible 2
+gammes_3v,1+2+3+4+5+6,3,1+3,,default,300000,120000,gammes/3v,Toutes gammes 3v cible 3
+gammes_3v,1+2+3+4+5+6,3,1+4,,default,300000,120000,gammes/3v,Toutes gammes 3v cible 4
+gammes_3v,1+2+3+4+5+6,3,1+5,,default,300000,120000,gammes/3v,Toutes gammes 3v cible 5
+gammes_4v,1+2+3+4+5+6,4,1+1+1,,default,300000,120000,gammes/4v,Toutes gammes 4v cible 1
+gammes_4v,1+2+3+4+5+6,4,1+1+3,,default,300000,120000,gammes/4v,Toutes gammes 4v cible 3
+gammes_4v,1+2+3+4+5+6,4,1+1+5,,default,300000,120000,gammes/4v,Toutes gammes 4v cible 5

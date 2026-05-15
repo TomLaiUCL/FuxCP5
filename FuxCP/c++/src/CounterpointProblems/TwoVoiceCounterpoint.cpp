@@ -15,8 +15,8 @@
  * @param ub the highest note possible for the counterpoint in MIDI
  */
 TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_type, vector<int> m_costs, vector<int> g_costs, 
-    vector<int> s_costs, vector<int> imp, int bm) : 
-    CounterpointProblem(cf, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES){
+    vector<int> s_costs, vector<int> imp, int bm, ObjectiveMode objMode) : 
+    CounterpointProblem(cf, v_type, m_costs, g_costs, s_costs, imp, TWO_VOICES, objMode){
     species = sp;
     upper_1 = new Stratum(*this, nMeasures, 0, 127, lowest->getNotes()); 
     upper_2 = nullptr;
@@ -30,6 +30,12 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
     // G6 : no chromatic melodies (works for 1st, 2nd and 3rd species)
     if (activeConstraints[V2_G6]) {
         G6_noChromaticMelodies(*this, counterpoint_1, species);
+    }
+
+    // M2_1 : variety cost (penalize repeated notes in 2-voice mode)
+    {
+        vector<Part*> parts = {cantusFirmus, counterpoint_1};
+        M2_1_varietyCost(*this, parts);
     }
 
     // 1.H4 (G9)
@@ -99,10 +105,16 @@ TwoVoiceCounterpoint::TwoVoiceCounterpoint(vector<int> cf, Species sp, int v_typ
         branch(*this, counterpoint_1->getCambiataCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
     if(species==FOURTH_SPECIES || species==FIFTH_SPECIES){
-        branch(*this, counterpoint_1->getSyncopeCostArray(),  INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
+        BoolVarArray noSync = counterpoint_1->getNoSyncope(); // Branch on the tie intervals directly (faster)
+        branch(*this, noSync, BOOL_VAR_AFC_MAX(), BOOL_VAL_MIN());
+        //branch(*this, counterpoint_1->getSyncopeCostArray(), INT_VAR_DEGREE_MAX(), INT_VAL_MIN());
     }
-    branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
-    
+    //branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+    //branch(*this, solutionArray, INT_VAR_SIZE_MIN(), INT_VAL_RND(1U)); // More efficient when random
+    branch(*this, solutionArray, INT_VAR_AFC_MAX(), INT_VAL_RND(1U)); // AFC to focus a bit more on variables involved in failures
+    //branch(*this, solutionArray, INT_VAR_AFC_MAX(), INT_VAL_MIN()); // Better --> NO, too slow
+
+    branch(*this, cost(), INT_VAR_NONE(), INT_VAL_MAX()); // Solves all "ValOfUnassignedVar" problems + accelerate every test
 
 }
 // COPY CONSTRUCTOR

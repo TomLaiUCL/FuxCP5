@@ -13,7 +13,7 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
      int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, int bm, int nV):
         Part(home, nMes, mSpecies, cf, lb, ub, v_type, m_costs, g_costs, s_costs, nV, bm) { /// super constructor
     
-    motherSpecies =         mSpecies;
+    motherSpecies = mSpecies;
     for(int i = lowerBound; i <= upperBound; i++){
         cp_range.push_back(i);
     }
@@ -22,19 +22,19 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     that he does like to borrow notes, so the borrow cost should just do the job and we should still allow borrowed notes, not outright forbid them
     */
     if(borrowMode==1){
-        extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
+        domain = cp_range;
     } else {
-        extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+        domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
     }
-    off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
+    off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);  // By default, always allow some specific notes of the major mode
 
     /// First species notes in the counterpoint
-    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+    firstSpeciesNotesCp = IntVarArray(home, nMeasures * notesPerMeasure.at(FIRST_SPECIES), IntSet(IntArgs(domain)));
 
     if(borrowMode==1 && motherSpecies==FIRST_SPECIES){
         firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     } else {
-        firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+        firstSpeciesNotesCp[firstSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(domain)));
     }
 
     rel(home, firstSpeciesNotesCp, IRT_EQ, notes.slice(0,4/notesPerMeasure.at(FIRST_SPECIES),notes.size()));
@@ -201,8 +201,10 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
         P3_1_noBattuta(home, this);
     }
 
-    costs = IntVarArray(home, 5, 0, 1000000);
-    cost_names = {"fifth", "octave", "motion", "melodic", "borrow"};
+    varietyCostArray = IntVarArray(home, 3*(firstSpeciesHarmonicIntervals.size()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 6, 0, 1000000);
+    cost_names = {"fifth", "octave", "motion", "melodic", "borrow", "variety"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), fifthCostArray.size())), costs);
@@ -214,6 +216,8 @@ FirstSpeciesCounterpoint::FirstSpeciesCounterpoint(Home home, int nMes, vector<i
     add_cost(home, 3, IntVarArray(home, melodicDegreeCost.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), melodicDegreeCost.size())), costs);
     //set cost[4] to be off cost
     add_cost(home, 4, IntVarArray(home, offCostArray.slice(0, 4/notesPerMeasure.at(FIRST_SPECIES), offCostArray.size())), costs);
+    //set cost[5] to be variety cost
+    add_cost(home, 5, varietyCostArray, costs);
 }
 
 /**

@@ -176,4 +176,33 @@ void R9_5_twoFifthSpeciesDiversity_3v(Home home, Part* cp1, Part* cp2);
  */
 void noMinorSecondBetweenUpper(Home home, vector<Stratum*> strata);
 
+/* ================================================
+ *         SOFT (RELAXED) CONSTRAINT VERSIONS
+ * ================================================
+ */
+
+/**
+ * Soft version of G9: last chord same as CF fundamental.
+ * Violations counted in problemRelaxCosts (IntVarArray with 0/1 entries).
+ */
+void G9_lastChordSameAsFundamental_soft(Home home, Stratum* lowest, Part* cantusFirmus, IntVarArray relaxCosts, int startIdx);
+
+/**
+ * Soft version of M2_2_3v: melodic intervals of 2sp should not have unisons.
+ * Violations counted in the Part's relaxationCostArray.
+ */
+void M2_2_3v_melodicIntervalsNotExceedMinorSixth_soft(Home home, vector<Part*> parts, bool containsThirdSpecies);
+
+/**
+ * Soft version of H2_3: dissonance implies diminution for 3rd species.
+ * Violations counted in the Part's relaxationCostArray.
+ */
+void H2_3_disonanceImpliesDiminution_soft(Home home, Part* part);
+
+/**
+ * Soft version of H2_2: arsis harmonies dissonance for 2nd species.
+ * Violations counted in the Part's relaxationCostArray.
+ */
+void H2_2_arsisHarmoniesCannotBeDisonnant_soft(Home home, Part* part);
+
 #endif

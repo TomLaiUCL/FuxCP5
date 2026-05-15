@@ -18,13 +18,13 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
     // cout << lowerBound << endl;
     // cout << upperBound << endl;
     /*
-    if borrowMode is enabled, the extended domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
+    if borrowMode is enabled, the domain is extended to make the inclusion of borrowed notes possible. We can see from Fux's examples
     that he does like to borrow notes, so the borrow cost should just do the job and still allow borrowed notes, not outright forbid them
     */
     if(borrowMode==1){
-        extended_domain = vector_union(cp_range, vector_union(scale, borrowed_scale));
+        domain = cp_range;
     } else {
-        extended_domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale));
+        domain = vector_intersection(cp_range, vector_union(scale, borrowed_scale)); // By default, always allow some specific notes of the major mode
     }
 
     off_domain = vector_difference(vector_intersection(cp_range, scale), lowerBound, upperBound);
@@ -41,7 +41,7 @@ FifthSpeciesCounterpoint::FifthSpeciesCounterpoint(Home home, int nMes, vector<i
      */
     createSpeciesArrays(home);
 
-    fifthSpeciesNotesCp = IntVarArray(home, notes.size(), IntSet(IntArgs(vector_intersection(cp_range, extended_domain))));
+    fifthSpeciesNotesCp = IntVarArray(home, notes.size(), IntSet(IntArgs(domain)));
     if(borrowMode==1){
         fifthSpeciesNotesCp[fifthSpeciesNotesCp.size()-2] = IntVar(home, IntSet(IntArgs(vector_intersection(cp_range, chromatic_scale))));
     }
@@ -616,8 +616,10 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     }
     
 
-    costs = IntVarArray(home, 8, 0, 1000000);
-    cost_names = {"fifth", "octave", "borrow", "melodic", "motion", "cambiata", "m2", "syncopation"};
+    varietyCostArray = IntVarArray(home, 3*(fifthSpeciesHIntervals.size()-2), IntSet({0, varietyCost}));
+
+    costs = IntVarArray(home, 9, 0, 1000000);
+    cost_names = {"fifth", "octave", "borrow", "melodic", "motion", "cambiata", "m2", "syncopation", "variety"};
 
     //set cost[0] to be fifth cost
     add_cost(home, 0, IntVarArray(home, fifthCostArray.slice(0, 4/notesPerMeasure.at(FIFTH_SPECIES), fifthCostArray.size())), costs);
@@ -635,6 +637,8 @@ FifthSpeciesCounterpoint(home, nMes, cf, lb, ub, FIFTH_SPECIES, low, c, v_type, 
     add_cost(home, 6, m2ZeroCostArray, costs);
     //need to set cost[7] to be syncopation cost
     add_cost(home, 7, snycopeCostArray, costs);
+    //set cost[8] to be variety cost
+    add_cost(home, 8, varietyCostArray, costs);
 }
 
 /**

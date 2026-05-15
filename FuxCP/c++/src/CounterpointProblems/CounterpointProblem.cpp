@@ -13,11 +13,12 @@
  * @param ub the highest note possible for the counterpoint in MIDI
  */
 CounterpointProblem::CounterpointProblem(vector<int> cf, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs,
-    vector<int> imp, int nV){
+    vector<int> imp, int nV, ObjectiveMode objMode){
     nMeasures = cf.size();
     lowest = new Stratum(*this, nMeasures, 0, 127);
     cantusFirmus = new CantusFirmus(*this, nMeasures, cf, lowest, v_type, m_costs, g_costs, s_costs, nV);
     importance = imp;
+    objectiveMode = objMode;
     n_unique_costs = 0;
     importanceNames = {"borrow", "fifth", "octave", "succ", "variety", "triad", "direct", "motion", "penult", "cambiata", "triad3" ,"m2", "syncopation", "melodic"};
     
@@ -125,6 +126,13 @@ CounterpointProblem::CounterpointProblem(CounterpointProblem& s) : IntLexMinimiz
         sorted_voices[i].update(*this, s.sorted_voices[i]);
     }
     globalCost.update(*this, s.globalCost);
+    objectiveMode = s.objectiveMode;
+
+    hasRelaxation = s.hasRelaxation;
+    problemRelaxationCosts.update(*this, s.problemRelaxationCosts);
+    if(hasRelaxation){
+        totalRelaxationCost.update(*this, s.totalRelaxationCost);
+    }
 }
 
 IntLexMinimizeSpace* CounterpointProblem::copy(){   
@@ -133,7 +141,8 @@ IntLexMinimizeSpace* CounterpointProblem::copy(){
 
 void CounterpointProblem::constrain(const IntLexMinimizeSpace& _b){
 
-    const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
+    //const CounterpointProblem &b = dynamic_cast<const CounterpointProblem &>(_b);
+    IntLexMinimizeSpace::constrain(_b); // Faster, default one (the previous one was empty ?!?)
     
 }
 
@@ -169,6 +178,15 @@ void CounterpointProblem::setPreferenceMap(vector<string> importance_names){
     for(int i = 0; i < importance.size(); i++){
         prefs.insert({importance_names[i], importance[i]});
     }
+}
+
+double CounterpointProblem::getCost() const {
+    double total = 0;
+    IntVarArgs costs = cost();
+    for (int i = 0; i < costs.size(); ++i) {
+        total += costs[i].val();
+    }
+    return total;
 }
 
 void CounterpointProblem::orderCosts(){
@@ -213,8 +231,55 @@ void CounterpointProblem::orderCosts(){
         //(this eliminates all the <not assigned> values of the intvararray for costs which are not set)
         rel(*this, finalCosts[i], IRT_EQ, orderedFactors[i]);
     }
-    //globalCost is the sum of all the finalCosts
+
+    // globalCost = somme des coûts musicaux originaux (lexicographiques).
+    // Doit être posé AVANT toute réassignation de finalCosts pour TOTAL/MIXED,
+    // sinon on cree un cycle (mixCost = globalCost + lexScore puis
+    //  globalCost = sum(finalCosts) = mixCost => lexScore = 0).
     rel(*this, globalCost, IRT_EQ, expr(*this, sum(finalCosts)));
+
+    // Adapte l'objectif (la cible de minimisation BAB) selon le mode demandé.
+    // globalCost reste figé sur les coûts musicaux originaux pour le reporting.
+    if (objectiveMode == OBJECTIVE_TOTAL) {
+        IntVarArray totalCosts(*this, 1, 0, 2000000);
+        rel(*this, totalCosts[0], IRT_EQ, globalCost);
+        finalCosts = totalCosts;
+    } else if (objectiveMode == OBJECTIVE_MIXED) {
+        // Score lexicographique pondéré (priorités fortes avec poids plus élevés)
+        IntVarArgs lexArgs(n_unique_costs);
+        IntArgs weights(n_unique_costs);
+        for(int i = 0; i < n_unique_costs; i++){
+            lexArgs[i] = orderedFactors[i];
+            weights[i] = n_unique_costs - i;
+        }
+        IntVar lexScore(*this, 0, 2000000);
+        linear(*this, weights, lexArgs, IRT_EQ, lexScore);
+
+        IntVar mixCost(*this, 0, 4000000);
+        IntArgs mixWeights(2);
+        mixWeights[0] = 1;
+        mixWeights[1] = 1;
+        IntVarArgs mixVars(2);
+        mixVars[0] = globalCost;
+        mixVars[1] = lexScore;
+        linear(*this, mixWeights, mixVars, IRT_EQ, mixCost);
+
+        IntVarArray mixedCosts(*this, 1, 0, 4000000);
+        rel(*this, mixedCosts[0], IRT_EQ, mixCost);
+        finalCosts = mixedCosts;
+    }
+
+    // If relaxation costs exist, prepend totalRelaxationCost as highest priority
+    if(hasRelaxation){
+        IntVarArray newFinalCosts(*this, finalCosts.size() + 1, 0, 1000000);
+        // First element: relaxation cost (highest lex priority)
+        rel(*this, newFinalCosts[0], IRT_EQ, totalRelaxationCost);
+        // Rest: original costs
+        for(int i = 0; i < finalCosts.size(); i++){
+            rel(*this, newFinalCosts[i+1], IRT_EQ, finalCosts[i]);
+        }
+        finalCosts = newFinalCosts;
+    }
 }
 
 
@@ -247,6 +312,16 @@ void CounterpointProblem::setStrata(){
         measures_order.push_back(IntVarArray(*this, nVoices, 0, nVoices-1));
         sorted_voices.push_back(IntVarArray(*this, nVoices, 0, 127));
         sorted(*this, voices, sorted_voices[i], measures_order[i]);
+
+        // ---- Tie-breaker: if two voices have same pitch, enforce deterministic order
+        for (int a = 0; a < nVoices; ++a) {
+            for (int b = a + 1; b < nVoices; ++b) {
+                BoolVar eq(*this, 0, 1);
+                rel(*this, voices[a], IRT_EQ, voices[b], Reify(eq, RM_EQV));
+                // If equal pitch, force order[a] < order[b] (priority: smaller index wins)
+                rel(*this, eq >> (measures_order[i][a] < measures_order[i][b]));
+            }
+        }
 
         // Set stratum constraints for each position in the measure
         int maxPos = (i == size-1) ? 1 : 4;  // Only set first position for last measure
@@ -923,9 +998,9 @@ int* CounterpointProblem::get_species_array_5sp(int ctp_index){
 
 int* CounterpointProblem::get_extended_cp_domain(int ctp_index){
     vector<int> ext_cp_dom;
-    if(ctp_index == 0) ext_cp_dom = counterpoint_1->getExtendedDomain();
-    else if(ctp_index == 1) ext_cp_dom = counterpoint_2->getExtendedDomain();
-    else if(ctp_index == 2) ext_cp_dom = counterpoint_3->getExtendedDomain();
+    if(ctp_index == 0) ext_cp_dom = counterpoint_1->getDomain();
+    else if(ctp_index == 1) ext_cp_dom = counterpoint_2->getDomain();
+    else if(ctp_index == 2) ext_cp_dom = counterpoint_3->getDomain();
     else{
         writeToLogFile("invalid value of ctp_index given as argument to get_extended_cp_domain");
         return nullptr;
@@ -943,9 +1018,9 @@ int* CounterpointProblem::get_extended_cp_domain(int ctp_index){
 
 int CounterpointProblem::get_ext_cp_domain_size(int ctp_index){
     int cpDomSize;
-    if(ctp_index == 0) cpDomSize = counterpoint_1->getExtendedDomain().size();
-    else if(ctp_index == 1) cpDomSize = counterpoint_2->getExtendedDomain().size();
-    else if(ctp_index == 2) cpDomSize = counterpoint_3->getExtendedDomain().size();
+    if(ctp_index == 0) cpDomSize = counterpoint_1->getDomain().size();
+    else if(ctp_index == 1) cpDomSize = counterpoint_2->getDomain().size();
+    else if(ctp_index == 2) cpDomSize = counterpoint_3->getDomain().size();
     else{
         writeToLogFile("invalid value of ctp_index given as argument to get_extended_cp_domain");
         return -1;
@@ -1081,4 +1156,57 @@ void CounterpointProblem::computeCombinedCosts(){
         // sum the costs
         rel(*this, combinedCosts[i], IRT_EQ, expr(*this, sum(to_combined)));
     }
+}
+
+void CounterpointProblem::uniteRelaxationCosts(){
+    // Collect relaxation cost arrays from all parts
+    int totalSize = 0;
+    
+    if(cantusFirmus && cantusFirmus->getRelaxationCostArray().size() > 0)
+        totalSize += cantusFirmus->getRelaxationCostArray().size();
+    if(counterpoint_1 && counterpoint_1->getRelaxationCostArray().size() > 0)
+        totalSize += counterpoint_1->getRelaxationCostArray().size();
+    if(counterpoint_2 && counterpoint_2->getRelaxationCostArray().size() > 0)
+        totalSize += counterpoint_2->getRelaxationCostArray().size();
+    if(counterpoint_3 && counterpoint_3->getRelaxationCostArray().size() > 0)
+        totalSize += counterpoint_3->getRelaxationCostArray().size();
+    
+    // Add problem-level relaxation costs
+    totalSize += problemRelaxationCosts.size();
+
+    if(totalSize == 0){
+        // No relaxation costs — totalRelaxationCost stays uninitialized
+        return;
+    }
+    
+    IntVarArgs allRelax(totalSize);
+    int idx = 0;
+    
+    if(cantusFirmus && cantusFirmus->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < cantusFirmus->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = cantusFirmus->getRelaxationCostArray()[i];
+        }
+    }
+    if(counterpoint_1 && counterpoint_1->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < counterpoint_1->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = counterpoint_1->getRelaxationCostArray()[i];
+        }
+    }
+    if(counterpoint_2 && counterpoint_2->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < counterpoint_2->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = counterpoint_2->getRelaxationCostArray()[i];
+        }
+    }
+    if(counterpoint_3 && counterpoint_3->getRelaxationCostArray().size() > 0){
+        for(int i = 0; i < counterpoint_3->getRelaxationCostArray().size(); i++){
+            allRelax[idx++] = counterpoint_3->getRelaxationCostArray()[i];
+        }
+    }
+    for(int i = 0; i < problemRelaxationCosts.size(); i++){
+        allRelax[idx++] = problemRelaxationCosts[i];
+    }
+    
+    // Sum all relaxation costs into totalRelaxationCost
+    totalRelaxationCost = IntVar(*this, 0, totalSize);
+    rel(*this, totalRelaxationCost, IRT_EQ, expr(*this, sum(allRelax)));
 }

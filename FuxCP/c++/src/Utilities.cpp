@@ -6,6 +6,7 @@
 #include "../headers/Utilities.hpp"
 
 vector<bool> activeConstraints = std::vector<bool>(consSize, false);
+vector<bool> softConstraints = std::vector<bool>(consSize, false);
 
 string get_constraint_name(int constraint) {
     if (constraint < 0 || constraint >= constraintNames.size()) {
@@ -45,6 +46,80 @@ vector<int> get_all_notes_from_interval_loop(int n, vector<int> intervals)
 vector<int> get_all_notes_from_scale(int root, vector<int> scale)
 {
     return get_all_notes_from_interval_loop(root, scale);
+}
+
+
+// Liste des gammes candidates pour la détection automatique.
+// Les noms affichés utilisent "Majeur" / "Mineur" (au lieu d'Ionien/Aeolien)
+// pour la lisibilité utilisateur. Les pentatoniques et blues sont incluses.
+static const vector<pair<string, vector<int>>> SCALE_CANDIDATES = {
+    {"Majeur",                MAJOR_SCALE},        // = Ionien
+    {"Mineur naturel",        AEOLIAN_SCALE},      // = mineur naturel
+    {"Dorien",                DORIAN_SCALE},
+    {"Mixolydien",            MIXOLYDIAN_SCALE},
+    {"Lydien",                LYDIAN_SCALE},
+    {"Phrygien",              PHRYGIAN_SCALE},
+    {"Locrien",               LOCRIAN_SCALE},
+    {"Mineur harmonique",     HARMONIC_MINOR_SCALE},
+    {"Mineur mélodique",      MELODIC_MINOR_SCALE},
+    {"Pentatonique majeure",  PENTATONIC_MAJOR_SCALE},
+    {"Pentatonique mineure",  PENTATONIC_MINOR_SCALE},
+    {"Blues majeure",         BLUES_MAJOR_SCALE},
+    {"Blues mineure",         BLUES_MINOR_SCALE}
+};
+
+static pair<string, vector<int>> detect_scale_pair(const vector<int>& cf) {
+    if (cf.empty()) {
+        return {"Majeur [fallback CF vide]", MAJOR_SCALE};
+    }
+    int root = ((cf[0] % 12) + 12) % 12;
+
+    // Classes de hauteurs présentes dans le CF
+    set<int> cf_pcs;
+    for (int n : cf) cf_pcs.insert(((n % 12) + 12) % 12);
+
+    // On cherche la gamme qui couvre le plus grand nombre de notes du CF.
+    // En cas d'égalité on garde la première candidate (= la plus générale).
+    int best_covered = -1;
+    int best_idx = -1;
+    for (size_t i = 0; i < SCALE_CANDIDATES.size(); ++i) {
+        set<int> scale_pcs;
+        int cur = root;
+        scale_pcs.insert(cur);
+        for (int step : SCALE_CANDIDATES[i].second) {
+            cur = (cur + step) % 12;
+            scale_pcs.insert(cur);
+        }
+        int covered = 0;
+        for (int pc : cf_pcs) {
+            if (scale_pcs.find(pc) != scale_pcs.end()) ++covered;
+        }
+        if (covered > best_covered) {
+            best_covered = covered;
+            best_idx = static_cast<int>(i);
+            if (covered == static_cast<int>(cf_pcs.size())) {
+                // couverture parfaite : on s'arrête (gamme la plus générale qui couvre tout)
+                break;
+            }
+        }
+    }
+    if (best_idx < 0) {
+        return {"Majeur [fallback]", MAJOR_SCALE};
+    }
+    auto chosen = SCALE_CANDIDATES[best_idx];
+    if (best_covered < static_cast<int>(cf_pcs.size())) {
+        chosen.first += " [couverture partielle " + std::to_string(best_covered)
+                      + "/" + std::to_string(cf_pcs.size()) + "]";
+    }
+    return chosen;
+}
+
+vector<int> detect_scale_for_cf(const vector<int>& cf) {
+    return detect_scale_pair(cf).second;
+}
+
+string detect_scale_name_for_cf(const vector<int>& cf) {
+    return detect_scale_pair(cf).first;
 }
 
 /**
@@ -88,6 +163,18 @@ string int_vector_to_string(vector<int> vector){
             s += " , ";
     }
     return s;
+}
+
+/**
+ * Transforms an IntVarArray into a string, with values separated by a space (for csv utilisation)
+ * @param array IntVarArray
+ * @return string the string representation of the vector
+ */
+string int_var_array_to_string(IntVarArray array){
+    ostringstream oss;
+    oss << array;
+    string my_str = oss.str();
+    return my_str.substr(1,my_str.size()-2);
 }
 
 /**

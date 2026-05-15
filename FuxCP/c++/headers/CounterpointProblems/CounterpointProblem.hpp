@@ -16,6 +16,13 @@ enum {
     bab_solver, //1
 };
 
+/** Modes d'optimisation des coûts */
+enum ObjectiveMode {
+    OBJECTIVE_LEX,   // ordre lexicographique (actuel)
+    OBJECTIVE_TOTAL, // somme globale des coûts
+    OBJECTIVE_MIXED  // mix somme + priorité lexicographique pondérée
+};
+
 
 /**
  * This (abstract) class gives a general model for a counterpoint problem. 
@@ -49,9 +56,14 @@ protected:
     vector<vector<string>> costLevels;
 
     IntVar globalCost;
+    ObjectiveMode objectiveMode = OBJECTIVE_LEX;
     // vector<int> species;        /// the species of the counterpoint to generate
 
     IntVarArray combinedCosts;
+
+    IntVarArray problemRelaxationCosts;
+    IntVar totalRelaxationCost;
+    bool hasRelaxation = false;
 
 public:
     /**
@@ -61,12 +73,16 @@ public:
      * @param lb the lowest note possible for the counterpoints in MIDI
      * @param ub the highest note possible for the counterpoints in MIDI
      */
-    CounterpointProblem(vector<int> cf, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, vector<int> imp, int nV);
+    CounterpointProblem(vector<int> cf, int v_type, vector<int> m_costs, vector<int> g_costs, vector<int> s_costs, vector<int> imp, int nV,
+        ObjectiveMode objMode = OBJECTIVE_LEX);
 
     CounterpointProblem(CounterpointProblem& s);
     virtual IntLexMinimizeSpace* copy(); 
 
     virtual string to_string() const;  
+
+    double getCost() const;
+
 
     /**
      * Constrain method for bab search
@@ -125,6 +141,9 @@ public:
 
     IntVarArray get_combinedCosts(){ return combinedCosts; }
     void computeCombinedCosts();
+
+    void uniteRelaxationCosts();
+    IntVarArray getProblemRelaxationCosts(){ return problemRelaxationCosts; }
 };
 
 
